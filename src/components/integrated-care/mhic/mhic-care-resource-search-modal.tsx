@@ -1,17 +1,18 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useRevalidator } from 'react-router-dom';
 import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
-
-import { MhicPageHeader } from './mhic-page-header';
+import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, PatientOrderModel, PlaceModel } from '@/lib/models';
+import { careResourceService } from '@/lib/services';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
+import { MhicPageHeader } from '@/components/integrated-care/mhic/mhic-page-header';
 import InputHelperSearch from '@/components/input-helper-search';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
-import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, PatientOrderModel, PlaceModel } from '@/lib/models';
-import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { PreviewCanvas } from '@/components/preview-canvas';
-import { careResourceService } from '@/lib/services';
-import useHandleError from '@/hooks/use-handle-error';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
-import { MhicCareResourceLocationDetails } from './mhic-care-resource-location-details';
+import { MhicCareResourceLocationDetails } from '@/components/integrated-care/mhic/mhic-care-resource-location-details';
 import MegaFilter, {
 	Filter,
 	FILTER_TYPE,
@@ -20,7 +21,7 @@ import MegaFilter, {
 	megaFilterValueAsSearchParams,
 } from '@/components/mega-filter';
 import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
-import { useRevalidator } from 'react-router-dom';
+import useAccount from '@/hooks/use-account';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -76,6 +77,8 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	const [placesOptions, setPlacesOptions] = useState<PlaceModel[]>([]);
 	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
 	const revalidator = useRevalidator();
+	const { addFlag } = useFlags();
+	const { institution } = useAccount();
 
 	const fetchFilterData = useCallback(async () => {
 		try {
@@ -344,6 +347,8 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 	}, [handleKeydown]);
 
 	const handleAddButtonClick = async (careResourceLocation: CareResourceLocationModel) => {
+		setIsLoading(true);
+
 		try {
 			if (!patientOrder.resourcePacket) {
 				throw new Error('patientOrder does not require resources.');
@@ -357,14 +362,23 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 				.fetch();
 
 			revalidator.revalidate();
-		} catch (error) {
-			console.log(error);
 
+			addFlag({
+				variant: 'success',
+				title: `Resource added to ${patientOrder.patientDisplayName}`,
+				description: `Remember to send a ${institution.myChartName} message to the patient about new resources that are added for them.`,
+				actions: [],
+			});
+		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
 	const handleRemoveButtonClick = async (careResourceLocation: CareResourceLocationModel) => {
+		setIsLoading(true);
+
 		try {
 			if (!patientOrder.resourcePacket) {
 				throw new Error('patientOrder does not require resources.');
@@ -385,8 +399,16 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 				.fetch();
 
 			revalidator.revalidate();
+
+			addFlag({
+				variant: 'warning',
+				title: `Resource removed from ${patientOrder.patientDisplayName}`,
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -578,7 +600,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 													careResourceLocation.careResourceLocationId
 											) ? (
 												<Button
-													variant="outline-danger"
+													variant="danger"
 													onClick={() => {
 														handleRemoveButtonClick(careResourceLocation);
 													}}
