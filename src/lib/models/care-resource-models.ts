@@ -110,7 +110,7 @@ export interface ResourcePacketModel {
 export interface ResourcePacketLocation {
 	addedByDisplayName: string;
 	addedDateDescription: string;
-	address: ResourcePacketAddress;
+	address?: ResourcePacketAddress;
 	careResourceLocationId: string;
 	careResourceLocationName: string;
 	createdByAccountFirstName: string;

@@ -94,11 +94,18 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 						<div className={classes.informationOuter}>
 							<div className="p-4">
 								<span className="mb-2 small text-gray">Address</span>
-								<span className="small">{careResourceLocation.address.streetAddress1}</span>
-								<span className="small">
-									{careResourceLocation.address.locality}, {careResourceLocation.address.region}{' '}
-									{careResourceLocation.address.postalCode}
-								</span>
+								{careResourceLocation.address ? (
+									<>
+										<span className="small">{careResourceLocation.address.streetAddress1}</span>
+										<span className="small">
+											{careResourceLocation.address.locality},{' '}
+											{careResourceLocation.address.region}{' '}
+											{careResourceLocation.address.postalCode}
+										</span>
+									</>
+								) : (
+									<span className="small">No address provided</span>
+								)}
 							</div>
 							<hr />
 							<div className="p-4">
@@ -149,42 +156,44 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 								/>
 							</div>
 						</div>
-						<div className={classes.mapOuter}>
-							<a
-								className={classNames(
-									'cobalt-button cobalt-button-primary text-decoration-none',
-									classes.directionsButton
-								)}
-								target="_blank"
-								rel="noreferrer"
-								href={buildQueryParamUrl('https://www.google.com/maps/dir/', {
-									api: 1,
-									origin: 'My Location',
-									destination: careResourceLocation.address.formattedAddress,
-									destination_place_id: careResourceLocation.address.googlePlaceId,
-								})}
-							>
-								Get Directions
-							</a>
-							<Map
-								mapId={careResourceLocation.careResourceLocationId}
-								style={{ width: '100%', height: '100%' }}
-								defaultCenter={{
-									lat: careResourceLocation.address.latitude,
-									lng: careResourceLocation.address.longitude,
-								}}
-								defaultZoom={12}
-								gestureHandling="greedy"
-								disableDefaultUI={true}
-							>
-								<Marker
-									position={{
+						{careResourceLocation.address && (
+							<div className={classes.mapOuter}>
+								<a
+									className={classNames(
+										'cobalt-button cobalt-button-primary text-decoration-none',
+										classes.directionsButton
+									)}
+									target="_blank"
+									rel="noreferrer"
+									href={buildQueryParamUrl('https://www.google.com/maps/dir/', {
+										api: 1,
+										origin: 'My Location',
+										destination: careResourceLocation.address.formattedAddress,
+										destination_place_id: careResourceLocation.address.googlePlaceId,
+									})}
+								>
+									Get Directions
+								</a>
+								<Map
+									mapId={careResourceLocation.careResourceLocationId}
+									style={{ width: '100%', height: '100%' }}
+									defaultCenter={{
 										lat: careResourceLocation.address.latitude,
 										lng: careResourceLocation.address.longitude,
 									}}
-								/>
-							</Map>
-						</div>
+									defaultZoom={12}
+									gestureHandling="greedy"
+									disableDefaultUI={true}
+								>
+									<Marker
+										position={{
+											lat: careResourceLocation.address.latitude,
+											lng: careResourceLocation.address.longitude,
+										}}
+									/>
+								</Map>
+							</div>
+						)}
 					</div>
 				</div>
 			</Collapse>
