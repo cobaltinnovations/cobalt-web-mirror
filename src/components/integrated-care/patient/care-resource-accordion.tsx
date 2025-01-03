@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ResourcePacketLocation } from '@/lib/models';
+import { buildQueryParamUrl } from '@/lib/utils';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	careResourceAccordion: {
@@ -37,7 +38,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	mapOuter: {
 		width: '50%',
+		position: 'relative',
 		backgroundColor: theme.colors.n75,
+	},
+	directionsButton: {
+		right: 16,
+		bottom: 32,
+		zIndex: 1,
+		position: 'absolute',
+		'&:hover': {
+			color: theme.colors.n0,
+		},
 	},
 }));
 
@@ -139,6 +150,22 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 							</div>
 						</div>
 						<div className={classes.mapOuter}>
+							<a
+								className={classNames(
+									'cobalt-button cobalt-button-primary text-decoration-none',
+									classes.directionsButton
+								)}
+								target="_blank"
+								rel="noreferrer"
+								href={buildQueryParamUrl('https://www.google.com/maps/dir/', {
+									api: 1,
+									origin: 'My Location',
+									destination: careResourceLocation.address.formattedAddress,
+									destination_place_id: careResourceLocation.address.googlePlaceId,
+								})}
+							>
+								Get Directions
+							</a>
 							<Map
 								mapId={careResourceLocation.careResourceLocationId}
 								style={{ width: '100%', height: '100%' }}
