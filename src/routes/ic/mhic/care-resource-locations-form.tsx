@@ -174,7 +174,7 @@ export const Component = () => {
 					text: careResourceLocation.address.formattedAddress,
 			  }
 			: undefined,
-		address2: careResourceLocation?.address.streetAddress2 ?? '',
+		address2: careResourceLocation?.address?.streetAddress2 ?? '',
 		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,
 		facilityTypes: careResourceLocation?.facilityTypes ?? [],
 		insuranceUseDefaults: !careResourceLocation?.overridePayors,

@@ -21,7 +21,7 @@ export interface CareResourceLocationModel {
 	careResourceLocationId: string;
 	appointmentTypeInPerson: boolean;
 	appointmentTypeOnline: boolean;
-	address: {
+	address?: {
 		addressId: string;
 		postalName: string;
 		streetAddress1: string;

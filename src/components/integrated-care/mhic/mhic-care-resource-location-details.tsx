@@ -195,16 +195,16 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 														<Col xs={9}>
 															<p className="m-0">
 																<span className="d-block text-nowrap">
-																	{careResourceLocation.address.streetAddress1}
+																	{careResourceLocation.address?.streetAddress1}
 																</span>
 																<span className="d-block text-nowrap">
-																	{careResourceLocation.address.locality},{' '}
-																	{careResourceLocation.address.region}{' '}
-																	{careResourceLocation.address.postalCode}
+																	{careResourceLocation.address?.locality},{' '}
+																	{careResourceLocation.address?.region}{' '}
+																	{careResourceLocation.address?.postalCode}
 																</span>
-																{careResourceLocation.address.streetAddress2 ?? (
+																{careResourceLocation.address?.streetAddress2 ?? (
 																	<span className="d-block text-nowrap">
-																		{careResourceLocation.address.streetAddress2}
+																		{careResourceLocation.address?.streetAddress2}
 																	</span>
 																)}
 															</p>

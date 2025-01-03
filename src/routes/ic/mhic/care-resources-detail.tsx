@@ -215,15 +215,15 @@ export const Component = () => {
 														</Button>
 													</span>
 													<span className="d-block text-nowrap">
-														{crl.address.streetAddress1}
+														{crl.address?.streetAddress1}
 													</span>
 													<span className="d-block text-nowrap">
-														{crl.address.locality}, {crl.address.region}{' '}
-														{crl.address.postalCode}
+														{crl.address?.locality}, {crl.address?.region}{' '}
+														{crl.address?.postalCode}
 													</span>
-													{crl.address.streetAddress2 ?? (
+													{crl.address?.streetAddress2 ?? (
 														<span className="d-block text-nowrap">
-															{crl.address.streetAddress2}
+															{crl.address?.streetAddress2}
 														</span>
 													)}
 												</TableCell>
