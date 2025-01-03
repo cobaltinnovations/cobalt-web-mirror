@@ -210,6 +210,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 		],
 		[
 			account?.accountCapabilityFlags.canAdministerIcDepartments,
+			account?.accountCapabilityFlags.canManageCareResources,
 			account?.accountCapabilityFlags.canViewIcReports,
 			adminMatch,
 			myPatientsMatch,
