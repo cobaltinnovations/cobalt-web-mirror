@@ -104,6 +104,7 @@ export interface PlaceModel {
 export interface ResourcePacketModel {
 	resourcePacketId: string;
 	careResourceLocations: ResourcePacketLocation[];
+	patientMessage: string;
 }
 
 export interface ResourcePacketLocation {

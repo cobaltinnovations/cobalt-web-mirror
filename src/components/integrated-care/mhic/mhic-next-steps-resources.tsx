@@ -134,40 +134,12 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 							bodyText={`Copy & paste the following message into ${institution.myChartName}`}
 							showDissmissButton={false}
 							detailText={
-								<div className="mt-4">
-									<p>Hello {patientOrder.patientDisplayName},</p>
-									<p>
-										This message is a follow up to the {institution.integratedCareProgramName}{' '}
-										assessment that you took through the {institution.name} platform. Based on your
-										responses to the assessment, I am providing you with a list of mental health
-										providers that are covered by your insurance along with their contact
-										information.{' '}
-									</p>
-									<p>
-										You can access the list of recommended resources at{' '}
-										<a href="/#" target="_blank">
-											link
-										</a>
-									</p>
-									<p>
-										If you have any questions, please feel free to give me a call back or discuss
-										with your primary care provider.
-									</p>
-									<p>
-										A phone number that you can call 24 hours a day if you are ever in serious
-										distress and need to talk with someone is <a href="tel:988">988</a>. In the
-										event of an emergency please call <a href="tel:911">911</a>.
-									</p>
-									<p>
-										Have a great day!
-										<br />
-										{institution.integratedCareProgramName}
-										<br />
-										<a href={`tel:${institution.integratedCarePhoneNumber}`}>
-											{institution.integratedCarePhoneNumberDescription}
-										</a>
-									</p>
-								</div>
+								<div
+									className="mt-4"
+									dangerouslySetInnerHTML={{
+										__html: patientOrder.resourcePacket?.patientMessage ?? '',
+									}}
+								/>
 							}
 							dismissText={''}
 							confirmText="Done"
