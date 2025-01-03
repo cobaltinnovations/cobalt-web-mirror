@@ -172,13 +172,17 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Admin',
 				active: adminMatch,
 				items: [
-					{
-						testId: '',
-						navigationItemId: 'RESOURCES',
-						to: '/ic/mhic/admin/resources',
-						title: 'Resources',
-						active: false,
-					},
+					...(account?.accountCapabilityFlags.canManageCareResources
+						? [
+								{
+									testId: '',
+									navigationItemId: 'RESOURCES',
+									to: '/ic/mhic/admin/resources',
+									title: 'Resources',
+									active: false,
+								},
+						  ]
+						: []),
 					...(account?.accountCapabilityFlags.canAdministerIcDepartments
 						? [
 								{
