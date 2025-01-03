@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from 'react-bootstrap';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import classNames from 'classnames';
 
 import {
@@ -10,10 +11,11 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
 } from '@/lib/models';
-import { analyticsService, appointmentService } from '@/lib/services';
+import { analyticsService, appointmentService, institutionService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useHandleError from '@/hooks/use-handle-error';
+import AsyncWrapper from '@/components/async-page';
 import ConfirmDialog from '@/components/confirm-dialog';
 import InlineAlert from '@/components/inline-alert';
 import NoData from '@/components/no-data';
@@ -37,6 +39,12 @@ export const NextStepsAssessmentComplete = ({
 	const handleError = useHandleError();
 	const [showInsuranceStatementModal, setShowInsuranceStatementModal] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+	const [mapsKey, setMapsKey] = useState('');
+
+	const fetchData = useCallback(async () => {
+		const response = await institutionService.getGoogleMapsApiKey(institution.institutionId).fetch();
+		setMapsKey(response.googleMapsPlatformApiKey);
+	}, [institution.institutionId]);
 
 	const handleCancelAppointmentConfirm = useCallback(async () => {
 		try {
@@ -131,16 +139,21 @@ export const NextStepsAssessmentComplete = ({
 								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
 								provider.
 							</p>
-							{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl, crlIndex) => {
-								const isLast =
-									crlIndex === (patientOrder.resourcePacket?.careResourceLocations ?? []).length - 1;
-								return (
-									<CareResourceAccordion
-										className={classNames({ 'mb-4': !isLast, 'mb-10': isLast })}
-										careResourceLocation={crl}
-									/>
-								);
-							})}
+							<AsyncWrapper fetchData={fetchData}>
+								<APIProvider apiKey={mapsKey}>
+									{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl, crlIndex) => {
+										const isLast =
+											crlIndex ===
+											(patientOrder.resourcePacket?.careResourceLocations ?? []).length - 1;
+										return (
+											<CareResourceAccordion
+												className={classNames({ 'mb-4': !isLast, 'mb-10': isLast })}
+												careResourceLocation={crl}
+											/>
+										);
+									})}
+								</APIProvider>
+							</AsyncWrapper>
 						</>
 					) : (
 						<Card bsPrefix="ic-card" className="mb-10">
