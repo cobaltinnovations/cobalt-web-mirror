@@ -121,7 +121,28 @@ export const NextStepsAssessmentComplete = ({
 
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
 				<>
-					{!patientOrder.resourcesSentAt ? (
+					{patientOrder.resourcesSentFlag ? (
+						<>
+							<h4 className="mb-1">Schedule with a recommended resource</h4>
+							<p className="mb-10">
+								These resources are covered by your insurance and were recommended based on your
+								responses to the assessment. If you have any questions, please feel free to call us at{' '}
+								{institution.integratedCarePhoneNumberDescription}{' '}
+								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
+								provider.
+							</p>
+							{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl, crlIndex) => {
+								const isLast =
+									crlIndex === (patientOrder.resourcePacket?.careResourceLocations ?? []).length - 1;
+								return (
+									<CareResourceAccordion
+										className={classNames({ 'mb-4': !isLast, 'mb-10': isLast })}
+										careResourceLocation={crl}
+									/>
+								);
+							})}
+						</>
+					) : (
 						<Card bsPrefix="ic-card" className="mb-10">
 							<Card.Header>
 								<Card.Title>Next Steps</Card.Title>
@@ -152,27 +173,6 @@ export const NextStepsAssessmentComplete = ({
 								</NextStepsItem>
 							</Card.Body>
 						</Card>
-					) : (
-						<>
-							<h4 className="mb-1">Schedule with a recommended resource</h4>
-							<p className="mb-10">
-								These resources are covered by your insurance and were recommended based on your
-								responses to the assessment. If you have any questions, please feel free to call us at{' '}
-								{institution.integratedCarePhoneNumberDescription}{' '}
-								{institution.integratedCareAvailabilityDescription} or discuss with your primary care
-								provider.
-							</p>
-							{(patientOrder.resourcePacket?.careResourceLocations ?? []).map((crl, crlIndex) => {
-								const isLast =
-									crlIndex === (patientOrder.resourcePacket?.careResourceLocations ?? []).length - 1;
-								return (
-									<CareResourceAccordion
-										className={classNames({ 'mb-4': !isLast, 'mb-10': isLast })}
-										careResourceLocation={crl}
-									/>
-								);
-							})}
-						</>
 					)}
 				</>
 			)}

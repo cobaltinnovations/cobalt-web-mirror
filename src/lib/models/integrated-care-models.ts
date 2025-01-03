@@ -132,6 +132,7 @@ export interface PatientOrderModel {
 	patientOrderResponseStatusId?: PatientOrderResponseStatusId;
 	patientOrderSafetyPlanningStatusId?: PatientOrderSafetyPlanningStatusId;
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId;
+	resourcesSentFlag?: boolean;
 	resourcesSentAt?: string;
 	resourcesSentAtDescription?: string;
 	resourcesSentNote?: string;
