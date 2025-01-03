@@ -11,6 +11,7 @@ import {
 	ResourcePacketLocation,
 } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import {
 	MhicCareResourcePreviewModal,
@@ -21,6 +22,7 @@ import InlineAlert from '@/components/inline-alert';
 
 import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
 import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -30,14 +32,14 @@ interface Props {
 }
 
 export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, className }: Props) => {
+	const { institution } = useAccount();
 	const handleError = useHandleError();
 	const [showResourcesModal, setShowResourcesModal] = useState(false);
 	const [showCareResourceSearchModal, setShowCareResourceSearchModal] = useState(false);
 	const [showCareResourcePreviewModal, setShowCareResourcePreviewModal] = useState(false);
-
 	const [careResourceLocations, setCareResourceLocations] = useState<ResourcePacketLocation[]>([]);
-
 	const revalidator = useRevalidator();
+	const [showExampleMessageModal, setShowExampleMessageModal] = useState(false);
 
 	const handleResourcesModalSave = useCallback(
 		(_updatedPatientOrder: PatientOrderModel) => {
@@ -124,18 +126,86 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 
 			<div className={className}>
 				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
-					<InlineAlert
-						className="mb-6"
-						variant="warning"
-						title="Patient needs resources"
-						action={{
-							title: 'Mark as sent',
-							onClick: () => {
-								setShowResourcesModal(true);
-							},
-							disabled,
-						}}
-					/>
+					<>
+						<ConfirmDialog
+							size="lg"
+							show={showExampleMessageModal}
+							titleText="Example Message"
+							bodyText={`Copy & paste the following message into ${institution.myChartName}`}
+							showDissmissButton={false}
+							detailText={
+								<div className="mt-4">
+									<p>Hello {patientOrder.patientDisplayName},</p>
+									<p>
+										This message is a follow up to the {institution.integratedCareProgramName}{' '}
+										assessment that you took through the {institution.name} platform. Based on your
+										responses to the assessment, I am providing you with a list of mental health
+										providers that are covered by your insurance along with their contact
+										information.{' '}
+									</p>
+									<p>
+										You can access the list of recommended resources at{' '}
+										<a href="/#" target="_blank">
+											link
+										</a>
+									</p>
+									<p>
+										If you have any questions, please feel free to give me a call back or discuss
+										with your primary care provider.
+									</p>
+									<p>
+										A phone number that you can call 24 hours a day if you are ever in serious
+										distress and need to talk with someone is <a href="tel:988">988</a>. In the
+										event of an emergency please call <a href="tel:911">911</a>.
+									</p>
+									<p>
+										Have a great day!
+										<br />
+										{institution.integratedCareProgramName}
+										<br />
+										<a href={`tel:${institution.integratedCarePhoneNumber}`}>
+											{institution.integratedCarePhoneNumberDescription}
+										</a>
+									</p>
+								</div>
+							}
+							dismissText={''}
+							confirmText="Done"
+							onConfirm={() => {
+								setShowExampleMessageModal(false);
+							}}
+							onHide={() => {
+								setShowExampleMessageModal(false);
+							}}
+						/>
+						<InlineAlert
+							className="mb-6"
+							variant="warning"
+							title="Patient needs resources"
+							description={
+								<>
+									Remember to send a{' '}
+									<Button
+										variant="link"
+										className="p-0 m-0 fw-normal"
+										onClick={() => {
+											setShowExampleMessageModal(true);
+										}}
+									>
+										{institution.myChartName} message
+									</Button>{' '}
+									to the patient once resources are available.
+								</>
+							}
+							action={{
+								title: 'Mark as sent',
+								onClick: () => {
+									setShowResourcesModal(true);
+								},
+								disabled,
+							}}
+						/>
+					</>
 				)}
 
 				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.SENT_RESOURCES && (
