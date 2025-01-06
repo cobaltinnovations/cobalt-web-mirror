@@ -165,7 +165,7 @@ export const NextStepsAssessmentComplete = ({
 									title="Step 3: Schedule appointment with a recommended resource"
 									description={`We will send you a ${
 										institution?.myChartName ?? 'MyChart'
-									} message in the next {[TODO]: timeframe} about recommended resources in your area.`}
+									} message about recommended resources in your area.`}
 								>
 									<NoData
 										title="Resources in progress"
