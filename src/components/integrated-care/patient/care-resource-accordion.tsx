@@ -84,11 +84,7 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 			<Collapse in={show} mountOnEnter unmountOnExit>
 				<div>
 					<div className="px-4 pb-4 bg-n75 border-bottom">
-						<p className="m-0">
-							There is a mandatory $99 enrollment + $39 monthly fee for the online system including same
-							day appointments, 24-hour Q&A, etc. The fee for the online system is not covered by
-							insurance and needs to be payed in addition to co-pay.
-						</p>
+						<p className="m-0">{careResourceLocation.notes}</p>
 					</div>
 					<div className="d-flex">
 						<div className={classes.informationOuter}>
