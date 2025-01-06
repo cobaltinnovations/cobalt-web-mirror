@@ -203,102 +203,107 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 					/>
 				)}
 
-				<Card bsPrefix="ic-card">
-					<Card.Header>
-						<Card.Title>Patient Resources</Card.Title>
-						<div className="button-container">
-							<Button
-								variant="link"
-								className="text-decoration-none"
-								size="sm"
-								onClick={() => {
-									setShowCareResourcePreviewModal(true);
-								}}
-							>
-								Preview
-							</Button>
-							<Button
-								variant="primary"
-								size="sm"
-								onClick={() => {
-									setShowCareResourceSearchModal(true);
-								}}
-							>
-								Find Resources
-							</Button>
-						</div>
-					</Card.Header>
-					<Card.Body className="p-0">
-						<div className="p-4">
-							<p className="m-0">
-								{careResourceLocations.length} resource
-								{careResourceLocations.length === 1 ? ' is' : 's are'} currently available for the
-								patient (drag to reorder)
-							</p>
-						</div>
-						<DragDropContext onDragEnd={handleDragEnd}>
-							<Droppable droppableId="care-resources-droppable">
-								{(droppableProvided) => (
-									<ul
-										ref={droppableProvided.innerRef}
-										className="list-unstyled m-0"
-										{...droppableProvided.droppableProps}
-									>
-										{careResourceLocations.map((crl, itemIndex) => (
-											<Draggable
-												key={crl.resourcePacketCareResourceLocationId}
-												draggableId={`care-resources-draggable-${crl.resourcePacketCareResourceLocationId}`}
-												index={itemIndex}
-											>
-												{(draggableProvided, itemDraggableSnapshot) => (
-													<li
-														ref={draggableProvided.innerRef}
-														className={classNames('bg-white d-flex align-items-center', {
-															'border-top': !itemDraggableSnapshot.isDragging,
-															border: itemDraggableSnapshot.isDragging,
-															'shadow-lg': itemDraggableSnapshot.isDragging,
-															rounded: itemDraggableSnapshot.isDragging,
-														})}
-														{...draggableProvided.draggableProps}
-													>
-														<div
-															className="p-4 flex-shrink-0"
-															{...draggableProvided.dragHandleProps}
+				{institution.resourcePacketsEnabled && (
+					<Card bsPrefix="ic-card">
+						<Card.Header>
+							<Card.Title>Patient Resources</Card.Title>
+							<div className="button-container">
+								<Button
+									variant="link"
+									className="text-decoration-none"
+									size="sm"
+									onClick={() => {
+										setShowCareResourcePreviewModal(true);
+									}}
+								>
+									Preview
+								</Button>
+								<Button
+									variant="primary"
+									size="sm"
+									onClick={() => {
+										setShowCareResourceSearchModal(true);
+									}}
+								>
+									Find Resources
+								</Button>
+							</div>
+						</Card.Header>
+						<Card.Body className="p-0">
+							<div className="p-4">
+								<p className="m-0">
+									{careResourceLocations.length} resource
+									{careResourceLocations.length === 1 ? ' is' : 's are'} currently available for the
+									patient (drag to reorder)
+								</p>
+							</div>
+							<DragDropContext onDragEnd={handleDragEnd}>
+								<Droppable droppableId="care-resources-droppable">
+									{(droppableProvided) => (
+										<ul
+											ref={droppableProvided.innerRef}
+											className="list-unstyled m-0"
+											{...droppableProvided.droppableProps}
+										>
+											{careResourceLocations.map((crl, itemIndex) => (
+												<Draggable
+													key={crl.resourcePacketCareResourceLocationId}
+													draggableId={`care-resources-draggable-${crl.resourcePacketCareResourceLocationId}`}
+													index={itemIndex}
+												>
+													{(draggableProvided, itemDraggableSnapshot) => (
+														<li
+															ref={draggableProvided.innerRef}
+															className={classNames(
+																'bg-white d-flex align-items-center',
+																{
+																	'border-top': !itemDraggableSnapshot.isDragging,
+																	border: itemDraggableSnapshot.isDragging,
+																	'shadow-lg': itemDraggableSnapshot.isDragging,
+																	rounded: itemDraggableSnapshot.isDragging,
+																}
+															)}
+															{...draggableProvided.draggableProps}
 														>
-															<DragIndicator className="text-gray" />
-														</div>
-														<div className="py-4 flex-fill">
-															<span className="d-block">
-																{crl.careResourceLocationName} (
-																{crl.careResourceLocationName})
-															</span>
-															<span className="d-block text-gray">
-																Added {crl.addedDateDescription} by{' '}
-																{crl.addedByDisplayName}
-															</span>
-														</div>
-														<div className="p-4 flex-shrink-0">
-															<Button
-																variant="danger"
-																className="p-2"
-																onClick={() => {
-																	handleMinusButtonClick(crl);
-																}}
+															<div
+																className="p-4 flex-shrink-0"
+																{...draggableProvided.dragHandleProps}
 															>
-																<MinusIcon className="d-flex" />
-															</Button>
-														</div>
-													</li>
-												)}
-											</Draggable>
-										))}
-										{droppableProvided.placeholder}
-									</ul>
-								)}
-							</Droppable>
-						</DragDropContext>
-					</Card.Body>
-				</Card>
+																<DragIndicator className="text-gray" />
+															</div>
+															<div className="py-4 flex-fill">
+																<span className="d-block">
+																	{crl.careResourceLocationName} (
+																	{crl.careResourceLocationName})
+																</span>
+																<span className="d-block text-gray">
+																	Added {crl.addedDateDescription} by{' '}
+																	{crl.addedByDisplayName}
+																</span>
+															</div>
+															<div className="p-4 flex-shrink-0">
+																<Button
+																	variant="danger"
+																	className="p-2"
+																	onClick={() => {
+																		handleMinusButtonClick(crl);
+																	}}
+																>
+																	<MinusIcon className="d-flex" />
+																</Button>
+															</div>
+														</li>
+													)}
+												</Draggable>
+											))}
+											{droppableProvided.placeholder}
+										</ul>
+									)}
+								</Droppable>
+							</DragDropContext>
+						</Card.Body>
+					</Card>
+				)}
 			</div>
 		</>
 	);

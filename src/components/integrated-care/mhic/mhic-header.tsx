@@ -119,7 +119,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const location = useLocation();
 
 	const overviewMatch = useMatch({
@@ -172,7 +172,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Admin',
 				active: adminMatch,
 				items: [
-					...(account?.accountCapabilityFlags.canManageCareResources
+					...(account?.accountCapabilityFlags.canManageCareResources && institution?.resourcePacketsEnabled
 						? [
 								{
 									testId: '',
@@ -213,6 +213,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			account?.accountCapabilityFlags.canManageCareResources,
 			account?.accountCapabilityFlags.canViewIcReports,
 			adminMatch,
+			institution?.resourcePacketsEnabled,
 			myPatientsMatch,
 			overviewMatch,
 			patientOrdersMatch,

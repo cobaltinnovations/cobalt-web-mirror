@@ -80,6 +80,7 @@ export interface Institution {
 	secureFilesharingPlatformUrl?: string;
 	tableauEnabled?: boolean;
 	contentAudiencesEnabled?: boolean;
+	resourcePacketsEnabled?: boolean;
 }
 
 export interface InstitutionFeature {
