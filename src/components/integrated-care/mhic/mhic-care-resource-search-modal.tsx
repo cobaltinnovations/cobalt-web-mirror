@@ -414,12 +414,12 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 		}
 	};
 
-	const addressDoesNotMatchPatientPreferences = useMemo(
+	const addressDoesNotMatchPatientPreferences = !!useMemo(
 		() => formValues.address && formValues.address.placeId !== patientOrder.patientAddress?.addressId,
 		[formValues.address, patientOrder.patientAddress?.addressId]
 	);
 
-	const distanceDoesNotMatchPatientPreferences = useMemo(
+	const distanceDoesNotMatchPatientPreferences = !!useMemo(
 		() =>
 			patientOrder.inPersonCareRadius &&
 			parseInt(formValues.distance?.[0].value?.[0] ?? '0', 10) !== patientOrder.inPersonCareRadius,
