@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
 import { Button, Form, Row, Col, OffcanvasProps } from 'react-bootstrap';
 import { CARE_RESOURCE_TAG_GROUP_ID, CareResourceLocationModel, PatientOrderModel, PlaceModel } from '@/lib/models';
@@ -23,6 +23,7 @@ import MegaFilter, {
 import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
 import useAccount from '@/hooks/use-account';
 import NoData from '@/components/no-data';
+import InlineAlert from '@/components/inline-alert';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -413,6 +414,46 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 		}
 	};
 
+	const addressDoesNotMatchPatientPreferences = useMemo(
+		() => formValues.address && formValues.address.placeId !== patientOrder.patientAddress?.addressId,
+		[formValues.address, patientOrder.patientAddress?.addressId]
+	);
+
+	const distanceDoesNotMatchPatientPreferences = useMemo(
+		() =>
+			patientOrder.inPersonCareRadius &&
+			parseInt(formValues.distance?.[0].value?.[0] ?? '0', 10) !== patientOrder.inPersonCareRadius,
+		[formValues.distance, patientOrder.inPersonCareRadius]
+	);
+
+	const displayResetToPatientPreferencesAlert = useMemo(
+		() => addressDoesNotMatchPatientPreferences || distanceDoesNotMatchPatientPreferences,
+		[addressDoesNotMatchPatientPreferences, distanceDoesNotMatchPatientPreferences]
+	);
+
+	const resetAddressAndDistanceToPatientPreferences = useCallback(() => {
+		const targetDistanceOption = distanceOptions.find((d) => d.value === `${patientOrder.inPersonCareRadius}`);
+
+		setFormValues((previousValue) => ({
+			...previousValue,
+			address: patientOrder.patientAddress
+				? {
+						placeId: patientOrder.patientAddress.addressId,
+						text: `${patientOrder.patientAddress.streetAddress1}, ${patientOrder.patientAddress.locality}, ${patientOrder.patientAddress.region}`,
+				  }
+				: undefined,
+			distance: [
+				{
+					id: 'searchRadiusMiles',
+					filterType: FILTER_TYPE.RADIO,
+					title: 'Distance',
+					value: targetDistanceOption ? [targetDistanceOption.value] : [],
+					options: distanceOptions,
+				},
+			],
+		}));
+	}, [patientOrder.inPersonCareRadius, patientOrder.patientAddress]);
+
 	return (
 		<>
 			<PreviewCanvas title="Available Resources" onEnter={handleOnEnter} {...props}>
@@ -532,6 +573,22 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 						</div>
 					</Col>
 				</Row>
+				{displayResetToPatientPreferencesAlert && (
+					<Row className="mb-8">
+						<Col>
+							<InlineAlert
+								variant="warning"
+								title="Address or distance does not match patient preferences"
+								action={[
+									{
+										title: 'Reset to patient preferences',
+										onClick: resetAddressAndDistanceToPatientPreferences,
+									},
+								]}
+							/>
+						</Col>
+					</Row>
+				)}
 				<Row className="mb-8">
 					<Col>
 						<Table isLoading={isLoading}>
