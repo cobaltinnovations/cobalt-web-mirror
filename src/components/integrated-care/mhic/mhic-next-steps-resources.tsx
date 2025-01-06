@@ -185,6 +185,20 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 						className="mb-6"
 						variant="success"
 						title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
+						description={
+							<>
+								View{' '}
+								<Button
+									variant="link"
+									className="p-0 m-0 fw-normal"
+									onClick={() => {
+										setShowExampleMessageModal(true);
+									}}
+								>
+									{institution.myChartName} example message
+								</Button>
+							</>
+						}
 					/>
 				)}
 
