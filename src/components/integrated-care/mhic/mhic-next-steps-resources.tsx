@@ -124,32 +124,33 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 				}}
 			/>
 
+			<ConfirmDialog
+				size="lg"
+				show={showExampleMessageModal}
+				titleText="Example Message"
+				bodyText={`Copy & paste the following message into ${institution.myChartName}`}
+				showDissmissButton={false}
+				detailText={
+					<div
+						className="mt-4"
+						dangerouslySetInnerHTML={{
+							__html: patientOrder.resourcePacket?.patientMessage ?? '',
+						}}
+					/>
+				}
+				dismissText={''}
+				confirmText="Done"
+				onConfirm={() => {
+					setShowExampleMessageModal(false);
+				}}
+				onHide={() => {
+					setShowExampleMessageModal(false);
+				}}
+			/>
+
 			<div className={className}>
 				{patientOrder.patientOrderResourcingStatusId === PatientOrderResourcingStatusId.NEEDS_RESOURCES && (
 					<>
-						<ConfirmDialog
-							size="lg"
-							show={showExampleMessageModal}
-							titleText="Example Message"
-							bodyText={`Copy & paste the following message into ${institution.myChartName}`}
-							showDissmissButton={false}
-							detailText={
-								<div
-									className="mt-4"
-									dangerouslySetInnerHTML={{
-										__html: patientOrder.resourcePacket?.patientMessage ?? '',
-									}}
-								/>
-							}
-							dismissText={''}
-							confirmText="Done"
-							onConfirm={() => {
-								setShowExampleMessageModal(false);
-							}}
-							onHide={() => {
-								setShowExampleMessageModal(false);
-							}}
-						/>
 						<InlineAlert
 							className="mb-6"
 							variant="warning"
