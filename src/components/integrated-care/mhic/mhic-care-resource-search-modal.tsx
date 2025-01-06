@@ -624,7 +624,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 												actions={[
 													{
 														variant: 'primary',
-														title: 'Reset Filters to Defaults',
+														title: 'Reset all changes',
 														onClick: () => {
 															handleOnEnter();
 															clearSearch();
