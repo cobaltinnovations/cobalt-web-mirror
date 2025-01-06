@@ -88,7 +88,7 @@ export const NextStepsAssessmentComplete = ({
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 				<Card bsPrefix="ic-card" className="mb-10">
 					<Card.Header>
-						<Card.Title>Next Steps</Card.Title>
+						<Card.Title>Next Step</Card.Title>
 					</Card.Header>
 					<Card.Body className="p-0">
 						{patientOrder.appointmentId ? (
@@ -158,7 +158,7 @@ export const NextStepsAssessmentComplete = ({
 					) : (
 						<Card bsPrefix="ic-card" className="mb-10">
 							<Card.Header>
-								<Card.Title>Next Steps</Card.Title>
+								<Card.Title>Next Step</Card.Title>
 							</Card.Header>
 							<Card.Body className="p-0">
 								<NextStepsItem
@@ -193,7 +193,7 @@ export const NextStepsAssessmentComplete = ({
 			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SUBCLINICAL && (
 				<Card bsPrefix="ic-card" className="mb-10">
 					<Card.Header>
-						<Card.Title>Next Steps</Card.Title>
+						<Card.Title>Next Step</Card.Title>
 					</Card.Header>
 					<Card.Body className="p-0">
 						<NextStepsItem
