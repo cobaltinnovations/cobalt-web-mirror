@@ -820,6 +820,21 @@ export const routes: RouteObject[] = [
 								],
 							},
 							{
+								path: 'pages',
+								children: [
+									{
+										id: 'admin-pages',
+										index: true,
+										lazy: () => import('@/routes/admin/pages/pages'),
+									},
+									{
+										id: 'admin-page-builder',
+										path: ':pageId?',
+										lazy: () => import('@/routes/admin/pages/page-builder'),
+									},
+								],
+							},
+							{
 								path: 'group-sessions',
 								children: [
 									{

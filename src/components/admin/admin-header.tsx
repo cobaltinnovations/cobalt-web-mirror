@@ -123,6 +123,9 @@ export const AdminHeader = () => {
 	const groupSessionsMatch = useMatch({
 		path: '/admin/group-sessions/*',
 	});
+	const pagesMatch = useMatch({
+		path: '/admin/pages/*',
+	});
 	const reportsMatch = useMatch({
 		path: '/admin/reports/*',
 	});
@@ -160,6 +163,13 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
+			{
+				testId: '',
+				navigationItemId: 'PAGES',
+				title: 'Pages',
+				to: '/admin/pages',
+				active: !!pagesMatch,
+			},
 			...(account?.accountCapabilityFlags.canViewProviderReports
 				? [
 						{
@@ -221,6 +231,7 @@ export const AdminHeader = () => {
 			analyticsMatch,
 			debugMatch,
 			groupSessionsMatch,
+			pagesMatch,
 			reportsMatch,
 			resourcesMatch,
 			studyInsightsMatch,
