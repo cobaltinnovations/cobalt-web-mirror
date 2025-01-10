@@ -1,10 +1,24 @@
-import React, { Suspense, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Await, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 
+interface MockPageModel {
+	pageId: string;
+	name: string;
+	statusId: string;
+	statusDescription: string;
+	createdDate: string;
+	createdDateDescription: string;
+	modifiedDate: string;
+	modifiedDateDescription: string;
+	publishedDate: string;
+	publishedDateDescription: string;
+}
+
 interface AdminPagesLoaderData {
-	pagesPromise: Promise<[]>;
+	pagesPromise: Promise<{ pages: MockPageModel[]; totalCount: number; totalCountDescription: string }>;
 }
 
 export function useAdminGroupSessionsLoaderData() {
@@ -13,7 +27,24 @@ export function useAdminGroupSessionsLoaderData() {
 
 export async function loader() {
 	const pagesPromise = new Promise((resolve) => {
-		resolve({ pages: [] });
+		resolve({
+			pages: [
+				{
+					pageId: 'xxxx-xxxx-xxxx-xxxx',
+					name: 'Topic Name',
+					statusId: 'DRAFT',
+					statusDescription: 'Draft',
+					createdDate: 'some-iso-string',
+					createdDateDescription: '2023-08-20',
+					modifiedDate: 'some-iso-string',
+					modifiedDateDescription: '2023-08-20',
+					publishedDate: 'some-iso-string',
+					publishedDateDescription: '2023-08-20',
+				},
+			],
+			totalCount: 1,
+			totalCountDescription: '1',
+		});
 	});
 
 	return defer({
@@ -22,14 +53,39 @@ export async function loader() {
 }
 
 export const Component = () => {
+	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 
 	const { pagesPromise } = useAdminGroupSessionsLoaderData();
 	const [isLoading, setIsLoading] = useState(false);
-	const [pages, setPages] = useState<void[]>([]);
-	const [pagesTotalCount, setPagesTotalCoount] = useState(0);
+	const [pages, setPages] = useState<MockPageModel[]>([]);
+	const [pagesTotalCount, setPagesTotalCount] = useState(0);
 	const [pagesTotalCountDescription, setPagesTotalCountDescription] = useState('0');
+
+	const fetchPages = useCallback(async () => {
+		if (!pagesPromise) {
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			const { pages, totalCount, totalCountDescription } = await pagesPromise;
+
+			setPages(pages);
+			setPagesTotalCount(totalCount);
+			setPagesTotalCountDescription(totalCountDescription);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [handleError, pagesPromise]);
+
+	useEffect(() => {
+		fetchPages();
+	}, [fetchPages]);
 
 	const handlePaginationClick = (pageIndex: number) => {
 		searchParams.set('pageNumber', String(pageIndex));
@@ -70,15 +126,15 @@ export const Component = () => {
 										</TableRow>
 									</TableHead>
 									<TableBody>
-										{pages.map((_page, pageIndex) => {
+										{pages.map((page) => {
 											return (
-												<TableRow key={pageIndex}>
-													<TableCell>Name</TableCell>
-													<TableCell>Status</TableCell>
-													<TableCell>Created</TableCell>
-													<TableCell>Modified</TableCell>
-													<TableCell>Published</TableCell>
-													<TableCell>Actions</TableCell>
+												<TableRow key={page.pageId}>
+													<TableCell>{page.name}</TableCell>
+													<TableCell>{page.statusDescription}</TableCell>
+													<TableCell>{page.createdDateDescription}</TableCell>
+													<TableCell>{page.modifiedDateDescription}</TableCell>
+													<TableCell>{page.publishedDateDescription}</TableCell>
+													<TableCell>[TODO]: Actions</TableCell>
 												</TableRow>
 											);
 										})}
