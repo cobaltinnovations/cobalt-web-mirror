@@ -1,5 +1,5 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { Await, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Await, defer, useNavigate, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
@@ -53,6 +53,7 @@ export async function loader() {
 }
 
 export const Component = () => {
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
@@ -128,7 +129,12 @@ export const Component = () => {
 									<TableBody>
 										{pages.map((page) => {
 											return (
-												<TableRow key={page.pageId}>
+												<TableRow
+													key={page.pageId}
+													onClick={() => {
+														navigate(`/admin/pages/${page.pageId}`);
+													}}
+												>
 													<TableCell>{page.name}</TableCell>
 													<TableCell>{page.statusDescription}</TableCell>
 													<TableCell>{page.createdDateDescription}</TableCell>

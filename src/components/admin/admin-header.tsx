@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link, useMatch } from 'react-router-dom';
+import { Link, matchPath, useLocation, useMatch } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 import classNames from 'classnames';
 
@@ -109,6 +109,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 export const AdminHeader = () => {
 	const classes = useStyles();
+	const location = useLocation();
 	const { account, signOutAndClearContext } = useAccount();
 
 	const isResourcePreview = useMatch({
@@ -239,6 +240,11 @@ export const AdminHeader = () => {
 	);
 
 	const showLinks = !isResourcePreview && !isGroupSessionPreview;
+	const hideDefaultHeaderRoutes = ['/admin/pages/:pageId'].some((path) => matchPath(path, location.pathname));
+
+	if (hideDefaultHeaderRoutes) {
+		return null;
+	}
 
 	return (
 		<header className={classes.header}>
