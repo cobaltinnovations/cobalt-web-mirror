@@ -11,6 +11,8 @@ import InputHelper from '@/components/input-helper';
 import { PageSectionShelf } from '@/components/admin/pages/page-section-shelf';
 import classNames from 'classnames';
 
+const SHELF_TRANSITION_DURATION_MS = 600;
+
 const useStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
 		top: 0,
@@ -78,20 +80,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	'@global': {
 		'.menu-animation-enter': {
-			opacity: 0,
 			transform: 'translateX(-100%)',
 		},
 		'.menu-animation-enter-active': {
-			opacity: 1,
 			transform: 'translateX(0)',
-			transition: 'opacity 200ms, transform 200ms',
+			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
 		},
 		'.menu-animation-exit': {
 			transform: 'translateX(0)',
 		},
 		'.menu-animation-exit-active': {
 			transform: 'translateX(-100%)',
-			transition: 'opacity 200ms, transform 200ms',
+			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
 		},
 	},
 }));
@@ -185,7 +185,13 @@ export const Component = () => {
 					</Tab.Content>
 				</Tab.Container>
 			</div>
-			<CSSTransition in={!!currentSection} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
+			<CSSTransition
+				in={!!currentSection}
+				timeout={SHELF_TRANSITION_DURATION_MS}
+				classNames="menu-animation"
+				mountOnEnter
+				unmountOnExit
+			>
 				<div className={classes.asideShelf}>
 					{currentSection && (
 						<PageSectionShelf

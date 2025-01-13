@@ -5,7 +5,7 @@ import { PageSectionModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
-const PAGE_TRANSITION_DURATION_MS = 500;
+const PAGE_TRANSITION_DURATION_MS = 600;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	page: {
@@ -40,7 +40,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.right-to-left-enter-active': {
 			opacity: 1,
 			transform: 'translateX(0)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms ease`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
 		},
 		'.right-to-left-exit': {
 			opacity: 1,
@@ -49,7 +49,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.right-to-left-exit-active': {
 			opacity: 0,
 			transform: 'translateX(-100%)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms ease`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
 		},
 		'.left-to-right-enter ': {
 			opacity: 0,
@@ -58,7 +58,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.left-to-right-enter-active': {
 			opacity: 1,
 			transform: 'translateX(0)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms ease`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
 		},
 		'.left-to-right-exit': {
 			opacity: 1,
@@ -67,7 +67,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.left-to-right-exit-active': {
 			opacity: 0,
 			transform: 'translateX(100%)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms ease`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
 		},
 	},
 }));
