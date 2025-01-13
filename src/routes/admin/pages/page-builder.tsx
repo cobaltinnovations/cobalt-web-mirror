@@ -1,11 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Tab } from 'react-bootstrap';
+import { CSSTransition } from 'react-transition-group';
+
 import { PageSectionModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelper from '@/components/input-helper';
+import { PageSectionShelf } from '@/components/admin/pages/page-section-shelf';
+import classNames from 'classnames';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
@@ -21,7 +25,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		right: 0,
 		height: 60,
-		zIndex: 1,
+		zIndex: 3,
 		position: 'absolute',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
@@ -30,7 +34,25 @@ const useStyles = createUseThemedStyles((theme) => ({
 		top: 60,
 		left: 0,
 		bottom: 0,
+		zIndex: 2,
 		width: 376,
+		position: 'absolute',
+		backgroundColor: theme.colors.n0,
+		borderRight: `1px solid ${theme.colors.n100}`,
+	},
+	sectionButton: {
+		padding: 24,
+		cursor: 'pointer',
+		borderBottom: `1px solid ${theme.colors.n100}`,
+		'&.active': {
+			backgroundColor: theme.colors.n75,
+		},
+	},
+	asideShelf: {
+		top: 60,
+		left: 376,
+		bottom: 0,
+		width: 576,
 		zIndex: 1,
 		position: 'absolute',
 		backgroundColor: theme.colors.n0,
@@ -41,7 +63,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		left: 376,
 		right: 0,
 		bottom: 0,
-		zIndex: 1,
+		zIndex: 0,
 		padding: 24,
 		overflowY: 'auto',
 		position: 'absolute',
@@ -53,6 +75,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n50,
 		border: `1px solid ${theme.colors.n100}`,
 	},
+	'@global': {
+		'.menu-animation-enter': {
+			opacity: 0,
+			transform: 'translateX(-100%)',
+		},
+		'.menu-animation-enter-active': {
+			opacity: 1,
+			transform: 'translateX(0)',
+			transition: 'opacity 200ms, transform 200ms',
+		},
+		'.menu-animation-exit': {
+			transform: 'translateX(0)',
+		},
+		'.menu-animation-exit-active': {
+			transform: 'translateX(-100%)',
+			transition: 'opacity 200ms, transform 200ms',
+		},
+	},
 }));
 
 export async function loader() {
@@ -63,21 +103,30 @@ export const Component = () => {
 	const classes = useStyles();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [sections, setSections] = useState<PageSectionModel[]>([]);
+	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
 
 	const handleAddSectionButtonClick = () => {
-		setSections((previousValue) => [
-			...previousValue,
-			{
-				pageSectionId: uuidv4(),
-				pageId: 'xxxx-xxxx-xxxx-xxxx',
-				name: 'Untitled Section',
-				headline: '',
-				description: '',
-				backgroundColorId: '',
-				displayOrder: previousValue.length,
-			},
-		]);
+		const newSection = {
+			pageSectionId: uuidv4(),
+			pageId: 'xxxx-xxxx-xxxx-xxxx',
+			name: 'Untitled Section',
+			headline: '',
+			description: '',
+			backgroundColorId: '',
+			displayOrder: sections.length,
+		};
+
+		setSections((previousValue) => [...previousValue, newSection]);
+		setCurrentSection(newSection);
 	};
+
+	const handleSectionClick = (section: PageSectionModel) => {
+		setCurrentSection(section);
+	};
+
+	useEffect(() => {
+		setCurrentSection(undefined);
+	}, [currentTab]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -103,7 +152,13 @@ export const Component = () => {
 					<Tab.Content>
 						<Tab.Pane eventKey="LAYOUT">
 							{sections.map((section) => (
-								<div key={section.pageSectionId} className="p-6 border-bottom">
+								<div
+									key={section.pageSectionId}
+									className={classNames(classes.sectionButton, {
+										active: currentSection?.pageSectionId === section.pageSectionId,
+									})}
+									onClick={() => handleSectionClick(section)}
+								>
 									{section.name}
 								</div>
 							))}
@@ -124,6 +179,18 @@ export const Component = () => {
 					</Tab.Content>
 				</Tab.Container>
 			</div>
+			<CSSTransition in={!!currentSection} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
+				<div className={classes.asideShelf}>
+					{currentSection && (
+						<PageSectionShelf
+							pageSection={currentSection}
+							onClose={() => {
+								setCurrentSection(undefined);
+							}}
+						/>
+					)}
+				</div>
+			</CSSTransition>
 			<div className={classes.previewPane}>
 				<div className={classes.previewPage}>
 					<PageHeader
