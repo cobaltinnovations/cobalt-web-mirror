@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { PageSectionModel } from '@/lib/models';
@@ -40,7 +40,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.right-to-left-enter-active': {
 			opacity: 1,
 			transform: 'translateX(0)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
 		},
 		'.right-to-left-exit': {
 			opacity: 1,
@@ -49,7 +49,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.right-to-left-exit-active': {
 			opacity: 0,
 			transform: 'translateX(-100%)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
 		},
 		'.left-to-right-enter ': {
 			opacity: 0,
@@ -58,7 +58,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.left-to-right-enter-active': {
 			opacity: 1,
 			transform: 'translateX(0)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
 		},
 		'.left-to-right-exit': {
 			opacity: 1,
@@ -67,7 +67,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'.left-to-right-exit-active': {
 			opacity: 0,
 			transform: 'translateX(100%)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
+			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
 		},
 	},
 }));
@@ -79,14 +79,20 @@ interface SectionShelfProps {
 }
 
 enum PAGE_STATES {
-	SETTINGS = 'SETTINGS',
+	SECTION_SETTINGS = 'SECTION_SETTINGS',
 	ADD_ROW = 'ADD_ROW',
+	ROW_SETTINGS = 'ROW_SETTINGS',
 }
 
 export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShelfProps) => {
 	const classes = useStyles();
-	const [pageState, setPageState] = useState(PAGE_STATES.SETTINGS);
+	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
+
+	useEffect(() => {
+		setIsNext(false);
+		setPageState(PAGE_STATES.SECTION_SETTINGS);
+	}, [pageSection.pageSectionId]);
 
 	return (
 		<TransitionGroup
@@ -100,7 +106,7 @@ export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShel
 		>
 			<CSSTransition key={pageState} timeout={PAGE_TRANSITION_DURATION_MS} classNames="item">
 				<>
-					{pageState === PAGE_STATES.SETTINGS && (
+					{pageState === PAGE_STATES.SECTION_SETTINGS && (
 						<div className={classes.page}>
 							<div className={classes.header}>
 								<div>
@@ -131,14 +137,93 @@ export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShel
 							<div className={classes.header}>
 								<div className="d-flex align-items-center justify-start">
 									<Button
+										className="me-2"
 										onClick={() => {
 											setIsNext(false);
-											setPageState(PAGE_STATES.SETTINGS);
+											setPageState(PAGE_STATES.SECTION_SETTINGS);
 										}}
 									>
 										Back
 									</Button>
 									<h5 className="mb-0">Select row type to add</h5>
+								</div>
+							</div>
+							<div className={classes.body}>
+								<Button
+									onClick={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+								>
+									Resources
+								</Button>
+								<Button
+									onClick={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+								>
+									Group Sessions
+								</Button>
+								<Button
+									onClick={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+								>
+									Tag Group
+								</Button>
+								<Button
+									onClick={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+								>
+									One Col
+								</Button>
+								<Button
+									onClick={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+								>
+									Two Col
+								</Button>
+								<Button
+									onClick={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+								>
+									Three Col
+								</Button>
+							</div>
+						</div>
+					)}
+					{pageState === PAGE_STATES.ROW_SETTINGS && (
+						<div className={classes.page}>
+							<div className={classes.header}>
+								<div className="w-100 d-flex align-items-center justify-content-between">
+									<div className="d-flex align-items-center">
+										<Button
+											className="me-2"
+											onClick={() => {
+												setIsNext(false);
+												setPageState(PAGE_STATES.SECTION_SETTINGS);
+											}}
+										>
+											Back
+										</Button>
+										<h5 className="mb-0">Row settings</h5>
+									</div>
+									<Button
+										variant="danger"
+										onClick={() => {
+											return;
+										}}
+									>
+										Delete Row
+									</Button>
 								</div>
 							</div>
 							<div className={classes.body}>

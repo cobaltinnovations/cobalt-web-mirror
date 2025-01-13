@@ -84,14 +84,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 		'.menu-animation-enter-active': {
 			transform: 'translateX(0)',
-			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
+			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
 		},
 		'.menu-animation-exit': {
 			transform: 'translateX(0)',
 		},
 		'.menu-animation-exit-active': {
 			transform: 'translateX(-100%)',
-			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.32,.99,.32,.99)`,
+			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
 		},
 	},
 }));
