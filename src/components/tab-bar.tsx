@@ -83,6 +83,7 @@ interface TabBarProps {
 	onTabClick?(value: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	hideBorder?: boolean;
 	className?: string;
+	classNameInner?: string;
 	style?: React.CSSProperties;
 }
 
@@ -93,6 +94,7 @@ const TabBar = ({
 	onTabClick,
 	hideBorder,
 	className,
+	classNameInner,
 	style,
 	children,
 }: PropsWithChildren<TabBarProps>) => {
@@ -104,7 +106,7 @@ const TabBar = ({
 	return (
 		<div className={classNames(classes.tabBar, className)} style={style}>
 			{children}
-			<ul>
+			<ul className={classNameInner}>
 				{tabs.map((tab) => {
 					return (
 						<li

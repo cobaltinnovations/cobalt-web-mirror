@@ -1,6 +1,11 @@
-import React from 'react';
-import { createUseThemedStyles } from '@/jss/theme';
+import { v4 as uuidv4 } from 'uuid';
+import React, { useState } from 'react';
+import { Button, Form, Tab } from 'react-bootstrap';
+import { PageSectionModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
+import TabBar from '@/components/tab-bar';
+import { createUseThemedStyles } from '@/jss/theme';
+import InputHelper from '@/components/input-helper';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
@@ -56,12 +61,69 @@ export async function loader() {
 
 export const Component = () => {
 	const classes = useStyles();
+	const [currentTab, setCurrentTab] = useState('LAYOUT');
+	const [sections, setSections] = useState<PageSectionModel[]>([]);
+
+	const handleAddSectionButtonClick = () => {
+		setSections((previousValue) => [
+			...previousValue,
+			{
+				pageSectionId: uuidv4(),
+				pageId: 'xxxx-xxxx-xxxx-xxxx',
+				name: 'Untitled Section',
+				headline: '',
+				description: '',
+				backgroundColorId: '',
+				displayOrder: previousValue.length,
+			},
+		]);
+	};
 
 	return (
 		<div className={classes.wrapper}>
 			{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
 			<div className={classes.header}></div>
-			<div className={classes.aside}></div>
+			<div className={classes.aside}>
+				<Tab.Container id="page-tabs" defaultActiveKey="LAYOUT" activeKey={currentTab}>
+					<TabBar
+						classNameInner="px-6"
+						value={currentTab}
+						tabs={[
+							{
+								title: 'Layout',
+								value: 'LAYOUT',
+							},
+							{
+								title: 'Settings',
+								value: 'SETTINGS',
+							},
+						]}
+						onTabClick={setCurrentTab}
+					/>
+					<Tab.Content>
+						<Tab.Pane eventKey="LAYOUT">
+							{sections.map((section) => (
+								<div key={section.pageSectionId} className="p-6 border-bottom">
+									{section.name}
+								</div>
+							))}
+							<div className="p-6 text-right">
+								<Button variant="outline-primary" onClick={handleAddSectionButtonClick}>
+									Add Section
+								</Button>
+							</div>
+						</Tab.Pane>
+						<Tab.Pane eventKey="SETTINGS">
+							<div className="p-6">
+								<Form>
+									<InputHelper className="mb-6" type="text" label="Page name" required />
+									<InputHelper type="url" label="Friendly url" required />
+								</Form>
+							</div>
+						</Tab.Pane>
+					</Tab.Content>
+				</Tab.Container>
+			</div>
 			<div className={classes.previewPane}>
 				<div className={classes.previewPage}>
 					<PageHeader
