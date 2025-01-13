@@ -54,6 +54,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		bottom: 0,
 		width: 576,
 		zIndex: 1,
+		overflowX: 'hidden',
 		position: 'absolute',
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
