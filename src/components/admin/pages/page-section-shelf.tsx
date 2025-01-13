@@ -24,11 +24,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface SectionShelfProps {
 	pageSection: PageSectionModel;
 	onClose(): void;
+	onDelete(): void;
 }
 
 enum PAGE_STATES {}
 
-export const PageSectionShelf = ({ pageSection, onClose }: SectionShelfProps) => {
+export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShelfProps) => {
 	const classes = useStyles();
 	const [pageState, setPageState] = useState();
 
@@ -37,59 +38,17 @@ export const PageSectionShelf = ({ pageSection, onClose }: SectionShelfProps) =>
 			<div className={classes.header}>
 				<div>
 					<h5 className="mb-0">{pageSection.name}</h5>
-					<h6>{pageSection.pageSectionId}</h6>
+					<span className="small text-gray">{pageSection.pageSectionId}</span>
 				</div>
-				<Button onClick={onClose}>Close</Button>
+				<div className="d-flex align-items-center justify-end">
+					<Button className="me-2" variant="danger" onClick={onDelete}>
+						Delete
+					</Button>
+					<Button onClick={onClose}>Close</Button>
+				</div>
 			</div>
 			<div className={classes.body}>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consequat nulla, id pellentesque
-					nunc. Integer tempus eleifend augue et vestibulum. Phasellus dapibus libero massa, ut venenatis
-					turpis porttitor et. Nulla rutrum leo vel rhoncus interdum. Sed sed lectus leo. Pellentesque a
-					commodo dui. Phasellus tincidunt ipsum vitae turpis tristique vulputate ut ut turpis. Mauris porta
-					facilisis ante non tempus. Pellentesque interdum maximus pulvinar. Quisque egestas ac lacus id
-					finibus. Ut ultrices mauris odio, ac euismod leo euismod nec.
-				</p>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consequat nulla, id pellentesque
-					nunc. Integer tempus eleifend augue et vestibulum. Phasellus dapibus libero massa, ut venenatis
-					turpis porttitor et. Nulla rutrum leo vel rhoncus interdum. Sed sed lectus leo. Pellentesque a
-					commodo dui. Phasellus tincidunt ipsum vitae turpis tristique vulputate ut ut turpis. Mauris porta
-					facilisis ante non tempus. Pellentesque interdum maximus pulvinar. Quisque egestas ac lacus id
-					finibus. Ut ultrices mauris odio, ac euismod leo euismod nec.
-				</p>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consequat nulla, id pellentesque
-					nunc. Integer tempus eleifend augue et vestibulum. Phasellus dapibus libero massa, ut venenatis
-					turpis porttitor et. Nulla rutrum leo vel rhoncus interdum. Sed sed lectus leo. Pellentesque a
-					commodo dui. Phasellus tincidunt ipsum vitae turpis tristique vulputate ut ut turpis. Mauris porta
-					facilisis ante non tempus. Pellentesque interdum maximus pulvinar. Quisque egestas ac lacus id
-					finibus. Ut ultrices mauris odio, ac euismod leo euismod nec.
-				</p>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consequat nulla, id pellentesque
-					nunc. Integer tempus eleifend augue et vestibulum. Phasellus dapibus libero massa, ut venenatis
-					turpis porttitor et. Nulla rutrum leo vel rhoncus interdum. Sed sed lectus leo. Pellentesque a
-					commodo dui. Phasellus tincidunt ipsum vitae turpis tristique vulputate ut ut turpis. Mauris porta
-					facilisis ante non tempus. Pellentesque interdum maximus pulvinar. Quisque egestas ac lacus id
-					finibus. Ut ultrices mauris odio, ac euismod leo euismod nec.
-				</p>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consequat nulla, id pellentesque
-					nunc. Integer tempus eleifend augue et vestibulum. Phasellus dapibus libero massa, ut venenatis
-					turpis porttitor et. Nulla rutrum leo vel rhoncus interdum. Sed sed lectus leo. Pellentesque a
-					commodo dui. Phasellus tincidunt ipsum vitae turpis tristique vulputate ut ut turpis. Mauris porta
-					facilisis ante non tempus. Pellentesque interdum maximus pulvinar. Quisque egestas ac lacus id
-					finibus. Ut ultrices mauris odio, ac euismod leo euismod nec.
-				</p>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non consequat nulla, id pellentesque
-					nunc. Integer tempus eleifend augue et vestibulum. Phasellus dapibus libero massa, ut venenatis
-					turpis porttitor et. Nulla rutrum leo vel rhoncus interdum. Sed sed lectus leo. Pellentesque a
-					commodo dui. Phasellus tincidunt ipsum vitae turpis tristique vulputate ut ut turpis. Mauris porta
-					facilisis ante non tempus. Pellentesque interdum maximus pulvinar. Quisque egestas ac lacus id
-					finibus. Ut ultrices mauris odio, ac euismod leo euismod nec.
-				</p>
+				<Button>Add Row</Button>
 			</div>
 		</>
 	);

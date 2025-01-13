@@ -124,6 +124,11 @@ export const Component = () => {
 		setCurrentSection(section);
 	};
 
+	const handlePageSectionDelete = (section: PageSectionModel) => {
+		setSections((previousValue) => previousValue.filter((s) => s.pageSectionId !== section.pageSectionId));
+		setCurrentSection(undefined);
+	};
+
 	useEffect(() => {
 		setCurrentSection(undefined);
 	}, [currentTab]);
@@ -184,6 +189,9 @@ export const Component = () => {
 					{currentSection && (
 						<PageSectionShelf
 							pageSection={currentSection}
+							onDelete={() => {
+								handlePageSectionDelete(currentSection);
+							}}
 							onClose={() => {
 								setCurrentSection(undefined);
 							}}
