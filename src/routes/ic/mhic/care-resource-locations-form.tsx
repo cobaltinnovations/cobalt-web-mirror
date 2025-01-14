@@ -163,7 +163,7 @@ export const Component = () => {
 					? CARE_RESOURCE_LOCATION_STATUS.AVAILABLE
 					: CARE_RESOURCE_LOCATION_STATUS.UNAVAILABLE
 				: CARE_RESOURCE_LOCATION_STATUS.AVAILABLE,
-		phoneNumber: careResourceLocation?.phoneNumber ?? '',
+		phoneNumber: careResourceLocation?.formattedPhoneNumber ?? '',
 		emailAddress: careResourceLocation?.emailAddress ?? '',
 		website: careResourceLocation?.websiteUrl ?? '',
 		appointmentTypeInPerson: careResourceLocation?.appointmentTypeInPerson ?? false,
