@@ -127,4 +127,12 @@ export const institutionService = {
 			url: '/institution-resources?institutionResourceGroupId=' + resourceGroupUrlNameOrId,
 		});
 	},
+	getGoogleMapsApiKey(institutionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			googleMapsPlatformApiKey: string;
+		}>({
+			method: 'GET',
+			url: `/institutions/${institutionId}/google-maps-platform-api-key`,
+		});
+	},
 };

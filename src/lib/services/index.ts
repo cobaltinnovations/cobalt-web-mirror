@@ -5,6 +5,7 @@ export * from './appointment-service';
 export * from './assessment-service';
 export * from './calendar-events-service';
 export * from './call-to-action-service';
+export * from './care-resource-service';
 export * from './content-service';
 export * from './faqs-service';
 export * from './feedback-service';

@@ -371,6 +371,13 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			minHeight: '50% !important',
 		},
 
+		'.shadow': {
+			boxShadow: theme.elevation.e200,
+		},
+		'.shadow-lg': {
+			boxShadow: theme.elevation.e400,
+		},
+
 		/* ----------------------------------------------------------- */
 		/* React Bootstrap Typeahead Helper (RBT) */
 		/* ----------------------------------------------------------- */

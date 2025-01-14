@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import { SORT_DIRECTION } from '.';
 import { createUseThemedStyles } from '@/jss/theme';
 
+import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+
 interface UseStylesProps {
 	header?: boolean;
 	width?: string | number;
@@ -37,11 +39,11 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		whiteSpace: ({ header }: UseStylesProps) => (header ? 'nowrap' : undefined),
 	},
 	sortableButton: {
-		width: 44,
-		height: 44,
+		padding: 0,
 		alignItems: 'center',
 		display: 'inline-flex',
 		justifyContent: 'center',
+		textDecoration: 'none',
 		'&:focus': {
 			boxShadow: 'none !important',
 		},
@@ -102,13 +104,16 @@ export const TableCell: FC<TableCellProps> = React.memo(
 		return (
 			<td className={classes.tableCell} colSpan={colSpan}>
 				<div className={classNames(classes.tableCellContent, className)}>
-					{children}
-					{header && sortable && (
+					{header && sortable ? (
 						<Button variant="link" className={classes.sortableButton} onClick={handleSortButtonClick}>
-							{!sortDirection && <>Not Sorting</>}
-							{sortDirection === SORT_DIRECTION.ASC && <>Sorting ASC</>}
-							{sortDirection === SORT_DIRECTION.DESC && <>Sorting DESC</>}
+							{children}
+							{sortDirection === SORT_DIRECTION.ASC && (
+								<DownChevron width={20} height={20} style={{ transform: 'scaleY(-1)' }} />
+							)}
+							{sortDirection === SORT_DIRECTION.DESC && <DownChevron width={20} height={20} />}
 						</Button>
+					) : (
+						<> {children}</>
 					)}
 				</div>
 			</td>

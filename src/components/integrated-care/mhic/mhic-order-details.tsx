@@ -12,6 +12,7 @@ import {
 	MhicEpisodeCard,
 	MhicNextStepsAlerts,
 	MhicNextStepsAppointment,
+	MhicNextStepsResources,
 	MhicScheduleAssessmentModal,
 	MhicScheduleCallCompleteModal,
 	MhicScheduleCallModal,
@@ -672,6 +673,22 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					)}
 				</Container>
 			</section>
+			{assessmentStatus === ASSESSMENT_STATUS.COMPLETE && (
+				<section>
+					<Container fluid>
+						<Row className="mb-6">
+							<Col>
+								<h4 className="mb-0">Resources</h4>
+							</Col>
+						</Row>
+						<MhicNextStepsResources
+							patientOrder={patientOrder}
+							referenceData={referenceDataResponse}
+							disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+						/>
+					</Container>
+				</section>
+			)}
 			<section>
 				<Container fluid>
 					<Row className="mb-6">

@@ -7,8 +7,9 @@ import { PatientOrderAutocompleteResult, PatientOrderModel } from '@/lib/models'
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
-import { Link, useMatch, useNavigate } from 'react-router-dom';
+import { Link, matchPath, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
+import HeaderNavDropdown from '@/components/header-nav-dropdown';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 interface MhicHeaderProps {
@@ -56,13 +57,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 			height: '100%',
 			position: 'relative',
 			'& a:not(.dropdown-item), & .dropdown button': {
+				border: 0,
 				height: '100%',
 				display: 'flex',
 				padding: '0 12px',
 				alignItems: 'center',
 				textDecoration: 'none',
 				...theme.fonts.default,
-				color: theme.colors.n500,
+				color: theme.colors.n900,
 				...theme.fonts.bodyNormal,
 				'&:hover': {
 					color: theme.colors.p700,
@@ -117,7 +119,8 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const classes = useStyles();
 	const { signOutAndClearContext } = useAccount();
 	const navigate = useNavigate();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
+	const location = useLocation();
 
 	const overviewMatch = useMatch({
 		path: '/ic/mhic/overview/*',
@@ -128,12 +131,17 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 	const patientOrdersMatch = useMatch({
 		path: '/ic/mhic/patient-orders/*',
 	});
-	const reportsMatch = useMatch({
-		path: '/ic/mhic/reports',
+	const adminMatch = useMatch({
+		path: '/ic/mhic/admin/*',
 	});
-	const departmentAvailabilityMatch = useMatch({
-		path: '/ic/mhic/department-availability',
-	});
+
+	const hideDefaultHeaderRoutes = [
+		'/ic/mhic/resource-locations/add',
+		'/ic/mhic/resource-locations/:careResourceLocationId/edit',
+		'/ic/mhic/admin/resources/:careResourceId/add-location',
+		'/ic/mhic/resource-search/:patientOrderId',
+	].some((path) => matchPath(path, location.pathname));
+
 	const assessmentMatch = useMatch({
 		path: '/ic/mhic/order-assessment/:patientOrderId/*',
 	});
@@ -158,39 +166,63 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Patient Orders',
 				active: patientOrdersMatch,
 			},
-			...(account?.accountCapabilityFlags.canAdministerIcDepartments
-				? [
-						{
-							testId: '',
-							navigationItemId: 'REPORTS',
-							to: '/ic/mhic/department-availability',
-							title: 'Department Availability',
-							active: !!departmentAvailabilityMatch,
-						},
-				  ]
-				: []),
-			...(account?.accountCapabilityFlags.canViewIcReports
-				? [
-						{
-							testId: '',
-							navigationItemId: 'REPORTS',
-							to: '/ic/mhic/reports',
-							title: 'Reports',
-							active: !!reportsMatch,
-						},
-				  ]
-				: []),
+			{
+				testId: '',
+				navigationItemId: 'ADMIN',
+				title: 'Admin',
+				active: adminMatch,
+				items: [
+					...(account?.accountCapabilityFlags.canManageCareResources && institution?.resourcePacketsEnabled
+						? [
+								{
+									testId: '',
+									navigationItemId: 'RESOURCES',
+									to: '/ic/mhic/admin/resources',
+									title: 'Resources',
+									active: false,
+								},
+						  ]
+						: []),
+					...(account?.accountCapabilityFlags.canAdministerIcDepartments
+						? [
+								{
+									testId: '',
+									navigationItemId: 'DEPARTMENT_AVAILABILITY',
+									to: '/ic/mhic/admin/department-availability',
+									title: 'Department Availability',
+									active: false,
+								},
+						  ]
+						: []),
+					...(account?.accountCapabilityFlags.canViewIcReports
+						? [
+								{
+									testId: '',
+									navigationItemId: 'REPORTS',
+									to: '/ic/mhic/admin/reports',
+									title: 'Reports',
+									active: false,
+								},
+						  ]
+						: []),
+				],
+			},
 		],
 		[
-			overviewMatch,
-			myPatientsMatch,
-			patientOrdersMatch,
 			account?.accountCapabilityFlags.canAdministerIcDepartments,
+			account?.accountCapabilityFlags.canManageCareResources,
 			account?.accountCapabilityFlags.canViewIcReports,
-			departmentAvailabilityMatch,
-			reportsMatch,
+			adminMatch,
+			institution?.resourcePacketsEnabled,
+			myPatientsMatch,
+			overviewMatch,
+			patientOrdersMatch,
 		]
 	);
+
+	if (hideDefaultHeaderRoutes) {
+		return null;
+	}
 
 	return (
 		<header className={classes.header}>
@@ -209,11 +241,27 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				) : (
 					<nav className="h-100">
 						<ul>
-							{navigationLinks.map((link, index) => (
-								<li key={index} className={classNames({ active: link.active })}>
-									{link.to && <Link to={link.to}>{link.title}</Link>}
-								</li>
-							))}
+							{navigationLinks.map((link, index) => {
+								if (link.items) {
+									return (
+										<li key={index} className={classNames({ active: link.active })}>
+											<HeaderNavDropdown title={link.title} featuredItem={null}>
+												{link.items.map((item, itemIndex) => (
+													<Dropdown.Item key={itemIndex} to={item.to} as={Link}>
+														{item.title}
+													</Dropdown.Item>
+												))}
+											</HeaderNavDropdown>
+										</li>
+									);
+								}
+
+								return (
+									<li key={index} className={classNames({ active: link.active })}>
+										{link.to && <Link to={link.to}>{link.title}</Link>}
+									</li>
+								);
+							})}
 						</ul>
 					</nav>
 				)}

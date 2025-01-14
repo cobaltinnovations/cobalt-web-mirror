@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Cancel, CancelTokenSource } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
 // Axios TS Definitions:
 // https://github.com/axios/axios/blob/master/index.d.ts
 

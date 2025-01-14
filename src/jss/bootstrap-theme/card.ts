@@ -30,6 +30,17 @@ export const card = (theme: CobaltTheme) => {
 		'.ic-card': {
 			borderRadius: 4,
 			border: `1px solid ${theme.colors.border}`,
+			'&--care-resource-location': {
+				border: 0,
+				'& .cobalt-card': {
+					'&__body': {
+						padding: 24,
+						borderRadius: 8,
+						backgroundColor: theme.colors.n75,
+						border: `1px solid ${theme.colors.border}`,
+					},
+				},
+			},
 			'& .cobalt-card': {
 				'&__header': {
 					padding: '14px 16px',
@@ -38,6 +49,10 @@ export const card = (theme: CobaltTheme) => {
 					borderTopRightRadius: 4,
 					backgroundColor: theme.colors.n75,
 					borderBottom: `1px solid ${theme.colors.border}`,
+					'&--mid': {
+						borderRadius: 0,
+						borderTop: `1px solid ${theme.colors.border}`,
+					},
 					'& .button-container': {
 						right: 16,
 						top: '50%',
@@ -55,38 +70,42 @@ export const card = (theme: CobaltTheme) => {
 					textTransform: 'none',
 				},
 				'&__body': {
-					borderTop: `1px solid ${theme.colors.n100}`,
+					borderTop: `0px solid ${theme.colors.n100}`,
 					padding: '20px 16px',
 					borderBottomLeftRadius: 4,
 					borderBottomRightRadius: 4,
 					backgroundColor: theme.colors.n0,
+					'&--top': {
+						borderTopLeftRadius: 4,
+						borderTopRightRadius: 4,
+					},
 				},
 			},
 		},
 		'.form-card': {
-			borderRadius: 4,
+			borderRadius: 8,
 			border: `1px solid ${theme.colors.border}`,
 			'& .cobalt-card': {
 				'&__header': {
 					padding: 16,
 					position: 'relative',
-					borderTopLeftRadius: 4,
-					borderTopRightRadius: 4,
+					borderTopLeftRadius: 8,
+					borderTopRightRadius: 8,
 					backgroundColor: theme.colors.n0,
 					borderBottom: `1px solid ${theme.colors.border}`,
 					'&.collapsed': {
-						borderRadius: 4,
+						borderRadius: 8,
 						borderBottom: 'none',
 					},
 				},
 				'&__body': {
 					borderTop: `1px solid ${theme.colors.n100}`,
 					padding: 16,
-					borderBottomLeftRadius: 4,
-					borderBottomRightRadius: 4,
+					borderBottomLeftRadius: 8,
+					borderBottomRightRadius: 8,
 					backgroundColor: theme.colors.n0,
 					'&.no-header': {
-						borderRadius: 4,
+						borderRadius: 8,
 					},
 				},
 			},

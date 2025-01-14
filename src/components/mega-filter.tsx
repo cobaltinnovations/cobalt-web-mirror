@@ -12,13 +12,14 @@ import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.
 
 interface UseStylesProps {
 	displaySingleColumn?: boolean;
+	maxWidth?: number;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
 		width: '90%',
 		height: '100%',
-		maxWidth: ({ displaySingleColumn }: UseStylesProps) => (displaySingleColumn ? 480 : 720),
+		maxWidth: ({ maxWidth }: UseStylesProps) => maxWidth ?? 720,
 		margin: '0 auto',
 		'& .modal-content': {
 			maxHeight: '90vh',
@@ -106,6 +107,7 @@ export interface MegaFilterProps {
 	displayFilterIcon?: boolean;
 	displayDownArrow?: boolean;
 	applyOnChange?: boolean;
+	maxWidth?: number;
 	className?: string;
 }
 
@@ -121,9 +123,10 @@ function MegaFilter({
 	displayFilterIcon = false,
 	displayDownArrow = true,
 	applyOnChange,
+	maxWidth,
 	className,
 }: MegaFilterProps) {
-	const classes = useStyles({ displaySingleColumn });
+	const classes = useStyles({ displaySingleColumn, maxWidth });
 	const [show, setShow] = useState(false);
 	const [internalValue, setInternalValue] = useState<Filter[]>([]);
 	const activeLength = useMemo(() => value.map((v) => v.value).flat().length, [value]);
@@ -333,6 +336,26 @@ const MegaFilterCollapse = ({
 				</div>
 			</Collapse>
 		</>
+	);
+};
+
+export const megaFilterValueAsSearchParams = (value: Filter[]) => {
+	return value.reduce(
+		(accumulator, currentvalue) => ({
+			...accumulator,
+			...(currentvalue.value.length > 0 ? { [currentvalue.id]: currentvalue.value } : {}),
+		}),
+		{}
+	);
+};
+
+export const getMegaFilterWithValueCleared = (value: Filter[]) => {
+	return value.map(
+		(currentvalue) => ({
+			...currentvalue,
+			value: [],
+		}),
+		[]
 	);
 };
 

@@ -1,4 +1,5 @@
 import { AccountModel } from './account';
+import { ResourcePacketModel } from './care-resource-models';
 import { PatientOrderOutreachTypeId } from './reference-data';
 import { ROLE_ID } from './roles';
 import { ScreeningSession, ScreeningSessionResult } from './screening-models';
@@ -131,6 +132,7 @@ export interface PatientOrderModel {
 	patientOrderResponseStatusId?: PatientOrderResponseStatusId;
 	patientOrderSafetyPlanningStatusId?: PatientOrderSafetyPlanningStatusId;
 	patientOrderResourcingStatusId?: PatientOrderResourcingStatusId;
+	resourcesSentFlag?: boolean;
 	resourcesSentAt?: string;
 	resourcesSentAtDescription?: string;
 	resourcesSentNote?: string;
@@ -253,6 +255,10 @@ export interface PatientOrderModel {
 	nextContactScheduledAtTimeDescription?: string;
 
 	patientOrderScheduledOutreaches: PatientOrderScheduledOutreach[];
+
+	// New for care resource packets
+	// Only exists if patient order requires resources
+	resourcePacket?: ResourcePacketModel;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {

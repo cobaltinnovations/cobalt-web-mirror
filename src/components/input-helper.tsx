@@ -16,7 +16,7 @@ interface UseStylesProps {
 
 const useInputHelperStyles = createUseThemedStyles((theme) => ({
 	inputHelper: {
-		borderRadius: 5,
+		borderRadius: 8,
 		overflow: 'hidden',
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
@@ -100,6 +100,7 @@ export interface InputHelperProps extends FormControlProps, PropsWithChildren {
 	error?: ReactNode;
 	required?: boolean;
 	autoFocus?: boolean;
+	placeholder?: string;
 }
 
 const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(

@@ -67,10 +67,11 @@ export interface InputHelperSearchProps extends FormControlProps {
 	className?: string;
 	autoFocus?: boolean;
 	onClear(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	placeholder?: string;
 }
 
 const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchProps>(
-	({ className, autoFocus, onClear, ...props }, ref) => {
+	({ className, autoFocus, onClear, placeholder, ...props }, ref) => {
 		const classes = useInputHelperSearchStyles();
 
 		return (
@@ -83,6 +84,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 						bsPrefix="input-helper__input--search"
 						type="search"
 						autoFocus={autoFocus}
+						placeholder={placeholder}
 						{...props}
 					/>
 					{props.value && (

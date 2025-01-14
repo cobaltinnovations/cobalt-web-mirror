@@ -77,6 +77,7 @@ export interface AccountModel {
 		canViewProviderReportAppointmentsEap: boolean; // PROVIDER_APPOINTMENTS_EAP report option in dropdown
 		canViewProviderReportAppointmentCancelations: boolean; // `PROVIDER_APPOINTMENT_CANCELATIONS` report option in dropdown
 		canViewProviderReportUnusedAvailability: boolean; // `PROVIDER_UNUSED_AVAILABILITY` report option in dropdown
+		canManageCareResources: boolean;
 	};
 }
 

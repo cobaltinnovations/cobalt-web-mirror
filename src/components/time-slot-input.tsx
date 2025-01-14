@@ -12,7 +12,7 @@ for (let i = 0; i < totalSlotsInDay; i += 15) {
 	timeSlots.push(timeSlot.format(DateFormats.UI.TimeSlotInput));
 }
 
-const TimeSlotInput = (props: InputHelperProps) => {
+const TimeSlotInput = (props: InputHelperProps & { placeholder?: string }) => {
 	return (
 		<InputHelper as="select" {...props}>
 			<option value="" disabled>

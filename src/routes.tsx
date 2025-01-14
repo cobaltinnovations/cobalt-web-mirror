@@ -972,15 +972,42 @@ export const routes: RouteObject[] = [
 										],
 									},
 									{
-										id: 'department-availability',
-										path: 'department-availability',
-										lazy: () => import('@/routes/ic/mhic/department-availability'),
+										id: 'mhic-admin',
+										path: 'admin',
+										children: [
+											{
+												id: 'mhic-admin-care-resources',
+												path: 'resources',
+												lazy: () => import('@/routes/ic/mhic/care-resources'),
+											},
+											{
+												id: 'mhic-admin-care-resources-detail',
+												path: 'resources/:careResourceId',
+												lazy: () => import('@/routes/ic/mhic/care-resources-detail'),
+											},
+											{
+												id: 'mhic-admin-care-resources-location-add',
+												path: 'resources/:careResourceId/location/add',
+												lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
+											},
+											{
+												id: 'mhic-admin-care-resources-location-edit',
+												path: 'resources/:careResourceId/location/:careResourceLocationId/edit',
+												lazy: () => import('@/routes/ic/mhic/care-resource-locations-form'),
+											},
+											{
+												id: 'department-availability',
+												path: 'department-availability',
+												lazy: () => import('@/routes/ic/mhic/department-availability'),
+											},
+											{
+												id: 'reports',
+												path: 'reports',
+												lazy: () => import('@/routes/ic/mhic/reports'),
+											},
+										],
 									},
-									{
-										id: 'reports',
-										path: 'reports',
-										lazy: () => import('@/routes/ic/mhic/reports'),
-									},
+
 									{
 										path: 'connect-with-support/mhp',
 										element: <ConnectWithSupportV2 />,

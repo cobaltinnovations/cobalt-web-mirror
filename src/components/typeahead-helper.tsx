@@ -1,10 +1,11 @@
-import React, { ReactElement, useState } from 'react';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import React, { ReactElement, useCallback, useState } from 'react';
+import { AsyncTypeahead, Typeahead } from 'react-bootstrap-typeahead';
 import { TypeaheadComponentProps } from 'react-bootstrap-typeahead/types/components/Typeahead';
 
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
+import useHandleError from '@/hooks/use-handle-error';
 
 interface UseStylesProps {
 	isHovered: boolean;
@@ -16,7 +17,7 @@ interface UseStylesProps {
 const useStyles = createUseThemedStyles((theme) => ({
 	typeaheadHelper: {
 		minHeight: 54,
-		borderRadius: 5,
+		borderRadius: 8,
 		position: 'relative',
 		backgroundColor: theme.colors.n0,
 		border: ({ isHovered, isFocused, hasError }: UseStylesProps) =>
@@ -49,26 +50,32 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface TypeaheadHelperProps extends TypeaheadComponentProps {
+interface TypeaheadHelperProps<T> extends TypeaheadComponentProps {
 	label: string;
 	required?: boolean;
 	error?: string;
 	helperText?: string;
 	characterCounter?: number;
 	className?: string;
+	fetchData?(query: string): Promise<T>;
+	onFetchResolve?(response: T): void;
 }
 
-export function TypeaheadHelper({
+export function TypeaheadHelper<T>({
 	label,
 	required,
 	error,
 	helperText,
 	characterCounter,
 	className,
+	fetchData,
+	onFetchResolve,
 	...props
-}: TypeaheadHelperProps): ReactElement {
+}: TypeaheadHelperProps<T>): ReactElement {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const handleError = useHandleError();
 
 	const classes = useStyles({
 		isHovered,
@@ -105,6 +112,25 @@ export function TypeaheadHelper({
 		}
 	}
 
+	const handleOnSearch = useCallback(
+		async (query: string) => {
+			if (!fetchData || !onFetchResolve) {
+				return;
+			}
+
+			try {
+				setIsLoading(true);
+				const response = await fetchData(query);
+				onFetchResolve(response);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[fetchData, handleError, onFetchResolve]
+	);
+
 	return (
 		<div className={classNames('typeahead-helper', className)}>
 			<Form.Group
@@ -115,7 +141,17 @@ export function TypeaheadHelper({
 				<Form.Label className={classes.label} bsPrefix="input-helper__label">
 					{label} {required && '*'}
 				</Form.Label>
-				<Typeahead onFocus={handleFocus} onBlur={handleBlur} {...props} />
+				{fetchData ? (
+					<AsyncTypeahead
+						isLoading={isLoading}
+						onSearch={handleOnSearch}
+						onFocus={handleFocus}
+						onBlur={handleBlur}
+						{...props}
+					/>
+				) : (
+					<Typeahead onFocus={handleFocus} onBlur={handleBlur} {...props} />
+				)}
 			</Form.Group>
 			{(helperText || characterCounter) && (
 				<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">
