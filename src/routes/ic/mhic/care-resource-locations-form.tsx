@@ -18,6 +18,7 @@ import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import ToggledInput from '@/components/toggled-input';
+import { CobaltError } from '@/lib/http-client';
 
 interface FormValues {
 	careResourceId: string;
@@ -220,13 +221,13 @@ export const Component = () => {
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
-			if (!formValues.address) {
-				throw new Error('address is undefined.');
+			if (formValues.appointmentTypeInPerson && !formValues.address) {
+				throw CobaltError.fromValidationFailed('Address is required for in person appointments.');
 			}
 
 			const requestBody = {
 				careResourceId: formValues.careResourceId,
-				googlePlaceId: formValues.address.placeId,
+				...(formValues.address?.placeId && { googlePlaceId: formValues.address.placeId }),
 				name: formValues.locationName,
 				notes: formValues.notes,
 				emailAddress: formValues.emailAddress,
