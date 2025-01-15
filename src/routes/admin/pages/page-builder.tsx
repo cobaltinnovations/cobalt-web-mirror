@@ -2,14 +2,13 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-
+import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
-import { createUseThemedStyles } from '@/jss/theme';
 import InputHelper from '@/components/input-helper';
-import { PageSectionShelf } from '@/components/admin/pages/page-section-shelf';
-import classNames from 'classnames';
+import { AddPageSectionModal, PageSectionShelf } from '@/components/admin/pages';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -111,6 +110,7 @@ export const Component = () => {
 	const classes = useStyles();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [sections, setSections] = useState<PageSectionModel[]>([]);
+	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
 
 	const handleAddSectionButtonClick = () => {
@@ -142,99 +142,122 @@ export const Component = () => {
 	}, [currentTab]);
 
 	return (
-		<div className={classes.wrapper}>
-			{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
-			<div className={classes.header}></div>
-			<div className={classes.aside}>
-				<Tab.Container id="page-tabs" defaultActiveKey="LAYOUT" activeKey={currentTab}>
-					<TabBar
-						classNameInner="px-6"
-						value={currentTab}
-						tabs={[
-							{
-								title: 'Layout',
-								value: 'LAYOUT',
-							},
-							{
-								title: 'Settings',
-								value: 'SETTINGS',
-							},
-						]}
-						onTabClick={setCurrentTab}
-					/>
-					<Tab.Content className={classes.tabContent}>
-						<Tab.Pane eventKey="LAYOUT">
-							{sections.map((section) => (
-								<div
-									key={section.pageSectionId}
-									className={classNames(classes.sectionButton, {
-										active: currentSection?.pageSectionId === section.pageSectionId,
-									})}
-									onClick={() => handleSectionClick(section)}
-								>
-									{section.name}
-								</div>
-							))}
-							<div className="p-6 text-right">
-								<Button variant="outline-primary" onClick={handleAddSectionButtonClick}>
-									Add Section
-								</Button>
-							</div>
-						</Tab.Pane>
-						<Tab.Pane eventKey="SETTINGS">
-							<div className="p-6">
-								<Form>
-									<InputHelper className="mb-6" type="text" label="Page name" required />
-									<InputHelper type="url" label="Friendly url" required />
-								</Form>
-							</div>
-						</Tab.Pane>
-					</Tab.Content>
-				</Tab.Container>
-			</div>
-			<CSSTransition
-				in={!!currentSection}
-				timeout={SHELF_TRANSITION_DURATION_MS}
-				classNames="menu-animation"
-				mountOnEnter
-				unmountOnExit
-			>
-				<div className={classes.asideShelf}>
-					{currentSection && (
-						<PageSectionShelf
-							pageSection={currentSection}
-							onDelete={() => {
-								handlePageSectionDelete(currentSection);
-							}}
-							onClose={() => {
-								setCurrentSection(undefined);
-							}}
+		<>
+			<AddPageSectionModal
+				show={showAddSectionModal}
+				onHide={() => {
+					setShowAddSectionModal(false);
+				}}
+				onSave={() => {
+					handleAddSectionButtonClick();
+					setShowAddSectionModal(false);
+				}}
+			/>
+			<div className={classes.wrapper}>
+				{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
+				<div className={classes.header}></div>
+				<div className={classes.aside}>
+					<Tab.Container id="page-tabs" defaultActiveKey="LAYOUT" activeKey={currentTab}>
+						<TabBar
+							classNameInner="px-6"
+							value={currentTab}
+							tabs={[
+								{
+									title: 'Layout',
+									value: 'LAYOUT',
+								},
+								{
+									title: 'Settings',
+									value: 'SETTINGS',
+								},
+							]}
+							onTabClick={setCurrentTab}
 						/>
-					)}
+						<Tab.Content className={classes.tabContent}>
+							<Tab.Pane eventKey="LAYOUT">
+								{sections.map((section) => (
+									<div
+										key={section.pageSectionId}
+										className={classNames(classes.sectionButton, {
+											active: currentSection?.pageSectionId === section.pageSectionId,
+										})}
+										onClick={() => handleSectionClick(section)}
+									>
+										{section.name}
+									</div>
+								))}
+								<div className="p-6 text-right">
+									<Button
+										variant="outline-primary"
+										onClick={() => {
+											setShowAddSectionModal(true);
+										}}
+									>
+										Add Section
+									</Button>
+								</div>
+							</Tab.Pane>
+							<Tab.Pane eventKey="SETTINGS">
+								<div className="p-6">
+									<Form>
+										<InputHelper className="mb-4" type="text" label="Page name" required />
+										<InputHelper className="mb-4" type="url" label="Friendly url" required />
+										<InputHelper
+											as="select"
+											label="Page Type"
+											required
+											helperText="The type determines where the content lives on Cobalt"
+										/>
+									</Form>
+								</div>
+							</Tab.Pane>
+						</Tab.Content>
+					</Tab.Container>
 				</div>
-			</CSSTransition>
-			<div className={classes.previewPane}>
-				<div className={classes.previewPage}>
-					<PageHeader
-						className="bg-p700 text-white"
-						title={
-							<>
-								<p className="fs-large">Community</p>
-								<h1>Name</h1>
-							</>
-						}
-						descriptionHtml="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed placerat
+				<CSSTransition
+					in={!!currentSection}
+					timeout={SHELF_TRANSITION_DURATION_MS}
+					classNames="menu-animation"
+					mountOnEnter
+					unmountOnExit
+				>
+					<div className={classes.asideShelf}>
+						{currentSection && (
+							<PageSectionShelf
+								pageSection={currentSection}
+								onDelete={() => {
+									handlePageSectionDelete(currentSection);
+								}}
+								onClose={() => {
+									setCurrentSection(undefined);
+								}}
+							/>
+						)}
+					</div>
+				</CSSTransition>
+				<div className={classes.previewPane}>
+					<div className={classes.previewPage}>
+						<PageHeader
+							className="bg-p700 text-white"
+							title={
+								<>
+									<p className="fs-large">Community</p>
+									<h1>Name</h1>
+								</>
+							}
+							descriptionHtml="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed placerat
 											consectetur magna, a pretium purus mattis et. Proin sagittis ex a faucibus
 											pellentesque. Sed posuere neque vel elementum rutrum. Vivamus faucibus
 											blandit nibh ut sodales. Quisque at enim fringilla, fringilla massa sed,
 											porttitor lectus. Morbi ut aliquam purus, sit amet interdum massa. Etiam ac
 											maximus ante. In fermentum dolor in aliquam venenatis. Sed sit amet laoreet
 											ante."
-						//imageUrl={topicCenter?.imageUrl}
-						//imageAlt={topicCenter?.name}
-					/>
+							//imageUrl={topicCenter?.imageUrl}
+							//imageAlt={topicCenter?.name}
+						/>
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
