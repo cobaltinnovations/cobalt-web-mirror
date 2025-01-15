@@ -6,7 +6,7 @@ import { PageSectionModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
-import { RowSelectionForm } from '@/components/admin/pages/row-selection-form';
+import { RowSelectionForm, SectionSettingsForm } from '@/components/admin/pages';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 const PAGE_TRANSITION_DURATION_MS = 600;
@@ -127,56 +127,13 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 									<Button onClick={onClose}>Close</Button>
 								</div>
 							</div>
-							<div className={classes.body}>
-								<Form>
-									<Form.Group>
-										<Form.Label>Basics</Form.Label>
-										<InputHelper className="mb-4" type="text" label="Headline" />
-										<InputHelper className="mb-4" as="textarea" label="Description" />
-									</Form.Group>
-									<Form.Group className="mb-6">
-										<Form.Label className="mb-2">Background color</Form.Label>
-										<Form.Check
-											type="radio"
-											name="background-color"
-											id="background-color--white"
-											label="White"
-										/>
-										<Form.Check
-											type="radio"
-											name="background-color"
-											id="background-color--neutral"
-											label="Neutral"
-										/>
-									</Form.Group>
-									<hr />
-									<Form.Group className="py-6 d-flex align-items-center justify-content-between">
-										<Form.Label className="mb-0">Rows</Form.Label>
-										<Button
-											type="button"
-											size="sm"
-											onClick={() => {
-												setIsNext(true);
-												setPageState(PAGE_STATES.ADD_ROW);
-											}}
-										>
-											Add Row
-										</Button>
-									</Form.Group>
-									<NoData
-										title="No rows added"
-										actions={[
-											{
-												variant: 'primary',
-												title: 'Add row',
-												onClick: () => {
-													setIsNext(true);
-													setPageState(PAGE_STATES.ADD_ROW);
-												},
-											},
-										]}
-									/>
-								</Form>
+							<div className={classNames(classes.body, 'pt-0')}>
+								<SectionSettingsForm
+									onAddRow={() => {
+										setIsNext(true);
+										setPageState(PAGE_STATES.ADD_ROW);
+									}}
+								/>
 							</div>
 						</div>
 					)}
