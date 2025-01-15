@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
-import InputHelper from '@/components/input-helper';
-import NoData from '@/components/no-data';
 import { RowSelectionForm, SectionSettingsForm } from '@/components/admin/pages';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
