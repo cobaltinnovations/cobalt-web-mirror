@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
+import { RowSelectionForm } from '@/components/admin/pages/row-selection-form';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 const PAGE_TRANSITION_DURATION_MS = 600;
@@ -194,55 +196,13 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 									<h5 className="mb-0">Select row type to add</h5>
 								</div>
 							</div>
-							<div className={classes.body}>
-								<Button
-									onClick={() => {
+							<div className={classNames(classes.body, 'pt-0')}>
+								<RowSelectionForm
+									onSelection={() => {
 										setIsNext(true);
 										setPageState(PAGE_STATES.ROW_SETTINGS);
 									}}
-								>
-									Resources
-								</Button>
-								<Button
-									onClick={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-								>
-									Group Sessions
-								</Button>
-								<Button
-									onClick={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-								>
-									Tag Group
-								</Button>
-								<Button
-									onClick={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-								>
-									One Col
-								</Button>
-								<Button
-									onClick={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-								>
-									Two Col
-								</Button>
-								<Button
-									onClick={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-								>
-									Three Col
-								</Button>
+								/>
 							</div>
 						</div>
 					)}
