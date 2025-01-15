@@ -76,8 +76,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface SectionShelfProps {
 	pageSection: PageSectionModel;
-	onClose(): void;
+	onEdit(): void;
 	onDelete(): void;
+	onClose(): void;
 }
 
 enum PAGE_STATES {
@@ -86,7 +87,7 @@ enum PAGE_STATES {
 	ROW_SETTINGS = 'ROW_SETTINGS',
 }
 
-export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShelfProps) => {
+export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: SectionShelfProps) => {
 	const classes = useStyles();
 	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
@@ -111,11 +112,13 @@ export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShel
 					{pageState === PAGE_STATES.SECTION_SETTINGS && (
 						<div className={classes.page}>
 							<div className={classes.header}>
-								<div>
+								<div className="d-flex align-items-center">
 									<h5 className="mb-0">{pageSection.name}</h5>
-									<span className="small text-gray">{pageSection.pageSectionId}</span>
+									<Button className="ms-2" onClick={onEdit}>
+										Edit
+									</Button>
 								</div>
-								<div className="d-flex align-items-center justify-end">
+								<div className="d-flex align-items-center">
 									<Button className="me-2" variant="danger" onClick={onDelete}>
 										Delete
 									</Button>

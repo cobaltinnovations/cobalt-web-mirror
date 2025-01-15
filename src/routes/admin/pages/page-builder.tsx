@@ -9,6 +9,7 @@ import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
 import { AddPageSectionModal, PageSectionShelf } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -111,6 +112,7 @@ export const Component = () => {
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [sections, setSections] = useState<PageSectionModel[]>([]);
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
 	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
 
 	const handleAddSectionButtonClick = () => {
@@ -132,8 +134,12 @@ export const Component = () => {
 		setCurrentSection(section);
 	};
 
-	const handlePageSectionDelete = (section: PageSectionModel) => {
-		setSections((previousValue) => previousValue.filter((s) => s.pageSectionId !== section.pageSectionId));
+	const deleteCurrentSection = () => {
+		if (!currentSection) {
+			throw new Error('currentSection is undefined');
+		}
+
+		setSections((previousValue) => previousValue.filter((s) => s.pageSectionId !== currentSection.pageSectionId));
 		setCurrentSection(undefined);
 	};
 
@@ -153,6 +159,24 @@ export const Component = () => {
 					setShowAddSectionModal(false);
 				}}
 			/>
+
+			<ConfirmDialog
+				show={showDeleteSectionModal}
+				size="lg"
+				titleText="Delete section"
+				bodyText="Are you sure you want to delete {Section Name}?"
+				dismissText="Cancel"
+				confirmText="Delete"
+				destructive
+				onHide={() => {
+					setShowDeleteSectionModal(false);
+				}}
+				onConfirm={() => {
+					deleteCurrentSection();
+					setShowDeleteSectionModal(false);
+				}}
+			/>
+
 			<div className={classes.wrapper}>
 				{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
 				<div className={classes.header}></div>
@@ -225,8 +249,11 @@ export const Component = () => {
 						{currentSection && (
 							<PageSectionShelf
 								pageSection={currentSection}
+								onEdit={() => {
+									setShowAddSectionModal(true);
+								}}
 								onDelete={() => {
-									handlePageSectionDelete(currentSection);
+									setShowDeleteSectionModal(true);
 								}}
 								onClose={() => {
 									setCurrentSection(undefined);
