@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Tab } from 'react-bootstrap';
+import { Badge, Button, Form, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
@@ -10,6 +10,7 @@ import InputHelper from '@/components/input-helper';
 import { AddPageSectionModal, PageSectionShelf } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
+import { useNavigate } from 'react-router-dom';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -28,7 +29,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		right: 0,
 		height: 60,
 		zIndex: 3,
+		display: 'flex',
+		padding: '0 24px',
 		position: 'absolute',
+		alignItems: 'center',
+		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
@@ -109,6 +114,7 @@ export async function loader() {
 
 export const Component = () => {
 	const classes = useStyles();
+	const navigate = useNavigate();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [sections, setSections] = useState<PageSectionModel[]>([]);
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
@@ -179,7 +185,32 @@ export const Component = () => {
 
 			<div className={classes.wrapper}>
 				{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
-				<div className={classes.header}></div>
+				<div className={classes.header}>
+					<div className="d-flex align-items-center">
+						<h5 className="mb-0 me-4">Page Name</h5>
+						<Badge pill bg="outline-dark">
+							Draft
+						</Badge>
+					</div>
+					<div className="d-flex align-items-center">
+						<Button
+							variant="link"
+							className="text-decoration-none"
+							onClick={() => {
+								navigate(-1);
+							}}
+						>
+							Finish Later
+						</Button>
+						<Button
+							onClick={() => {
+								navigate(-1);
+							}}
+						>
+							Publish
+						</Button>
+					</div>
+				</div>
 				<div className={classes.aside}>
 					<Tab.Container id="page-tabs" defaultActiveKey="LAYOUT" activeKey={currentTab}>
 						<TabBar
