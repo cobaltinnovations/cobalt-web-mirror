@@ -4,7 +4,12 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
-import { RowSelectionForm, SectionSettingsForm } from '@/components/admin/pages';
+import { CustomRowForm, RowSelectionForm, SectionSettingsForm } from '@/components/admin/pages';
+
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
+import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
+import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 const PAGE_TRANSITION_DURATION_MS = 600;
@@ -114,15 +119,17 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 							<div className={classes.header}>
 								<div className="d-flex align-items-center">
 									<h5 className="mb-0">{pageSection.name}</h5>
-									<Button className="ms-2" onClick={onEdit}>
-										Edit
+									<Button variant="link" className="p-2 ms-2" onClick={onEdit}>
+										<EditIcon />
 									</Button>
 								</div>
 								<div className="d-flex align-items-center">
-									<Button className="me-2" variant="danger" onClick={onDelete}>
-										Delete
+									<Button variant="link" className="p-2" onClick={onDelete}>
+										<TrashIcon />
 									</Button>
-									<Button onClick={onClose}>Close</Button>
+									<Button variant="link" className="p-2" onClick={onClose}>
+										<CloseIcon />
+									</Button>
 								</div>
 							</div>
 							<div className={classNames(classes.body, 'pt-0')}>
@@ -140,13 +147,14 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 							<div className={classes.header}>
 								<div className="d-flex align-items-center justify-start">
 									<Button
-										className="me-2"
+										variant="link"
+										className="p-2 me-2"
 										onClick={() => {
 											setIsNext(false);
 											setPageState(PAGE_STATES.SECTION_SETTINGS);
 										}}
 									>
-										Back
+										<BackArrowIcon />
 									</Button>
 									<h5 className="mb-0">Select row type to add</h5>
 								</div>
@@ -167,107 +175,30 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 								<div className="w-100 d-flex align-items-center justify-content-between">
 									<div className="d-flex align-items-center">
 										<Button
-											className="me-2"
+											variant="link"
+											className="p-2 me-2"
 											onClick={() => {
 												setIsNext(false);
 												setPageState(PAGE_STATES.SECTION_SETTINGS);
 											}}
 										>
-											Back
+											<BackArrowIcon />
 										</Button>
 										<h5 className="mb-0">Row settings</h5>
 									</div>
 									<Button
-										variant="danger"
+										variant="link"
+										className="p-2"
 										onClick={() => {
 											return;
 										}}
 									>
-										Delete Row
+										<TrashIcon />
 									</Button>
 								</div>
 							</div>
-							<div className={classes.body}>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
-								<p>
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nunc ipsum, egestas sit
-									amet imperdiet a, euismod id risus. Curabitur in sapien mauris. Aliquam tincidunt mi
-									varius mi semper varius. Maecenas elementum vulputate tortor sit amet imperdiet. Sed
-									molestie mollis lectus, vel dictum tellus imperdiet nec. Class aptent taciti
-									sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi
-									egestas non purus ac ultricies. Aliquam fermentum consectetur risus, quis accumsan
-									purus pulvinar lacinia. Sed id lacus in magna laoreet posuere. Fusce sed ultricies
-									mauris. Donec vel sagittis lorem. Vivamus pretium hendrerit erat nec porta.
-								</p>
+							<div className={classNames(classes.body, 'pt-0')}>
+								<CustomRowForm />
 							</div>
 						</div>
 					)}
