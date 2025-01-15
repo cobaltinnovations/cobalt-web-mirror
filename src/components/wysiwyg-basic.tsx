@@ -4,6 +4,10 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import 'react-quill/dist/quill.snow.css';
 
+interface UseWysiwygStylesProps {
+	height?: number;
+}
+
 const useWysiwygStyles = createUseThemedStyles((theme) => ({
 	quill: {
 		'& .ql-toolbar': {
@@ -17,6 +21,9 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 			borderBottomRightRadius: 8,
 			borderColor: theme.colors.n100,
 			backgroundColor: theme.colors.n0,
+			'& .ql-editor': {
+				minHeight: ({ height }: UseWysiwygStylesProps) => height ?? 400,
+			},
 		},
 	},
 }));
@@ -26,16 +33,17 @@ interface WysiwygProps {
 	onChange(value: string, delta: unknown, source: unknown, editor: ReactQuill.UnprivilegedEditor): void;
 	disabled?: boolean;
 	className?: string;
+	height?: number;
 }
 
 const formats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
 
 const WysiwygBasic = React.forwardRef(
 	(
-		{ value, onChange, disabled, className }: WysiwygProps,
+		{ value, onChange, disabled, className, height }: WysiwygProps,
 		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
 	) => {
-		const classes = useWysiwygStyles();
+		const classes = useWysiwygStyles({ height });
 		const quillModules = useMemo(
 			() => ({
 				toolbar: [

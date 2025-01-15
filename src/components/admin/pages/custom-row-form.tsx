@@ -12,6 +12,7 @@ export const CustomRowForm = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						height={228}
 						value={''}
 						onChange={() => {
 							throw new Error('Function not implemented.');
@@ -29,6 +30,7 @@ export const CustomRowForm = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						height={228}
 						value={''}
 						onChange={() => {
 							throw new Error('Function not implemented.');
@@ -46,6 +48,7 @@ export const CustomRowForm = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						height={228}
 						value={''}
 						onChange={() => {
 							throw new Error('Function not implemented.');
