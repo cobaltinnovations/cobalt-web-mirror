@@ -460,6 +460,12 @@ export const Component = () => {
 									}
 									onFetchResolve={({ places }) => setPlacesOptions(places)}
 									options={placesOptions}
+									filterBy={(option, props) => {
+										const str = (option as PlaceModel).text.toLowerCase();
+										const search = props.text.toLowerCase().trim();
+
+										return str.indexOf(search) > -1;
+									}}
 									selected={formValues.address ? [formValues.address] : []}
 									onChange={([selected]) => {
 										setFormValues((previousValues) => ({
@@ -507,7 +513,7 @@ export const Component = () => {
 									onChange={(selected) => {
 										setFormValues((previousValues) => ({
 											...previousValues,
-											facilityType: selected as CareResourceTag[],
+											facilityTypes: selected as CareResourceTag[],
 										}));
 									}}
 								/>
