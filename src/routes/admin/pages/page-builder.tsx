@@ -42,6 +42,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
 	},
+	tabContent: {
+		height: 'calc(100% - 57px)',
+		'& .tab-pane': {
+			height: '100%',
+			overflowY: 'auto',
+		},
+	},
 	sectionButton: {
 		padding: 24,
 		cursor: 'pointer',
@@ -155,7 +162,7 @@ export const Component = () => {
 						]}
 						onTabClick={setCurrentTab}
 					/>
-					<Tab.Content>
+					<Tab.Content className={classes.tabContent}>
 						<Tab.Pane eventKey="LAYOUT">
 							{sections.map((section) => (
 								<div

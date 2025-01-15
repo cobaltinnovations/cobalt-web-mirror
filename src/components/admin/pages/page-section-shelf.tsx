@@ -106,7 +106,7 @@ export const PageSectionShelf = ({ pageSection, onDelete, onClose }: SectionShel
 				})
 			}
 		>
-			<CSSTransition key={pageState} timeout={PAGE_TRANSITION_DURATION_MS} classNames="item">
+			<CSSTransition key={pageState} timeout={PAGE_TRANSITION_DURATION_MS}>
 				<>
 					{pageState === PAGE_STATES.SECTION_SETTINGS && (
 						<div className={classes.page}>
