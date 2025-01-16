@@ -3,6 +3,7 @@ import { Await, defer, useNavigate, useRouteLoaderData, useSearchParams } from '
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
+import { AddPageModal } from '@/components/admin/pages';
 
 interface MockPageModel {
 	pageId: string;
@@ -64,6 +65,8 @@ export const Component = () => {
 	const [pagesTotalCount, setPagesTotalCount] = useState(0);
 	const [pagesTotalCountDescription, setPagesTotalCountDescription] = useState('0');
 
+	const [showAddPageModal, setShowAddPageModal] = useState(false);
+
 	const fetchPages = useCallback(async () => {
 		if (!pagesPromise) {
 			return;
@@ -95,6 +98,16 @@ export const Component = () => {
 
 	return (
 		<>
+			<AddPageModal
+				show={showAddPageModal}
+				onHide={() => {
+					setShowAddPageModal(false);
+				}}
+				onContinue={(pageId) => {
+					navigate(`/admin/pages/${pageId}`);
+				}}
+			/>
+
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>
@@ -102,7 +115,7 @@ export const Component = () => {
 							<h2 className="mb-0">Pages</h2>
 							<Button
 								onClick={() => {
-									window.alert('Todo: Add Page');
+									setShowAddPageModal(true);
 								}}
 							>
 								Add Pages

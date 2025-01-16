@@ -28,3 +28,8 @@ export interface PageRowModel {
 	rowTypeId: string;
 	displayOrder: number;
 }
+
+export interface PageFriendlyUrlValidationResult {
+	available: boolean;
+	recommendation: string;
+}
