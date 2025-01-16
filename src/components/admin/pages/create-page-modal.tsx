@@ -5,6 +5,8 @@ import { PageFriendlyUrlValidationResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
+import useHandleError from '@/hooks/use-handle-error';
+import { pagesService } from '@/lib/services';
 
 const useStyles = createUseThemedStyles((_theme) => ({
 	modal: {
@@ -23,6 +25,7 @@ const initialFormValues = {
 };
 
 export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) => {
+	const handleError = useHandleError();
 	const classes = useStyles();
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState(initialFormValues);
@@ -38,9 +41,26 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 		nameInputRef.current?.focus();
 	};
 
-	const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		console.log(formValues);
+
+		try {
+			const response = await pagesService
+				.createPage({
+					name: formValues.pageName,
+					urlName: formValues.friendlyUrl,
+					pageTypeId: formValues.pageType,
+					pageStatusId: '',
+					headline: '',
+					description: '',
+					imageFileUploadId: '',
+					imageAltText: '',
+				})
+				.fetch();
+			onContinue(response.page.pageId);
+		} catch (error) {
+			handleError(error);
+		}
 	};
 
 	return (
@@ -66,6 +86,8 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 						<option value="" disabled>
 							Select page type...
 						</option>
+						<option value="TOPIC_CENTER">Topic Center</option>
+						<option value="COMMUNITY">Community</option>
 					</InputHelper>
 					<InputHelper
 						ref={nameInputRef}
@@ -133,12 +155,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 						<Button type="button" variant="outline-primary" onClick={props.onHide}>
 							Cancel
 						</Button>
-						<Button
-							type="submit"
-							className="ms-2"
-							variant="primary"
-							onClick={() => onContinue('xxx-xxx-xxx-xxx')}
-						>
+						<Button type="submit" className="ms-2" variant="primary">
 							Continue
 						</Button>
 					</div>
