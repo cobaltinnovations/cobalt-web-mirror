@@ -1,12 +1,18 @@
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useRevalidator, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
-import { AnalyticsNativeEventTypeId, FeatureId, InstitutionLocation } from '@/lib/models';
+import {
+	AnalyticsNativeEventTypeId,
+	FeatureId,
+	InstitutionFeatureInstitutionReferrer,
+	InstitutionLocation,
+	InstitutionReferrer,
+} from '@/lib/models';
 import {
 	accountService,
 	FindOptionsResponse,
@@ -15,6 +21,7 @@ import {
 	ProviderSection,
 	providerService,
 	analyticsService,
+	institutionReferrersService,
 } from '@/lib/services';
 import { BookingContext, BookingSource, FILTER_DAYS } from '@/contexts/booking-context';
 import useAccount from '@/hooks/use-account';
@@ -28,6 +35,7 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
+import InlineAlert from '@/components/inline-alert';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -45,6 +53,7 @@ const ConnectWithSupportV2 = () => {
 	const bookingRef = useRef<BookingRefHandle>(null);
 	const { trackEvent } = useAnalytics();
 	const revalidator = useRevalidator();
+	const navigate = useNavigate();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get(SEARCH_PARAMS.START_DATE), [searchParams]);
@@ -73,6 +82,11 @@ const ConnectWithSupportV2 = () => {
 	const featureDetails = useMemo(() => {
 		return (institution?.features ?? []).find((feature) => pathname.includes(feature.urlName));
 	}, [institution?.features, pathname]);
+
+	const [institutionReferrers, setInstitutionReferrers] = useState<InstitutionReferrer[]>([]);
+	const [institutionFeatureInstitutionReferrers, setInstitutionFeatureInstitutionReferrers] = useState<
+		InstitutionFeatureInstitutionReferrer[]
+	>([]);
 
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
@@ -114,6 +128,17 @@ const ConnectWithSupportV2 = () => {
 
 		filtersFetched.current = true;
 	}, [featureDetails, institution]);
+
+	const fetchInstitutionReferrer = useCallback(async () => {
+		if (!featureDetails) {
+			return;
+		}
+
+		const response = await institutionReferrersService.getReferrerByFeatureId(featureDetails.featureId).fetch();
+
+		setInstitutionReferrers(response.institutionReferrers);
+		setInstitutionFeatureInstitutionReferrers(response.institutionFeatureInstitutionReferrers);
+	}, [featureDetails]);
 
 	/* --------------------------------------------------- */
 	/* Get providers based on searchParams  */
@@ -506,6 +531,39 @@ const ConnectWithSupportV2 = () => {
 					</Container>
 				)}
 			</AsyncWrapper>
+
+			<AsyncWrapper fetchData={fetchInstitutionReferrer}>
+				{institutionFeatureInstitutionReferrers.length > 0 && (
+					<Container className="py-10">
+						<Row>
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								{institutionFeatureInstitutionReferrers.map((ifir) => (
+									<InlineAlert
+										variant="warning"
+										title={ifir.ctaTitle}
+										description={ifir.ctaDescription}
+										action={{
+											title: 'Learn more',
+											onClick: () => {
+												const targetReferrer = institutionReferrers.find(
+													(ir) => ir.institutionReferrerId === ifir.institutionReferrerId
+												);
+
+												if (!targetReferrer) {
+													throw new Error('institutionReferrer is undefined.');
+												}
+
+												navigate(`/referrals/${targetReferrer.urlName}`);
+											},
+										}}
+									/>
+								))}
+							</Col>
+						</Row>
+					</Container>
+				)}
+			</AsyncWrapper>
+
 			<AsyncWrapper fetchData={fetchProviders}>
 				{institution.integratedCareEnabled && providerSections.length <= 0 && (
 					<Container className="py-8">

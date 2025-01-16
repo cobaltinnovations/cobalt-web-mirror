@@ -263,7 +263,7 @@ const ShelfContent = ({
 					<p className="mb-0">
 						Phone:{' '}
 						<span className="fw-bold">
-							{patientOrderResponse.patientOrder.patientPhoneNumberDescription}
+							{patientOrderResponse.patientOrder.patientPhoneNumberDescription ?? 'Unknown'}
 						</span>
 					</p>
 					<span className="text-n300 mx-2">|</span>

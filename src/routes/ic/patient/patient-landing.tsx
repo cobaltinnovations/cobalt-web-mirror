@@ -12,6 +12,7 @@ import {
 	PatientOrderIntakeLocationStatusId,
 	PatientOrderIntakeInsuranceStatusId,
 	PatientOrderSafetyPlanningStatusId,
+	PatientOrderReferralSourceId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import { CobaltError } from '@/lib/http-client';
@@ -210,9 +211,15 @@ export const Component = () => {
 			/* ------------------------------------------------------------------ */
 			/* Set defaults for if not terminal */
 			/* ------------------------------------------------------------------ */
-			setIntroductionText(
-				`Your primary care provider, <strong>${response.patientOrder.orderingProviderDisplayName}</strong>, has referred you to the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
-			);
+			if (response.patientOrder.patientOrderReferralSourceId === PatientOrderReferralSourceId.SELF) {
+				setIntroductionText(
+					`Thank you for contacting the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
+				);
+			} else {
+				setIntroductionText(
+					`Your primary care provider, <strong>${response.patientOrder.orderingProviderDisplayName}</strong>, has referred you to the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
+				);
+			}
 
 			/* ------------------------------------------------------------------ */
 			/* Set page state */
@@ -256,7 +263,10 @@ export const Component = () => {
 					<Container className="py-10">
 						<Row className="mb-10">
 							<Col md={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
-								<h1 className="mb-6">Welcome, {patientOrder?.patientFirstName ?? 'patient'}</h1>
+								{patientOrder?.patientFirstName && (
+									<h1 className="mb-6">Welcome, {patientOrder?.patientFirstName}</h1>
+								)}
+								{!patientOrder?.patientFirstName && <h1 className="mb-6">Welcome!</h1>}
 								<hr className="mb-8" />
 								{introductionText && (
 									<p className="mb-0" dangerouslySetInnerHTML={{ __html: introductionText }} />
@@ -306,6 +316,9 @@ export const Component = () => {
 													description={
 														patientOrder?.patientDemographicsConfirmed
 															? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
+															: patientOrder?.patientOrderReferralSourceId ===
+															  PatientOrderReferralSourceId.SELF
+															? 'Review the information we have on file and make sure it is correct.'
 															: 'Review the information provided by your primary care provider and make sure it is correct.'
 													}
 													button={{
@@ -340,6 +353,9 @@ export const Component = () => {
 																	: homescreenState ===
 																	  PAGE_STATES.ASSESSMENT_IN_PROGRESS
 																	? ''
+																	: patientOrder.patientOrderReferralSourceId ===
+																	  PatientOrderReferralSourceId.SELF
+																	? 'There are two ways to complete the assessment. Performing the assessment yourself online can more quickly determine your eligibility and connect you to care.'
 																	: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
 															}
 															button={

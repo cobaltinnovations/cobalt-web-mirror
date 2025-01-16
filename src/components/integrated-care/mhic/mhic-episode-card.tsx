@@ -272,9 +272,20 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<p className="m-0 text-gray">Practice</p>
 							</Col>
 							<Col xs={9}>
-								<p className="m-0">
-									{patientOrder.referringPracticeName} ({patientOrder.referringPracticeId})
-								</p>
+								{patientOrder.referringPracticeName && patientOrder.referringPracticeId && (
+									<p className="m-0">
+										{patientOrder.referringPracticeName} ({patientOrder.referringPracticeId})
+									</p>
+								)}
+								{patientOrder.referringPracticeName && !patientOrder.referringPracticeId && (
+									<p className="m-0">{patientOrder.referringPracticeName}</p>
+								)}
+								{!patientOrder.referringPracticeName && patientOrder.referringPracticeId && (
+									<p className="m-0">Practice {patientOrder.referringPracticeId}</p>
+								)}
+								{!patientOrder.referringPracticeName && !patientOrder.referringPracticeId && (
+									<p className="m-0">N/A</p>
+								)}
 							</Col>
 						</Row>
 						<Row className="mb-4">
@@ -282,7 +293,10 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<p className="m-0 text-gray">Ordering Provider</p>
 							</Col>
 							<Col xs={9}>
-								<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
+								{patientOrder.orderingProviderDisplayName && (
+									<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
+								)}
+								{!patientOrder.orderingProviderDisplayName && <p className="m-0">N/A</p>}
 							</Col>
 						</Row>
 						{/* <Row className="mb-4">
@@ -300,7 +314,10 @@ export const MhicEpisodeCard = ({ patientOrder }: MhicEpisodeCardProps) => {
 								<p className="m-0 text-gray">Billing Provider</p>
 							</Col>
 							<Col xs={9}>
-								<p className="m-0">{patientOrder.billingProviderDisplayName}</p>
+								{patientOrder.billingProviderDisplayName && (
+									<p className="m-0">{patientOrder.billingProviderDisplayName}</p>
+								)}
+								{!patientOrder.billingProviderDisplayName && <p className="m-0">N/A</p>}
 							</Col>
 						</Row>
 					</Container>

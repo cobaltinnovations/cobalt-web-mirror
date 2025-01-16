@@ -11,6 +11,7 @@ export * from './content-feedback-models';
 export * from './content-visibility-type-id-models';
 export * from './content';
 export * from './group-session-models';
+export * from './institution-referrer-models';
 export * from './institution';
 export * from './integrated-care-models';
 export * from './interaction-models';

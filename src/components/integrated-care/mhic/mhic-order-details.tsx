@@ -497,7 +497,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											{patientOrder.screeningSession?.completedAtDescription ??
 												patientOrder.intakeScreeningSession?.completedAtDescription}
 										</strong>{' '}
-										by{' '}
+										{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName && (
+											<span>by </span>
+										)}
 										<strong>
 											{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
 												patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
@@ -724,7 +726,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">Phone Number</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">{patientOrder.patientPhoneNumberDescription}</p>
+												<p className="m-0">
+													{patientOrder.patientPhoneNumberDescription ?? 'Not Available'}
+												</p>
 											</Col>
 										</Row>
 										<Row>
@@ -797,7 +801,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">Date of birth</p>
 											</Col>
 											<Col>
-												<p className="m-0">{patientOrder.patientBirthdateDescription}</p>
+												<p className="m-0">
+													{patientOrder.patientBirthdateDescription ?? 'Unknown'}
+												</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -1015,14 +1021,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Container fluid>
 										<Row>
 											<Col>
-												<div
-													dangerouslySetInnerHTML={{
-														__html: `<p class="mb-0">${patientOrder.comments?.replace(
-															/\n/g,
-															'<br/><br/>'
-														)}</p>`,
-													}}
-												/>
+												{patientOrder.comments && (
+													<div
+														dangerouslySetInnerHTML={{
+															__html: `<p class="mb-0">${patientOrder.comments?.replace(
+																/\n/g,
+																'<br/><br/>'
+															)}</p>`,
+														}}
+													/>
+												)}
+												{!patientOrder.comments && <div>N/A</div>}
 											</Col>
 										</Row>
 									</Container>
@@ -1046,7 +1055,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 														'mb-2': (patientOrder.patientOrderDiagnoses ?? []).length > 0,
 													})}
 												>
-													{patientOrder.associatedDiagnosis}
+													{patientOrder.associatedDiagnosis ?? 'N/A'}
 												</p>
 												{(patientOrder.patientOrderDiagnoses ?? []).length > 0 && (
 													<ul className="mb-0">
@@ -1122,7 +1131,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">Practice</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">{patientOrder.referringPracticeName}</p>
+												<p className="m-0">{patientOrder.referringPracticeName ?? 'Unknown'}</p>
 											</Col>
 										</Row>
 										<Row className="mb-4">
@@ -1130,7 +1139,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<p className="m-0 text-gray">PC Provider</p>
 											</Col>
 											<Col xs={9}>
-												<p className="m-0">{patientOrder.orderingProviderDisplayName}</p>
+												<p className="m-0">
+													{patientOrder.orderingProviderDisplayName ?? 'Unknown'}
+												</p>
 											</Col>
 										</Row>
 										<hr className="mb-4" />
