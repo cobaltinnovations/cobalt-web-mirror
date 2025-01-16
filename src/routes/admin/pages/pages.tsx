@@ -1,56 +1,35 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { Await, defer, useNavigate, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Await, defer, LoaderFunctionArgs, useNavigate, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { GetPagesResponse, pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { AddPageModal } from '@/components/admin/pages';
-
-interface MockPageModel {
-	pageId: string;
-	name: string;
-	statusId: string;
-	statusDescription: string;
-	createdDate: string;
-	createdDateDescription: string;
-	modifiedDate: string;
-	modifiedDateDescription: string;
-	publishedDate: string;
-	publishedDateDescription: string;
-}
+import { PageModel } from '@/lib/models';
 
 interface AdminPagesLoaderData {
-	pagesPromise: Promise<{ pages: MockPageModel[]; totalCount: number; totalCountDescription: string }>;
+	pagesPromise: Promise<GetPagesResponse>;
 }
 
 export function useAdminGroupSessionsLoaderData() {
 	return useRouteLoaderData('admin-pages') as AdminPagesLoaderData;
 }
 
-export async function loader() {
-	const pagesPromise = new Promise((resolve) => {
-		resolve({
-			pages: [
-				{
-					pageId: 'xxxx-xxxx-xxxx-xxxx',
-					name: 'Topic Name',
-					statusId: 'DRAFT',
-					statusDescription: 'Draft',
-					createdDate: 'some-iso-string',
-					createdDateDescription: '2023-08-20',
-					modifiedDate: 'some-iso-string',
-					modifiedDateDescription: '2023-08-20',
-					publishedDate: 'some-iso-string',
-					publishedDateDescription: '2023-08-20',
-				},
-			],
-			totalCount: 1,
-			totalCountDescription: '1',
-		});
-	});
+export async function loader({ request }: LoaderFunctionArgs) {
+	const url = new URL(request.url);
+	const pageNumber = url.searchParams.get('pageNumber');
+	const pageSize = url.searchParams.get('pageSize');
+	const orderBy = url.searchParams.get('orderBy');
 
-	return defer({
-		pagesPromise,
-	});
+	const pagesPromise = pagesService
+		.getPages({
+			...(pageNumber && { pageNumber }),
+			...(pageSize && { pageSize }),
+			...(orderBy && { orderBy }),
+		})
+		.fetch();
+
+	return defer({ pagesPromise });
 }
 
 export const Component = () => {
@@ -61,7 +40,7 @@ export const Component = () => {
 
 	const { pagesPromise } = useAdminGroupSessionsLoaderData();
 	const [isLoading, setIsLoading] = useState(false);
-	const [pages, setPages] = useState<MockPageModel[]>([]);
+	const [pages, setPages] = useState<PageModel[]>([]);
 	const [pagesTotalCount, setPagesTotalCount] = useState(0);
 	const [pagesTotalCountDescription, setPagesTotalCountDescription] = useState('0');
 
@@ -149,9 +128,9 @@ export const Component = () => {
 													}}
 												>
 													<TableCell>{page.name}</TableCell>
-													<TableCell>{page.statusDescription}</TableCell>
-													<TableCell>{page.createdDateDescription}</TableCell>
-													<TableCell>{page.modifiedDateDescription}</TableCell>
+													<TableCell>{page.pageStatusId}</TableCell>
+													<TableCell>[TODO]: Created Desc</TableCell>
+													<TableCell>[TODO]: Modified Desc</TableCell>
 													<TableCell>{page.publishedDateDescription}</TableCell>
 													<TableCell>[TODO]: Actions</TableCell>
 												</TableRow>

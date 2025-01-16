@@ -2,6 +2,12 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import { PageModel } from '@/lib/models';
 
+export interface GetPagesResponse {
+	totalCountDescription: string;
+	totalCount: number;
+	pages: PageModel[];
+}
+
 export const pagesService = {
 	createPage(data: {
 		name: string;
@@ -22,11 +28,7 @@ export const pagesService = {
 		});
 	},
 	getPages(searchParameters?: { pageNumber?: string; pageSize?: string; orderBy?: string }) {
-		return httpSingleton.orchestrateRequest<{
-			totalCountDescription: string;
-			totalCount: number;
-			pages: PageModel[];
-		}>({
+		return httpSingleton.orchestrateRequest<GetPagesResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/pages', searchParameters),
 		});
