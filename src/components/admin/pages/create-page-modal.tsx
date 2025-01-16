@@ -18,8 +18,24 @@ interface AddPageModalProps extends ModalProps {
 	onContinue(pageId: string): void;
 }
 
+enum PAGE_TYPE_IDS {
+	TOPIC_CENTER = 'TOPIC_CENTER',
+	COMMUNITY = 'COMMUNITY',
+}
+
+const pageTypes = [
+	{
+		pageTypeId: PAGE_TYPE_IDS.TOPIC_CENTER,
+		title: 'Topic Center',
+	},
+	{
+		pageTypeId: PAGE_TYPE_IDS.COMMUNITY,
+		title: 'Community',
+	},
+];
+
 const initialFormValues = {
-	pageType: '',
+	pageTypeId: PAGE_TYPE_IDS.TOPIC_CENTER,
 	pageName: '',
 	friendlyUrl: '',
 };
@@ -49,7 +65,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 				.createPage({
 					name: formValues.pageName,
 					urlName: formValues.friendlyUrl,
-					pageTypeId: formValues.pageType,
+					pageTypeId: formValues.pageTypeId,
 					pageStatusId: '',
 					headline: '',
 					description: '',
@@ -74,11 +90,11 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 						as="select"
 						className="mb-4"
 						label="Page Type"
-						value={formValues.pageType}
+						value={formValues.pageTypeId}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								pageType: currentTarget.value,
+								pageTypeId: currentTarget.value as PAGE_TYPE_IDS,
 							}));
 						}}
 						required
@@ -86,8 +102,11 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 						<option value="" disabled>
 							Select page type...
 						</option>
-						<option value="TOPIC_CENTER">Topic Center</option>
-						<option value="COMMUNITY">Community</option>
+						{pageTypes.map((pt) => (
+							<option key={pt.pageTypeId} value={pt.pageTypeId}>
+								{pt.title}
+							</option>
+						))}
 					</InputHelper>
 					<InputHelper
 						ref={nameInputRef}
