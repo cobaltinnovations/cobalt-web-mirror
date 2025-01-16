@@ -6,6 +6,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { AddPageModal } from '@/components/admin/pages';
 import { PageModel } from '@/lib/models';
+import NoData from '@/components/no-data';
 
 interface AdminPagesLoaderData {
 	pagesPromise: Promise<GetPagesResponse>;
@@ -119,6 +120,13 @@ export const Component = () => {
 										</TableRow>
 									</TableHead>
 									<TableBody>
+										{pages.length <= 0 && (
+											<TableRow>
+												<TableCell colSpan={6}>
+													<NoData title="No pages" actions={[]} />
+												</TableCell>
+											</TableRow>
+										)}
 										{pages.map((page) => {
 											return (
 												<TableRow
