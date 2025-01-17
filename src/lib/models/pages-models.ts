@@ -8,13 +8,17 @@ export interface PageModel {
 	name: string;
 	urlName: string;
 	pageTypeId: string;
-	pageStatusId: PAGE_STATUS_ID;
+	pageStatusId: string;
 	headline: string;
 	description: string;
 	imageFileUploadId: string;
 	imageAltText: string;
 	publishedDate: string;
 	publishedDateDescription: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
 }
 
 export interface PageSectionModel {

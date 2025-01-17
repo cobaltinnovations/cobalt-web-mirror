@@ -1,12 +1,28 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { Await, defer, LoaderFunctionArgs, useNavigate, useRouteLoaderData, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import {
+	Await,
+	defer,
+	Link,
+	LoaderFunctionArgs,
+	useNavigate,
+	useRouteLoaderData,
+	useSearchParams,
+} from 'react-router-dom';
+import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
+import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
 import { GetPagesResponse, pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { AddPageModal } from '@/components/admin/pages';
-import { PageModel } from '@/lib/models';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import NoData from '@/components/no-data';
+
+import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
+import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 
 interface AdminPagesLoaderData {
 	pagesPromise: Promise<GetPagesResponse>;
@@ -129,18 +145,111 @@ export const Component = () => {
 										)}
 										{pages.map((page) => {
 											return (
-												<TableRow
-													key={page.pageId}
-													onClick={() => {
-														navigate(`/admin/pages/${page.pageId}`);
-													}}
-												>
-													<TableCell>{page.name}</TableCell>
+												<TableRow key={page.pageId}>
+													<TableCell>
+														<Link
+															className="text-decoration-none"
+															to={`/admin/pages/${page.pageId}`}
+														>
+															{page.name}
+														</Link>
+													</TableCell>
 													<TableCell>{page.pageStatusId}</TableCell>
-													<TableCell>[TODO]: Created Desc</TableCell>
-													<TableCell>[TODO]: Modified Desc</TableCell>
+													<TableCell>{page.createdDescription}</TableCell>
+													<TableCell>{page.lastUpdatedDescription}</TableCell>
 													<TableCell>{page.publishedDateDescription}</TableCell>
-													<TableCell>[TODO]: Actions</TableCell>
+													<TableCell className="text-right">
+														<Dropdown>
+															<Dropdown.Toggle
+																as={DropdownToggle}
+																id={`dropdown--${page.pageId}`}
+																className="p-2"
+															>
+																<MoreIcon className="d-flex" />
+															</Dropdown.Toggle>
+															<Dropdown.Menu
+																compact
+																as={DropdownMenu}
+																align="end"
+																popperConfig={{ strategy: 'fixed' }}
+																renderOnMount
+															>
+																<Dropdown.Item
+																	className="d-flex align-items-center"
+																	onClick={() => {
+																		return;
+																	}}
+																>
+																	<EditIcon
+																		className="me-2 text-n500"
+																		width={20}
+																		height={20}
+																	/>
+																	Edit
+																</Dropdown.Item>
+																<Dropdown.Item
+																	className="d-flex align-items-center"
+																	onClick={() => {
+																		return;
+																	}}
+																>
+																	<CopyIcon
+																		className="me-2 text-n500"
+																		width={20}
+																		height={20}
+																	/>
+																	Duplicate
+																</Dropdown.Item>
+																<Dropdown.Divider />
+																{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
+																	<Dropdown.Item
+																		className="d-flex align-items-center"
+																		onClick={() => {
+																			return;
+																		}}
+																	>
+																		<TrashIcon
+																			className="me-2 text-n500"
+																			width={20}
+																			height={20}
+																		/>
+																		Delete
+																	</Dropdown.Item>
+																)}
+																{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
+																	<>
+																		<Dropdown.Item
+																			className="d-flex align-items-center"
+																			onClick={() => {
+																				return;
+																			}}
+																		>
+																			<ExternalIcon
+																				className="me-2 text-n500"
+																				width={20}
+																				height={20}
+																			/>
+																			View on Cobalt
+																		</Dropdown.Item>
+																		<Dropdown.Divider />
+																		<Dropdown.Item
+																			className="d-flex align-items-center"
+																			onClick={() => {
+																				return;
+																			}}
+																		>
+																			<MinusIcon
+																				className="me-2 text-n500"
+																				width={20}
+																				height={20}
+																			/>
+																			Unpublish
+																		</Dropdown.Item>
+																	</>
+																)}
+															</Dropdown.Menu>
+														</Dropdown>
+													</TableCell>
 												</TableRow>
 											);
 										})}
