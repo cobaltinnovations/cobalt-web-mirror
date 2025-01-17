@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { PageModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
 
 export interface GetPagesResponse {
 	totalCountDescription: string;
@@ -13,11 +13,11 @@ export const pagesService = {
 		name: string;
 		urlName: string;
 		pageTypeId: string;
-		pageStatusId: string;
-		headline: string;
-		description: string;
-		imageFileUploadId: string;
-		imageAltText: string;
+		pageStatusId: PAGE_STATUS_ID;
+		headline?: string;
+		description?: string;
+		imageFileUploadId?: string;
+		imageAltText?: string;
 	}) {
 		return httpSingleton.orchestrateRequest<{
 			page: PageModel;

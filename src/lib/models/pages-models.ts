@@ -1,9 +1,14 @@
+export enum PAGE_STATUS_ID {
+	LIVE = 'LIVE',
+	DRAFT = 'DRAFT',
+}
+
 export interface PageModel {
 	pageId: string;
 	name: string;
 	urlName: string;
 	pageTypeId: string;
-	pageStatusId: string;
+	pageStatusId: PAGE_STATUS_ID;
 	headline: string;
 	description: string;
 	imageFileUploadId: string;

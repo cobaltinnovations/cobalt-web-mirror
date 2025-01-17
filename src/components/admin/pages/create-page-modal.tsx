@@ -1,7 +1,7 @@
 import React, { FC, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import useDebouncedState from '@/hooks/use-debounced-state';
-import { PageFriendlyUrlValidationResult } from '@/lib/models';
+import { PAGE_STATUS_ID, PageFriendlyUrlValidationResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
@@ -66,11 +66,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 					name: formValues.pageName,
 					urlName: formValues.friendlyUrl,
 					pageTypeId: formValues.pageTypeId,
-					pageStatusId: '',
-					headline: '',
-					description: '',
-					imageFileUploadId: '',
-					imageAltText: '',
+					pageStatusId: PAGE_STATUS_ID.DRAFT,
 				})
 				.fetch();
 			onContinue(response.page.pageId);

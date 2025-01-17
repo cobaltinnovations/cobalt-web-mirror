@@ -98,7 +98,7 @@ export const Component = () => {
 									setShowAddPageModal(true);
 								}}
 							>
-								Add Pages
+								Add Page
 							</Button>
 						</div>
 						<hr />
