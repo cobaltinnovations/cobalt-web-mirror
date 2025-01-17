@@ -1,6 +1,9 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import InputHelper from '@/components/input-helper';
+import { AdminFormImageInput } from '../admin-form-image-input';
+import { groupSessionsService } from '@/lib/services';
 
 export const HERO_SECTION_ID = 'HERO';
 
@@ -8,7 +11,8 @@ export const SectionHeroSettingsForm = () => {
 	const [formValues, setFormValues] = useState({
 		headline: '',
 		description: '',
-		image: '',
+		imageFileUploadId: '',
+		imageUrl: '',
 		imageAltText: '',
 	});
 
@@ -36,6 +40,23 @@ export const SectionHeroSettingsForm = () => {
 						...previousValue,
 						description: currentTarget.value,
 					}));
+				}}
+			/>
+			<AdminFormImageInput
+				className="mb-4"
+				imageSrc={formValues.imageUrl}
+				onSrcChange={(nextId, nextSrc) => {
+					setFormValues((previousValue) => ({
+						...previousValue,
+						imageFileUploadId: nextId,
+						imageUrl: nextSrc,
+					}));
+				}}
+				presignedUploadGetter={(blob) => {
+					return groupSessionsService.getPresignedUploadUrl({
+						contentType: blob.type,
+						filename: `${uuidv4()}.jpg`,
+					}).fetch;
 				}}
 			/>
 			<InputHelper

@@ -50,6 +50,7 @@ const ImageUploadCard: FC<ImageUploadCardProps> = ({
 	progress,
 	onChange,
 	onRemove,
+	className,
 	disabled = false,
 }) => {
 	const classes = useStyles({
@@ -57,8 +58,8 @@ const ImageUploadCard: FC<ImageUploadCardProps> = ({
 	});
 
 	return (
-		<Card bsPrefix="form-card">
-			<Card.Body className="no-header">
+		<Card bsPrefix="form-card" className={className}>
+			<Card.Body className="no-header border-0">
 				{imagePreview && <img src={imagePreview} className="mb-3 w-100 d-block" alt="" />}
 
 				<div className="text-center">

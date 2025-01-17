@@ -9,9 +9,15 @@ export interface AdminFormImageInputProps {
 	imageSrc: string;
 	onSrcChange: (newId: string, newSrc: string) => void;
 	presignedUploadGetter: (blob: Blob) => () => Promise<PresignedUploadResponse>;
+	className?: string;
 }
 
-export const AdminFormImageInput = ({ imageSrc, onSrcChange, presignedUploadGetter }: AdminFormImageInputProps) => {
+export const AdminFormImageInput = ({
+	imageSrc,
+	onSrcChange,
+	presignedUploadGetter,
+	className,
+}: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 	const [cropModalImageSrc, setCropModalImageSrc] = useState(imageSrc);
@@ -57,6 +63,7 @@ export const AdminFormImageInput = ({ imageSrc, onSrcChange, presignedUploadGett
 			/>
 
 			<ImageUploadCard
+				className={className}
 				imagePreview={imagePreviewSrc}
 				isUploading={isUploading}
 				progress={progress}
