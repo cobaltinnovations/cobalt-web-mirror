@@ -8,8 +8,8 @@ import {
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import { PageModel } from '@/lib/models';
+import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
+import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
 import { GetPagesResponse, pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
@@ -175,7 +175,7 @@ export const Component = () => {
 										{pages.map((page) => {
 											return (
 												<TableRow key={page.pageId}>
-													<TableCell>
+													<TableCell className="text-nowrap">
 														<Link
 															className="text-decoration-none"
 															to={`/admin/pages/${page.pageId}`}
@@ -183,10 +183,33 @@ export const Component = () => {
 															{page.name}
 														</Link>
 													</TableCell>
-													<TableCell>{page.pageStatusId}</TableCell>
-													<TableCell>{page.createdDescription}</TableCell>
-													<TableCell>{page.lastUpdatedDescription}</TableCell>
-													<TableCell>{page.publishedDateDescription}</TableCell>
+													<TableCell>
+														<div>
+															{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
+																<Badge pill bg="outline-dark" className="text-nowrap">
+																	Draft
+																</Badge>
+															)}
+															{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
+																<Badge
+																	pill
+																	bg="outline-success"
+																	className="text-nowrap"
+																>
+																	Live
+																</Badge>
+															)}
+														</div>
+													</TableCell>
+													<TableCell className="text-nowrap">
+														{page.createdDescription}
+													</TableCell>
+													<TableCell className="text-nowrap">
+														{page.lastUpdatedDescription}
+													</TableCell>
+													<TableCell className="text-nowrap">
+														{page.publishedDateDescription}
+													</TableCell>
 													<TableCell className="text-right">
 														<PageActionsDropdown
 															page={page}
