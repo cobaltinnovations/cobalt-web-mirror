@@ -8,6 +8,11 @@ export enum PAGE_TYPE_ID {
 	COMMUNITY = 'COMMUNITY',
 }
 
+export enum BACKGROUND_COLOR_ID {
+	WHITE = 'WHITE',
+	NEUTRAL = 'NEUTRAL',
+}
+
 export interface PageModel {
 	pageId: string;
 	name: string;
