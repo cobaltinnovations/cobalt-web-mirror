@@ -156,7 +156,9 @@ export const Component = () => {
 								<Table isLoading={isLoading}>
 									<TableHead>
 										<TableRow>
-											<TableCell header>Name</TableCell>
+											<TableCell header width="48%">
+												Name
+											</TableCell>
 											<TableCell header>Status</TableCell>
 											<TableCell header>Created</TableCell>
 											<TableCell header>Modified</TableCell>
@@ -175,7 +177,7 @@ export const Component = () => {
 										{pages.map((page) => {
 											return (
 												<TableRow key={page.pageId}>
-													<TableCell className="text-nowrap">
+													<TableCell className="text-nowrap" width="48%">
 														<Link
 															className="text-decoration-none"
 															to={`/admin/pages/${page.pageId}`}
