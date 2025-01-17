@@ -8,21 +8,13 @@ import {
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
-import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
-import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageModel } from '@/lib/models';
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import { PageModel } from '@/lib/models';
 import { GetPagesResponse, pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { AddPageModal } from '@/components/admin/pages';
-import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import { AddPageModal, PageActionsDropdown } from '@/components/admin/pages';
 import NoData from '@/components/no-data';
-
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 
 interface AdminPagesLoaderData {
@@ -196,114 +188,15 @@ export const Component = () => {
 													<TableCell>{page.lastUpdatedDescription}</TableCell>
 													<TableCell>{page.publishedDateDescription}</TableCell>
 													<TableCell className="text-right">
-														<Dropdown>
-															<Dropdown.Toggle
-																as={DropdownToggle}
-																id={`dropdown--${page.pageId}`}
-																className="p-2"
-															>
-																<MoreIcon className="d-flex" />
-															</Dropdown.Toggle>
-															<Dropdown.Menu
-																compact
-																as={DropdownMenu}
-																align="end"
-																popperConfig={{ strategy: 'fixed' }}
-																renderOnMount
-															>
-																<Dropdown.Item
-																	className="d-flex align-items-center"
-																	onClick={() => {
-																		navigate(`/admin/pages/${page.pageId}`);
-																	}}
-																>
-																	<EditIcon
-																		className="me-2 text-n500"
-																		width={20}
-																		height={20}
-																	/>
-																	Edit
-																</Dropdown.Item>
-																<Dropdown.Item
-																	className="d-flex align-items-center"
-																	onClick={() => {
-																		return;
-																	}}
-																>
-																	<CopyIcon
-																		className="me-2 text-n500"
-																		width={20}
-																		height={20}
-																	/>
-																	Duplicate
-																</Dropdown.Item>
-																<Dropdown.Divider />
-																{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
-																	<Dropdown.Item
-																		className="d-flex align-items-center"
-																		onClick={() => {
-																			setShowDeletePageModal(true);
-																		}}
-																	>
-																		<TrashIcon
-																			className="me-2 text-n500"
-																			width={20}
-																			height={20}
-																		/>
-																		Delete
-																	</Dropdown.Item>
-																)}
-																{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
-																	<>
-																		<Dropdown.Item
-																			className="d-flex align-items-center"
-																			onClick={() => {
-																				let pathname = '';
-
-																				if (
-																					page.pageTypeId ===
-																					PAGE_TYPE_ID.COMMUNITY
-																				) {
-																					pathname = `/community/${page.urlName}`;
-																				} else if (
-																					page.pageTypeId ===
-																					PAGE_TYPE_ID.TOPIC_CENTER
-																				) {
-																					pathname = `/topic/${page.urlName}`;
-																				}
-
-																				window.open(
-																					`${window.location.origin}${pathname}`,
-																					'_blank',
-																					'noopener, noreferrer'
-																				);
-																			}}
-																		>
-																			<ExternalIcon
-																				className="me-2 text-n500"
-																				width={20}
-																				height={20}
-																			/>
-																			View on Cobalt
-																		</Dropdown.Item>
-																		<Dropdown.Divider />
-																		<Dropdown.Item
-																			className="d-flex align-items-center"
-																			onClick={() => {
-																				setShowUnpublishPageModal(true);
-																			}}
-																		>
-																			<MinusIcon
-																				className="me-2 text-n500"
-																				width={20}
-																				height={20}
-																			/>
-																			Unpublish
-																		</Dropdown.Item>
-																	</>
-																)}
-															</Dropdown.Menu>
-														</Dropdown>
+														<PageActionsDropdown
+															page={page}
+															onDelete={() => {
+																setShowDeletePageModal(true);
+															}}
+															onUnpublish={() => {
+																setShowUnpublishPageModal(true);
+															}}
+														/>
 													</TableCell>
 												</TableRow>
 											);
