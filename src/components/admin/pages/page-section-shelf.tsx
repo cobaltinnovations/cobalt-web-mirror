@@ -4,7 +4,13 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
-import { CustomRowForm, RowSelectionForm, SectionSettingsForm } from '@/components/admin/pages';
+import {
+	CustomRowForm,
+	HERO_SECTION_ID,
+	RowSelectionForm,
+	SectionHeroSettingsForm,
+	SectionSettingsForm,
+} from '@/components/admin/pages';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
@@ -119,26 +125,38 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 							<div className={classes.header}>
 								<div className="d-flex align-items-center">
 									<h5 className="mb-0">{pageSection.name}</h5>
-									<Button variant="link" className="p-2 ms-2" onClick={onEdit}>
-										<EditIcon />
-									</Button>
+									{pageSection.pageSectionId !== HERO_SECTION_ID && (
+										<Button variant="link" className="p-2 ms-2" onClick={onEdit}>
+											<EditIcon />
+										</Button>
+									)}
 								</div>
 								<div className="d-flex align-items-center">
-									<Button variant="link" className="p-2" onClick={onDelete}>
-										<TrashIcon />
-									</Button>
+									{pageSection.pageSectionId !== HERO_SECTION_ID && (
+										<Button variant="link" className="p-2" onClick={onDelete}>
+											<TrashIcon />
+										</Button>
+									)}
 									<Button variant="link" className="p-2" onClick={onClose}>
 										<CloseIcon />
 									</Button>
 								</div>
 							</div>
-							<div className={classNames(classes.body, 'pt-0')}>
-								<SectionSettingsForm
-									onAddRow={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ADD_ROW);
-									}}
-								/>
+							<div
+								className={classNames(classes.body, {
+									'pt-0': pageSection.pageSectionId !== HERO_SECTION_ID,
+								})}
+							>
+								{pageSection.pageSectionId === HERO_SECTION_ID ? (
+									<SectionHeroSettingsForm />
+								) : (
+									<SectionSettingsForm
+										onAddRow={() => {
+											setIsNext(true);
+											setPageState(PAGE_STATES.ADD_ROW);
+										}}
+									/>
+								)}
 							</div>
 						</div>
 					)}

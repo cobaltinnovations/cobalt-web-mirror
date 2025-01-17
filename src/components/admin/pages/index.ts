@@ -5,4 +5,5 @@ export * from './custom-row-form';
 export * from './page-actions-dropdown';
 export * from './page-section-shelf';
 export * from './row-selection-form';
+export * from './section-hero-settings-form';
 export * from './section-settings-form';

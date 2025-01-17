@@ -7,7 +7,7 @@ import { PageSectionModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
-import { AddPageSectionModal, PageSectionShelf } from '@/components/admin/pages';
+import { AddPageSectionModal, HERO_SECTION_ID, PageSectionShelf } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate } from 'react-router-dom';
@@ -121,6 +121,20 @@ export const Component = () => {
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
 	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
 
+	const handleHeroSectionClick = () => {
+		const heroSection = {
+			pageSectionId: HERO_SECTION_ID,
+			pageId: 'xxxx-xxxx-xxxx-xxxx',
+			name: 'Hero',
+			headline: '',
+			description: '',
+			backgroundColorId: '',
+			displayOrder: 0,
+		};
+
+		setCurrentSection(heroSection);
+	};
+
 	const handleAddSectionButtonClick = () => {
 		const newSection = {
 			pageSectionId: uuidv4(),
@@ -230,6 +244,14 @@ export const Component = () => {
 						/>
 						<Tab.Content className={classes.tabContent}>
 							<Tab.Pane eventKey="LAYOUT">
+								<div
+									className={classNames(classes.sectionButton, {
+										active: currentSection?.pageSectionId === HERO_SECTION_ID,
+									})}
+									onClick={handleHeroSectionClick}
+								>
+									Hero
+								</div>
 								{sections.map((section) => (
 									<div
 										key={section.pageSectionId}
@@ -245,6 +267,7 @@ export const Component = () => {
 									<Button
 										variant="outline-primary"
 										onClick={() => {
+											setCurrentSection(undefined);
 											setShowAddSectionModal(true);
 										}}
 									>
