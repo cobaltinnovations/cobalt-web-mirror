@@ -23,6 +23,7 @@ import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 interface AdminPagesLoaderData {
 	pagesPromise: Promise<GetPagesResponse>;
@@ -62,6 +63,8 @@ export const Component = () => {
 	const [pagesTotalCountDescription, setPagesTotalCountDescription] = useState('0');
 
 	const [showAddPageModal, setShowAddPageModal] = useState(false);
+	const [showDeletePageModal, setShowDeletePageModal] = useState(false);
+	const [showUnpublishPageModal, setShowUnpublishPageModal] = useState(false);
 
 	const fetchPages = useCallback(async () => {
 		if (!pagesPromise) {
@@ -101,6 +104,40 @@ export const Component = () => {
 				}}
 				onContinue={(pageId) => {
 					navigate(`/admin/pages/${pageId}`);
+				}}
+			/>
+
+			<ConfirmDialog
+				show={showDeletePageModal}
+				size="lg"
+				titleText="Delete"
+				bodyText="Are you sure you want to delete this page?"
+				detailText={<p className="mt-2 mb-0">This action is permanent.</p>}
+				dismissText="Cancel"
+				confirmText="Delete"
+				destructive
+				onHide={() => {
+					setShowDeletePageModal(false);
+				}}
+				onConfirm={() => {
+					setShowDeletePageModal(false);
+				}}
+			/>
+
+			<ConfirmDialog
+				show={showUnpublishPageModal}
+				size="lg"
+				titleText="Unpublish Page"
+				bodyText={`Are you sure you want to unpublish ${'[TODO]: Page Name'}?`}
+				detailText={<p className="mt-2 mb-0">“[TODO]: Page Name” will be removed from Cobalt immediately.</p>}
+				dismissText="Cancel"
+				confirmText="Unpublish"
+				destructive
+				onHide={() => {
+					setShowUnpublishPageModal(false);
+				}}
+				onConfirm={() => {
+					setShowUnpublishPageModal(false);
 				}}
 			/>
 
@@ -177,7 +214,7 @@ export const Component = () => {
 																<Dropdown.Item
 																	className="d-flex align-items-center"
 																	onClick={() => {
-																		return;
+																		navigate(`/admin/pages/${page.pageId}`);
 																	}}
 																>
 																	<EditIcon
@@ -205,7 +242,7 @@ export const Component = () => {
 																	<Dropdown.Item
 																		className="d-flex align-items-center"
 																		onClick={() => {
-																			return;
+																			setShowDeletePageModal(true);
 																		}}
 																	>
 																		<TrashIcon
@@ -235,7 +272,7 @@ export const Component = () => {
 																		<Dropdown.Item
 																			className="d-flex align-items-center"
 																			onClick={() => {
-																				return;
+																				setShowUnpublishPageModal(true);
 																			}}
 																		>
 																			<MinusIcon
