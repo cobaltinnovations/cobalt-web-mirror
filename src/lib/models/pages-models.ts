@@ -3,12 +3,17 @@ export enum PAGE_STATUS_ID {
 	DRAFT = 'DRAFT',
 }
 
+export enum PAGE_TYPE_ID {
+	TOPIC_CENTER = 'TOPIC_CENTER',
+	COMMUNITY = 'COMMUNITY',
+}
+
 export interface PageModel {
 	pageId: string;
 	name: string;
 	urlName: string;
-	pageTypeId: string;
-	pageStatusId: string;
+	pageTypeId: PAGE_TYPE_ID;
+	pageStatusId: PAGE_STATUS_ID;
 	headline: string;
 	description: string;
 	imageFileUploadId: string;

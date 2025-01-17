@@ -9,7 +9,7 @@ import {
 	useSearchParams,
 } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
-import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageModel } from '@/lib/models';
 import { GetPagesResponse, pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
@@ -258,7 +258,25 @@ export const Component = () => {
 																		<Dropdown.Item
 																			className="d-flex align-items-center"
 																			onClick={() => {
-																				return;
+																				let pathname = '';
+
+																				if (
+																					page.pageTypeId ===
+																					PAGE_TYPE_ID.COMMUNITY
+																				) {
+																					pathname = `/community/${page.urlName}`;
+																				} else if (
+																					page.pageTypeId ===
+																					PAGE_TYPE_ID.TOPIC_CENTER
+																				) {
+																					pathname = `/topic/${page.urlName}`;
+																				}
+
+																				window.open(
+																					`${window.location.origin}${pathname}`,
+																					'_blank',
+																					'noopener, noreferrer'
+																				);
 																			}}
 																		>
 																			<ExternalIcon

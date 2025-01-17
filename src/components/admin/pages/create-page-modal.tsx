@@ -1,7 +1,7 @@
 import React, { FC, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import useDebouncedState from '@/hooks/use-debounced-state';
-import { PAGE_STATUS_ID, PageFriendlyUrlValidationResult } from '@/lib/models';
+import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageFriendlyUrlValidationResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
@@ -18,24 +18,19 @@ interface AddPageModalProps extends ModalProps {
 	onContinue(pageId: string): void;
 }
 
-enum PAGE_TYPE_IDS {
-	TOPIC_CENTER = 'TOPIC_CENTER',
-	COMMUNITY = 'COMMUNITY',
-}
-
 const pageTypes = [
 	{
-		pageTypeId: PAGE_TYPE_IDS.TOPIC_CENTER,
+		pageTypeId: PAGE_TYPE_ID.TOPIC_CENTER,
 		title: 'Topic Center',
 	},
 	{
-		pageTypeId: PAGE_TYPE_IDS.COMMUNITY,
+		pageTypeId: PAGE_TYPE_ID.COMMUNITY,
 		title: 'Community',
 	},
 ];
 
 const initialFormValues = {
-	pageTypeId: PAGE_TYPE_IDS.TOPIC_CENTER,
+	pageTypeId: PAGE_TYPE_ID.TOPIC_CENTER,
 	pageName: '',
 	friendlyUrl: '',
 };
@@ -90,7 +85,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								pageTypeId: currentTarget.value as PAGE_TYPE_IDS,
+								pageTypeId: currentTarget.value as PAGE_TYPE_ID,
 							}));
 						}}
 						required
