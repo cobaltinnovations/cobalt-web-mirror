@@ -2,12 +2,11 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Form, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import classNames from 'classnames';
 import { PageSectionModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
-import { AddPageSectionModal, HERO_SECTION_ID, PageSectionShelf } from '@/components/admin/pages';
+import { AddPageSectionModal, LayoutTab, PageSectionShelf } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate } from 'react-router-dom';
@@ -52,14 +51,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'& .tab-pane': {
 			height: '100%',
 			overflowY: 'auto',
-		},
-	},
-	sectionButton: {
-		padding: 24,
-		cursor: 'pointer',
-		borderBottom: `1px solid ${theme.colors.n100}`,
-		'&.active': {
-			backgroundColor: theme.colors.n75,
 		},
 	},
 	asideShelf: {
@@ -120,20 +111,6 @@ export const Component = () => {
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
 	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
-
-	const handleHeroSectionClick = () => {
-		const heroSection = {
-			pageSectionId: HERO_SECTION_ID,
-			pageId: 'xxxx-xxxx-xxxx-xxxx',
-			name: 'Hero',
-			headline: '',
-			description: '',
-			backgroundColorId: '',
-			displayOrder: 0,
-		};
-
-		setCurrentSection(heroSection);
-	};
 
 	const handleAddSectionButtonClick = () => {
 		const newSection = {
@@ -244,36 +221,14 @@ export const Component = () => {
 						/>
 						<Tab.Content className={classes.tabContent}>
 							<Tab.Pane eventKey="LAYOUT">
-								<div
-									className={classNames(classes.sectionButton, {
-										active: currentSection?.pageSectionId === HERO_SECTION_ID,
-									})}
-									onClick={handleHeroSectionClick}
-								>
-									Hero
-								</div>
-								{sections.map((section) => (
-									<div
-										key={section.pageSectionId}
-										className={classNames(classes.sectionButton, {
-											active: currentSection?.pageSectionId === section.pageSectionId,
-										})}
-										onClick={() => handleSectionClick(section)}
-									>
-										{section.name}
-									</div>
-								))}
-								<div className="p-6 text-right">
-									<Button
-										variant="outline-primary"
-										onClick={() => {
-											setCurrentSection(undefined);
-											setShowAddSectionModal(true);
-										}}
-									>
-										Add Section
-									</Button>
-								</div>
+								<LayoutTab
+									sections={sections}
+									onSectionClick={handleSectionClick}
+									onAddSection={() => {
+										setCurrentSection(undefined);
+										setShowAddSectionModal(true);
+									}}
+								/>
 							</Tab.Pane>
 							<Tab.Pane eventKey="SETTINGS">
 								<div className="p-6">
