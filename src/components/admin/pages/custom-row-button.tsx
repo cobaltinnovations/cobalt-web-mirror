@@ -1,7 +1,8 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { Button } from 'react-bootstrap';
+import { ReactComponent as ImageIcon } from '@/assets/icons/icon-image.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	customRowButton: {
@@ -37,8 +38,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 	image: {
 		height: 72,
 		width: '100%',
+		display: 'flex',
 		borderRadius: 4,
 		marginBottom: 16,
+		alignItems: 'center',
+		justifyContent: 'space-around',
 		backgroundColor: theme.colors.n75,
 	},
 	header: {
@@ -78,7 +82,9 @@ export const CustomRowButton = ({ title, cols = 1, className, onClick }: CustomR
 			</div>
 			{Array.apply(null, Array(cols)).map(() => (
 				<div className={classes.column}>
-					<div className={classes.image} />
+					<div className={classes.image}>
+						<ImageIcon className="text-gray" />
+					</div>
 					<div className={classes.header} />
 					<div className={classes.paragraph} />
 					<div className={classes.paragraph} />

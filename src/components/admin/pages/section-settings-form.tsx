@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
@@ -10,6 +10,7 @@ interface SectionSettingsFormProps {
 }
 
 export const SectionSettingsForm = ({ onAddRow }: SectionSettingsFormProps) => {
+	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
 		description: '',
@@ -17,11 +18,16 @@ export const SectionSettingsForm = ({ onAddRow }: SectionSettingsFormProps) => {
 		rows: [],
 	});
 
+	useEffect(() => {
+		headlineInputRef.current?.focus();
+	}, []);
+
 	return (
 		<>
 			<CollapseButton title="Basics" initialShow>
 				<Form>
 					<InputHelper
+						ref={headlineInputRef}
 						className="mb-4"
 						type="text"
 						label="Headline"

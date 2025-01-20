@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import InputHelper from '@/components/input-helper';
 import { AdminFormImageInput } from '../admin-form-image-input';
@@ -8,6 +8,7 @@ import { groupSessionsService } from '@/lib/services';
 export const HERO_SECTION_ID = 'HERO';
 
 export const SectionHeroSettingsForm = () => {
+	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
 		description: '',
@@ -16,9 +17,14 @@ export const SectionHeroSettingsForm = () => {
 		imageAltText: '',
 	});
 
+	useEffect(() => {
+		headlineInputRef.current?.focus();
+	}, []);
+
 	return (
 		<Form>
 			<InputHelper
+				ref={headlineInputRef}
 				className="mb-4"
 				type="text"
 				label="Headline"
