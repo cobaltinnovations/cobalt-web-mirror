@@ -32,6 +32,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 		height: PAGE_SECTION_SHELF_HEADER_HEIGHT,
 		borderBottom: `1px solid ${theme.colors.border}`,
+		'& > div:first-child': {
+			minWidth: 0,
+		},
 	},
 	body: {
 		padding: 24,
@@ -124,7 +127,7 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 						<div className={classes.page}>
 							<div className={classes.header}>
 								<div className="d-flex align-items-center">
-									<h5 className="mb-0">{pageSection.name}</h5>
+									<h5 className="mb-0 text-truncate">{pageSection.name}</h5>
 									{pageSection.pageSectionId !== HERO_SECTION_ID && (
 										<Button variant="link" className="p-2 ms-2" onClick={onEdit}>
 											<EditIcon />

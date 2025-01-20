@@ -15,16 +15,22 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'center',
 		background: theme.colors.n0,
+		transition: '0.3s background-color',
+		'&:hover': {
+			backgroundColor: theme.colors.n50,
+		},
 		'&.active': {
 			backgroundColor: theme.colors.n75,
 		},
 	},
 	handleOuter: {
 		padding: 16,
+		flexShrink: 0,
 	},
 	sectionButton: {
+		flex: 1,
 		border: 0,
-		width: '100%',
+		minWidth: 0,
 		display: 'flex',
 		cursor: 'pointer',
 		textAlign: 'left',
@@ -33,7 +39,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'space-between',
 		padding: '16px 16px 16px 0',
 		backgroundColor: 'transparent',
-		transition: '0.3s background-color',
 	},
 }));
 
@@ -133,8 +138,8 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, 
 												className={classes.sectionButton}
 												onClick={() => onSectionClick(section)}
 											>
-												<span>{section.name}</span>
-												<div className="d-flex align-items-center">
+												<span className="text-truncate">{section.name}</span>
+												<div className="d-flex flex-shrink-0 align-items-center">
 													<span className="text-n500">[0] rows</span>
 													<RightChevron className="text-n500" />
 												</div>

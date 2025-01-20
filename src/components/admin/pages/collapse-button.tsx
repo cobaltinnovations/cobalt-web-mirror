@@ -35,7 +35,7 @@ export const CollapseButton = ({ title, initialShow, children }: PropsWithChildr
 		<>
 			<Button className={classes.collapseButton} bsPrefix="collapse-button" onClick={() => setShow(!show)}>
 				{title}
-				<DownChevron className="d-flex" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
+				<DownChevron className="d-flex text-n500" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
 			</Button>
 			<Collapse in={show}>
 				<div>{children}</div>
