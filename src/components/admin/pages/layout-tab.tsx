@@ -1,25 +1,39 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
+import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
+
 import { PageSectionModel } from '@/lib/models';
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
+import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
-	sectionButton: {
-		border: 0,
-		padding: 24,
-		width: '100%',
-		display: 'block',
-		cursor: 'pointer',
-		textAlign: 'left',
-		appearance: 'none',
-		background: 'transparent',
-		transition: '0.3s background-color',
-		borderBottom: `1px solid ${theme.colors.n100}`,
+	sectionItem: {
+		display: 'flex',
+		alignItems: 'center',
+		background: theme.colors.n0,
 		'&.active': {
 			backgroundColor: theme.colors.n75,
 		},
+	},
+	handleOuter: {
+		padding: 16,
+	},
+	sectionButton: {
+		border: 0,
+		width: '100%',
+		display: 'flex',
+		cursor: 'pointer',
+		textAlign: 'left',
+		appearance: 'none',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		padding: '16px 16px 16px 0',
+		backgroundColor: 'transparent',
+		transition: '0.3s background-color',
 	},
 }));
 
@@ -27,10 +41,11 @@ interface LayoutTabProps {
 	sections: PageSectionModel[];
 	currentSection?: PageSectionModel;
 	onSectionClick(section: PageSectionModel): void;
+	onChange(sections: PageSectionModel[]): void;
 	onAddSection(): void;
 }
 
-export const LayoutTab = ({ sections, currentSection, onSectionClick, onAddSection }: LayoutTabProps) => {
+export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, onAddSection }: LayoutTabProps) => {
 	const classes = useStyles();
 
 	const handleHeroSectionClick = () => {
@@ -47,29 +62,92 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onAddSecti
 		onSectionClick(heroSection);
 	};
 
+	const handleDragEnd = async ({ source, destination }: DropResult) => {
+		if (!destination) {
+			return;
+		}
+
+		const sectionsClone = window.structuredClone(sections);
+		const [removedSection] = (sectionsClone ?? []).splice(source.index, 1);
+		(sectionsClone ?? []).splice(destination.index, 0, removedSection);
+
+		// Optimistically update UI so drag-n-drop feels fast/tight/responsive
+		onChange(sectionsClone);
+
+		try {
+			// await careResourceService
+			// 	.reorderCareResourceLocationPacket(removedSection.pageSectionId, {
+			// 		displayOrder: destination.index,
+			// 	})
+			// 	.fetch();
+		} catch (error) {
+			// handleError(error);
+		} finally {
+			// Fire change event again after reorder call to get the "true" order from the backend
+			// onChange(itemsClone);
+		}
+	};
+
 	return (
 		<>
-			<button
-				type="button"
-				className={classNames(classes.sectionButton, {
+			<div
+				className={classNames(classes.sectionItem, 'border-bottom', {
 					active: currentSection?.pageSectionId === HERO_SECTION_ID,
 				})}
-				onClick={handleHeroSectionClick}
 			>
-				Hero
-			</button>
-			{sections.map((section) => (
-				<button
-					type="button"
-					key={section.pageSectionId}
-					className={classNames(classes.sectionButton, {
-						active: currentSection?.pageSectionId === section.pageSectionId,
-					})}
-					onClick={() => onSectionClick(section)}
-				>
-					{section.name}
+				<div className={classes.handleOuter}>
+					<LockIcon className="text-n300" />
+				</div>
+				<button type="button" className={classes.sectionButton} onClick={handleHeroSectionClick}>
+					<span>Hero</span>
+					<RightChevron className="text-n500" />
 				</button>
-			))}
+			</div>
+			<DragDropContext onDragEnd={handleDragEnd}>
+				<Droppable droppableId="page-sections-droppable" direction="vertical">
+					{(droppableProvided) => (
+						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+							{sections.map((section, sectionIndex) => (
+								<Draggable
+									key={section.pageSectionId}
+									draggableId={`page-sections-draggable-${section.pageSectionId}`}
+									index={sectionIndex}
+								>
+									{(draggableProvided, draggableSnapshot) => (
+										<div
+											ref={draggableProvided.innerRef}
+											key={section.pageSectionId}
+											className={classNames(classes.sectionItem, {
+												active: currentSection?.pageSectionId === section.pageSectionId,
+												'shadow-lg': draggableSnapshot.isDragging,
+												'border-bottom': !draggableSnapshot.isDragging,
+												rounded: draggableSnapshot.isDragging,
+											})}
+											{...draggableProvided.draggableProps}
+										>
+											<div className={classes.handleOuter} {...draggableProvided.dragHandleProps}>
+												<DragIndicator className="text-gray" />
+											</div>
+											<button
+												type="button"
+												className={classes.sectionButton}
+												onClick={() => onSectionClick(section)}
+											>
+												<span>{section.name}</span>
+												<div className="d-flex align-items-center">
+													<span className="text-n500">[0] rows</span>
+													<RightChevron className="text-n500" />
+												</div>
+											</button>
+										</div>
+									)}
+								</Draggable>
+							))}
+							{droppableProvided.placeholder}
+						</div>
+					)}
+				</Droppable>
+			</DragDropContext>
 			<div className="p-6 text-right">
 				<Button variant="outline-primary" onClick={onAddSection}>
 					Add Section

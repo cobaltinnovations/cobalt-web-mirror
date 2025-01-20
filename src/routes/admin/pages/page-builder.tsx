@@ -207,6 +207,9 @@ export const Component = () => {
 									onSectionClick={(pageSection) => {
 										setCurrentSection(pageSection);
 									}}
+									onChange={(pageSections) => {
+										setSections(pageSections);
+									}}
 									onAddSection={() => {
 										setCurrentSection(undefined);
 										setShowAddSectionModal(true);
