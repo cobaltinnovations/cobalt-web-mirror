@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CollapseButton } from './collapse-button';
+import { SelectResourcesModal } from './select-resources-modal';
 
 interface RowSelectionFormProps {
 	onSelection(): void;
 }
 
 export const RowSelectionForm = ({ onSelection }: RowSelectionFormProps) => {
+	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	return (
 		<>
+			<SelectResourcesModal
+				show={showSelectResourcesModal}
+				onAdd={() => {
+					onSelection();
+				}}
+				onHide={() => {
+					setShowSelectResourcesModal(false);
+				}}
+			/>
+
 			<CollapseButton title="Content Row" initialShow>
 				<div className="pb-6">
 					<p>Use a content row to add existing content from Cobalt.</p>
 					<div className="d-flex">
-						<Button className="me-1 flex-fill" onClick={onSelection}>
+						<Button
+							className="me-1 flex-fill"
+							onClick={() => {
+								setShowSelectResourcesModal(true);
+							}}
+						>
 							Resources
 						</Button>
 						<Button className="mx-1 flex-fill" onClick={onSelection}>
