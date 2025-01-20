@@ -9,15 +9,29 @@ interface RowSelectionFormProps {
 
 export const RowSelectionForm = ({ onSelection }: RowSelectionFormProps) => {
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
+	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
+
 	return (
 		<>
 			<SelectResourcesModal
 				show={showSelectResourcesModal}
 				onAdd={() => {
 					onSelection();
+					setShowSelectResourcesModal(false);
 				}}
 				onHide={() => {
 					setShowSelectResourcesModal(false);
+				}}
+			/>
+
+			<SelectResourcesModal
+				show={showSelectGroupSessionsModal}
+				onAdd={() => {
+					onSelection();
+					setShowSelectGroupSessionsModal(false);
+				}}
+				onHide={() => {
+					setShowSelectGroupSessionsModal(false);
 				}}
 			/>
 
@@ -33,7 +47,12 @@ export const RowSelectionForm = ({ onSelection }: RowSelectionFormProps) => {
 						>
 							Resources
 						</Button>
-						<Button className="mx-1 flex-fill" onClick={onSelection}>
+						<Button
+							className="mx-1 flex-fill"
+							onClick={() => {
+								setShowSelectGroupSessionsModal(true);
+							}}
+						>
 							Group Sessions
 						</Button>
 						<Button className="ms-1 flex-fill" onClick={onSelection}>
