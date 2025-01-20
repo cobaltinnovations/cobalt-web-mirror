@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Badge, Button, Form, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import { PageSectionModel } from '@/lib/models';
@@ -112,25 +111,6 @@ export const Component = () => {
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
 	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
 
-	const handleAddSectionButtonClick = () => {
-		const newSection = {
-			pageSectionId: uuidv4(),
-			pageId: 'xxxx-xxxx-xxxx-xxxx',
-			name: 'Untitled Section',
-			headline: '',
-			description: '',
-			backgroundColorId: '',
-			displayOrder: sections.length,
-		};
-
-		setSections((previousValue) => [...previousValue, newSection]);
-		setCurrentSection(newSection);
-	};
-
-	const handleSectionClick = (section: PageSectionModel) => {
-		setCurrentSection(section);
-	};
-
 	const deleteCurrentSection = () => {
 		if (!currentSection) {
 			throw new Error('currentSection is undefined');
@@ -140,10 +120,6 @@ export const Component = () => {
 		setCurrentSection(undefined);
 	};
 
-	useEffect(() => {
-		setCurrentSection(undefined);
-	}, [currentTab]);
-
 	return (
 		<>
 			<AddPageSectionModal
@@ -151,8 +127,9 @@ export const Component = () => {
 				onHide={() => {
 					setShowAddSectionModal(false);
 				}}
-				onSave={() => {
-					handleAddSectionButtonClick();
+				onSave={(pageSection) => {
+					setSections((previousValue) => [...previousValue, pageSection]);
+					setCurrentSection(pageSection);
 					setShowAddSectionModal(false);
 				}}
 			/>
@@ -161,7 +138,7 @@ export const Component = () => {
 				show={showDeleteSectionModal}
 				size="lg"
 				titleText="Delete section"
-				bodyText="Are you sure you want to delete {Section Name}?"
+				bodyText={`Are you sure you want to delete "${currentSection?.name ?? ''}"?`}
 				dismissText="Cancel"
 				confirmText="Delete"
 				destructive
@@ -217,13 +194,19 @@ export const Component = () => {
 									value: 'SETTINGS',
 								},
 							]}
-							onTabClick={setCurrentTab}
+							onTabClick={(tabValue) => {
+								setCurrentTab(tabValue);
+								setCurrentSection(undefined);
+							}}
 						/>
 						<Tab.Content className={classes.tabContent}>
 							<Tab.Pane eventKey="LAYOUT">
 								<LayoutTab
 									sections={sections}
-									onSectionClick={handleSectionClick}
+									currentSection={currentSection}
+									onSectionClick={(pageSection) => {
+										setCurrentSection(pageSection);
+									}}
 									onAddSection={() => {
 										setCurrentSection(undefined);
 										setShowAddSectionModal(true);

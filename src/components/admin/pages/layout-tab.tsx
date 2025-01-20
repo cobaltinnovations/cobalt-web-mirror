@@ -7,8 +7,15 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionButton: {
+		border: 0,
 		padding: 24,
+		width: '100%',
+		display: 'block',
 		cursor: 'pointer',
+		textAlign: 'left',
+		appearance: 'none',
+		background: 'transparent',
+		transition: '0.3s background-color',
 		borderBottom: `1px solid ${theme.colors.n100}`,
 		'&.active': {
 			backgroundColor: theme.colors.n75,
@@ -42,16 +49,18 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onAddSecti
 
 	return (
 		<>
-			<div
+			<button
+				type="button"
 				className={classNames(classes.sectionButton, {
 					active: currentSection?.pageSectionId === HERO_SECTION_ID,
 				})}
 				onClick={handleHeroSectionClick}
 			>
 				Hero
-			</div>
+			</button>
 			{sections.map((section) => (
-				<div
+				<button
+					type="button"
 					key={section.pageSectionId}
 					className={classNames(classes.sectionButton, {
 						active: currentSection?.pageSectionId === section.pageSectionId,
@@ -59,7 +68,7 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onAddSecti
 					onClick={() => onSectionClick(section)}
 				>
 					{section.name}
-				</div>
+				</button>
 			))}
 			<div className="p-6 text-right">
 				<Button variant="outline-primary" onClick={onAddSection}>

@@ -1,7 +1,9 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelper from '@/components/input-helper';
+import { PageSectionModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
@@ -10,7 +12,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface AddPageSectionModalProps extends ModalProps {
-	onSave(): void;
+	onSave(pageSection: PageSectionModel): void;
 }
 
 export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onSave, ...props }) => {
@@ -28,7 +30,18 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onSave, ...p
 
 	const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		console.log(formValues);
+
+		const newSection = {
+			pageSectionId: uuidv4(),
+			pageId: 'xxxx-xxxx-xxxx-xxxx',
+			name: formValues.name,
+			headline: '',
+			description: '',
+			backgroundColorId: '',
+			displayOrder: 0,
+		};
+
+		onSave(newSection);
 	};
 
 	return (
@@ -57,7 +70,7 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onSave, ...p
 						<Button type="button" variant="outline-primary" onClick={props.onHide}>
 							Cancel
 						</Button>
-						<Button type="submit" className="ms-2" variant="primary" onClick={onSave}>
+						<Button type="submit" className="ms-2" variant="primary">
 							Add
 						</Button>
 					</div>

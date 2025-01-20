@@ -80,8 +80,8 @@ export const CustomRowButton = ({ title, cols = 1, className, onClick }: CustomR
 			<div className="overlay">
 				<Button onClick={onClick}>{title}</Button>
 			</div>
-			{Array.apply(null, Array(cols)).map(() => (
-				<div className={classes.column}>
+			{Array.apply(null, Array(cols)).map((_col, colIndex) => (
+				<div className={classes.column} key={colIndex}>
 					<div className={classes.image}>
 						<ImageIcon className="text-gray" />
 					</div>
