@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { CollapseButton } from './collapse-button';
-import { SelectResourcesModal } from './select-resources-modal';
+import { CollapseButton, CustomRowButton, SelectResourcesModal } from '@/components/admin/pages';
 
 interface RowSelectionFormProps {
 	onSelection(): void;
@@ -63,17 +62,11 @@ export const RowSelectionForm = ({ onSelection }: RowSelectionFormProps) => {
 			</CollapseButton>
 			<hr />
 			<CollapseButton title="Custom Row" initialShow>
-				<p>Custom rows are blank layouts. You will need to add your own images and text.</p>
+				<p className="mb-4">Custom rows are blank layouts. You will need to add your own images and text.</p>
 				<div>
-					<Button className="mb-2 d-block w-100" onClick={onSelection}>
-						One Col
-					</Button>
-					<Button className="mb-2 d-block w-100" onClick={onSelection}>
-						Two Cols
-					</Button>
-					<Button className="d-block w-100" onClick={onSelection}>
-						Three Cols
-					</Button>
+					<CustomRowButton className="mb-4" title="Select Layout" onClick={onSelection} />
+					<CustomRowButton className="mb-4" cols={2} title="Select Layout" onClick={onSelection} />
+					<CustomRowButton cols={3} title="Select Layout" onClick={onSelection} />
 				</div>
 			</CollapseButton>
 		</>
