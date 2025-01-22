@@ -13,6 +13,14 @@ export enum BACKGROUND_COLOR_ID {
 	NEUTRAL = 'NEUTRAL',
 }
 
+export enum ROW_TYPE_ID {
+	RESOURCES = 'RESOURCES',
+	TAG_GROUP = 'TAG_GROUP',
+	ONE_COLUMN_IMAGE = 'ONE_COLUMN_IMAGE',
+	TWO_COLUMN_IMAGE = 'TWO_COLUMN_IMAGE',
+	THREE_COLUMN_IMAGE = 'THREE_COLUMN_IMAGE',
+}
+
 export interface PageModel {
 	pageId: string;
 	name: string;
@@ -37,7 +45,7 @@ export interface PageSectionModel {
 	name: string;
 	headline: string;
 	description: string;
-	backgroundColorId: string;
+	backgroundColorId: BACKGROUND_COLOR_ID;
 	displayOrder: number;
 }
 
@@ -53,4 +61,93 @@ export interface PageFriendlyUrlValidationResult {
 	recommendation: string;
 }
 
-export interface PageDetailModel {}
+export interface PageDetailModel {
+	pageId: string;
+	name: string;
+	urlName: string;
+	pageTypeId: string;
+	pageStatusId: string;
+	publishedDate: string;
+	publishedDateDescription: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	pageSections: PageSectionDetailModel[];
+}
+
+export interface PageSectionDetailModel {
+	pageSectionId: string;
+	pageId: string;
+	name: string;
+	headline: string;
+	description: string;
+	backgroundColorId: BACKGROUND_COLOR_ID;
+	displayOrder: number;
+	pageRows: (
+		| ResourcesRowModel
+		| TagGroupRowModel
+		| OneColumnImageRowModel
+		| TwoColumnImageRowModel
+		| ThreeColumnImageRowModel
+	)[];
+}
+
+export interface PageRowDetailModal {
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
+}
+
+export interface ResourcesRowModel extends PageRowDetailModal {
+	contents: {
+		pageRowContentId: string;
+		contentId: string;
+		contentDisplayOrder: number;
+	}[];
+}
+
+export interface TagGroupRowModel extends PageRowDetailModal {
+	tagGroup: {
+		pageRowTagGroupId: string;
+		tagGroupId: string;
+	};
+}
+
+export interface OneColumnImageRowModel extends PageRowDetailModal {
+	pageRowOneColumn: {
+		pageRowId: string;
+		displayOrder: number;
+		columnOne: ColumnImageModel;
+	};
+}
+
+export interface TwoColumnImageRowModel extends PageRowDetailModal {
+	pageRowTwoColumn: {
+		pageRowId: string;
+		displayOrder: number;
+		columnOne: ColumnImageModel;
+		columnTwo: ColumnImageModel;
+	};
+}
+
+export interface ThreeColumnImageRowModel extends PageRowDetailModal {
+	pageRowThreeColumn: {
+		pageRowId: string;
+		displayOrder: number;
+		columnOne: ColumnImageModel;
+		columnTwo: ColumnImageModel;
+		columnThree: ColumnImageModel;
+	};
+}
+
+interface ColumnImageModel {
+	pageRowColumnId: string;
+	pageRowId: string;
+	headline: string;
+	description: string;
+	imageFileUploadId: string;
+	imageAltText: string;
+	columnDisplayOrder: number;
+}

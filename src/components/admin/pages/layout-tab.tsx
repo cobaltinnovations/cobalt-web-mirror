@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 
-import { PageSectionModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageSectionModel } from '@/lib/models';
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
@@ -60,7 +60,7 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, 
 			name: 'Hero',
 			headline: '',
 			description: '',
-			backgroundColorId: '',
+			backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
 			displayOrder: 0,
 		};
 

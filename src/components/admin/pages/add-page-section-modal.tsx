@@ -3,7 +3,7 @@ import React, { FC, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelper from '@/components/input-helper';
-import { PageSectionModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageSectionModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
@@ -37,7 +37,7 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onSave, ...p
 			name: formValues.name,
 			headline: '',
 			description: '',
-			backgroundColorId: '',
+			backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
 			displayOrder: 0,
 		};
 
