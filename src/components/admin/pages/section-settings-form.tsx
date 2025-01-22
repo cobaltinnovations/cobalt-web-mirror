@@ -4,6 +4,8 @@ import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
 import { BACKGROUND_COLOR_ID, PageRowModel, PageSectionDetailModel } from '@/lib/models';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { DraggableItem } from './draggable-item';
 
 interface SectionSettingsFormProps {
 	pageSection: PageSectionDetailModel;
@@ -109,17 +111,33 @@ export const SectionSettingsForm = ({
 					]}
 				/>
 			)}
-			{pageSection.pageRows.map((pageRow) => (
-				<Button
-					key={pageRow.pageRowId}
-					className="d-block w-100"
-					onClick={() => {
-						onRowButtonClick(pageRow);
-					}}
-				>
-					{pageRow.pageRowId}
-				</Button>
-			))}
+			<DragDropContext onDragEnd={() => {}}>
+				<Droppable droppableId="page-sections-droppable" direction="vertical">
+					{(droppableProvided) => (
+						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+							{pageSection.pageRows.map((pageRow, sectionIndex) => (
+								<Draggable
+									key={pageRow.pageSectionId}
+									draggableId={`page-sections-draggable-${pageRow.pageSectionId}`}
+									index={sectionIndex}
+								>
+									{(draggableProvided, draggableSnapshot) => (
+										<DraggableItem
+											key={pageRow.pageRowId}
+											draggableProvided={draggableProvided}
+											draggableSnapshot={draggableSnapshot}
+											onClick={() => onRowButtonClick(pageRow)}
+											title={pageRow.pageRowId}
+											subTitle="sub title"
+										/>
+									)}
+								</Draggable>
+							))}
+							{droppableProvided.placeholder}
+						</div>
+					)}
+				</Droppable>
+			</DragDropContext>
 		</>
 	);
 };

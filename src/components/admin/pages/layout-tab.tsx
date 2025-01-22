@@ -7,8 +7,8 @@ import { BACKGROUND_COLOR_ID, PageSectionDetailModel } from '@/lib/models';
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
-import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { DraggableItem } from './draggable-item';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionItem: {
@@ -112,32 +112,15 @@ export const LayoutTab = ({
 									index={sectionIndex}
 								>
 									{(draggableProvided, draggableSnapshot) => (
-										<div
-											ref={draggableProvided.innerRef}
+										<DraggableItem
 											key={section.pageSectionId}
-											className={classNames(classes.sectionItem, {
-												active: currentSection?.pageSectionId === section.pageSectionId,
-												'shadow-lg': draggableSnapshot.isDragging,
-												'border-bottom': !draggableSnapshot.isDragging,
-												rounded: draggableSnapshot.isDragging,
-											})}
-											{...draggableProvided.draggableProps}
-										>
-											<div className={classes.handleOuter} {...draggableProvided.dragHandleProps}>
-												<DragIndicator className="text-gray" />
-											</div>
-											<button
-												type="button"
-												className={classes.sectionButton}
-												onClick={() => onSectionClick(section)}
-											>
-												<span className="text-truncate">{section.name}</span>
-												<div className="d-flex flex-shrink-0 align-items-center">
-													<span className="text-n500">{section.pageRows.length} rows</span>
-													<RightChevron className="text-n500" />
-												</div>
-											</button>
-										</div>
+											draggableProvided={draggableProvided}
+											draggableSnapshot={draggableSnapshot}
+											active={currentSection?.pageSectionId === section.pageSectionId}
+											onClick={() => onSectionClick(section)}
+											title={section.name}
+											subTitle={`${section.pageRows.length} rows`}
+										/>
 									)}
 								</Draggable>
 							))}

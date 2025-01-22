@@ -3,6 +3,7 @@ export * from './collapse-button';
 export * from './create-page-modal';
 export * from './custom-row-button';
 export * from './custom-row-form';
+export * from './draggable-item';
 export * from './layout-tab';
 export * from './page-actions-dropdown';
 export * from './page-section-shelf';

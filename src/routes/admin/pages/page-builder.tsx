@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Badge, Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { BACKGROUND_COLOR_ID, PageDetailModel, PageSectionDetailModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID, PageDetailModel, PageSectionDetailModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
@@ -216,10 +216,17 @@ export const Component = () => {
 				{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
 				<div className={classes.header}>
 					<div className="d-flex align-items-center">
-						<h5 className="mb-0 me-4">Page Name</h5>
-						<Badge pill bg="outline-dark">
-							Draft
-						</Badge>
+						<h5 className="mb-0 me-4">{page?.name}</h5>
+						{page?.pageStatusId === PAGE_STATUS_ID.DRAFT && (
+							<Badge pill bg="outline-dark" className="text-nowrap">
+								Draft
+							</Badge>
+						)}
+						{page?.pageStatusId === PAGE_STATUS_ID.LIVE && (
+							<Badge pill bg="outline-success" className="text-nowrap">
+								Live
+							</Badge>
+						)}
 					</div>
 					<div className="d-flex align-items-center">
 						<Button
