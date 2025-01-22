@@ -3,15 +3,28 @@ import { Button } from 'react-bootstrap';
 import { CollapseButton, CustomRowButton, SelectResourcesModal } from '@/components/admin/pages';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { ResourcesRowModel } from '@/lib/models';
+import {
+	OneColumnImageRowModel,
+	ResourcesRowModel,
+	ThreeColumnImageRowModel,
+	TwoColumnImageRowModel,
+} from '@/lib/models';
 
 interface RowSelectionFormProps {
 	pageSectionId: string;
 	onResourcesRowAdded(pageRow: ResourcesRowModel): void;
-	onSelection(): void;
+	onOneColumnRowAdded(pageRow: OneColumnImageRowModel): void;
+	onTwoColumnRowAdded(pageRow: TwoColumnImageRowModel): void;
+	onThreeColumnRowAdded(pageRow: ThreeColumnImageRowModel): void;
 }
 
-export const RowSelectionForm = ({ pageSectionId, onResourcesRowAdded, onSelection }: RowSelectionFormProps) => {
+export const RowSelectionForm = ({
+	pageSectionId,
+	onResourcesRowAdded,
+	onOneColumnRowAdded,
+	onTwoColumnRowAdded,
+	onThreeColumnRowAdded,
+}: RowSelectionFormProps) => {
 	const handleError = useHandleError();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 
@@ -21,6 +34,33 @@ export const RowSelectionForm = ({ pageSectionId, onResourcesRowAdded, onSelecti
 
 			setShowSelectResourcesModal(false);
 			onResourcesRowAdded(response.pageRow);
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleOneColumnButtonClick = async () => {
+		try {
+			const response = await pagesService.createOneColumnRow(pageSectionId).fetch();
+			onOneColumnRowAdded(response.pageRow);
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleTwoColumnButtonClick = async () => {
+		try {
+			const response = await pagesService.createTwoColumnRow(pageSectionId).fetch();
+			onTwoColumnRowAdded(response.pageRow);
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleThreeColumnButtonClick = async () => {
+		try {
+			const response = await pagesService.createThreeColumnRow(pageSectionId).fetch();
+			onThreeColumnRowAdded(response.pageRow);
 		} catch (error) {
 			handleError(error);
 		}
@@ -71,9 +111,14 @@ export const RowSelectionForm = ({ pageSectionId, onResourcesRowAdded, onSelecti
 			<CollapseButton title="Custom Row" initialShow>
 				<p className="mb-4">Custom rows are blank layouts. You will need to add your own images and text.</p>
 				<div>
-					<CustomRowButton className="mb-4" title="Select Layout" onClick={onSelection} />
-					<CustomRowButton className="mb-4" cols={2} title="Select Layout" onClick={onSelection} />
-					<CustomRowButton cols={3} title="Select Layout" onClick={onSelection} />
+					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnButtonClick} />
+					<CustomRowButton
+						className="mb-4"
+						cols={2}
+						title="Select Layout"
+						onClick={handleTwoColumnButtonClick}
+					/>
+					<CustomRowButton cols={3} title="Select Layout" onClick={handleThreeColumnButtonClick} />
 				</div>
 			</CollapseButton>
 		</>

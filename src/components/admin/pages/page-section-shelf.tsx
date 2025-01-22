@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
-import { PageSectionDetailModel, ResourcesRowModel, ROW_TYPE_ID } from '@/lib/models';
+import { PageRowUnionModel, PageSectionDetailModel, ResourcesRowModel, ROW_TYPE_ID } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import {
 	CustomRowForm,
@@ -122,13 +122,10 @@ export const PageSectionShelf = ({
 		setPageState(PAGE_STATES.SECTION_SETTINGS);
 	}, [pageSection.pageSectionId]);
 
-	const handleResourceRowAdded = (pageRow: ResourcesRowModel) => {
+	const updateSectionWithRow = (pageRow: PageRowUnionModel) => {
 		const pageSectionClone = cloneDeep(pageSection);
 		pageSectionClone.pageRows = [...pageSectionClone.pageRows, pageRow];
 		onChange(pageSectionClone);
-
-		setIsNext(false);
-		setPageState(PAGE_STATES.SECTION_SETTINGS);
 	};
 
 	return (
@@ -230,8 +227,23 @@ export const PageSectionShelf = ({
 							<div className={classNames(classes.body, 'pt-0')}>
 								<RowSelectionForm
 									pageSectionId={pageSection.pageSectionId}
-									onResourcesRowAdded={handleResourceRowAdded}
-									onSelection={() => {
+									onResourcesRowAdded={(pageRow) => {
+										updateSectionWithRow(pageRow);
+										setIsNext(false);
+										setPageState(PAGE_STATES.SECTION_SETTINGS);
+									}}
+									onOneColumnRowAdded={(pageRow) => {
+										updateSectionWithRow(pageRow);
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+									onTwoColumnRowAdded={(pageRow) => {
+										updateSectionWithRow(pageRow);
+										setIsNext(true);
+										setPageState(PAGE_STATES.ROW_SETTINGS);
+									}}
+									onThreeColumnRowAdded={(pageRow) => {
+										updateSectionWithRow(pageRow);
 										setIsNext(true);
 										setPageState(PAGE_STATES.ROW_SETTINGS);
 									}}

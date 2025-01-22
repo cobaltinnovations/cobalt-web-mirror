@@ -2,11 +2,14 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
+	OneColumnImageRowModel,
 	PAGE_STATUS_ID,
 	PageDetailModel,
 	PageModel,
 	PageSectionModel,
 	ResourcesRowModel,
+	ThreeColumnImageRowModel,
+	TwoColumnImageRowModel,
 } from '@/lib/models';
 
 export interface GetPagesResponse {
@@ -72,6 +75,33 @@ export const pagesService = {
 			method: 'POST',
 			url: `/pages/row/${pageSectionId}/content`,
 			data,
+		});
+	},
+	createOneColumnRow(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnImageRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-one-column`,
+			data: { columnOne: {} },
+		});
+	},
+	createTwoColumnRow(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: TwoColumnImageRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-two-column`,
+			data: { columnOne: {}, columnTwo: {} },
+		});
+	},
+	createThreeColumnRow(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: ThreeColumnImageRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-three-column`,
+			data: { columnOne: {}, columnTwo: {}, columnThree: {} },
 		});
 	},
 };

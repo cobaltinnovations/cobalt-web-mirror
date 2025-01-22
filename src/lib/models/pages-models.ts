@@ -96,14 +96,11 @@ export type PageRowUnionModel =
 	| TwoColumnImageRowModel
 	| ThreeColumnImageRowModel;
 
-export interface PageRowDetailModel {
+export interface ResourcesRowModel {
 	pageRowId: string;
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-}
-
-export interface ResourcesRowModel extends PageRowDetailModel {
 	contents: {
 		pageRowContentId: string;
 		contentId: string;
@@ -111,7 +108,11 @@ export interface ResourcesRowModel extends PageRowDetailModel {
 	}[];
 }
 
-export interface GroupSessionsRowModel extends PageRowDetailModel {
+export interface GroupSessionsRowModel {
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
 	groupSessions: {
 		pageRowGroupSessionId: string;
 		groupSessionId: string;
@@ -120,14 +121,22 @@ export interface GroupSessionsRowModel extends PageRowDetailModel {
 	}[];
 }
 
-export interface TagGroupRowModel extends PageRowDetailModel {
+export interface TagGroupRowModel {
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
 	tagGroup: {
 		pageRowTagGroupId: string;
 		tagGroupId: string;
 	};
 }
 
-export interface OneColumnImageRowModel extends PageRowDetailModel {
+export interface OneColumnImageRowModel {
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
 	pageRowOneColumn: {
 		pageRowId: string;
 		displayOrder: number;
@@ -135,7 +144,11 @@ export interface OneColumnImageRowModel extends PageRowDetailModel {
 	};
 }
 
-export interface TwoColumnImageRowModel extends PageRowDetailModel {
+export interface TwoColumnImageRowModel {
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
 	pageRowTwoColumn: {
 		pageRowId: string;
 		displayOrder: number;
@@ -144,7 +157,11 @@ export interface TwoColumnImageRowModel extends PageRowDetailModel {
 	};
 }
 
-export interface ThreeColumnImageRowModel extends PageRowDetailModel {
+export interface ThreeColumnImageRowModel {
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
 	pageRowThreeColumn: {
 		pageRowId: string;
 		displayOrder: number;

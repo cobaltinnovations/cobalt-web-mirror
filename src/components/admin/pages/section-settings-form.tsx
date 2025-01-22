@@ -170,7 +170,11 @@ export const SectionSettingsForm = ({
 					]}
 				/>
 			)}
-			<DragDropContext onDragEnd={() => {}}>
+			<DragDropContext
+				onDragEnd={() => {
+					window.alert('[TODO]: DropEnd for Rows');
+				}}
+			>
 				<Droppable droppableId="page-rows-droppable" direction="vertical">
 					{(droppableProvided) => (
 						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
