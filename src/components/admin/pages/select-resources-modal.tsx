@@ -88,7 +88,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface SelectResourcesModalProps extends ModalProps {
-	onAdd(resources: void[]): void;
+	onAdd(contentIds: string[]): void;
 }
 
 export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalProps) => {
@@ -102,8 +102,8 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 		setSelectedContentIds([]);
 
 		try {
-			const response = await resourceLibraryService.getResourceLibrary().fetch();
-			setContents(Object.values(response.contentsByTagGroupId).flat());
+			const response = await resourceLibraryService.searchResourceLibrary({ pageSize: 5000 }).fetch();
+			setContents(response.findResult.contents);
 		} catch (error) {
 			handleError(error);
 		}
@@ -140,7 +140,7 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 						/>
 					</div>
 					<div className={classes.addedHeaderCol}>
-						<span className="fw-bold">Resources to add</span>
+						<span className="fw-bold">Resources to add ({selectedContentIds.length})</span>
 					</div>
 				</div>
 				<div className={classes.bodyInner}>
@@ -175,9 +175,10 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 					</div>
 					<div className={classes.addedCol}>
 						<ul>
-							{selectedContentIds.map((cid) => (
-								<li>Resource Title</li>
-							))}
+							{selectedContentIds.map((cid) => {
+								const content = contents.find((c) => c.contentId === cid);
+								return <li>{content?.title}</li>;
+							})}
 						</ul>
 					</div>
 				</div>
@@ -192,10 +193,10 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
-							onAdd([]);
+							onAdd(selectedContentIds);
 						}}
 					>
-						Add Resources ({selectedContentIds.length})
+						Add Resources
 					</Button>
 				</div>
 			</Modal.Footer>
