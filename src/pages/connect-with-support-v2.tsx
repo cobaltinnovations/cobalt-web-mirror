@@ -35,7 +35,9 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
-import InlineAlert from '@/components/inline-alert';
+import CallToActionBlock from '@/components/call-to-action-block';
+
+import scheduleApptWoman from '@/assets/images/img-ill-schedule-appt-woman.png';
 
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
@@ -536,25 +538,24 @@ const ConnectWithSupportV2 = () => {
 				{institutionFeatureInstitutionReferrers.length > 0 && (
 					<Container className="py-10">
 						<Row>
-							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+							<Col>
 								{institutionFeatureInstitutionReferrers.map((ifir) => (
-									<InlineAlert
-										variant="warning"
-										title={ifir.ctaTitle}
-										description={ifir.ctaDescription}
-										action={{
-											title: 'Learn more',
-											onClick: () => {
-												const targetReferrer = institutionReferrers.find(
-													(ir) => ir.institutionReferrerId === ifir.institutionReferrerId
-												);
+									<CallToActionBlock
+										variant="primary"
+										heading={ifir.ctaTitle}
+										descriptionHtml={ifir.ctaDescription}
+										imageUrl={scheduleApptWoman}
+										primaryActionText="Learn More"
+										onPrimaryActionClick={() => {
+											const targetReferrer = institutionReferrers.find(
+												(ir) => ir.institutionReferrerId === ifir.institutionReferrerId
+											);
 
-												if (!targetReferrer) {
-													throw new Error('institutionReferrer is undefined.');
-												}
+											if (!targetReferrer) {
+												throw new Error('institutionReferrer is undefined.');
+											}
 
-												navigate(`/referrals/${targetReferrer.urlName}`);
-											},
+											navigate(`/referrals/${targetReferrer.urlName}`);
 										}}
 									/>
 								))}
