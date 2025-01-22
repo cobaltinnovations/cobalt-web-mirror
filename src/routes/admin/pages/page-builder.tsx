@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Badge, Button, Form, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { PageDetailModel, PageSectionModel } from '@/lib/models';
+import { PageDetailModel, PageSectionDetailModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate, useParams } from 'react-router-dom';
 import { pagesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
+import { cloneDeep } from 'lodash';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -111,10 +112,9 @@ export const Component = () => {
 	const { pageId } = useParams<{ pageId: string }>();
 	const [page, setPage] = useState<PageDetailModel>();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
-	const [sections, setSections] = useState<PageSectionModel[]>([]);
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
-	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
+	const [currentSection, setCurrentSection] = useState<PageSectionDetailModel>();
 
 	const fetchData = useCallback(async () => {
 		if (!pageId) {
@@ -125,32 +125,41 @@ export const Component = () => {
 		setPage(response.page);
 	}, [pageId]);
 
-	useEffect(() => {
-		console.log('page', page);
-	}, [page]);
-
 	const deleteCurrentSection = () => {
 		if (!currentSection) {
 			throw new Error('currentSection is undefined');
 		}
 
-		setSections((previousValue) => previousValue.filter((s) => s.pageSectionId !== currentSection.pageSectionId));
-		setCurrentSection(undefined);
+		window.alert('[TODO]: Delete Section');
+	};
+
+	const handleSectionReorder = (pageSections: PageSectionDetailModel[]) => {
+		if (!page) {
+			return;
+		}
+
+		const pageClone = cloneDeep(page);
+		pageClone.pageSections = pageSections;
+		setPage(pageClone);
 	};
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
-			<AddPageSectionModal
-				show={showAddSectionModal}
-				onHide={() => {
-					setShowAddSectionModal(false);
-				}}
-				onSave={(pageSection) => {
-					setSections((previousValue) => [...previousValue, pageSection]);
-					setCurrentSection(pageSection);
-					setShowAddSectionModal(false);
-				}}
-			/>
+			{page && (
+				<AddPageSectionModal
+					pageId={page.pageId}
+					pageStatusId={page.pageStatusId}
+					show={showAddSectionModal}
+					onHide={() => {
+						setShowAddSectionModal(false);
+					}}
+					onSave={(pageSection) => {
+						// setSections((previousValue) => [...previousValue, pageSection]);
+						setCurrentSection(pageSection);
+						setShowAddSectionModal(false);
+					}}
+				/>
+			)}
 
 			<ConfirmDialog
 				show={showDeleteSectionModal}
@@ -219,20 +228,18 @@ export const Component = () => {
 						/>
 						<Tab.Content className={classes.tabContent}>
 							<Tab.Pane eventKey="LAYOUT">
-								<LayoutTab
-									sections={sections}
-									currentSection={currentSection}
-									onSectionClick={(pageSection) => {
-										setCurrentSection(pageSection);
-									}}
-									onChange={(pageSections) => {
-										setSections(pageSections);
-									}}
-									onAddSection={() => {
-										setCurrentSection(undefined);
-										setShowAddSectionModal(true);
-									}}
-								/>
+								{page && (
+									<LayoutTab
+										sections={page.pageSections}
+										currentSection={currentSection}
+										onSectionClick={setCurrentSection}
+										onReorder={handleSectionReorder}
+										onAddSectionClick={() => {
+											setCurrentSection(undefined);
+											setShowAddSectionModal(true);
+										}}
+									/>
+								)}
 							</Tab.Pane>
 							<Tab.Pane eventKey="SETTINGS">
 								<div className="p-6">

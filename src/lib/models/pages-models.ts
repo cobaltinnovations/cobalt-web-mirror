@@ -66,7 +66,7 @@ export interface PageDetailModel {
 	name: string;
 	urlName: string;
 	pageTypeId: string;
-	pageStatusId: string;
+	pageStatusId: PAGE_STATUS_ID;
 	publishedDate: string;
 	publishedDateDescription: string;
 	created: string;

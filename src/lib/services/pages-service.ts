@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { PAGE_STATUS_ID, PageDetailModel, PageModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID, PageDetailModel, PageModel, PageSectionModel } from '@/lib/models';
 
 export interface GetPagesResponse {
 	totalCountDescription: string;
@@ -36,7 +36,26 @@ export const pagesService = {
 	getPage(pageId: string) {
 		return httpSingleton.orchestrateRequest<{ page: PageDetailModel }>({
 			method: 'GET',
-			url: `/page/${pageId}`,
+			url: `/pages/${pageId}`,
+		});
+	},
+	createPageSection(
+		pageId: string,
+		data: {
+			name: string;
+			headline?: string;
+			description?: string;
+			backgroundColorId: BACKGROUND_COLOR_ID;
+			displayOrder?: number;
+			pageStatusId: PAGE_STATUS_ID;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageSection: PageSectionModel;
+		}>({
+			method: 'POST',
+			url: `/pages/${pageId}/section`,
+			data,
 		});
 	},
 };

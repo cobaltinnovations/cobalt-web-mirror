@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 
-import { BACKGROUND_COLOR_ID, PageSectionModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageSectionDetailModel, PageSectionModel } from '@/lib/models';
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
@@ -43,14 +43,20 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface LayoutTabProps {
-	sections: PageSectionModel[];
-	currentSection?: PageSectionModel;
-	onSectionClick(section: PageSectionModel): void;
-	onChange(sections: PageSectionModel[]): void;
-	onAddSection(): void;
+	sections: PageSectionDetailModel[];
+	currentSection?: PageSectionDetailModel;
+	onSectionClick(section: PageSectionDetailModel): void;
+	onReorder(sections: PageSectionDetailModel[]): void;
+	onAddSectionClick(): void;
 }
 
-export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, onAddSection }: LayoutTabProps) => {
+export const LayoutTab = ({
+	sections,
+	currentSection,
+	onSectionClick,
+	onReorder,
+	onAddSectionClick,
+}: LayoutTabProps) => {
 	const classes = useStyles();
 
 	const handleHeroSectionClick = () => {
@@ -62,6 +68,7 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, 
 			description: '',
 			backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
 			displayOrder: 0,
+			pageRows: [],
 		};
 
 		onSectionClick(heroSection);
@@ -76,21 +83,7 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, 
 		const [removedSection] = (sectionsClone ?? []).splice(source.index, 1);
 		(sectionsClone ?? []).splice(destination.index, 0, removedSection);
 
-		// Optimistically update UI so drag-n-drop feels fast/tight/responsive
-		onChange(sectionsClone);
-
-		try {
-			// await careResourceService
-			// 	.reorderCareResourceLocationPacket(removedSection.pageSectionId, {
-			// 		displayOrder: destination.index,
-			// 	})
-			// 	.fetch();
-		} catch (error) {
-			// handleError(error);
-		} finally {
-			// Fire change event again after reorder call to get the "true" order from the backend
-			// onChange(itemsClone);
-		}
+		onReorder(sectionsClone);
 	};
 
 	return (
@@ -140,7 +133,7 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, 
 											>
 												<span className="text-truncate">{section.name}</span>
 												<div className="d-flex flex-shrink-0 align-items-center">
-													<span className="text-n500">[0] rows</span>
+													<span className="text-n500">{section.pageRows.length} rows</span>
 													<RightChevron className="text-n500" />
 												</div>
 											</button>
@@ -154,7 +147,7 @@ export const LayoutTab = ({ sections, currentSection, onSectionClick, onChange, 
 				</Droppable>
 			</DragDropContext>
 			<div className="p-6 text-right">
-				<Button variant="outline-primary" onClick={onAddSection}>
+				<Button variant="outline-primary" onClick={onAddSectionClick}>
 					Add Section
 				</Button>
 			</div>

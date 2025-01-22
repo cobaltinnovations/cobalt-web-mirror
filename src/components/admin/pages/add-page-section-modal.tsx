@@ -1,22 +1,26 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelper from '@/components/input-helper';
-import { BACKGROUND_COLOR_ID, PageSectionModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID, PageSectionDetailModel } from '@/lib/models';
+import useHandleError from '@/hooks/use-handle-error';
+import { pagesService } from '@/lib/services';
 
-const useStyles = createUseThemedStyles((theme) => ({
+const useStyles = createUseThemedStyles(() => ({
 	modal: {
 		maxWidth: 480,
 	},
 }));
 
 interface AddPageSectionModalProps extends ModalProps {
-	onSave(pageSection: PageSectionModel): void;
+	pageId: string;
+	pageStatusId: PAGE_STATUS_ID;
+	onSave(pageSection: PageSectionDetailModel): void;
 }
 
-export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onSave, ...props }) => {
+export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ pageId, pageStatusId, onSave, ...props }) => {
 	const classes = useStyles();
+	const handleError = useHandleError();
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({ name: '' });
 
@@ -28,20 +32,22 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onSave, ...p
 		nameInputRef.current?.focus();
 	};
 
-	const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		const newSection = {
-			pageSectionId: uuidv4(),
-			pageId: 'xxxx-xxxx-xxxx-xxxx',
-			name: formValues.name,
-			headline: '',
-			description: '',
-			backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
-			displayOrder: 0,
-		};
+		try {
+			const response = await pagesService
+				.createPageSection(pageId, {
+					name: formValues.name,
+					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+					pageStatusId,
+				})
+				.fetch();
 
-		onSave(newSection);
+			onSave({ ...response.pageSection, pageRows: [] });
+		} catch (error) {
+			handleError(error);
+		}
 	};
 
 	return (
