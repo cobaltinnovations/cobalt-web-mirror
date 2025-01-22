@@ -3,7 +3,18 @@ import { Button, Form } from 'react-bootstrap';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
-import { BACKGROUND_COLOR_ID, PageRowModel, PageSectionDetailModel } from '@/lib/models';
+import {
+	BACKGROUND_COLOR_ID,
+	isGroupSessionsRow,
+	isOneColumnImageRow,
+	isResourcesRow,
+	isTagGroupRow,
+	isThreeColumnImageRow,
+	isTwoColumnImageRow,
+	PageRowModel,
+	PageRowUnionModel,
+	PageSectionDetailModel,
+} from '@/lib/models';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { DraggableItem } from './draggable-item';
 
@@ -29,6 +40,54 @@ export const SectionSettingsForm = ({
 	useEffect(() => {
 		headlineInputRef.current?.focus();
 	}, []);
+
+	const getTitleForPageRow = (pageRow: PageRowUnionModel) => {
+		if (isResourcesRow(pageRow)) {
+			return 'Resources';
+		}
+
+		if (isGroupSessionsRow(pageRow)) {
+			return 'Group Sessions';
+		}
+
+		if (isTagGroupRow(pageRow)) {
+			return 'Tag Group';
+		}
+
+		if (isOneColumnImageRow(pageRow) || isTwoColumnImageRow(pageRow) || isThreeColumnImageRow(pageRow)) {
+			return 'Custom Row';
+		}
+
+		return '';
+	};
+
+	const getSubTitleForPageRow = (pageRow: PageRowUnionModel) => {
+		if (isResourcesRow(pageRow)) {
+			return `${pageRow.contents.length} Resources`;
+		}
+
+		if (isGroupSessionsRow(pageRow)) {
+			return `${pageRow.groupSessions.length} Sessions`;
+		}
+
+		if (isTagGroupRow(pageRow)) {
+			return `TODO: ${pageRow.tagGroup.tagGroupId}`;
+		}
+
+		if (isOneColumnImageRow(pageRow)) {
+			return '1 Item';
+		}
+
+		if (isTwoColumnImageRow(pageRow)) {
+			return '2 Items';
+		}
+
+		if (isThreeColumnImageRow(pageRow)) {
+			return '3 Items';
+		}
+
+		return '';
+	};
 
 	return (
 		<>
@@ -112,13 +171,13 @@ export const SectionSettingsForm = ({
 				/>
 			)}
 			<DragDropContext onDragEnd={() => {}}>
-				<Droppable droppableId="page-sections-droppable" direction="vertical">
+				<Droppable droppableId="page-rows-droppable" direction="vertical">
 					{(droppableProvided) => (
 						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
 							{pageSection.pageRows.map((pageRow, sectionIndex) => (
 								<Draggable
-									key={pageRow.pageSectionId}
-									draggableId={`page-sections-draggable-${pageRow.pageSectionId}`}
+									key={pageRow.pageRowId}
+									draggableId={`page-rows-draggable-${pageRow.pageRowId}`}
 									index={sectionIndex}
 								>
 									{(draggableProvided, draggableSnapshot) => (
@@ -127,8 +186,8 @@ export const SectionSettingsForm = ({
 											draggableProvided={draggableProvided}
 											draggableSnapshot={draggableSnapshot}
 											onClick={() => onRowButtonClick(pageRow)}
-											title={pageRow.pageRowId}
-											subTitle="sub title"
+											title={getTitleForPageRow(pageRow)}
+											subTitle={getSubTitleForPageRow(pageRow)}
 										/>
 									)}
 								</Draggable>

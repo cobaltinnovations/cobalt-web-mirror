@@ -85,14 +85,16 @@ export interface PageSectionDetailModel {
 	description: string;
 	backgroundColorId: BACKGROUND_COLOR_ID;
 	displayOrder: number;
-	pageRows: (
-		| ResourcesRowModel
-		| TagGroupRowModel
-		| OneColumnImageRowModel
-		| TwoColumnImageRowModel
-		| ThreeColumnImageRowModel
-	)[];
+	pageRows: PageRowUnionModel[];
 }
+
+export type PageRowUnionModel =
+	| ResourcesRowModel
+	| GroupSessionsRowModel
+	| TagGroupRowModel
+	| OneColumnImageRowModel
+	| TwoColumnImageRowModel
+	| ThreeColumnImageRowModel;
 
 export interface PageRowDetailModel {
 	pageRowId: string;
