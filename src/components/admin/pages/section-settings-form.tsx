@@ -3,13 +3,14 @@ import { Button, Form } from 'react-bootstrap';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
-import { BACKGROUND_COLOR_ID } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageSectionDetailModel } from '@/lib/models';
 
 interface SectionSettingsFormProps {
-	onAddRow(): void;
+	pageSection: PageSectionDetailModel;
+	onAddRowButtonClick(): void;
 }
 
-export const SectionSettingsForm = ({ onAddRow }: SectionSettingsFormProps) => {
+export const SectionSettingsForm = ({ pageSection, onAddRowButtonClick }: SectionSettingsFormProps) => {
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -87,20 +88,25 @@ export const SectionSettingsForm = ({ onAddRow }: SectionSettingsFormProps) => {
 			<hr />
 			<Form.Group className="py-6 d-flex align-items-center justify-content-between">
 				<h5 className="mb-0">Rows</h5>
-				<Button type="button" size="sm" onClick={onAddRow}>
+				<Button type="button" size="sm" onClick={onAddRowButtonClick}>
 					Add Row
 				</Button>
 			</Form.Group>
-			<NoData
-				title="No rows added"
-				actions={[
-					{
-						variant: 'primary',
-						title: 'Add row',
-						onClick: onAddRow,
-					},
-				]}
-			/>
+			{pageSection.pageRows.length === 0 && (
+				<NoData
+					title="No rows added"
+					actions={[
+						{
+							variant: 'primary',
+							title: 'Add row',
+							onClick: onAddRowButtonClick,
+						},
+					]}
+				/>
+			)}
+			{pageSection.pageRows.map((pageRow) => (
+				<div>{pageRow.pageRowId}</div>
+			))}
 		</>
 	);
 };

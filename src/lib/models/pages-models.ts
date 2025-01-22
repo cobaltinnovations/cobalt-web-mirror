@@ -93,14 +93,14 @@ export interface PageSectionDetailModel {
 	)[];
 }
 
-export interface PageRowDetailModal {
+export interface PageRowDetailModel {
 	pageRowId: string;
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
 }
 
-export interface ResourcesRowModel extends PageRowDetailModal {
+export interface ResourcesRowModel extends PageRowDetailModel {
 	contents: {
 		pageRowContentId: string;
 		contentId: string;
@@ -108,14 +108,14 @@ export interface ResourcesRowModel extends PageRowDetailModal {
 	}[];
 }
 
-export interface TagGroupRowModel extends PageRowDetailModal {
+export interface TagGroupRowModel extends PageRowDetailModel {
 	tagGroup: {
 		pageRowTagGroupId: string;
 		tagGroupId: string;
 	};
 }
 
-export interface OneColumnImageRowModel extends PageRowDetailModal {
+export interface OneColumnImageRowModel extends PageRowDetailModel {
 	pageRowOneColumn: {
 		pageRowId: string;
 		displayOrder: number;
@@ -123,7 +123,7 @@ export interface OneColumnImageRowModel extends PageRowDetailModal {
 	};
 }
 
-export interface TwoColumnImageRowModel extends PageRowDetailModal {
+export interface TwoColumnImageRowModel extends PageRowDetailModel {
 	pageRowTwoColumn: {
 		pageRowId: string;
 		displayOrder: number;
@@ -132,7 +132,7 @@ export interface TwoColumnImageRowModel extends PageRowDetailModal {
 	};
 }
 
-export interface ThreeColumnImageRowModel extends PageRowDetailModal {
+export interface ThreeColumnImageRowModel extends PageRowDetailModel {
 	pageRowThreeColumn: {
 		pageRowId: string;
 		displayOrder: number;

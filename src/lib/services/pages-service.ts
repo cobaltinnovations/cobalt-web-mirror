@@ -1,6 +1,13 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID, PageDetailModel, PageModel, PageSectionModel } from '@/lib/models';
+import {
+	BACKGROUND_COLOR_ID,
+	PAGE_STATUS_ID,
+	PageDetailModel,
+	PageModel,
+	PageSectionModel,
+	ResourcesRowModel,
+} from '@/lib/models';
 
 export interface GetPagesResponse {
 	totalCountDescription: string;
@@ -55,6 +62,15 @@ export const pagesService = {
 		}>({
 			method: 'POST',
 			url: `/pages/${pageId}/section`,
+			data,
+		});
+	},
+	createResourcesRow(pageSectionId: string, data: { contentIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: ResourcesRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/content`,
 			data,
 		});
 	},

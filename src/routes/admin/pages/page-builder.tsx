@@ -133,14 +133,38 @@ export const Component = () => {
 		window.alert('[TODO]: Delete Section');
 	};
 
-	const handleSectionReorder = (pageSections: PageSectionDetailModel[]) => {
+	const handleSectionReorder = (updatedPageSections: PageSectionDetailModel[]) => {
 		if (!page) {
 			return;
 		}
 
 		const pageClone = cloneDeep(page);
-		pageClone.pageSections = pageSections;
+		pageClone.pageSections = updatedPageSections;
 		setPage(pageClone);
+	};
+
+	const handleSectionChange = (updatedPageSection: PageSectionDetailModel) => {
+		if (!page) {
+			return;
+		}
+
+		const pageClone = cloneDeep(page);
+		pageClone.pageSections = pageClone.pageSections.map((ps) =>
+			ps.pageSectionId === updatedPageSection.pageSectionId ? updatedPageSection : ps
+		);
+
+		setPage(pageClone);
+		setCurrentSection((cs) => {
+			if (!cs) {
+				return undefined;
+			}
+
+			if (cs.pageSectionId === updatedPageSection.pageSectionId) {
+				return updatedPageSection;
+			}
+
+			return cs;
+		});
 	};
 
 	return (
@@ -269,13 +293,14 @@ export const Component = () => {
 						{currentSection && (
 							<PageSectionShelf
 								pageSection={currentSection}
-								onEdit={() => {
+								onChange={handleSectionChange}
+								onEditButtonClick={() => {
 									setShowAddSectionModal(true);
 								}}
-								onDelete={() => {
+								onDeleteButtonClick={() => {
 									setShowDeleteSectionModal(true);
 								}}
-								onClose={() => {
+								onCloseButtonClick={() => {
 									setCurrentSection(undefined);
 								}}
 							/>

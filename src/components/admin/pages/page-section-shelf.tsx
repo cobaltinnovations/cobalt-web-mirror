@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
-import { PageSectionModel } from '@/lib/models';
+import { PageSectionDetailModel, ResourcesRowModel } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import {
 	CustomRowForm,
@@ -16,6 +16,7 @@ import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { cloneDeep } from 'lodash';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 const PAGE_TRANSITION_DURATION_MS = 600;
@@ -89,10 +90,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface SectionShelfProps {
-	pageSection: PageSectionModel;
-	onEdit(): void;
-	onDelete(): void;
-	onClose(): void;
+	pageSection: PageSectionDetailModel;
+	onChange(pageSection: PageSectionDetailModel): void;
+	onEditButtonClick(): void;
+	onDeleteButtonClick(): void;
+	onCloseButtonClick(): void;
 }
 
 enum PAGE_STATES {
@@ -101,7 +103,13 @@ enum PAGE_STATES {
 	ROW_SETTINGS = 'ROW_SETTINGS',
 }
 
-export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: SectionShelfProps) => {
+export const PageSectionShelf = ({
+	pageSection,
+	onChange,
+	onEditButtonClick,
+	onDeleteButtonClick,
+	onCloseButtonClick,
+}: SectionShelfProps) => {
 	const classes = useStyles();
 	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
@@ -110,6 +118,15 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 		setIsNext(false);
 		setPageState(PAGE_STATES.SECTION_SETTINGS);
 	}, [pageSection.pageSectionId]);
+
+	const handleResourceRowAdded = (pageRow: ResourcesRowModel) => {
+		const pageSectionClone = cloneDeep(pageSection);
+		pageSectionClone.pageRows = [...pageSectionClone.pageRows, pageRow];
+		onChange(pageSectionClone);
+
+		setIsNext(false);
+		setPageState(PAGE_STATES.SECTION_SETTINGS);
+	};
 
 	return (
 		<TransitionGroup
@@ -129,18 +146,18 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 								<div className="d-flex align-items-center">
 									<h5 className="mb-0 text-truncate">{pageSection.name}</h5>
 									{pageSection.pageSectionId !== HERO_SECTION_ID && (
-										<Button variant="link" className="p-2 ms-2" onClick={onEdit}>
+										<Button variant="link" className="p-2 ms-2" onClick={onEditButtonClick}>
 											<EditIcon />
 										</Button>
 									)}
 								</div>
 								<div className="d-flex align-items-center">
 									{pageSection.pageSectionId !== HERO_SECTION_ID && (
-										<Button variant="link" className="p-2" onClick={onDelete}>
+										<Button variant="link" className="p-2" onClick={onDeleteButtonClick}>
 											<TrashIcon />
 										</Button>
 									)}
-									<Button variant="link" className="p-2" onClick={onClose}>
+									<Button variant="link" className="p-2" onClick={onCloseButtonClick}>
 										<CloseIcon />
 									</Button>
 								</div>
@@ -154,7 +171,8 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 									<SectionHeroSettingsForm />
 								) : (
 									<SectionSettingsForm
-										onAddRow={() => {
+										pageSection={pageSection}
+										onAddRowButtonClick={() => {
 											setIsNext(true);
 											setPageState(PAGE_STATES.ADD_ROW);
 										}}
@@ -182,6 +200,8 @@ export const PageSectionShelf = ({ pageSection, onEdit, onDelete, onClose }: Sec
 							</div>
 							<div className={classNames(classes.body, 'pt-0')}>
 								<RowSelectionForm
+									pageSectionId={pageSection.pageSectionId}
+									onResourcesRowAdded={handleResourceRowAdded}
 									onSelection={() => {
 										setIsNext(true);
 										setPageState(PAGE_STATES.ROW_SETTINGS);
