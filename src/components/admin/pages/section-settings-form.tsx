@@ -3,14 +3,19 @@ import { Button, Form } from 'react-bootstrap';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
-import { BACKGROUND_COLOR_ID, PageSectionDetailModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageRowModel, PageSectionDetailModel } from '@/lib/models';
 
 interface SectionSettingsFormProps {
 	pageSection: PageSectionDetailModel;
 	onAddRowButtonClick(): void;
+	onRowButtonClick(pageRow: PageRowModel): void;
 }
 
-export const SectionSettingsForm = ({ pageSection, onAddRowButtonClick }: SectionSettingsFormProps) => {
+export const SectionSettingsForm = ({
+	pageSection,
+	onAddRowButtonClick,
+	onRowButtonClick,
+}: SectionSettingsFormProps) => {
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -105,7 +110,15 @@ export const SectionSettingsForm = ({ pageSection, onAddRowButtonClick }: Sectio
 				/>
 			)}
 			{pageSection.pageRows.map((pageRow) => (
-				<div>{pageRow.pageRowId}</div>
+				<Button
+					key={pageRow.pageRowId}
+					className="d-block w-100"
+					onClick={() => {
+						onRowButtonClick(pageRow);
+					}}
+				>
+					{pageRow.pageRowId}
+				</Button>
 			))}
 		</>
 	);

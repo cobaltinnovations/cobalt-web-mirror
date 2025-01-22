@@ -147,7 +147,7 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 					<div className={classes.resourcesCol}>
 						<ul className="list-unstyled m-0">
 							{contents.map((c) => (
-								<li className={classes.resourceItem}>
+								<li key={c.contentId} className={classes.resourceItem}>
 									<Form.Check
 										type="checkbox"
 										name="resources"
@@ -177,7 +177,7 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 						<ul>
 							{selectedContentIds.map((cid) => {
 								const content = contents.find((c) => c.contentId === cid);
-								return <li>{content?.title}</li>;
+								return <li key={cid}>{content?.title}</li>;
 							})}
 						</ul>
 					</div>

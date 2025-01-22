@@ -15,6 +15,7 @@ export enum BACKGROUND_COLOR_ID {
 
 export enum ROW_TYPE_ID {
 	RESOURCES = 'RESOURCES',
+	GROUP_SESSIONS = 'GROUP_SESSIONS',
 	TAG_GROUP = 'TAG_GROUP',
 	ONE_COLUMN_IMAGE = 'ONE_COLUMN_IMAGE',
 	TWO_COLUMN_IMAGE = 'TWO_COLUMN_IMAGE',
@@ -108,6 +109,15 @@ export interface ResourcesRowModel extends PageRowDetailModel {
 	}[];
 }
 
+export interface GroupSessionsRowModel extends PageRowDetailModel {
+	groupSessions: {
+		pageRowGroupSessionId: string;
+		groupSessionId: string;
+		groupSessionDisplayOrder: number;
+		pageRowId: string;
+	}[];
+}
+
 export interface TagGroupRowModel extends PageRowDetailModel {
 	tagGroup: {
 		pageRowTagGroupId: string;
@@ -151,3 +161,27 @@ interface ColumnImageModel {
 	imageAltText: string;
 	columnDisplayOrder: number;
 }
+
+export const isResourcesRow = (x: any): x is ResourcesRowModel => {
+	return x.hasOwnProperty('contents');
+};
+
+export const isGroupSessionsRow = (x: any): x is GroupSessionsRowModel => {
+	return x.hasOwnProperty('groupSessions');
+};
+
+export const isTagGroupRow = (x: any): x is TagGroupRowModel => {
+	return x.hasOwnProperty('tagGroup');
+};
+
+export const isOneColumnImageRow = (x: any): x is OneColumnImageRowModel => {
+	return x.hasOwnProperty('pageRowOneColumn');
+};
+
+export const isTwoColumnImageRow = (x: any): x is TwoColumnImageRowModel => {
+	return x.hasOwnProperty('pageRowTwoColumn');
+};
+
+export const isThreeColumnImageRow = (x: any): x is ThreeColumnImageRowModel => {
+	return x.hasOwnProperty('pageRowThreeColumn');
+};

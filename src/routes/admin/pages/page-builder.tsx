@@ -133,6 +133,19 @@ export const Component = () => {
 		window.alert('[TODO]: Delete Section');
 	};
 
+	const handleSectionAdd = (newSection: PageSectionDetailModel) => {
+		if (!page) {
+			return;
+		}
+
+		const pageClone = cloneDeep(page);
+		pageClone.pageSections = [...pageClone.pageSections, newSection];
+
+		setPage(pageClone);
+		setCurrentSection(newSection);
+		setShowAddSectionModal(false);
+	};
+
 	const handleSectionReorder = (updatedPageSections: PageSectionDetailModel[]) => {
 		if (!page) {
 			return;
@@ -140,6 +153,7 @@ export const Component = () => {
 
 		const pageClone = cloneDeep(page);
 		pageClone.pageSections = updatedPageSections;
+
 		setPage(pageClone);
 	};
 
@@ -177,11 +191,7 @@ export const Component = () => {
 					onHide={() => {
 						setShowAddSectionModal(false);
 					}}
-					onSave={(pageSection) => {
-						// setSections((previousValue) => [...previousValue, pageSection]);
-						setCurrentSection(pageSection);
-						setShowAddSectionModal(false);
-					}}
+					onSave={handleSectionAdd}
 				/>
 			)}
 
@@ -318,6 +328,7 @@ export const Component = () => {
 						/>
 						{(page?.pageSections ?? []).map((ps) => (
 							<Container
+								key={ps.pageSectionId}
 								fluid
 								className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 							>
@@ -332,7 +343,7 @@ export const Component = () => {
 										</Col>
 									</Row>
 									{ps.pageRows.map((r) => (
-										<Row>
+										<Row key={r.pageRowId}>
 											<Col>{r.pageRowId}</Col>
 										</Row>
 									))}

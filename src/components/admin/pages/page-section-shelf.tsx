@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
-import { PageSectionDetailModel, ResourcesRowModel } from '@/lib/models';
+import { PageSectionDetailModel, ResourcesRowModel, ROW_TYPE_ID } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import {
 	CustomRowForm,
@@ -100,6 +100,9 @@ interface SectionShelfProps {
 enum PAGE_STATES {
 	SECTION_SETTINGS = 'SECTION_SETTINGS',
 	ADD_ROW = 'ADD_ROW',
+	RESOURCES_ROW_SETTINGS = 'RESOURCES_ROW_SETTINGS',
+	GROUP_SESSIONS_ROW_SETTINGS = 'GROUP_SESSIONS_ROW_SETTINGS',
+	TAG_GROUP_ROW_SETTINGS = 'TAG_GROUP_ROW_SETTINGS',
 	ROW_SETTINGS = 'ROW_SETTINGS',
 }
 
@@ -176,6 +179,32 @@ export const PageSectionShelf = ({
 											setIsNext(true);
 											setPageState(PAGE_STATES.ADD_ROW);
 										}}
+										onRowButtonClick={(pageRow) => {
+											if (pageRow.rowTypeId === ROW_TYPE_ID.RESOURCES) {
+												setIsNext(true);
+												setPageState(PAGE_STATES.RESOURCES_ROW_SETTINGS);
+											}
+											if (pageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS) {
+												setIsNext(true);
+												setPageState(PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS);
+											}
+											if (pageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP) {
+												setIsNext(true);
+												setPageState(PAGE_STATES.TAG_GROUP_ROW_SETTINGS);
+											}
+											if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE) {
+												setIsNext(true);
+												setPageState(PAGE_STATES.ROW_SETTINGS);
+											}
+											if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE) {
+												setIsNext(true);
+												setPageState(PAGE_STATES.ROW_SETTINGS);
+											}
+											if (pageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE) {
+												setIsNext(true);
+												setPageState(PAGE_STATES.ROW_SETTINGS);
+											}
+										}}
 									/>
 								)}
 							</div>
@@ -208,6 +237,37 @@ export const PageSectionShelf = ({
 									}}
 								/>
 							</div>
+						</div>
+					)}
+					{pageState === PAGE_STATES.RESOURCES_ROW_SETTINGS && (
+						<div className={classes.page}>
+							<div className={classes.header}>
+								<div className="w-100 d-flex align-items-center justify-content-between">
+									<div className="d-flex align-items-center">
+										<Button
+											variant="link"
+											className="p-2 me-2"
+											onClick={() => {
+												setIsNext(false);
+												setPageState(PAGE_STATES.SECTION_SETTINGS);
+											}}
+										>
+											<BackArrowIcon />
+										</Button>
+										<h5 className="mb-0">Resources</h5>
+									</div>
+									<Button
+										variant="link"
+										className="p-2"
+										onClick={() => {
+											return;
+										}}
+									>
+										<TrashIcon />
+									</Button>
+								</div>
+							</div>
+							<div className={classNames(classes.body, 'pt-0')}>TODO: Resources Form</div>
 						</div>
 					)}
 					{pageState === PAGE_STATES.ROW_SETTINGS && (
