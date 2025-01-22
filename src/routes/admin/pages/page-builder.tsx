@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { Badge, Button, Form, Tab } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { PageDetailModel, PageSectionDetailModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageDetailModel, PageSectionDetailModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
@@ -106,10 +106,10 @@ export async function loader() {
 }
 
 export const Component = () => {
+	const { pageId } = useParams<{ pageId: string }>();
 	const classes = useStyles();
 	const navigate = useNavigate();
 
-	const { pageId } = useParams<{ pageId: string }>();
 	const [page, setPage] = useState<PageDetailModel>();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
@@ -286,22 +286,34 @@ export const Component = () => {
 					<div className={classes.previewPage}>
 						<PageHeader
 							className="bg-p700 text-white"
-							title={
-								<>
-									<p className="fs-large">Community</p>
-									<h1>Name</h1>
-								</>
-							}
-							descriptionHtml="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed placerat
-											consectetur magna, a pretium purus mattis et. Proin sagittis ex a faucibus
-											pellentesque. Sed posuere neque vel elementum rutrum. Vivamus faucibus
-											blandit nibh ut sodales. Quisque at enim fringilla, fringilla massa sed,
-											porttitor lectus. Morbi ut aliquam purus, sit amet interdum massa. Etiam ac
-											maximus ante. In fermentum dolor in aliquam venenatis. Sed sit amet laoreet
-											ante."
+							title={<h1>[Hero.headline]</h1>}
+							descriptionHtml="[Hero.description]"
 							//imageUrl={topicCenter?.imageUrl}
 							//imageAlt={topicCenter?.name}
 						/>
+						{(page?.pageSections ?? []).map((ps) => (
+							<Container
+								fluid
+								className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
+							>
+								<Container>
+									<Row>
+										<Col>
+											<sub>
+												{ps.pageSectionId}: {ps.name}
+											</sub>
+											<h1>{ps.headline}</h1>
+											<p>{ps.description}</p>
+										</Col>
+									</Row>
+									{ps.pageRows.map((r) => (
+										<Row>
+											<Col>{r.pageRowId}</Col>
+										</Row>
+									))}
+								</Container>
+							</Container>
+						))}
 					</div>
 				</div>
 			</div>
