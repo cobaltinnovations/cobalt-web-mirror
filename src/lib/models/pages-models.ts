@@ -52,3 +52,5 @@ export interface PageFriendlyUrlValidationResult {
 	available: boolean;
 	recommendation: string;
 }
+
+export interface PageDetailModel {}

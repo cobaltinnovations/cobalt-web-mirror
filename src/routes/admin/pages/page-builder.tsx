@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Form, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { PageSectionModel } from '@/lib/models';
+import { PageDetailModel, PageSectionModel } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
 import { AddPageSectionModal, LayoutTab, PageSectionShelf } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { pagesService } from '@/lib/services';
+import AsyncWrapper from '@/components/async-page';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -105,11 +107,27 @@ export async function loader() {
 export const Component = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+
+	const { pageId } = useParams<{ pageId: string }>();
+	const [page, setPage] = useState<PageDetailModel>();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [sections, setSections] = useState<PageSectionModel[]>([]);
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
 	const [currentSection, setCurrentSection] = useState<PageSectionModel>();
+
+	const fetchData = useCallback(async () => {
+		if (!pageId) {
+			throw new Error('pageId is undefined.');
+		}
+
+		const response = await pagesService.getPage(pageId).fetch();
+		setPage(response.page);
+	}, [pageId]);
+
+	useEffect(() => {
+		console.log('page', page);
+	}, [page]);
 
 	const deleteCurrentSection = () => {
 		if (!currentSection) {
@@ -121,7 +139,7 @@ export const Component = () => {
 	};
 
 	return (
-		<>
+		<AsyncWrapper fetchData={fetchData}>
 			<AddPageSectionModal
 				show={showAddSectionModal}
 				onHide={() => {
@@ -280,6 +298,6 @@ export const Component = () => {
 					</div>
 				</div>
 			</div>
-		</>
+		</AsyncWrapper>
 	);
 };

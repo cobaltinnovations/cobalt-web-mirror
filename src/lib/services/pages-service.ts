@@ -1,6 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PageDetailModel, PageModel } from '@/lib/models';
 
 export interface GetPagesResponse {
 	totalCountDescription: string;
@@ -31,6 +31,12 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<GetPagesResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/pages', searchParameters),
+		});
+	},
+	getPage(pageId: string) {
+		return httpSingleton.orchestrateRequest<{ page: PageDetailModel }>({
+			method: 'GET',
+			url: `/page/${pageId}`,
 		});
 	},
 };
