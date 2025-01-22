@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
-import { PageRowUnionModel, PageSectionDetailModel, ResourcesRowModel, ROW_TYPE_ID } from '@/lib/models';
+import { PageRowUnionModel, PageSectionDetailModel, ROW_TYPE_ID } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import {
 	CustomRowForm,

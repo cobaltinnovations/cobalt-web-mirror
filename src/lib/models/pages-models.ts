@@ -137,11 +137,7 @@ export interface OneColumnImageRowModel {
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-	pageRowOneColumn: {
-		pageRowId: string;
-		displayOrder: number;
-		columnOne: ColumnImageModel;
-	};
+	columnOne: ColumnImageModel;
 }
 
 export interface TwoColumnImageRowModel {
@@ -149,12 +145,8 @@ export interface TwoColumnImageRowModel {
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-	pageRowTwoColumn: {
-		pageRowId: string;
-		displayOrder: number;
-		columnOne: ColumnImageModel;
-		columnTwo: ColumnImageModel;
-	};
+	columnOne: ColumnImageModel;
+	columnTwo: ColumnImageModel;
 }
 
 export interface ThreeColumnImageRowModel {
@@ -162,13 +154,9 @@ export interface ThreeColumnImageRowModel {
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-	pageRowThreeColumn: {
-		pageRowId: string;
-		displayOrder: number;
-		columnOne: ColumnImageModel;
-		columnTwo: ColumnImageModel;
-		columnThree: ColumnImageModel;
-	};
+	columnOne: ColumnImageModel;
+	columnTwo: ColumnImageModel;
+	columnThree: ColumnImageModel;
 }
 
 interface ColumnImageModel {
@@ -194,13 +182,13 @@ export const isTagGroupRow = (x: any): x is TagGroupRowModel => {
 };
 
 export const isOneColumnImageRow = (x: any): x is OneColumnImageRowModel => {
-	return x.hasOwnProperty('pageRowOneColumn');
+	return x.hasOwnProperty('columnOne');
 };
 
 export const isTwoColumnImageRow = (x: any): x is TwoColumnImageRowModel => {
-	return x.hasOwnProperty('pageRowTwoColumn');
+	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo');
 };
 
 export const isThreeColumnImageRow = (x: any): x is ThreeColumnImageRowModel => {
-	return x.hasOwnProperty('pageRowThreeColumn');
+	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
 };
