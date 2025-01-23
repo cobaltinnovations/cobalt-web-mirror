@@ -60,7 +60,7 @@ export const RowSettingsResources = () => {
 										key={content.contentId}
 										draggableProvided={draggableProvided}
 										draggableSnapshot={draggableSnapshot}
-										title={content.contentId}
+										title={content.title}
 									/>
 								)}
 							</Draggable>

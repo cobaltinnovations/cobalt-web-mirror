@@ -108,6 +108,7 @@ export interface ResourcesRowModel {
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
 	contents: {
+		title: string;
 		pageRowContentId: string;
 		contentId: string;
 		contentDisplayOrder: number;
