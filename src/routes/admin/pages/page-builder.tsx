@@ -1,11 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { Badge, Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
+import { Badge, Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
-import InputHelper from '@/components/input-helper';
-import { AddPageSectionModal, LayoutTab, PageSectionShelf } from '@/components/admin/pages';
+import { AddPageSectionModal, LayoutTab, PageSectionShelf, SettingsTab } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -215,18 +214,9 @@ const PageBuilder = () => {
 									}}
 								/>
 							</Tab.Pane>
-							<Tab.Pane eventKey="SETTINGS">
+							<Tab.Pane eventKey="SETTINGS" mountOnEnter unmountOnExit>
 								<div className="p-6">
-									<Form>
-										<InputHelper className="mb-4" type="text" label="Page name" required />
-										<InputHelper className="mb-4" type="url" label="Friendly url" required />
-										<InputHelper
-											as="select"
-											label="Page Type"
-											required
-											helperText="The type determines where the content lives on Cobalt"
-										/>
-									</Form>
+									<SettingsTab />
 								</div>
 							</Tab.Pane>
 						</Tab.Content>
@@ -257,8 +247,9 @@ const PageBuilder = () => {
 					<div className={classes.previewPage}>
 						<PageHeader
 							className="bg-p700 text-white"
-							title={<h1>[Hero.headline]</h1>}
-							descriptionHtml="[Hero.description]"
+							title={<h1>{page?.headline ?? 'No hero headline'}</h1>}
+							descriptionHtml={page?.description ?? 'No hero description'}
+							imageAlt={page?.imageAltText}
 						/>
 						{(page?.pageSections ?? []).map((ps) => (
 							<Container

@@ -66,8 +66,12 @@ export interface PageDetailModel {
 	pageId: string;
 	name: string;
 	urlName: string;
-	pageTypeId: string;
+	pageTypeId: PAGE_TYPE_ID;
 	pageStatusId: PAGE_STATUS_ID;
+	headline: string;
+	description: string;
+	imageFileUploadId: string;
+	imageAltText: string;
 	publishedDate: string;
 	publishedDateDescription: string;
 	created: string;
@@ -169,26 +173,26 @@ interface ColumnImageModel {
 	columnDisplayOrder: number;
 }
 
-export const isResourcesRow = (x: any): x is ResourcesRowModel => {
+export const isResourcesRow = (x: PageRowUnionModel): x is ResourcesRowModel => {
 	return x.hasOwnProperty('contents');
 };
 
-export const isGroupSessionsRow = (x: any): x is GroupSessionsRowModel => {
+export const isGroupSessionsRow = (x: PageRowUnionModel): x is GroupSessionsRowModel => {
 	return x.hasOwnProperty('groupSessions');
 };
 
-export const isTagGroupRow = (x: any): x is TagGroupRowModel => {
+export const isTagGroupRow = (x: PageRowUnionModel): x is TagGroupRowModel => {
 	return x.hasOwnProperty('tagGroup');
 };
 
-export const isOneColumnImageRow = (x: any): x is OneColumnImageRowModel => {
-	return x.hasOwnProperty('columnOne');
+export const isOneColumnImageRow = (x: PageRowUnionModel): x is OneColumnImageRowModel => {
+	return x.hasOwnProperty('columnOne') && !x.hasOwnProperty('columnTwo') && !x.hasOwnProperty('columnThree');
 };
 
-export const isTwoColumnImageRow = (x: any): x is TwoColumnImageRowModel => {
-	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo');
+export const isTwoColumnImageRow = (x: PageRowUnionModel): x is TwoColumnImageRowModel => {
+	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && !x.hasOwnProperty('columnThree');
 };
 
-export const isThreeColumnImageRow = (x: any): x is ThreeColumnImageRowModel => {
+export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnImageRowModel => {
 	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
 };

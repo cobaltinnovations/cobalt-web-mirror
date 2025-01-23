@@ -11,3 +11,4 @@ export * from './row-selection-form';
 export * from './section-hero-settings-form';
 export * from './section-settings-form';
 export * from './select-resources-modal';
+export * from './settings-tab';

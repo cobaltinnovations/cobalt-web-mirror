@@ -4,10 +4,12 @@ import {
 	BACKGROUND_COLOR_ID,
 	OneColumnImageRowModel,
 	PAGE_STATUS_ID,
+	PAGE_TYPE_ID,
 	PageDetailModel,
 	PageModel,
 	PageSectionDetailModel,
 	PageSectionModel,
+	PresignedUploadResponse,
 	ResourcesRowModel,
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
@@ -48,6 +50,39 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<{ page: PageDetailModel }>({
 			method: 'GET',
 			url: `/pages/${pageId}`,
+		});
+	},
+	updatePageSettings(
+		pageId: string,
+		data: {
+			name: string;
+			urlName: string;
+			pageTypeId: PAGE_TYPE_ID;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			page: PageDetailModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/${pageId}/settings`,
+			data,
+		});
+	},
+	updatePageHero(
+		pageId: string,
+		data: {
+			headline: string;
+			description: string;
+			imageFileUploadId: string;
+			imageAltText: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			page: PageDetailModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/${pageId}/hero`,
+			data,
 		});
 	},
 	createPageSection(
@@ -121,6 +156,13 @@ export const pagesService = {
 			method: 'POST',
 			url: `/pages/row/${pageSectionId}/custom-three-column`,
 			data: { columnOne: {}, columnTwo: {}, columnThree: {} },
+		});
+	},
+	createPresignedFileUpload(data: { contentType: string; filename: string }) {
+		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
+			method: 'POST',
+			url: '/pages/file-presigned-upload',
+			data,
 		});
 	},
 };

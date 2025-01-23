@@ -46,48 +46,40 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 	}, [currentPageSection?.backgroundColorId, currentPageSection?.description, currentPageSection?.headline]);
 
 	const getTitleForPageRow = (pageRow: PageRowUnionModel) => {
-		if (isResourcesRow(pageRow)) {
-			return 'Resources';
-		}
+		const rowTypeMap = [
+			{ check: isResourcesRow, title: 'Resources' },
+			{ check: isGroupSessionsRow, title: 'Group Sessions' },
+			{ check: isTagGroupRow, title: 'Tag Group' },
+			{
+				check: (row: PageRowUnionModel) =>
+					isOneColumnImageRow(row) || isTwoColumnImageRow(row) || isThreeColumnImageRow(row),
+				title: 'Custom Row',
+			},
+		];
 
-		if (isGroupSessionsRow(pageRow)) {
-			return 'Group Sessions';
-		}
-
-		if (isTagGroupRow(pageRow)) {
-			return 'Tag Group';
-		}
-
-		if (isOneColumnImageRow(pageRow) || isTwoColumnImageRow(pageRow) || isThreeColumnImageRow(pageRow)) {
-			return 'Custom Row';
+		for (const { check, title } of rowTypeMap) {
+			if (check(pageRow)) {
+				return title;
+			}
 		}
 
 		return '';
 	};
 
 	const getSubTitleForPageRow = (pageRow: PageRowUnionModel) => {
-		if (isResourcesRow(pageRow)) {
-			return `${pageRow.contents.length} Resources`;
-		}
+		const rowTypeMap = [
+			{ check: isResourcesRow, getSubtitle: (row: any) => `${row.contents.length} Resources` },
+			{ check: isGroupSessionsRow, getSubtitle: (row: any) => `${row.groupSessions.length} Sessions` },
+			{ check: isTagGroupRow, getSubtitle: (row: any) => `TODO: ${row.tagGroup.tagGroupId}` },
+			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
+			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
+			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
+		];
 
-		if (isGroupSessionsRow(pageRow)) {
-			return `${pageRow.groupSessions.length} Sessions`;
-		}
-
-		if (isTagGroupRow(pageRow)) {
-			return `TODO: ${pageRow.tagGroup.tagGroupId}`;
-		}
-
-		if (isOneColumnImageRow(pageRow)) {
-			return '1 Item';
-		}
-
-		if (isTwoColumnImageRow(pageRow)) {
-			return '2 Items';
-		}
-
-		if (isThreeColumnImageRow(pageRow)) {
-			return '3 Items';
+		for (const { check, getSubtitle } of rowTypeMap) {
+			if (check(pageRow)) {
+				return getSubtitle(pageRow);
+			}
 		}
 
 		return '';

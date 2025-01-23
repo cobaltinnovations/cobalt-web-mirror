@@ -1,13 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
+import { pagesService } from '@/lib/services';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
-import { AdminFormImageInput } from '../admin-form-image-input';
-import { groupSessionsService } from '@/lib/services';
+import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 
 export const HERO_SECTION_ID = 'HERO';
 
 export const SectionHeroSettingsForm = () => {
+	const handleError = useHandleError();
+	const { page, setPage } = usePageBuilderContext();
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -18,11 +22,42 @@ export const SectionHeroSettingsForm = () => {
 	});
 
 	useEffect(() => {
+		setFormValues({
+			headline: page?.headline ?? '',
+			description: page?.description ?? '',
+			imageFileUploadId: page?.imageFileUploadId ?? '',
+			imageUrl: '',
+			imageAltText: page?.imageAltText ?? '',
+		});
+
 		headlineInputRef.current?.focus();
-	}, []);
+	}, [page?.description, page?.headline, page?.imageAltText, page?.imageFileUploadId]);
+
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		try {
+			if (!page) {
+				throw new Error('page is undefined');
+			}
+
+			const response = await pagesService
+				.updatePageHero(page.pageId, {
+					headline: formValues.headline,
+					description: formValues.description,
+					imageFileUploadId: formValues.imageFileUploadId,
+					imageAltText: formValues.imageAltText,
+				})
+				.fetch();
+
+			setPage(response.page);
+		} catch (error) {
+			handleError(error);
+		}
+	};
 
 	return (
-		<Form>
+		<Form onSubmit={handleFormSubmit}>
 			<InputHelper
 				ref={headlineInputRef}
 				className="mb-4"
@@ -59,7 +94,7 @@ export const SectionHeroSettingsForm = () => {
 					}));
 				}}
 				presignedUploadGetter={(blob) => {
-					return groupSessionsService.getPresignedUploadUrl({
+					return pagesService.createPresignedFileUpload({
 						contentType: blob.type,
 						filename: `${uuidv4()}.jpg`,
 					}).fetch;
@@ -77,6 +112,9 @@ export const SectionHeroSettingsForm = () => {
 					}));
 				}}
 			/>
+			<Button type="submit" variant="warning">
+				Temp Submit Button (No live saving yet)
+			</Button>
 		</Form>
 	);
 };
