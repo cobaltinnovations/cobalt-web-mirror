@@ -3,37 +3,32 @@ import { Button } from 'react-bootstrap';
 import { CollapseButton, CustomRowButton, SelectResourcesModal } from '@/components/admin/pages';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import {
-	OneColumnImageRowModel,
-	ResourcesRowModel,
-	ThreeColumnImageRowModel,
-	TwoColumnImageRowModel,
-} from '@/lib/models';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 interface RowSelectionFormProps {
-	pageSectionId: string;
-	onResourcesRowAdded(pageRow: ResourcesRowModel): void;
-	onOneColumnRowAdded(pageRow: OneColumnImageRowModel): void;
-	onTwoColumnRowAdded(pageRow: TwoColumnImageRowModel): void;
-	onThreeColumnRowAdded(pageRow: ThreeColumnImageRowModel): void;
+	onRowAdded(): void;
 }
 
-export const RowSelectionForm = ({
-	pageSectionId,
-	onResourcesRowAdded,
-	onOneColumnRowAdded,
-	onTwoColumnRowAdded,
-	onThreeColumnRowAdded,
-}: RowSelectionFormProps) => {
+export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 	const handleError = useHandleError();
+
+	const { currentPageSection, addPageRowToCurrentPageSection } = usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 
 	const handleResourcesAdd = async (contentIds: string[]) => {
 		try {
-			const response = await pagesService.createResourcesRow(pageSectionId, { contentIds }).fetch();
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
 
+			const { pageRow } = await pagesService
+				.createResourcesRow(currentPageSection.pageSectionId, { contentIds })
+				.fetch();
+
+			addPageRowToCurrentPageSection(pageRow);
 			setShowSelectResourcesModal(false);
-			onResourcesRowAdded(response.pageRow);
+
+			onRowAdded();
 		} catch (error) {
 			handleError(error);
 		}
@@ -41,8 +36,13 @@ export const RowSelectionForm = ({
 
 	const handleOneColumnButtonClick = async () => {
 		try {
-			const response = await pagesService.createOneColumnRow(pageSectionId).fetch();
-			onOneColumnRowAdded(response.pageRow);
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createOneColumnRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			onRowAdded();
 		} catch (error) {
 			handleError(error);
 		}
@@ -50,8 +50,13 @@ export const RowSelectionForm = ({
 
 	const handleTwoColumnButtonClick = async () => {
 		try {
-			const response = await pagesService.createTwoColumnRow(pageSectionId).fetch();
-			onTwoColumnRowAdded(response.pageRow);
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createTwoColumnRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			onRowAdded();
 		} catch (error) {
 			handleError(error);
 		}
@@ -59,8 +64,13 @@ export const RowSelectionForm = ({
 
 	const handleThreeColumnButtonClick = async () => {
 		try {
-			const response = await pagesService.createThreeColumnRow(pageSectionId).fetch();
-			onThreeColumnRowAdded(response.pageRow);
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createThreeColumnRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			onRowAdded();
 		} catch (error) {
 			handleError(error);
 		}

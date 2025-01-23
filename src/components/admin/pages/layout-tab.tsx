@@ -3,12 +3,13 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 
-import { BACKGROUND_COLOR_ID, PageSectionDetailModel } from '@/lib/models';
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { DraggableItem } from './draggable-item';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import { cloneDeep } from 'lodash';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionItem: {
@@ -43,60 +44,44 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface LayoutTabProps {
-	sections: PageSectionDetailModel[];
-	currentSection?: PageSectionDetailModel;
-	onSectionClick(section: PageSectionDetailModel): void;
-	onReorder(sections: PageSectionDetailModel[]): void;
-	onAddSectionClick(): void;
+	onAddSectionButtonClick(): void;
 }
 
-export const LayoutTab = ({
-	sections,
-	currentSection,
-	onSectionClick,
-	onReorder,
-	onAddSectionClick,
-}: LayoutTabProps) => {
+export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 	const classes = useStyles();
-
-	const handleHeroSectionClick = () => {
-		const heroSection = {
-			pageSectionId: HERO_SECTION_ID,
-			pageId: 'xxxx-xxxx-xxxx-xxxx',
-			name: 'Hero',
-			headline: '',
-			description: '',
-			backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
-			displayOrder: 0,
-			pageRows: [],
-		};
-
-		onSectionClick(heroSection);
-	};
+	const { page, setPage, setCurrentPageSectionId, currentPageSection } = usePageBuilderContext();
 
 	const handleDragEnd = async ({ source, destination }: DropResult) => {
 		if (!destination) {
 			return;
 		}
 
-		const sectionsClone = window.structuredClone(sections);
-		const [removedSection] = (sectionsClone ?? []).splice(source.index, 1);
-		(sectionsClone ?? []).splice(destination.index, 0, removedSection);
+		if (!page) {
+			return;
+		}
 
-		onReorder(sectionsClone);
+		const pageClone = cloneDeep(page);
+		const [removedSection] = pageClone.pageSections.splice(source.index, 1);
+		pageClone.pageSections.splice(destination.index, 0, removedSection);
+
+		setPage(pageClone);
 	};
 
 	return (
 		<>
 			<div
 				className={classNames(classes.sectionItem, 'border-bottom', {
-					active: currentSection?.pageSectionId === HERO_SECTION_ID,
+					active: currentPageSection?.pageSectionId === HERO_SECTION_ID,
 				})}
 			>
 				<div className={classes.handleOuter}>
 					<LockIcon className="text-n300" />
 				</div>
-				<button type="button" className={classes.sectionButton} onClick={handleHeroSectionClick}>
+				<button
+					type="button"
+					className={classes.sectionButton}
+					onClick={() => setCurrentPageSectionId(HERO_SECTION_ID)}
+				>
 					<span>Hero</span>
 					<RightChevron className="text-n500" />
 				</button>
@@ -105,7 +90,7 @@ export const LayoutTab = ({
 				<Droppable droppableId="page-sections-droppable" direction="vertical">
 					{(droppableProvided) => (
 						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-							{sections.map((section, sectionIndex) => (
+							{(page?.pageSections ?? []).map((section, sectionIndex) => (
 								<Draggable
 									key={section.pageSectionId}
 									draggableId={`page-sections-draggable-${section.pageSectionId}`}
@@ -116,8 +101,8 @@ export const LayoutTab = ({
 											key={section.pageSectionId}
 											draggableProvided={draggableProvided}
 											draggableSnapshot={draggableSnapshot}
-											active={currentSection?.pageSectionId === section.pageSectionId}
-											onClick={() => onSectionClick(section)}
+											active={currentPageSection?.pageSectionId === section.pageSectionId}
+											onClick={() => setCurrentPageSectionId(section.pageSectionId)}
 											title={section.name}
 											subTitle={`${section.pageRows.length} rows`}
 										/>
@@ -130,7 +115,7 @@ export const LayoutTab = ({
 				</Droppable>
 			</DragDropContext>
 			<div className="p-6 text-right">
-				<Button variant="outline-primary" onClick={onAddSectionClick}>
+				<Button variant="outline-primary" onClick={onAddSectionButtonClick}>
 					Add Section
 				</Button>
 			</div>

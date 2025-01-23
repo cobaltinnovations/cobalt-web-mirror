@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
-import { PageRowUnionModel, PageSectionDetailModel, ROW_TYPE_ID } from '@/lib/models';
-import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
+import { ROW_TYPE_ID } from '@/lib/models';
 import {
 	CustomRowForm,
 	HERO_SECTION_ID,
@@ -11,12 +10,12 @@ import {
 	SectionHeroSettingsForm,
 	SectionSettingsForm,
 } from '@/components/admin/pages';
-
+import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { cloneDeep } from 'lodash';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 const PAGE_TRANSITION_DURATION_MS = 600;
@@ -90,8 +89,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface SectionShelfProps {
-	pageSection: PageSectionDetailModel;
-	onChange(pageSection: PageSectionDetailModel): void;
 	onEditButtonClick(): void;
 	onDeleteButtonClick(): void;
 	onCloseButtonClick(): void;
@@ -106,27 +103,16 @@ enum PAGE_STATES {
 	ROW_SETTINGS = 'ROW_SETTINGS',
 }
 
-export const PageSectionShelf = ({
-	pageSection,
-	onChange,
-	onEditButtonClick,
-	onDeleteButtonClick,
-	onCloseButtonClick,
-}: SectionShelfProps) => {
+export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick, onCloseButtonClick }: SectionShelfProps) => {
 	const classes = useStyles();
 	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
+	const { currentPageSection } = usePageBuilderContext();
 
 	useEffect(() => {
 		setIsNext(false);
 		setPageState(PAGE_STATES.SECTION_SETTINGS);
-	}, [pageSection.pageSectionId]);
-
-	const updateSectionWithRow = (pageRow: PageRowUnionModel) => {
-		const pageSectionClone = cloneDeep(pageSection);
-		pageSectionClone.pageRows = [...pageSectionClone.pageRows, pageRow];
-		onChange(pageSectionClone);
-	};
+	}, [currentPageSection?.pageSectionId]);
 
 	return (
 		<TransitionGroup
@@ -144,15 +130,15 @@ export const PageSectionShelf = ({
 						<div className={classes.page}>
 							<div className={classes.header}>
 								<div className="d-flex align-items-center">
-									<h5 className="mb-0 text-truncate">{pageSection.name}</h5>
-									{pageSection.pageSectionId !== HERO_SECTION_ID && (
+									<h5 className="mb-0 text-truncate">{currentPageSection?.name}</h5>
+									{currentPageSection?.pageSectionId !== HERO_SECTION_ID && (
 										<Button variant="link" className="p-2 ms-2" onClick={onEditButtonClick}>
 											<EditIcon />
 										</Button>
 									)}
 								</div>
 								<div className="d-flex align-items-center">
-									{pageSection.pageSectionId !== HERO_SECTION_ID && (
+									{currentPageSection?.pageSectionId !== HERO_SECTION_ID && (
 										<Button variant="link" className="p-2" onClick={onDeleteButtonClick}>
 											<TrashIcon />
 										</Button>
@@ -164,14 +150,13 @@ export const PageSectionShelf = ({
 							</div>
 							<div
 								className={classNames(classes.body, {
-									'pt-0': pageSection.pageSectionId !== HERO_SECTION_ID,
+									'pt-0': currentPageSection?.pageSectionId !== HERO_SECTION_ID,
 								})}
 							>
-								{pageSection.pageSectionId === HERO_SECTION_ID ? (
+								{currentPageSection?.pageSectionId === HERO_SECTION_ID ? (
 									<SectionHeroSettingsForm />
 								) : (
 									<SectionSettingsForm
-										pageSection={pageSection}
 										onAddRowButtonClick={() => {
 											setIsNext(true);
 											setPageState(PAGE_STATES.ADD_ROW);
@@ -226,26 +211,9 @@ export const PageSectionShelf = ({
 							</div>
 							<div className={classNames(classes.body, 'pt-0')}>
 								<RowSelectionForm
-									pageSectionId={pageSection.pageSectionId}
-									onResourcesRowAdded={(pageRow) => {
-										updateSectionWithRow(pageRow);
+									onRowAdded={() => {
 										setIsNext(false);
 										setPageState(PAGE_STATES.SECTION_SETTINGS);
-									}}
-									onOneColumnRowAdded={(pageRow) => {
-										updateSectionWithRow(pageRow);
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-									onTwoColumnRowAdded={(pageRow) => {
-										updateSectionWithRow(pageRow);
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
-									}}
-									onThreeColumnRowAdded={(pageRow) => {
-										updateSectionWithRow(pageRow);
-										setIsNext(true);
-										setPageState(PAGE_STATES.ROW_SETTINGS);
 									}}
 								/>
 							</div>

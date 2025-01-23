@@ -13,22 +13,18 @@ import {
 	isTwoColumnImageRow,
 	PageRowModel,
 	PageRowUnionModel,
-	PageSectionDetailModel,
 } from '@/lib/models';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { DraggableItem } from './draggable-item';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 interface SectionSettingsFormProps {
-	pageSection: PageSectionDetailModel;
 	onAddRowButtonClick(): void;
 	onRowButtonClick(pageRow: PageRowModel): void;
 }
 
-export const SectionSettingsForm = ({
-	pageSection,
-	onAddRowButtonClick,
-	onRowButtonClick,
-}: SectionSettingsFormProps) => {
+export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: SectionSettingsFormProps) => {
+	const { currentPageSection } = usePageBuilderContext();
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -158,7 +154,7 @@ export const SectionSettingsForm = ({
 					Add Row
 				</Button>
 			</Form.Group>
-			{pageSection.pageRows.length === 0 && (
+			{(currentPageSection?.pageRows ?? []).length === 0 && (
 				<NoData
 					title="No rows added"
 					actions={[
@@ -178,7 +174,7 @@ export const SectionSettingsForm = ({
 				<Droppable droppableId="page-rows-droppable" direction="vertical">
 					{(droppableProvided) => (
 						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-							{pageSection.pageRows.map((pageRow, sectionIndex) => (
+							{(currentPageSection?.pageRows ?? []).map((pageRow, sectionIndex) => (
 								<Draggable
 									key={pageRow.pageRowId}
 									draggableId={`page-rows-draggable-${pageRow.pageRowId}`}

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Badge, Button, Col, Container, Form, Row, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID, PageDetailModel, PageSectionDetailModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import InputHelper from '@/components/input-helper';
@@ -11,7 +11,8 @@ import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate, useParams } from 'react-router-dom';
 import { pagesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { cloneDeep } from 'lodash';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import { PageBuilderProvider } from '@/contexts/page-builder-context';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -101,20 +102,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export async function loader() {
-	return null;
-}
-
-export const Component = () => {
+const PageBuilder = () => {
 	const { pageId } = useParams<{ pageId: string }>();
 	const classes = useStyles();
 	const navigate = useNavigate();
 
-	const [page, setPage] = useState<PageDetailModel>();
+	const { page, setPage, setCurrentPageSectionId, currentPageSection } = usePageBuilderContext();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
-	const [currentSection, setCurrentSection] = useState<PageSectionDetailModel>();
 
 	const fetchData = useCallback(async () => {
 		if (!pageId) {
@@ -123,83 +119,26 @@ export const Component = () => {
 
 		const response = await pagesService.getPage(pageId).fetch();
 		setPage(response.page);
-	}, [pageId]);
+	}, [pageId, setPage]);
 
 	const deleteCurrentSection = () => {
-		if (!currentSection) {
-			throw new Error('currentSection is undefined');
-		}
-
 		window.alert('[TODO]: Delete Section');
-	};
-
-	const handleSectionAdd = (newSection: PageSectionDetailModel) => {
-		if (!page) {
-			return;
-		}
-
-		const pageClone = cloneDeep(page);
-		pageClone.pageSections = [...pageClone.pageSections, newSection];
-
-		setPage(pageClone);
-		setCurrentSection(newSection);
-		setShowAddSectionModal(false);
-	};
-
-	const handleSectionReorder = (updatedPageSections: PageSectionDetailModel[]) => {
-		if (!page) {
-			return;
-		}
-
-		const pageClone = cloneDeep(page);
-		pageClone.pageSections = updatedPageSections;
-
-		setPage(pageClone);
-	};
-
-	const handleSectionChange = (updatedPageSection: PageSectionDetailModel) => {
-		if (!page) {
-			return;
-		}
-
-		const pageClone = cloneDeep(page);
-		pageClone.pageSections = pageClone.pageSections.map((ps) =>
-			ps.pageSectionId === updatedPageSection.pageSectionId ? updatedPageSection : ps
-		);
-
-		setPage(pageClone);
-		setCurrentSection((cs) => {
-			if (!cs) {
-				return undefined;
-			}
-
-			if (cs.pageSectionId === updatedPageSection.pageSectionId) {
-				return updatedPageSection;
-			}
-
-			return cs;
-		});
 	};
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
-			{page && (
-				<AddPageSectionModal
-					pageId={page.pageId}
-					pageStatusId={page.pageStatusId}
-					show={showAddSectionModal}
-					onHide={() => {
-						setShowAddSectionModal(false);
-					}}
-					onSave={handleSectionAdd}
-				/>
-			)}
+			<AddPageSectionModal
+				show={showAddSectionModal}
+				onHide={() => {
+					setShowAddSectionModal(false);
+				}}
+			/>
 
 			<ConfirmDialog
 				show={showDeleteSectionModal}
 				size="lg"
 				titleText="Delete section"
-				bodyText={`Are you sure you want to delete "${currentSection?.name ?? ''}"?`}
+				bodyText={`Are you sure you want to delete "${currentPageSection?.name ?? ''}"?`}
 				dismissText="Cancel"
 				confirmText="Delete"
 				destructive
@@ -264,23 +203,17 @@ export const Component = () => {
 							]}
 							onTabClick={(tabValue) => {
 								setCurrentTab(tabValue);
-								setCurrentSection(undefined);
+								setCurrentPageSectionId('');
 							}}
 						/>
 						<Tab.Content className={classes.tabContent}>
 							<Tab.Pane eventKey="LAYOUT">
-								{page && (
-									<LayoutTab
-										sections={page.pageSections}
-										currentSection={currentSection}
-										onSectionClick={setCurrentSection}
-										onReorder={handleSectionReorder}
-										onAddSectionClick={() => {
-											setCurrentSection(undefined);
-											setShowAddSectionModal(true);
-										}}
-									/>
-								)}
+								<LayoutTab
+									onAddSectionButtonClick={() => {
+										setCurrentPageSectionId('');
+										setShowAddSectionModal(true);
+									}}
+								/>
 							</Tab.Pane>
 							<Tab.Pane eventKey="SETTINGS">
 								<div className="p-6">
@@ -300,28 +233,24 @@ export const Component = () => {
 					</Tab.Container>
 				</div>
 				<CSSTransition
-					in={!!currentSection}
+					in={!!currentPageSection}
 					timeout={SHELF_TRANSITION_DURATION_MS}
 					classNames="menu-animation"
 					mountOnEnter
 					unmountOnExit
 				>
 					<div className={classes.asideShelf}>
-						{currentSection && (
-							<PageSectionShelf
-								pageSection={currentSection}
-								onChange={handleSectionChange}
-								onEditButtonClick={() => {
-									setShowAddSectionModal(true);
-								}}
-								onDeleteButtonClick={() => {
-									setShowDeleteSectionModal(true);
-								}}
-								onCloseButtonClick={() => {
-									setCurrentSection(undefined);
-								}}
-							/>
-						)}
+						<PageSectionShelf
+							onEditButtonClick={() => {
+								setShowAddSectionModal(true);
+							}}
+							onDeleteButtonClick={() => {
+								setShowDeleteSectionModal(true);
+							}}
+							onCloseButtonClick={() => {
+								setCurrentPageSectionId('');
+							}}
+						/>
 					</div>
 				</CSSTransition>
 				<div className={classes.previewPane}>
@@ -330,8 +259,6 @@ export const Component = () => {
 							className="bg-p700 text-white"
 							title={<h1>[Hero.headline]</h1>}
 							descriptionHtml="[Hero.description]"
-							//imageUrl={topicCenter?.imageUrl}
-							//imageAlt={topicCenter?.name}
 						/>
 						{(page?.pageSections ?? []).map((ps) => (
 							<Container
@@ -361,5 +288,17 @@ export const Component = () => {
 				</div>
 			</div>
 		</AsyncWrapper>
+	);
+};
+
+export async function loader() {
+	return null;
+}
+
+export const Component = () => {
+	return (
+		<PageBuilderProvider>
+			<PageBuilder />
+		</PageBuilderProvider>
 	);
 };

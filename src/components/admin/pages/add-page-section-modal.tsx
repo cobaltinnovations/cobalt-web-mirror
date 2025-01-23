@@ -2,9 +2,11 @@ import React, { FC, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelper from '@/components/input-helper';
-import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID, PageSectionDetailModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { pagesService } from '@/lib/services';
+import { cloneDeep } from 'lodash';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 const useStyles = createUseThemedStyles(() => ({
 	modal: {
@@ -12,13 +14,10 @@ const useStyles = createUseThemedStyles(() => ({
 	},
 }));
 
-interface AddPageSectionModalProps extends ModalProps {
-	pageId: string;
-	pageStatusId: PAGE_STATUS_ID;
-	onSave(pageSection: PageSectionDetailModel): void;
-}
+interface AddPageSectionModalProps extends ModalProps {}
 
-export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ pageId, pageStatusId, onSave, ...props }) => {
+export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectionAdded, ...props }) => {
+	const { page, setPage, setCurrentPageSectionId } = usePageBuilderContext();
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const nameInputRef = useRef<HTMLInputElement>(null);
@@ -35,16 +34,27 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ pageId, page
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
+		if (!page) {
+			return;
+		}
+
 		try {
 			const response = await pagesService
-				.createPageSection(pageId, {
+				.createPageSection(page.pageId, {
 					name: formValues.name,
 					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
-					pageStatusId,
+					pageStatusId: page.pageStatusId,
 				})
 				.fetch();
 
-			onSave({ ...response.pageSection, pageRows: [] });
+			const formattedSection = { ...response.pageSection, pageRows: [] };
+
+			const pageClone = cloneDeep(page);
+			pageClone.pageSections = [...pageClone.pageSections, formattedSection];
+			setPage(pageClone);
+
+			setCurrentPageSectionId(response.pageSection.pageSectionId);
+			props.onHide?.();
 		} catch (error) {
 			handleError(error);
 		}
