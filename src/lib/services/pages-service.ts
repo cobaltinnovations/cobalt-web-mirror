@@ -131,6 +131,20 @@ export const pagesService = {
 			data,
 		});
 	},
+	updateResourcesRow(
+		pageRowId: string,
+		data: {
+			contentIds: string[];
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: ResourcesRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/content`,
+			data,
+		});
+	},
 	createOneColumnRow(pageSectionId: string) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: OneColumnImageRowModel;

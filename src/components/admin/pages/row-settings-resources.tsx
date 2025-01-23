@@ -2,10 +2,13 @@ import { cloneDeep } from 'lodash';
 import React, { useMemo } from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { ResourcesRowModel } from '@/lib/models';
+import { pagesService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { DraggableItem } from '@/components/admin/pages/draggable-item';
 
 export const RowSettingsResources = () => {
+	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow } = usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as ResourcesRowModel | undefined, [currentPageRow]);
 
@@ -22,8 +25,23 @@ export const RowSettingsResources = () => {
 		const [removedContent] = pageRowClone.contents.splice(source.index, 1);
 		pageRowClone.contents.splice(destination.index, 0, removedContent);
 
-		window.alert('[TODO]: API call to reorder resources');
 		updatePageRow(pageRowClone);
+
+		try {
+			if (!currentPageRow) {
+				throw new Error('currentPageRow is undefined.');
+			}
+
+			const response = await pagesService
+				.updateResourcesRow(currentPageRow.pageRowId, {
+					contentIds: pageRowClone.contents.map((c) => c.contentId),
+				})
+				.fetch();
+
+			updatePageRow(response.pageRow);
+		} catch (error) {
+			handleError(error);
+		}
 	};
 
 	return (
@@ -33,16 +51,16 @@ export const RowSettingsResources = () => {
 					<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
 						{(resourcesRow?.contents ?? []).map((content, contentIndex) => (
 							<Draggable
-								key={content.pageRowContentId}
-								draggableId={`row-settings-resources-draggable-${content.pageRowContentId}`}
+								key={content.contentId}
+								draggableId={`row-settings-resources-draggable-${content.contentId}`}
 								index={contentIndex}
 							>
 								{(draggableProvided, draggableSnapshot) => (
 									<DraggableItem
-										key={content.pageRowContentId}
+										key={content.contentId}
 										draggableProvided={draggableProvided}
 										draggableSnapshot={draggableSnapshot}
-										title={content.pageRowContentId}
+										title={content.contentId}
 									/>
 								)}
 							</Draggable>
