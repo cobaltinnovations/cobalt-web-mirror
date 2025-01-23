@@ -14,6 +14,7 @@ import {
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
 } from '@/lib/models';
+import ResourceLibraryCard from '@/components/resource-library-card';
 
 export const getRendererForPageRow = (pageRow: PageRowUnionModel) => {
 	const rowTypeMap = [
@@ -55,7 +56,22 @@ export const getRendererForPageRow = (pageRow: PageRowUnionModel) => {
 const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
 	return (
 		<Row className="mb-16">
-			<Col>[TODO]: Resources Row Renderer</Col>
+			{pageRow.contents.map((c) => (
+				<Col key={c.contentId} xs={12} md={6} lg={4} className="mb-8">
+					<ResourceLibraryCard
+						linkTo={`/resource-library/${c.contentId}`}
+						className="h-100"
+						//imageUrl={c.imageUrl}
+						//badgeTitle={c.newFlag ? 'New' : ''}
+						title={c.title}
+						author={'TODO'}
+						//description={c.description}
+						tags={[]}
+						//contentTypeId={c.contentTypeId}
+						//duration={c.durationInMinutesDescription}
+					/>
+				</Col>
+			))}
 		</Row>
 	);
 };
