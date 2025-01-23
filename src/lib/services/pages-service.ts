@@ -168,6 +168,31 @@ export const pagesService = {
 			data: { columnOne: {}, columnTwo: {} },
 		});
 	},
+	updateTwoColumnRow(
+		pageRowId: string,
+		data: {
+			columnOne: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+			columnTwo: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnImageRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-two-column`,
+			data,
+		});
+	},
 	createThreeColumnRow(pageSectionId: string) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: ThreeColumnImageRowModel;

@@ -14,7 +14,6 @@ export const RowSettingsOneColumn = () => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow } = usePageBuilderContext();
 	const oneColumnImageRow = useMemo(() => currentPageRow as OneColumnImageRowModel | undefined, [currentPageRow]);
-
 	const [formValues, setFormValues] = useState({
 		headline: '',
 		description: '',

@@ -4,7 +4,13 @@ import { CSSTransition } from 'react-transition-group';
 import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
-import { AddPageSectionModal, LayoutTab, PageSectionShelf, SettingsTab } from '@/components/admin/pages';
+import {
+	AddPageSectionModal,
+	getRendererForPageRow,
+	LayoutTab,
+	PageSectionShelf,
+	SettingsTab,
+} from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -255,17 +261,15 @@ const PageBuilder = () => {
 								fluid
 								className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 							>
-								<Container className="py-10">
-									<Row>
+								<Container className="py-16">
+									<Row className="mb-16">
 										<Col>
-											<h1 className="mb-6 text-center">{ps.headline}</h1>
-											<p className="mb-0 text-center">{ps.description}</p>
+											<h2 className="mb-6 text-center">{ps.headline}</h2>
+											<p className="mb-0 fs-large text-center">{ps.description}</p>
 										</Col>
 									</Row>
 									{ps.pageRows.map((r) => (
-										<Row key={r.pageRowId}>
-											<Col>{r.pageRowId}</Col>
-										</Row>
+										<React.Fragment key={r.pageRowId}>{getRendererForPageRow(r)}</React.Fragment>
 									))}
 								</Container>
 							</Container>

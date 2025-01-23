@@ -6,6 +6,7 @@ export * from './draggable-item';
 export * from './layout-tab';
 export * from './page-actions-dropdown';
 export * from './page-section-shelf';
+export * from './row-renderer';
 export * from './row-selection-form';
 export * from './row-settings-header';
 export * from './row-settings-one-column';
