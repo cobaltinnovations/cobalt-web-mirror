@@ -5,7 +5,6 @@ import InputHelper from '@/components/input-helper';
 import { BACKGROUND_COLOR_ID } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { pagesService } from '@/lib/services';
-import { cloneDeep } from 'lodash';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 const useStyles = createUseThemedStyles(() => ({
@@ -17,14 +16,15 @@ const useStyles = createUseThemedStyles(() => ({
 interface AddPageSectionModalProps extends ModalProps {}
 
 export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectionAdded, ...props }) => {
-	const { page, setPage, setCurrentPageSectionId } = usePageBuilderContext();
+	const { page, setCurrentPageSectionId, currentPageSection, addPageSection, updatePageSection } =
+		usePageBuilderContext();
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({ name: '' });
 
 	const handleOnEnter = () => {
-		setFormValues({ name: '' });
+		setFormValues({ name: currentPageSection?.name ?? '' });
 	};
 
 	const handleOnEntered = () => {
@@ -39,22 +39,34 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectio
 		}
 
 		try {
-			const response = await pagesService
-				.createPageSection(page.pageId, {
-					name: formValues.name,
-					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
-					pageStatusId: page.pageStatusId,
-				})
-				.fetch();
+			if (currentPageSection) {
+				const response = await pagesService
+					.updatePageSection(currentPageSection.pageSectionId, {
+						name: formValues.name,
+						headline: currentPageSection.headline,
+						description: currentPageSection.description,
+						backgroundColorId: currentPageSection.backgroundColorId,
+						displayOrder: currentPageSection.displayOrder,
+					})
+					.fetch();
 
-			const formattedSection = { ...response.pageSection, pageRows: [] };
+				updatePageSection(response.pageSection);
+				setCurrentPageSectionId(response.pageSection.pageSectionId);
+				props.onHide?.();
+			} else {
+				const response = await pagesService
+					.createPageSection(page.pageId, {
+						name: formValues.name,
+						backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+						pageStatusId: page.pageStatusId,
+					})
+					.fetch();
 
-			const pageClone = cloneDeep(page);
-			pageClone.pageSections = [...pageClone.pageSections, formattedSection];
-			setPage(pageClone);
-
-			setCurrentPageSectionId(response.pageSection.pageSectionId);
-			props.onHide?.();
+				const formattedSection = { ...response.pageSection, pageRows: [] };
+				addPageSection(formattedSection);
+				setCurrentPageSectionId(response.pageSection.pageSectionId);
+				props.onHide?.();
+			}
 		} catch (error) {
 			handleError(error);
 		}
@@ -63,7 +75,7 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectio
 	return (
 		<Modal dialogClassName={classes.modal} centered onEnter={handleOnEnter} onEntered={handleOnEntered} {...props}>
 			<Modal.Header closeButton>
-				<Modal.Title>Add section</Modal.Title>
+				<Modal.Title>{currentPageSection ? 'Edit' : 'Add'} section</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
