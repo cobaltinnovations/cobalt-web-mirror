@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Collapse } from 'react-bootstrap';
-import { Marker, Map, useMap } from '@vis.gl/react-google-maps';
+import { Marker, Map } from '@vis.gl/react-google-maps';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
@@ -59,16 +59,7 @@ interface CareResourceAccordionProps {
 
 export const CareResourceAccordion = ({ careResourceLocation, className }: CareResourceAccordionProps) => {
 	const classes = useStyles();
-	const map = useMap(careResourceLocation.careResourceLocationId);
 	const [show, setShow] = useState(true);
-
-	useEffect(() => {
-		if (!map) {
-			return;
-		}
-
-		console.log(map);
-	}, [map]);
 
 	return (
 		<div className={classNames(classes.careResourceAccordion, className)}>

@@ -111,7 +111,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 	const classes = useStyles();
 	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
-	const { setCurrentPageSectionId, currentPageSection } = usePageBuilderContext();
+	const { setCurrentPageSectionId, currentPageSection, setCurrentPageRowId } = usePageBuilderContext();
 
 	useEffect(() => {
 		setIsNext(false);
@@ -172,28 +172,24 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 											setPageState(PAGE_STATES.ADD_ROW);
 										}}
 										onRowButtonClick={(pageRow) => {
+											setCurrentPageRowId(pageRow.pageRowId);
+											setIsNext(true);
 											if (pageRow.rowTypeId === ROW_TYPE_ID.RESOURCES) {
-												setIsNext(true);
 												setPageState(PAGE_STATES.RESOURCES_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS) {
-												setIsNext(true);
 												setPageState(PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP) {
-												setIsNext(true);
 												setPageState(PAGE_STATES.TAG_GROUP_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE) {
-												setIsNext(true);
 												setPageState(PAGE_STATES.ONE_COLUMN_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE) {
-												setIsNext(true);
 												setPageState(PAGE_STATES.TWO_COLUMN_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE) {
-												setIsNext(true);
 												setPageState(PAGE_STATES.THREE_COLUMN_ROW_SETTINGS);
 											}
 										}}
@@ -235,6 +231,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								<RowSettingsHeader
 									title="Resources (N)"
 									onBackButtonClick={() => {
+										setCurrentPageRowId('');
 										setIsNext(false);
 										setPageState(PAGE_STATES.SECTION_SETTINGS);
 									}}
@@ -253,6 +250,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								<RowSettingsHeader
 									title="Custom Row (1 Item)"
 									onBackButtonClick={() => {
+										setCurrentPageRowId('');
 										setIsNext(false);
 										setPageState(PAGE_STATES.SECTION_SETTINGS);
 									}}
@@ -273,6 +271,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								<RowSettingsHeader
 									title="Custom Row (2 Items)"
 									onBackButtonClick={() => {
+										setCurrentPageRowId('');
 										setIsNext(false);
 										setPageState(PAGE_STATES.SECTION_SETTINGS);
 									}}
@@ -293,6 +292,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								<RowSettingsHeader
 									title="Custom Row (3 Items)"
 									onBackButtonClick={() => {
+										setCurrentPageRowId('');
 										setIsNext(false);
 										setPageState(PAGE_STATES.SECTION_SETTINGS);
 									}}

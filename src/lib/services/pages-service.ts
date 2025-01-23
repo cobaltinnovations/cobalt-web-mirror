@@ -140,6 +140,25 @@ export const pagesService = {
 			data: { columnOne: {} },
 		});
 	},
+	updateOneColumnRow(
+		pageRowId: string,
+		data: {
+			columnOne: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnImageRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-one-column`,
+			data,
+		});
+	},
 	createTwoColumnRow(pageSectionId: string) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: TwoColumnImageRowModel;

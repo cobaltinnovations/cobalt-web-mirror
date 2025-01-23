@@ -11,6 +11,9 @@ type PageBuilderContextConfig = {
 	addPageSection(pageSection: PageSectionDetailModel): void;
 	updatePageSection(pageSection: PageSectionDetailModel): void;
 	addPageRowToCurrentPageSection(pageRow: PageRowUnionModel): void;
+	setCurrentPageRowId: React.Dispatch<React.SetStateAction<string>>;
+	currentPageRow?: PageRowUnionModel;
+	updatePageRow(pageRow: PageRowUnionModel): void;
 };
 
 const PageBuilderContext = createContext({} as PageBuilderContextConfig);
@@ -89,6 +92,48 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		setPage(pageClone);
 	};
 
+	const [currentPageRowId, setCurrentPageRowId] = useState('');
+
+	const currentPageRow = useMemo(() => {
+		if (!page) {
+			return undefined;
+		}
+
+		if (!currentPageSection) {
+			return undefined;
+		}
+
+		return currentPageSection.pageRows.find((pr) => pr.pageRowId === currentPageRowId);
+	}, [currentPageRowId, currentPageSection, page]);
+
+	const updatePageRow = (pageRow: PageRowUnionModel) => {
+		if (!page) {
+			return undefined;
+		}
+
+		if (!currentPageSection) {
+			return undefined;
+		}
+
+		setPage((previousValue) => {
+			if (!previousValue) {
+				return undefined;
+			}
+
+			return {
+				...previousValue,
+				pageSections: previousValue.pageSections.map((ps) =>
+					ps.pageSectionId === currentPageSectionId
+						? {
+								...ps,
+								pageRows: ps.pageRows.map((pr) => (pr.pageRowId === pageRow.pageRowId ? pageRow : pr)),
+						  }
+						: ps
+				),
+			};
+		});
+	};
+
 	const value = {
 		page,
 		setPage,
@@ -97,6 +142,9 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		addPageSection,
 		updatePageSection,
 		addPageRowToCurrentPageSection,
+		setCurrentPageRowId,
+		currentPageRow,
+		updatePageRow,
 	};
 
 	return <PageBuilderContext.Provider value={value}>{children}</PageBuilderContext.Provider>;
