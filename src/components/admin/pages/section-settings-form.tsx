@@ -17,6 +17,8 @@ import {
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { DraggableItem } from './draggable-item';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import { pagesService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 
 interface SectionSettingsFormProps {
 	onAddRowButtonClick(): void;
@@ -24,18 +26,24 @@ interface SectionSettingsFormProps {
 }
 
 export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: SectionSettingsFormProps) => {
-	const { currentPageSection } = usePageBuilderContext();
+	const handleError = useHandleError();
+	const { currentPageSection, updatePageSection } = usePageBuilderContext();
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
 		description: '',
 		backgroundColor: BACKGROUND_COLOR_ID.WHITE,
-		rows: [],
 	});
 
 	useEffect(() => {
 		headlineInputRef.current?.focus();
-	}, []);
+
+		setFormValues({
+			headline: currentPageSection?.headline ?? '',
+			description: currentPageSection?.description ?? '',
+			backgroundColor: currentPageSection?.backgroundColorId ?? BACKGROUND_COLOR_ID.WHITE,
+		});
+	}, [currentPageSection?.backgroundColorId, currentPageSection?.description, currentPageSection?.headline]);
 
 	const getTitleForPageRow = (pageRow: PageRowUnionModel) => {
 		if (isResourcesRow(pageRow)) {
@@ -85,10 +93,33 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		return '';
 	};
 
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined');
+			}
+			const response = await pagesService
+				.updatePageSection(currentPageSection.pageSectionId, {
+					name: currentPageSection.name,
+					headline: formValues.headline,
+					description: formValues.description,
+					backgroundColorId: formValues.backgroundColor,
+					displayOrder: currentPageSection.displayOrder,
+				})
+				.fetch();
+
+			updatePageSection(response.pageSection);
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
 	return (
 		<>
 			<CollapseButton title="Basics" initialShow>
-				<Form>
+				<Form onSubmit={handleFormSubmit}>
 					<InputHelper
 						ref={headlineInputRef}
 						className="mb-4"
@@ -145,6 +176,9 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 							}}
 						/>
 					</Form.Group>
+					<Button type="submit" variant="warning" className="mb-4">
+						Temp Submit Button (No live saving yet)
+					</Button>
 				</Form>
 			</CollapseButton>
 			<hr />

@@ -6,6 +6,7 @@ import {
 	PAGE_STATUS_ID,
 	PageDetailModel,
 	PageModel,
+	PageSectionDetailModel,
 	PageSectionModel,
 	ResourcesRowModel,
 	ThreeColumnImageRowModel,
@@ -65,6 +66,24 @@ export const pagesService = {
 		}>({
 			method: 'POST',
 			url: `/pages/${pageId}/section`,
+			data,
+		});
+	},
+	updatePageSection(
+		pageSectionId: string,
+		data: {
+			name: string;
+			headline: string;
+			description: string;
+			backgroundColorId: BACKGROUND_COLOR_ID;
+			displayOrder: number;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageSection: PageSectionDetailModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/section/${pageSectionId}`,
 			data,
 		});
 	},
