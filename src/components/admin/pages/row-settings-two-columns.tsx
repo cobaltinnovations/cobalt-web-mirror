@@ -6,52 +6,37 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
+import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
-import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 
 export const RowSettingsTwoColumns = () => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow } = usePageBuilderContext();
 	const twoColumnImageRow = useMemo(() => currentPageRow as TwoColumnImageRowModel | undefined, [currentPageRow]);
 	const [formValues, setFormValues] = useState({
-		columnOneHeadline: '',
-		columnOneDescription: '',
-		columnOneImageFileUploadId: '',
-		columnOneImageUrl: '',
-		columnOneImageAltText: '',
-		columnTwoHeadline: '',
-		columnTwoDescription: '',
-		columnTwoImageFileUploadId: '',
-		columnTwoImageUrl: '',
-		columnTwoImageAltText: '',
+		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
+		columnTwo: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 	});
 
 	useEffect(() => {
 		setFormValues({
-			columnOneHeadline: twoColumnImageRow?.columnOne.headline ?? '',
-			columnOneDescription: twoColumnImageRow?.columnOne.description ?? '',
-			columnOneImageFileUploadId: twoColumnImageRow?.columnOne.imageFileUploadId ?? '',
-			columnOneImageUrl: twoColumnImageRow?.columnOne.imageUrl ?? '',
-			columnOneImageAltText: twoColumnImageRow?.columnOne.imageAltText ?? '',
-			columnTwoHeadline: twoColumnImageRow?.columnTwo.headline ?? '',
-			columnTwoDescription: twoColumnImageRow?.columnTwo.description ?? '',
-			columnTwoImageFileUploadId: twoColumnImageRow?.columnTwo.imageFileUploadId ?? '',
-			columnTwoImageUrl: twoColumnImageRow?.columnTwo.imageUrl ?? '',
-			columnTwoImageAltText: twoColumnImageRow?.columnTwo.imageAltText ?? '',
+			columnOne: {
+				headline: twoColumnImageRow?.columnOne.headline ?? '',
+				description: twoColumnImageRow?.columnOne.description ?? '',
+				imageFileUploadId: twoColumnImageRow?.columnOne.imageFileUploadId ?? '',
+				imageUrl: twoColumnImageRow?.columnOne.imageUrl ?? '',
+				imageAltText: twoColumnImageRow?.columnOne.imageAltText ?? '',
+			},
+			columnTwo: {
+				headline: twoColumnImageRow?.columnTwo.headline ?? '',
+				description: twoColumnImageRow?.columnTwo.description ?? '',
+				imageFileUploadId: twoColumnImageRow?.columnTwo.imageFileUploadId ?? '',
+				imageUrl: twoColumnImageRow?.columnTwo.imageUrl ?? '',
+				imageAltText: twoColumnImageRow?.columnTwo.imageAltText ?? '',
+			},
 		});
-	}, [
-		twoColumnImageRow?.columnOne.description,
-		twoColumnImageRow?.columnOne.headline,
-		twoColumnImageRow?.columnOne.imageAltText,
-		twoColumnImageRow?.columnOne.imageFileUploadId,
-		twoColumnImageRow?.columnOne.imageUrl,
-		twoColumnImageRow?.columnTwo.description,
-		twoColumnImageRow?.columnTwo.headline,
-		twoColumnImageRow?.columnTwo.imageAltText,
-		twoColumnImageRow?.columnTwo.imageFileUploadId,
-		twoColumnImageRow?.columnTwo.imageUrl,
-	]);
+	}, [twoColumnImageRow]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -63,18 +48,8 @@ export const RowSettingsTwoColumns = () => {
 
 			const response = await pagesService
 				.updateTwoColumnRow(currentPageRow.pageRowId, {
-					columnOne: {
-						headline: formValues.columnOneHeadline,
-						description: formValues.columnOneDescription,
-						imageFileUploadId: formValues.columnOneImageFileUploadId,
-						imageAltText: formValues.columnOneImageAltText,
-					},
-					columnTwo: {
-						headline: formValues.columnTwoHeadline,
-						description: formValues.columnTwoDescription,
-						imageFileUploadId: formValues.columnTwoImageFileUploadId,
-						imageAltText: formValues.columnTwoImageAltText,
-					},
+					columnOne: formValues.columnOne,
+					columnTwo: formValues.columnTwo,
 				})
 				.fetch();
 
@@ -91,11 +66,14 @@ export const RowSettingsTwoColumns = () => {
 					className="mb-4"
 					type="text"
 					label="Headline"
-					value={formValues.columnOneHeadline}
+					value={formValues.columnOne.headline}
 					onChange={({ currentTarget }) => {
 						setFormValues((previousValue) => ({
 							...previousValue,
-							columnOneHeadline: currentTarget.value,
+							columnOne: {
+								...previousValue.columnOne,
+								headline: currentTarget.value,
+							},
 						}));
 					}}
 				/>
@@ -103,11 +81,14 @@ export const RowSettingsTwoColumns = () => {
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
 						height={228}
-						value={formValues.columnOneDescription}
+						value={formValues.columnOne.description}
 						onChange={(value) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								columnOneDescription: value,
+								columnOne: {
+									...previousValue.columnOne,
+									description: value,
+								},
 							}));
 						}}
 					/>
@@ -116,12 +97,15 @@ export const RowSettingsTwoColumns = () => {
 					<Form.Label className="mb-2">Image</Form.Label>
 					<AdminFormImageInput
 						className="mb-4"
-						imageSrc={formValues.columnOneImageUrl}
+						imageSrc={formValues.columnOne.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								columnOneImageFileUploadId: nextId,
-								columnOneImageUrl: nextSrc,
+								columnOne: {
+									...previousValue.columnOne,
+									imageFileUploadId: nextId,
+									imageUrl: nextSrc,
+								},
 							}));
 						}}
 						presignedUploadGetter={(blob) => {
@@ -134,11 +118,14 @@ export const RowSettingsTwoColumns = () => {
 					<InputHelper
 						type="text"
 						label="Image alt text"
-						value={formValues.columnOneImageAltText}
+						value={formValues.columnOne.imageAltText}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								columnOneImageAltText: currentTarget.value,
+								columnOne: {
+									...previousValue.columnOne,
+									imageAltText: currentTarget.value,
+								},
 							}));
 						}}
 					/>
@@ -150,11 +137,14 @@ export const RowSettingsTwoColumns = () => {
 					className="mb-4"
 					type="text"
 					label="Headline"
-					value={formValues.columnTwoHeadline}
+					value={formValues.columnTwo.headline}
 					onChange={({ currentTarget }) => {
 						setFormValues((previousValue) => ({
 							...previousValue,
-							columnTwoHeadline: currentTarget.value,
+							columnTwo: {
+								...previousValue.columnTwo,
+								headline: currentTarget.value,
+							},
 						}));
 					}}
 				/>
@@ -162,11 +152,14 @@ export const RowSettingsTwoColumns = () => {
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
 						height={228}
-						value={formValues.columnTwoDescription}
+						value={formValues.columnTwo.description}
 						onChange={(value) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								columnTwoDescription: value,
+								columnTwo: {
+									...previousValue.columnTwo,
+									description: value,
+								},
 							}));
 						}}
 					/>
@@ -175,12 +168,15 @@ export const RowSettingsTwoColumns = () => {
 					<Form.Label className="mb-2">Image</Form.Label>
 					<AdminFormImageInput
 						className="mb-4"
-						imageSrc={formValues.columnTwoImageUrl}
+						imageSrc={formValues.columnTwo.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								columnTwoImageFileUploadId: nextId,
-								columnTwoImageUrl: nextSrc,
+								columnTwo: {
+									...previousValue.columnTwo,
+									imageFileUploadId: nextId,
+									imageUrl: nextSrc,
+								},
 							}));
 						}}
 						presignedUploadGetter={(blob) => {
@@ -193,11 +189,14 @@ export const RowSettingsTwoColumns = () => {
 					<InputHelper
 						type="text"
 						label="Image alt text"
-						value={formValues.columnTwoImageAltText}
+						value={formValues.columnTwo.imageAltText}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValue) => ({
 								...previousValue,
-								columnTwoImageAltText: currentTarget.value,
+								columnTwo: {
+									...previousValue.columnTwo,
+									imageAltText: currentTarget.value,
+								},
 							}));
 						}}
 					/>

@@ -30,13 +30,7 @@ export const RowSettingsOneColumn = () => {
 			imageUrl: oneColumnImageRow?.columnOne.imageUrl ?? '',
 			imageAltText: oneColumnImageRow?.columnOne.imageAltText ?? '',
 		});
-	}, [
-		oneColumnImageRow?.columnOne.description,
-		oneColumnImageRow?.columnOne.headline,
-		oneColumnImageRow?.columnOne.imageAltText,
-		oneColumnImageRow?.columnOne.imageFileUploadId,
-		oneColumnImageRow?.columnOne.imageUrl,
-	]);
+	}, [oneColumnImageRow]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -122,10 +116,10 @@ export const RowSettingsOneColumn = () => {
 						}}
 					/>
 				</Form.Group>
-				<Button type="submit" variant="warning">
-					Temp Submit Button (No live saving yet)
-				</Button>
 			</CollapseButton>
+			<Button type="submit" variant="warning">
+				Temp Submit Button (No live saving yet)
+			</Button>
 		</Form>
 	);
 };

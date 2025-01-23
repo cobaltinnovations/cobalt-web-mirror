@@ -186,7 +186,7 @@ export const pagesService = {
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
-			pageRow: OneColumnImageRowModel;
+			pageRow: TwoColumnImageRowModel;
 		}>({
 			method: 'PUT',
 			url: `/pages/row/${pageRowId}/custom-two-column`,
@@ -200,6 +200,37 @@ export const pagesService = {
 			method: 'POST',
 			url: `/pages/row/${pageSectionId}/custom-three-column`,
 			data: { columnOne: {}, columnTwo: {}, columnThree: {} },
+		});
+	},
+	updateThreeColumnRow(
+		pageRowId: string,
+		data: {
+			columnOne: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+			columnTwo: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+			columnThree: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: ThreeColumnImageRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-three-column`,
+			data,
 		});
 	},
 	createPresignedFileUpload(data: { contentType: string; filename: string }) {
