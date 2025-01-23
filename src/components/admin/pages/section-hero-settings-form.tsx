@@ -26,12 +26,12 @@ export const SectionHeroSettingsForm = () => {
 			headline: page?.headline ?? '',
 			description: page?.description ?? '',
 			imageFileUploadId: page?.imageFileUploadId ?? '',
-			imageUrl: '',
+			imageUrl: page?.imageUrl ?? '',
 			imageAltText: page?.imageAltText ?? '',
 		});
 
 		headlineInputRef.current?.focus();
-	}, [page?.description, page?.headline, page?.imageAltText, page?.imageFileUploadId]);
+	}, [page?.description, page?.headline, page?.imageAltText, page?.imageFileUploadId, page?.imageUrl]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();

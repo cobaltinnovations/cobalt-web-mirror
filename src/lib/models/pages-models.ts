@@ -32,6 +32,7 @@ export interface PageModel {
 	description: string;
 	imageFileUploadId: string;
 	imageAltText: string;
+	imageUrl: string;
 	publishedDate: string;
 	publishedDateDescription: string;
 	created: string;
@@ -72,6 +73,7 @@ export interface PageDetailModel {
 	description: string;
 	imageFileUploadId: string;
 	imageAltText: string;
+	imageUrl: string;
 	publishedDate: string;
 	publishedDateDescription: string;
 	created: string;
@@ -170,6 +172,7 @@ interface ColumnImageModel {
 	description: string;
 	imageFileUploadId: string;
 	imageAltText: string;
+	imageUrl: string;
 	columnDisplayOrder: number;
 }
 

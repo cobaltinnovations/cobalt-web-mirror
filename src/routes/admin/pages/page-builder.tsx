@@ -249,7 +249,8 @@ const PageBuilder = () => {
 							className="bg-p700 text-white"
 							title={<h1>{page?.headline ?? 'No hero headline'}</h1>}
 							descriptionHtml={page?.description ?? 'No hero description'}
-							imageAlt={page?.imageAltText}
+							imageAlt={page?.imageAltText ?? ''}
+							imageUrl={page?.imageUrl ?? ''}
 						/>
 						{(page?.pageSections ?? []).map((ps) => (
 							<Container
@@ -257,14 +258,11 @@ const PageBuilder = () => {
 								fluid
 								className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 							>
-								<Container>
+								<Container className="py-10">
 									<Row>
 										<Col>
-											<sub>
-												{ps.pageSectionId}: {ps.name}
-											</sub>
-											<h1>{ps.headline}</h1>
-											<p>{ps.description}</p>
+											<h1 className="mb-6 text-center">{ps.headline}</h1>
+											<p className="mb-0 text-center">{ps.description}</p>
 										</Col>
 									</Row>
 									{ps.pageRows.map((r) => (
