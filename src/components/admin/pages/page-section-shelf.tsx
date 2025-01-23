@@ -8,6 +8,7 @@ import {
 	RowSelectionForm,
 	RowSettingsHeader,
 	RowSettingsOneColumn,
+	RowSettingsResources,
 	RowSettingsThreeColumns,
 	RowSettingsTwoColumns,
 	SectionHeroSettingsForm,
@@ -198,6 +199,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							</div>
 						</div>
 					)}
+
 					{pageState === PAGE_STATES.ADD_ROW && (
 						<div className={classes.page}>
 							<div className={classes.header}>
@@ -225,6 +227,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							</div>
 						</div>
 					)}
+
 					{pageState === PAGE_STATES.RESOURCES_ROW_SETTINGS && (
 						<div className={classes.page}>
 							<div className={classes.header}>
@@ -240,7 +243,9 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 									}}
 								/>
 							</div>
-							<div className={classes.body}>TODO: Resources Form</div>
+							<div className={classes.body}>
+								<RowSettingsResources />
+							</div>
 						</div>
 					)}
 

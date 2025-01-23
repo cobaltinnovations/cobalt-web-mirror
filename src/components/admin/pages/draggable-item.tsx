@@ -5,6 +5,10 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
+interface UseStylesProps {
+	clickable?: boolean;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionItem: {
 		display: 'flex',
@@ -12,7 +16,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		background: theme.colors.n0,
 		transition: '0.3s background-color',
 		'&:hover': {
-			backgroundColor: theme.colors.n50,
+			backgroundColor: ({ clickable }: UseStylesProps) => (clickable ? theme.colors.n50 : theme.colors.n0),
 		},
 		'&.active': {
 			backgroundColor: theme.colors.n75,
@@ -27,13 +31,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		border: 0,
 		minWidth: 0,
 		display: 'flex',
-		cursor: 'pointer',
 		textAlign: 'left',
 		appearance: 'none',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		padding: '16px 16px 16px 0',
 		backgroundColor: 'transparent',
+		cursor: ({ clickable }: UseStylesProps) => (clickable ? 'pointer' : 'default'),
 	},
 }));
 
@@ -41,9 +45,9 @@ interface DraggableItemProps {
 	draggableProvided: DraggableProvided;
 	draggableSnapshot: DraggableStateSnapshot;
 	title: string;
-	subTitle: string;
+	subTitle?: string;
 	active?: boolean;
-	onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
 export const DraggableItem = ({
@@ -54,7 +58,7 @@ export const DraggableItem = ({
 	active,
 	onClick,
 }: DraggableItemProps) => {
-	const classes = useStyles();
+	const classes = useStyles({ clickable: !!onClick });
 
 	return (
 		<div
@@ -70,13 +74,22 @@ export const DraggableItem = ({
 			<div className={classes.handleOuter} {...draggableProvided.dragHandleProps}>
 				<DragIndicator className="text-gray" />
 			</div>
-			<button type="button" className={classes.sectionButton} onClick={onClick}>
-				<span className="text-truncate">{title}</span>
-				<div className="d-flex flex-shrink-0 align-items-center">
-					<span className="text-n500">{subTitle}</span>
-					<RightChevron className="text-n500" />
+			{onClick ? (
+				<button type="button" className={classes.sectionButton} onClick={onClick}>
+					<span className="text-truncate">{title}</span>
+					<div className="d-flex flex-shrink-0 align-items-center">
+						<span className="text-n500">{subTitle}</span>
+						<RightChevron className="text-n500" />
+					</div>
+				</button>
+			) : (
+				<div className={classes.sectionButton}>
+					<span className="text-truncate">{title}</span>
+					<div className="d-flex flex-shrink-0 align-items-center">
+						<span className="text-n500">{subTitle}</span>
+					</div>
 				</div>
-			</button>
+			)}
 		</div>
 	);
 };

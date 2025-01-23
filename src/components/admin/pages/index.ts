@@ -10,6 +10,7 @@ export * from './row-renderer';
 export * from './row-selection-form';
 export * from './row-settings-header';
 export * from './row-settings-one-column';
+export * from './row-settings-resources';
 export * from './row-settings-three-columns';
 export * from './row-settings-two-columns';
 export * from './section-hero-settings-form';
