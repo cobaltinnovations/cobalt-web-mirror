@@ -237,9 +237,6 @@ const PageBuilder = () => {
 							onDeleteButtonClick={() => {
 								setShowDeleteSectionModal(true);
 							}}
-							onCloseButtonClick={() => {
-								setCurrentPageSectionId('');
-							}}
 						/>
 					</div>
 				</CSSTransition>

@@ -4,9 +4,12 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import classNames from 'classnames';
 import { ROW_TYPE_ID } from '@/lib/models';
 import {
-	CustomRowForm,
 	HERO_SECTION_ID,
 	RowSelectionForm,
+	RowSettingsHeader,
+	RowSettingsOneColumn,
+	RowSettingsThreeColumns,
+	RowSettingsTwoColumns,
 	SectionHeroSettingsForm,
 	SectionSettingsForm,
 } from '@/components/admin/pages';
@@ -91,7 +94,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface SectionShelfProps {
 	onEditButtonClick(): void;
 	onDeleteButtonClick(): void;
-	onCloseButtonClick(): void;
 }
 
 enum PAGE_STATES {
@@ -100,14 +102,16 @@ enum PAGE_STATES {
 	RESOURCES_ROW_SETTINGS = 'RESOURCES_ROW_SETTINGS',
 	GROUP_SESSIONS_ROW_SETTINGS = 'GROUP_SESSIONS_ROW_SETTINGS',
 	TAG_GROUP_ROW_SETTINGS = 'TAG_GROUP_ROW_SETTINGS',
-	ROW_SETTINGS = 'ROW_SETTINGS',
+	ONE_COLUMN_ROW_SETTINGS = 'ONE_COLUMN_ROW_SETTINGS',
+	TWO_COLUMN_ROW_SETTINGS = 'TWO_COLUMN_ROW_SETTINGS',
+	THREE_COLUMN_ROW_SETTINGS = 'THREE_COLUMN_ROW_SETTINGS',
 }
 
-export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick, onCloseButtonClick }: SectionShelfProps) => {
+export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: SectionShelfProps) => {
 	const classes = useStyles();
 	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
-	const { currentPageSection } = usePageBuilderContext();
+	const { setCurrentPageSectionId, currentPageSection } = usePageBuilderContext();
 
 	useEffect(() => {
 		setIsNext(false);
@@ -143,7 +147,13 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick, onClo
 											<TrashIcon />
 										</Button>
 									)}
-									<Button variant="link" className="p-2" onClick={onCloseButtonClick}>
+									<Button
+										variant="link"
+										className="p-2"
+										onClick={() => {
+											setCurrentPageSectionId('');
+										}}
+									>
 										<CloseIcon />
 									</Button>
 								</div>
@@ -176,15 +186,15 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick, onClo
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE) {
 												setIsNext(true);
-												setPageState(PAGE_STATES.ROW_SETTINGS);
+												setPageState(PAGE_STATES.ONE_COLUMN_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE) {
 												setIsNext(true);
-												setPageState(PAGE_STATES.ROW_SETTINGS);
+												setPageState(PAGE_STATES.TWO_COLUMN_ROW_SETTINGS);
 											}
 											if (pageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE) {
 												setIsNext(true);
-												setPageState(PAGE_STATES.ROW_SETTINGS);
+												setPageState(PAGE_STATES.THREE_COLUMN_ROW_SETTINGS);
 											}
 										}}
 									/>
@@ -222,64 +232,77 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick, onClo
 					{pageState === PAGE_STATES.RESOURCES_ROW_SETTINGS && (
 						<div className={classes.page}>
 							<div className={classes.header}>
-								<div className="w-100 d-flex align-items-center justify-content-between">
-									<div className="d-flex align-items-center">
-										<Button
-											variant="link"
-											className="p-2 me-2"
-											onClick={() => {
-												setIsNext(false);
-												setPageState(PAGE_STATES.SECTION_SETTINGS);
-											}}
-										>
-											<BackArrowIcon />
-										</Button>
-										<h5 className="mb-0">Resources</h5>
-									</div>
-									<Button
-										variant="link"
-										className="p-2"
-										onClick={() => {
-											return;
-										}}
-									>
-										<TrashIcon />
-									</Button>
-								</div>
+								<RowSettingsHeader
+									title="Resources (N)"
+									onBackButtonClick={() => {
+										setIsNext(false);
+										setPageState(PAGE_STATES.SECTION_SETTINGS);
+									}}
+									onDeleteButtonClick={() => {
+										return;
+									}}
+								/>
 							</div>
-							<div className={classNames(classes.body, 'pt-0')}>TODO: Resources Form</div>
+							<div className={classes.body}>TODO: Resources Form</div>
 						</div>
 					)}
-					{pageState === PAGE_STATES.ROW_SETTINGS && (
+
+					{pageState === PAGE_STATES.ONE_COLUMN_ROW_SETTINGS && (
 						<div className={classes.page}>
 							<div className={classes.header}>
-								<div className="w-100 d-flex align-items-center justify-content-between">
-									<div className="d-flex align-items-center">
-										<Button
-											variant="link"
-											className="p-2 me-2"
-											onClick={() => {
-												setIsNext(false);
-												setPageState(PAGE_STATES.SECTION_SETTINGS);
-											}}
-										>
-											<BackArrowIcon />
-										</Button>
-										<h5 className="mb-0">Row settings</h5>
-									</div>
-									<Button
-										variant="link"
-										className="p-2"
-										onClick={() => {
-											return;
-										}}
-									>
-										<TrashIcon />
-									</Button>
-								</div>
+								<RowSettingsHeader
+									title="Custom Row (1 Item)"
+									onBackButtonClick={() => {
+										setIsNext(false);
+										setPageState(PAGE_STATES.SECTION_SETTINGS);
+									}}
+									onDeleteButtonClick={() => {
+										return;
+									}}
+								/>
 							</div>
 							<div className={classNames(classes.body, 'pt-0')}>
-								<CustomRowForm />
+								<RowSettingsOneColumn />
+							</div>
+						</div>
+					)}
+
+					{pageState === PAGE_STATES.TWO_COLUMN_ROW_SETTINGS && (
+						<div className={classes.page}>
+							<div className={classes.header}>
+								<RowSettingsHeader
+									title="Custom Row (2 Items)"
+									onBackButtonClick={() => {
+										setIsNext(false);
+										setPageState(PAGE_STATES.SECTION_SETTINGS);
+									}}
+									onDeleteButtonClick={() => {
+										return;
+									}}
+								/>
+							</div>
+							<div className={classNames(classes.body, 'pt-0')}>
+								<RowSettingsTwoColumns />
+							</div>
+						</div>
+					)}
+
+					{pageState === PAGE_STATES.THREE_COLUMN_ROW_SETTINGS && (
+						<div className={classes.page}>
+							<div className={classes.header}>
+								<RowSettingsHeader
+									title="Custom Row (3 Items)"
+									onBackButtonClick={() => {
+										setIsNext(false);
+										setPageState(PAGE_STATES.SECTION_SETTINGS);
+									}}
+									onDeleteButtonClick={() => {
+										return;
+									}}
+								/>
+							</div>
+							<div className={classNames(classes.body, 'pt-0')}>
+								<RowSettingsThreeColumns />
 							</div>
 						</div>
 					)}
