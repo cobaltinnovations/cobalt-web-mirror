@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
@@ -14,7 +15,7 @@ import {
 	PageRowModel,
 	PageRowUnionModel,
 } from '@/lib/models';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { DraggableItem } from './draggable-item';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { pagesService } from '@/lib/services';
@@ -108,6 +109,23 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		}
 	};
 
+	const handleDragEnd = async ({ source, destination }: DropResult) => {
+		if (!destination) {
+			return;
+		}
+
+		if (!currentPageSection) {
+			return;
+		}
+
+		const pageSectionClone = cloneDeep(currentPageSection);
+		const [removedContent] = pageSectionClone.pageRows.splice(source.index, 1);
+		pageSectionClone.pageRows.splice(destination.index, 0, removedContent);
+
+		window.alert('[TODO]: API call to reorder rows');
+		updatePageSection(pageSectionClone);
+	};
+
 	return (
 		<>
 			<CollapseButton title="Basics" initialShow>
@@ -192,11 +210,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					]}
 				/>
 			)}
-			<DragDropContext
-				onDragEnd={() => {
-					window.alert('[TODO]: DropEnd for Rows');
-				}}
-			>
+			<DragDropContext onDragEnd={handleDragEnd}>
 				<Droppable droppableId="page-rows-droppable" direction="vertical">
 					{(droppableProvided) => (
 						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>

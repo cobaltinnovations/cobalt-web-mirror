@@ -64,6 +64,7 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 		const [removedSection] = pageClone.pageSections.splice(source.index, 1);
 		pageClone.pageSections.splice(destination.index, 0, removedSection);
 
+		window.alert('[TODO]: API call to reorder sections');
 		setPage(pageClone);
 	};
 
