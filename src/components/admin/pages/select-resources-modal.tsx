@@ -88,10 +88,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface SelectResourcesModalProps extends ModalProps {
+	contentIds: string[];
 	onAdd(contentIds: string[]): void;
 }
 
-export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalProps) => {
+export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectResourcesModalProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [contents, setContents] = useState<Content[]>([]);
@@ -99,7 +100,7 @@ export const SelectResourcesModal = ({ onAdd, ...props }: SelectResourcesModalPr
 
 	const handleOnEnter = async () => {
 		setContents([]);
-		setSelectedContentIds([]);
+		setSelectedContentIds(contentIds);
 
 		try {
 			const response = await resourceLibraryService.searchResourceLibrary({ pageSize: 5000 }).fetch();

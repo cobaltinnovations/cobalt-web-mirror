@@ -79,6 +79,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 	return (
 		<>
 			<SelectResourcesModal
+				contentIds={[]}
 				show={showSelectResourcesModal}
 				onAdd={handleResourcesAdd}
 				onHide={() => {
