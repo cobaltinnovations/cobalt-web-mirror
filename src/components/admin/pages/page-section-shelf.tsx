@@ -172,18 +172,13 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 					)}
 
 					{pageState === PAGE_STATES.RESOURCES_ROW_SETTINGS && (
-						<PageSectionShelfPage
-							showBackButton
+						<RowSettingsResources
 							onBackButtonClick={() => {
 								setCurrentPageRowId('');
 								setIsNext(false);
 								setPageState(PAGE_STATES.SECTION_SETTINGS);
 							}}
-							showDeleteButton
-							title="Resources (N)"
-						>
-							<RowSettingsResources />
-						</PageSectionShelfPage>
+						/>
 					)}
 
 					{pageState === PAGE_STATES.ONE_COLUMN_ROW_SETTINGS && (

@@ -38,6 +38,7 @@ interface PageSectionShelfPageProps {
 	onBackButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	showEditButton?: boolean;
 	onEditButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	customHeaderElements?: JSX.Element;
 	showDeleteButton?: boolean;
 	onDeleteButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	showCloseButton?: boolean;
@@ -53,6 +54,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 	onBackButtonClick,
 	showEditButton,
 	onEditButtonClick,
+	customHeaderElements,
 	showDeleteButton,
 	onDeleteButtonClick,
 	showCloseButton,
@@ -81,6 +83,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 					)}
 				</div>
 				<div className="d-flex align-items-center">
+					{customHeaderElements}
 					{showDeleteButton && (
 						<Button variant="link" className="p-2" onClick={onDeleteButtonClick}>
 							<TrashIcon />
