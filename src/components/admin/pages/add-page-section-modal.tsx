@@ -16,7 +16,7 @@ const useStyles = createUseThemedStyles(() => ({
 interface AddPageSectionModalProps extends ModalProps {}
 
 export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectionAdded, ...props }) => {
-	const { page, setCurrentPageSectionId, currentPageSection, addPageSection, updatePageSection } =
+	const { page, setCurrentPageSectionId, currentPageSection, addPageSection, updatePageSection, setIsSaving } =
 		usePageBuilderContext();
 	const classes = useStyles();
 	const handleError = useHandleError();
@@ -39,6 +39,8 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectio
 		}
 
 		try {
+			setIsSaving(true);
+
 			if (currentPageSection) {
 				const response = await pagesService
 					.updatePageSection(currentPageSection.pageSectionId, {
@@ -69,6 +71,8 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectio
 			}
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

@@ -19,7 +19,7 @@ const pageTypes = [
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
-	const { page, setPage } = usePageBuilderContext();
+	const { page, setPage, setIsSaving } = usePageBuilderContext();
 	const pageNameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		pageName: '',
@@ -39,6 +39,7 @@ export const SettingsTab = () => {
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setIsSaving(true);
 
 		try {
 			if (!page) {
@@ -56,6 +57,8 @@ export const SettingsTab = () => {
 			setPage(response.page);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

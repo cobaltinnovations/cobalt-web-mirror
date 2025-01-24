@@ -12,7 +12,7 @@ import { OneColumnImageRowModel } from '@/lib/models';
 
 export const RowSettingsOneColumn = () => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow } = usePageBuilderContext();
+	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const oneColumnImageRow = useMemo(() => currentPageRow as OneColumnImageRowModel | undefined, [currentPageRow]);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -34,6 +34,7 @@ export const RowSettingsOneColumn = () => {
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setIsSaving(true);
 
 		try {
 			if (!currentPageRow) {
@@ -54,6 +55,8 @@ export const RowSettingsOneColumn = () => {
 			updatePageRow(response.pageRow);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

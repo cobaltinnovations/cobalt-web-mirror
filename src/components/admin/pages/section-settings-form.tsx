@@ -31,7 +31,7 @@ interface SectionSettingsFormProps {
 
 export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: SectionSettingsFormProps) => {
 	const handleError = useHandleError();
-	const { currentPageSection, updatePageSection } = usePageBuilderContext();
+	const { currentPageSection, updatePageSection, setIsSaving } = usePageBuilderContext();
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -94,11 +94,13 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setIsSaving(true);
 
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined');
 			}
+
 			const response = await pagesService
 				.updatePageSection(currentPageSection.pageSectionId, {
 					name: currentPageSection.name,
@@ -112,6 +114,8 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			updatePageSection(response.pageSection);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

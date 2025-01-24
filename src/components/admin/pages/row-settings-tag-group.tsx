@@ -13,7 +13,7 @@ interface RowSettingsTagGroupProps {
 
 export const RowSettingsTagGroup = ({ onBackButtonClick }: RowSettingsTagGroupProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow } = usePageBuilderContext();
+	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as TagGroupRowModel | undefined, [currentPageRow]);
 	const [tagGroupOptions, setTagGroupOptions] = useState<TagGroup[]>([]);
 	const [formValues, setFormValues] = useState({ tagGroupId: '' });
@@ -31,6 +31,8 @@ export const RowSettingsTagGroup = ({ onBackButtonClick }: RowSettingsTagGroupPr
 	}, [handleError, resourcesRow?.tagGroup.tagGroupId]);
 
 	const handleTagGroupSelectChange = async (tagGroupId: string) => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageRow) {
 				throw new Error('currentPageRow is undefined.');
@@ -40,6 +42,8 @@ export const RowSettingsTagGroup = ({ onBackButtonClick }: RowSettingsTagGroupPr
 			updatePageRow(pageRow);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

@@ -14,11 +14,13 @@ interface RowSettingsGroupSessionsProps {
 
 export const RowSettingsGroupSessions = ({ onBackButtonClick }: RowSettingsGroupSessionsProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow } = usePageBuilderContext();
+	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const groupSessionsRow = useMemo(() => currentPageRow as GroupSessionsRowModel | undefined, [currentPageRow]);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 
 	const handleGroupSessionsAdd = async (groupSessionIds: string[]) => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageRow) {
 				throw new Error('currentPageRow is undefined.');
@@ -32,6 +34,8 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick }: RowSettingsGroup
 			setShowSelectGroupSessionsModal(false);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
@@ -45,6 +49,7 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick }: RowSettingsGroup
 		pageRowClone.groupSessions.splice(destination.index, 0, removedContent);
 
 		updatePageRow(pageRowClone);
+		setIsSaving(true);
 
 		try {
 			if (!currentPageRow) {
@@ -60,6 +65,8 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick }: RowSettingsGroup
 			updatePageRow(pageRow);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

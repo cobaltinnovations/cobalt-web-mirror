@@ -14,6 +14,8 @@ type PageBuilderContextConfig = {
 	setCurrentPageRowId: React.Dispatch<React.SetStateAction<string>>;
 	currentPageRow?: PageRowUnionModel;
 	updatePageRow(pageRow: PageRowUnionModel): void;
+	isSaving: boolean;
+	setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const PageBuilderContext = createContext({} as PageBuilderContextConfig);
@@ -21,6 +23,8 @@ const PageBuilderContext = createContext({} as PageBuilderContextConfig);
 const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [page, setPage] = useState<PageDetailModel>();
 	const [currentPageSectionId, setCurrentPageSectionId] = useState('');
+	const [currentPageRowId, setCurrentPageRowId] = useState('');
+	const [isSaving, setIsSaving] = useState(false);
 
 	const currentPageSection = useMemo(() => {
 		if (!page) {
@@ -92,8 +96,6 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		setPage(pageClone);
 	};
 
-	const [currentPageRowId, setCurrentPageRowId] = useState('');
-
 	const currentPageRow = useMemo(() => {
 		if (!page) {
 			return undefined;
@@ -145,6 +147,8 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		setCurrentPageRowId,
 		currentPageRow,
 		updatePageRow,
+		isSaving,
+		setIsSaving,
 	};
 
 	return <PageBuilderContext.Provider value={value}>{children}</PageBuilderContext.Provider>;

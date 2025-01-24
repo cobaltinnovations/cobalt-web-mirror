@@ -14,11 +14,13 @@ interface RowSettingsResourcesProps {
 
 export const RowSettingsResources = ({ onBackButtonClick }: RowSettingsResourcesProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow } = usePageBuilderContext();
+	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as ResourcesRowModel | undefined, [currentPageRow]);
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 
 	const handleResourcesAdd = async (contentIds: string[]) => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageRow) {
 				throw new Error('currentPageRow is undefined.');
@@ -30,6 +32,8 @@ export const RowSettingsResources = ({ onBackButtonClick }: RowSettingsResources
 			setShowSelectResourcesModal(false);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
@@ -43,6 +47,7 @@ export const RowSettingsResources = ({ onBackButtonClick }: RowSettingsResources
 		pageRowClone.contents.splice(destination.index, 0, removedContent);
 
 		updatePageRow(pageRowClone);
+		setIsSaving(true);
 
 		try {
 			if (!currentPageRow) {
@@ -58,6 +63,8 @@ export const RowSettingsResources = ({ onBackButtonClick }: RowSettingsResources
 			updatePageRow(pageRow);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

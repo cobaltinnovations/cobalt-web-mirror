@@ -11,7 +11,7 @@ export const HERO_SECTION_ID = 'HERO';
 
 export const SectionHeroSettingsForm = () => {
 	const handleError = useHandleError();
-	const { page, setPage } = usePageBuilderContext();
+	const { page, setPage, setIsSaving } = usePageBuilderContext();
 	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
@@ -35,6 +35,7 @@ export const SectionHeroSettingsForm = () => {
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setIsSaving(true);
 
 		try {
 			if (!page) {
@@ -53,6 +54,8 @@ export const SectionHeroSettingsForm = () => {
 			setPage(response.page);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

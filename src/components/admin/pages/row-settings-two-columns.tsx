@@ -12,7 +12,7 @@ import WysiwygBasic from '@/components/wysiwyg-basic';
 
 export const RowSettingsTwoColumns = () => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow } = usePageBuilderContext();
+	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const twoColumnImageRow = useMemo(() => currentPageRow as TwoColumnImageRowModel | undefined, [currentPageRow]);
 	const [formValues, setFormValues] = useState({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
@@ -40,6 +40,7 @@ export const RowSettingsTwoColumns = () => {
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setIsSaving(true);
 
 		try {
 			if (!currentPageRow) {
@@ -56,6 +57,8 @@ export const RowSettingsTwoColumns = () => {
 			updatePageRow(response.pageRow);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 

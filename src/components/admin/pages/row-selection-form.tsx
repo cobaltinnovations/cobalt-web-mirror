@@ -18,12 +18,14 @@ interface RowSelectionFormProps {
 export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 	const handleError = useHandleError();
 
-	const { currentPageSection, addPageRowToCurrentPageSection } = usePageBuilderContext();
+	const { currentPageSection, addPageRowToCurrentPageSection, setIsSaving } = usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 	const [showSelectTagGroupModal, setShowSelectTagGroupModal] = useState(false);
 
 	const handleResourcesAdd = async (contentIds: string[]) => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
@@ -37,10 +39,14 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
 	const handleGroupSessionsAdd = async (groupSessionIds: string[]) => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
@@ -54,10 +60,14 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
 	const handleTagGroupAdd = async (tagGroupId: string) => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
@@ -71,10 +81,14 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
 	const handleOneColumnButtonClick = async () => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
@@ -85,10 +99,14 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
 	const handleTwoColumnButtonClick = async () => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
@@ -99,10 +117,14 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
 	const handleThreeColumnButtonClick = async () => {
+		setIsSaving(true);
+
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
@@ -113,6 +135,8 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSaving(false);
 		}
 	};
 
