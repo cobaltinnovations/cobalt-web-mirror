@@ -5,6 +5,7 @@ import {
 	CustomRowButton,
 	SelectGroupSessionsModal,
 	SelectResourcesModal,
+	SelectTagGroupModal,
 } from '@/components/admin/pages';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -20,6 +21,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 	const { currentPageSection, addPageRowToCurrentPageSection } = usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
+	const [showSelectTagGroupModal, setShowSelectTagGroupModal] = useState(false);
 
 	const handleResourcesAdd = async (contentIds: string[]) => {
 		try {
@@ -49,6 +51,23 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 				.fetch();
 			addPageRowToCurrentPageSection(pageRow);
 			setShowSelectGroupSessionsModal(false);
+			onRowAdded();
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleTagGroupAdd = async (tagGroupId: string) => {
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createTagGroupRow(currentPageSection.pageSectionId, { tagGroupId })
+				.fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setShowSelectTagGroupModal(false);
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
@@ -117,6 +136,15 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 				}}
 			/>
 
+			<SelectTagGroupModal
+				tagGroupId=""
+				show={showSelectTagGroupModal}
+				onAdd={handleTagGroupAdd}
+				onHide={() => {
+					setShowSelectTagGroupModal(false);
+				}}
+			/>
+
 			<CollapseButton title="Content Row" initialShow>
 				<div className="pb-6">
 					<p>Use a content row to add existing content from Cobalt.</p>
@@ -140,7 +168,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 						<Button
 							className="ms-1 flex-fill"
 							onClick={() => {
-								window.alert('[TODO]: Tag group modal');
+								setShowSelectTagGroupModal(true);
 							}}
 						>
 							Tag Group

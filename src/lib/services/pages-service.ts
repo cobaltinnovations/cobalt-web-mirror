@@ -12,6 +12,7 @@ import {
 	PageSectionModel,
 	PresignedUploadResponse,
 	ResourcesRowModel,
+	TagGroupRowModel,
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
 } from '@/lib/models';
@@ -156,6 +157,24 @@ export const pagesService = {
 		}>({
 			method: 'PUT',
 			url: `/pages/row/${pageRowId}/group-session`,
+			data,
+		});
+	},
+	createTagGroupRow(pageSectionId: string, data: { tagGroupId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: TagGroupRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/tag-group`,
+			data,
+		});
+	},
+	updateTagGroupRow(pageRowId: string, data: { tagGroupId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: TagGroupRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/tag-group`,
 			data,
 		});
 	},

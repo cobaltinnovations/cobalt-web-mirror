@@ -6,6 +6,7 @@ import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
 import {
 	BACKGROUND_COLOR_ID,
+	GroupSessionsRowModel,
 	isGroupSessionsRow,
 	isOneColumnImageRow,
 	isResourcesRow,
@@ -14,6 +15,8 @@ import {
 	isTwoColumnImageRow,
 	PageRowModel,
 	PageRowUnionModel,
+	ResourcesRowModel,
+	TagGroupRowModel,
 } from '@/lib/models';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { DraggableItem } from './draggable-item';
@@ -69,9 +72,12 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 
 	const getSubTitleForPageRow = (pageRow: PageRowUnionModel) => {
 		const rowTypeMap = [
-			{ check: isResourcesRow, getSubtitle: (row: any) => `${row.contents.length} Resources` },
-			{ check: isGroupSessionsRow, getSubtitle: (row: any) => `${row.groupSessions.length} Sessions` },
-			{ check: isTagGroupRow, getSubtitle: (row: any) => `TODO: ${row.tagGroup.tagGroupId}` },
+			{ check: isResourcesRow, getSubtitle: (row: ResourcesRowModel) => `${row.contents.length} Resources` },
+			{
+				check: isGroupSessionsRow,
+				getSubtitle: (row: GroupSessionsRowModel) => `${row.groupSessions.length} Sessions`,
+			},
+			{ check: isTagGroupRow, getSubtitle: (row: TagGroupRowModel) => row.tagGroup.name },
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
@@ -79,7 +85,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 
 		for (const { check, getSubtitle } of rowTypeMap) {
 			if (check(pageRow)) {
-				return getSubtitle(pageRow);
+				return getSubtitle(pageRow as any);
 			}
 		}
 

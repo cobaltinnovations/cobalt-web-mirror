@@ -1,5 +1,6 @@
 import { Content } from '@/lib/models/content';
 import { GroupSessionModel } from '@/lib/models/group-session-models';
+import { TagGroup } from './tag-groups';
 
 export enum PAGE_STATUS_ID {
 	LIVE = 'LIVE',
@@ -126,10 +127,7 @@ export interface TagGroupRowModel {
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-	tagGroup: {
-		pageRowTagGroupId: string;
-		tagGroupId: string;
-	};
+	tagGroup: TagGroup;
 }
 
 export interface OneColumnImageRowModel {
