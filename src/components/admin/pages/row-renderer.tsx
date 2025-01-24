@@ -1,5 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
+import classNames from 'classnames';
 import {
 	GroupSessionsRowModel,
 	isGroupSessionsRow,
@@ -15,43 +17,7 @@ import {
 	TwoColumnImageRowModel,
 } from '@/lib/models';
 import ResourceLibraryCard from '@/components/resource-library-card';
-
-export const getRendererForPageRow = (pageRow: PageRowUnionModel) => {
-	const rowTypeMap = [
-		{
-			check: isResourcesRow,
-			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} />,
-		},
-		{
-			check: isGroupSessionsRow,
-			getRow: (row: any) => <GroupSessionsRowRenderer pageRow={row} />,
-		},
-		{
-			check: isTagGroupRow,
-			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} />,
-		},
-		{
-			check: isOneColumnImageRow,
-			getRow: (row: any) => <OneColRowRenderer pageRow={row} />,
-		},
-		{
-			check: isTwoColumnImageRow,
-			getRow: (row: any) => <TwoColRowRenderer pageRow={row} />,
-		},
-		{
-			check: isThreeColumnImageRow,
-			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} />,
-		},
-	];
-
-	for (const { check, getRow } of rowTypeMap) {
-		if (check(pageRow)) {
-			return getRow(pageRow);
-		}
-	}
-
-	return null;
-};
+import StudioEvent from '@/components/studio-event';
 
 const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
 	return (
@@ -80,7 +46,13 @@ const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
 const GroupSessionsRowRenderer = ({ pageRow }: { pageRow: GroupSessionsRowModel }) => {
 	return (
 		<Row className="mb-16">
-			<Col>[TODO]: Group Sessions Row Renderer</Col>
+			{pageRow.groupSessions.map((groupSession) => (
+				<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
+					<Link className="d-block text-decoration-none h-100" to={`/group-sessions/${groupSession.urlName}`}>
+						<StudioEvent className="h-100" studioEvent={groupSession} />
+					</Link>
+				</Col>
+			))}
 		</Row>
 	);
 };
@@ -97,11 +69,23 @@ const OneColRowRenderer = ({ pageRow }: { pageRow: OneColumnImageRowModel }) => 
 	return (
 		<Row className="mb-16 align-items-center">
 			<Col>
-				<img className="w-100" src={pageRow.columnOne.imageUrl} alt={pageRow.columnOne.imageAltText ?? ''} />
+				{pageRow.columnOne.imageUrl && (
+					<img
+						className="w-100"
+						src={pageRow.columnOne.imageUrl}
+						alt={pageRow.columnOne.imageAltText ?? ''}
+					/>
+				)}
 			</Col>
 			<Col>
-				<h3 className="mb-6">{pageRow.columnOne.headline}</h3>
-				<div dangerouslySetInnerHTML={{ __html: pageRow.columnOne.description ?? '' }} />
+				{pageRow.columnOne.headline && (
+					<h3 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
+						{pageRow.columnOne.headline}
+					</h3>
+				)}
+				{pageRow.columnOne.description && (
+					<div dangerouslySetInnerHTML={{ __html: pageRow.columnOne.description ?? '' }} />
+				)}
 			</Col>
 		</Row>
 	);
@@ -164,4 +148,41 @@ const ThreeColRowRenderer = ({ pageRow }: { pageRow: ThreeColumnImageRowModel })
 			</Col>
 		</Row>
 	);
+};
+
+export const getRendererForPageRow = (pageRow: PageRowUnionModel) => {
+	const rowTypeMap = [
+		{
+			check: isResourcesRow,
+			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} />,
+		},
+		{
+			check: isGroupSessionsRow,
+			getRow: (row: any) => <GroupSessionsRowRenderer pageRow={row} />,
+		},
+		{
+			check: isTagGroupRow,
+			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} />,
+		},
+		{
+			check: isOneColumnImageRow,
+			getRow: (row: any) => <OneColRowRenderer pageRow={row} />,
+		},
+		{
+			check: isTwoColumnImageRow,
+			getRow: (row: any) => <TwoColRowRenderer pageRow={row} />,
+		},
+		{
+			check: isThreeColumnImageRow,
+			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} />,
+		},
+	];
+
+	for (const { check, getRow } of rowTypeMap) {
+		if (check(pageRow)) {
+			return getRow(pageRow);
+		}
+	}
+
+	return null;
 };
