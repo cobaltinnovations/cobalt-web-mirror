@@ -113,7 +113,7 @@ const PageBuilder = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 
-	const { page, setPage, setCurrentPageSectionId, currentPageSection } = usePageBuilderContext();
+	const { page, setPage, setCurrentPageSectionId, currentPageSection, isSaving } = usePageBuilderContext();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
@@ -174,22 +174,20 @@ const PageBuilder = () => {
 						)}
 					</div>
 					<div className="d-flex align-items-center">
-						<Button
-							variant="link"
-							className="text-decoration-none"
-							onClick={() => {
-								navigate(-1);
-							}}
-						>
-							Finish Later
-						</Button>
-						<Button
-							onClick={() => {
-								navigate(-1);
-							}}
-						>
-							Publish
-						</Button>
+						{isSaving ? (
+							<span className="me-4 fw-bold text-n500">Saving...</span>
+						) : (
+							<Button
+								variant="link"
+								className="text-decoration-none"
+								onClick={() => {
+									navigate(-1);
+								}}
+							>
+								Finish Later
+							</Button>
+						)}
+						<Button onClick={() => navigate(-1)}>Publish</Button>
 					</div>
 				</div>
 				<div className={classes.aside}>
