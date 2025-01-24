@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { TagGroup, TagGroupRowModel } from '@/lib/models';
 import { pagesService, tagService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -24,11 +24,14 @@ export const RowSettingsTagGroup = ({ onBackButtonClick }: RowSettingsTagGroupPr
 		try {
 			const { tagGroups } = await tagService.getTagGroups().fetch();
 			setTagGroupOptions(tagGroups);
-			setFormValues({ tagGroupId: resourcesRow?.tagGroup.tagGroupId ?? '' });
 		} catch (error) {
 			handleError(error);
 		}
-	}, [handleError, resourcesRow?.tagGroup.tagGroupId]);
+	}, [handleError]);
+
+	useEffect(() => {
+		setFormValues({ tagGroupId: resourcesRow?.tagGroup.tagGroupId ?? '' });
+	}, [resourcesRow?.tagGroup.tagGroupId]);
 
 	const handleTagGroupSelectChange = async (tagGroupId: string) => {
 		setIsSaving(true);
