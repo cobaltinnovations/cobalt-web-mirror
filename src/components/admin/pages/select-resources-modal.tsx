@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelperSearch from '@/components/input-helper-search';
-import MegaFilter from '@/components/mega-filter';
 import { resourceLibraryService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Content } from '@/lib/models';
@@ -33,7 +32,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	searchInput: {
 		flex: 1,
-		display: 'flex',
 	},
 	addedHeaderCol: {
 		width: '40%',
@@ -95,23 +93,45 @@ interface SelectResourcesModalProps extends ModalProps {
 export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectResourcesModalProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	const [contents, setContents] = useState<Content[]>([]);
 	const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
+	const [searchInputValue, setSearchInputValue] = useState('');
+
+	const fetchData = useCallback(
+		async (searchQuery: string) => {
+			try {
+				const response = await resourceLibraryService
+					.searchResourceLibrary({ pageSize: 5000, searchQuery })
+					.fetch();
+
+				setContents(response.findResult.contents);
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[handleError]
+	);
 
 	const handleOnEnter = async () => {
 		setContents([]);
 		setSelectedContentIds(contentIds);
-
-		try {
-			const response = await resourceLibraryService.searchResourceLibrary({ pageSize: 5000 }).fetch();
-			setContents(response.findResult.contents);
-		} catch (error) {
-			handleError(error);
-		}
+		setSearchInputValue('');
+		fetchData('');
 	};
 
 	const handleOnEntered = () => {
-		// TODO: focus search input
+		searchInputRef.current?.focus();
+	};
+
+	const handleSearchFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		fetchData(searchInputValue);
+	};
+
+	const handleSearchFormClear = () => {
+		setSearchInputValue('');
+		fetchData('');
 	};
 
 	return (
@@ -122,23 +142,17 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 			<Modal.Body className="p-0">
 				<div className={classes.subHeader}>
 					<div className={classes.resourceHeaderCol}>
-						<InputHelperSearch
-							className={classes.searchInput}
-							onClear={() => {
-								throw new Error('Function not implemented.');
-							}}
-						/>
-						<MegaFilter
-							className="ms-4 flex-shrink-0"
-							displayCount={false}
-							displayFilterIcon
-							buttonTitle="Filter"
-							modalTitle="Filter"
-							value={[]}
-							onChange={(value) => {
-								throw new Error('Function not implemented.');
-							}}
-						/>
+						<Form className={classes.searchInput} onSubmit={handleSearchFormSubmit}>
+							<InputHelperSearch
+								ref={searchInputRef}
+								className={classes.searchInput}
+								value={searchInputValue}
+								onChange={({ currentTarget }) => {
+									setSearchInputValue(currentTarget.value);
+								}}
+								onClear={handleSearchFormClear}
+							/>
+						</Form>
 					</div>
 					<div className={classes.addedHeaderCol}>
 						<span className="fw-bold">Resources to add ({selectedContentIds.length})</span>
