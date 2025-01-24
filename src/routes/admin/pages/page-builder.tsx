@@ -18,6 +18,7 @@ import { pagesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { PageBuilderProvider } from '@/contexts/page-builder-context';
+import classNames from 'classnames';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -262,12 +263,24 @@ const PageBuilder = () => {
 								className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 							>
 								<Container className="py-16">
-									<Row className="mb-16">
-										<Col>
-											<h2 className="mb-6 text-center">{ps.headline}</h2>
-											<p className="mb-0 fs-large text-center">{ps.description}</p>
-										</Col>
-									</Row>
+									{(ps.headline || ps.description) && (
+										<Row className="mb-16">
+											<Col>
+												{ps.headline && (
+													<h2
+														className={classNames('text-center', {
+															'mb-6': ps.description,
+														})}
+													>
+														{ps.headline}
+													</h2>
+												)}
+												{ps.description && (
+													<p className="mb-0 fs-large text-center">{ps.description}</p>
+												)}
+											</Col>
+										</Row>
+									)}
 									{ps.pageRows.map((r) => (
 										<React.Fragment key={r.pageRowId}>{getRendererForPageRow(r)}</React.Fragment>
 									))}

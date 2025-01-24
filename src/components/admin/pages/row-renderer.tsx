@@ -56,19 +56,20 @@ export const getRendererForPageRow = (pageRow: PageRowUnionModel) => {
 const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
 	return (
 		<Row className="mb-16">
-			{pageRow.contents.map((c) => (
-				<Col key={c.contentId} xs={12} md={6} lg={4} className="mb-8">
+			{pageRow.contents.map((content) => (
+				<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
 					<ResourceLibraryCard
-						linkTo={`/resource-library/${c.contentId}`}
+						key={content.contentId}
+						linkTo={`/resource-library/${content.contentId}`}
 						className="h-100"
-						//imageUrl={c.imageUrl}
-						//badgeTitle={c.newFlag ? 'New' : ''}
-						title={c.title}
-						author={'TODO'}
-						//description={c.description}
+						imageUrl={content.imageUrl}
+						badgeTitle={content.newFlag ? 'New' : ''}
+						title={content.title}
+						author={content.author}
+						description={content.description}
 						tags={[]}
-						//contentTypeId={c.contentTypeId}
-						//duration={c.durationInMinutesDescription}
+						contentTypeId={content.contentTypeId}
+						duration={content.durationInMinutesDescription}
 					/>
 				</Col>
 			))}

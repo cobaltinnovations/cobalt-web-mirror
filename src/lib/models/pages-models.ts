@@ -1,3 +1,6 @@
+import { Content } from '@/lib/models/content';
+import { GroupSessionModel } from '@/lib/models/group-session-models';
+
 export enum PAGE_STATUS_ID {
 	LIVE = 'LIVE',
 	DRAFT = 'DRAFT',
@@ -107,12 +110,7 @@ export interface ResourcesRowModel {
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-	contents: {
-		title: string;
-		pageRowContentId: string;
-		contentId: string;
-		contentDisplayOrder: number;
-	}[];
+	contents: Content[];
 }
 
 export interface GroupSessionsRowModel {
@@ -120,12 +118,7 @@ export interface GroupSessionsRowModel {
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
-	groupSessions: {
-		pageRowGroupSessionId: string;
-		groupSessionId: string;
-		groupSessionDisplayOrder: number;
-		pageRowId: string;
-	}[];
+	groupSessions: GroupSessionModel[];
 }
 
 export interface TagGroupRowModel {
