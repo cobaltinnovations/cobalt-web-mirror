@@ -9,6 +9,7 @@ export * from './page-section-shelf-page';
 export * from './page-section-shelf';
 export * from './row-renderer';
 export * from './row-selection-form';
+export * from './row-settings-group-sessions';
 export * from './row-settings-one-column';
 export * from './row-settings-resources';
 export * from './row-settings-three-columns';

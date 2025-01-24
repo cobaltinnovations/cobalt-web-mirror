@@ -5,6 +5,7 @@ import {
 	HERO_SECTION_ID,
 	PageSectionShelfPage,
 	RowSelectionForm,
+	RowSettingsGroupSessions,
 	RowSettingsOneColumn,
 	RowSettingsResources,
 	RowSettingsThreeColumns,
@@ -173,6 +174,16 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 
 					{pageState === PAGE_STATES.RESOURCES_ROW_SETTINGS && (
 						<RowSettingsResources
+							onBackButtonClick={() => {
+								setCurrentPageRowId('');
+								setIsNext(false);
+								setPageState(PAGE_STATES.SECTION_SETTINGS);
+							}}
+						/>
+					)}
+
+					{pageState === PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS && (
+						<RowSettingsGroupSessions
 							onBackButtonClick={() => {
 								setCurrentPageRowId('');
 								setIsNext(false);

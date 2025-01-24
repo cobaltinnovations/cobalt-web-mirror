@@ -132,12 +132,7 @@ export const pagesService = {
 			data,
 		});
 	},
-	updateResourcesRow(
-		pageRowId: string,
-		data: {
-			contentIds: string[];
-		}
-	) {
+	updateResourcesRow(pageRowId: string, data: { contentIds: string[] }) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: ResourcesRowModel;
 		}>({
@@ -152,6 +147,15 @@ export const pagesService = {
 		}>({
 			method: 'POST',
 			url: `/pages/row/${pageSectionId}/group-session`,
+			data,
+		});
+	},
+	updateGroupSessionsRow(pageRowId: string, data: { groupSessionIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: GroupSessionsRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/group-session`,
 			data,
 		});
 	},
