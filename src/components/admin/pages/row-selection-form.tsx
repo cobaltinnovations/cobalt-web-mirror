@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { CollapseButton, CustomRowButton, SelectResourcesModal } from '@/components/admin/pages';
+import {
+	CollapseButton,
+	CustomRowButton,
+	SelectGroupSessionsModal,
+	SelectResourcesModal,
+} from '@/components/admin/pages';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -14,6 +19,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 
 	const { currentPageSection, addPageRowToCurrentPageSection } = usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
+	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 
 	const handleResourcesAdd = async (contentIds: string[]) => {
 		try {
@@ -24,10 +30,25 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			const { pageRow } = await pagesService
 				.createResourcesRow(currentPageSection.pageSectionId, { contentIds })
 				.fetch();
-
 			addPageRowToCurrentPageSection(pageRow);
 			setShowSelectResourcesModal(false);
+			onRowAdded();
+		} catch (error) {
+			handleError(error);
+		}
+	};
 
+	const handleGroupSessionsAdd = async (groupSessionIds: string[]) => {
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createGroupSessionsRow(currentPageSection.pageSectionId, { groupSessionIds })
+				.fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setShowSelectGroupSessionsModal(false);
 			onRowAdded();
 		} catch (error) {
 			handleError(error);
@@ -87,6 +108,15 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 				}}
 			/>
 
+			<SelectGroupSessionsModal
+				groupSessionIds={[]}
+				show={showSelectGroupSessionsModal}
+				onAdd={handleGroupSessionsAdd}
+				onHide={() => {
+					setShowSelectGroupSessionsModal(false);
+				}}
+			/>
+
 			<CollapseButton title="Content Row" initialShow>
 				<div className="pb-6">
 					<p>Use a content row to add existing content from Cobalt.</p>
@@ -102,7 +132,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 						<Button
 							className="mx-1 flex-fill"
 							onClick={() => {
-								window.alert('[TODO]: Group sessions modal');
+								setShowSelectGroupSessionsModal(true);
 							}}
 						>
 							Group Sessions

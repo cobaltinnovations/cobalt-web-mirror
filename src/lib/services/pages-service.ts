@@ -2,6 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
+	GroupSessionsRowModel,
 	OneColumnImageRowModel,
 	PAGE_STATUS_ID,
 	PAGE_TYPE_ID,
@@ -142,6 +143,15 @@ export const pagesService = {
 		}>({
 			method: 'PUT',
 			url: `/pages/row/${pageRowId}/content`,
+			data,
+		});
+	},
+	createGroupSessionsRow(pageSectionId: string, data: { groupSessionIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: GroupSessionsRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/group-session`,
 			data,
 		});
 	},

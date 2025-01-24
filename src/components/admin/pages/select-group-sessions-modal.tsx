@@ -2,9 +2,9 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import InputHelperSearch from '@/components/input-helper-search';
-import { resourceLibraryService } from '@/lib/services';
+import { groupSessionsService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { Content } from '@/lib/models';
+import { GroupSessionModel } from '@/lib/models';
 import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -86,27 +86,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface SelectResourcesModalProps extends ModalProps {
-	contentIds: string[];
-	onAdd(contentIds: string[]): void;
+interface SelectGroupSessionsModalProps extends ModalProps {
+	groupSessionIds: string[];
+	onAdd(groupSessionIds: string[]): void;
 }
 
-export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectResourcesModalProps) => {
+export const SelectGroupSessionsModal = ({ groupSessionIds, onAdd, ...props }: SelectGroupSessionsModalProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const searchInputRef = useRef<HTMLInputElement>(null);
-	const [contents, setContents] = useState<Content[]>([]);
-	const [selectedContentIds, setSelectedContentIds] = useState<string[]>([]);
+	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
+	const [selectedGroupSessionIds, setSelectedGroupSessionIds] = useState<string[]>([]);
 	const [searchInputValue, setSearchInputValue] = useState('');
 
 	const fetchData = useCallback(
 		async (searchQuery: string) => {
 			try {
-				const response = await resourceLibraryService
-					.searchResourceLibrary({ pageSize: 5000, searchQuery })
-					.fetch();
-
-				setContents(response.findResult.contents);
+				const response = await groupSessionsService.getGroupSessions({ pageSize: 5000, searchQuery }).fetch();
+				setGroupSessions(response.groupSessions);
 			} catch (error) {
 				handleError(error);
 			}
@@ -115,8 +112,8 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 	);
 
 	const handleOnEnter = async () => {
-		setContents([]);
-		setSelectedContentIds(contentIds);
+		setGroupSessions([]);
+		setSelectedGroupSessionIds(groupSessionIds);
 		setSearchInputValue('');
 		fetchData('');
 	};
@@ -138,7 +135,7 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 	return (
 		<Modal dialogClassName={classes.modal} centered onEnter={handleOnEnter} onEntered={handleOnEntered} {...props}>
 			<Modal.Header closeButton>
-				<Modal.Title>Select resources</Modal.Title>
+				<Modal.Title>Select group sessions</Modal.Title>
 			</Modal.Header>
 			<Modal.Body className="p-0">
 				<div className={classes.subHeader}>
@@ -156,34 +153,34 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 						</Form>
 					</div>
 					<div className={classes.addedHeaderCol}>
-						<span className="fw-bold">Resources to add ({selectedContentIds.length})</span>
+						<span className="fw-bold">Group sessions to add ({selectedGroupSessionIds.length})</span>
 					</div>
 				</div>
 				<div className={classes.bodyInner}>
 					<div className={classes.resourcesCol}>
 						<ul className="list-unstyled m-0">
-							{contents.map((c) => (
-								<li key={c.contentId} className={classes.resourceItem}>
+							{groupSessions.map((gs) => (
+								<li key={gs.groupSessionId} className={classes.resourceItem}>
 									<Form.Check
 										type="checkbox"
 										name="resources"
-										id={`resource--${c.contentId}`}
+										id={`resource--${gs.groupSessionId}`}
 										label=""
-										value={c.contentId}
-										checked={selectedContentIds.includes(c.contentId)}
+										value={gs.groupSessionId}
+										checked={selectedGroupSessionIds.includes(gs.groupSessionId)}
 										onChange={({ currentTarget }) => {
-											setSelectedContentIds(
-												AddOrRemoveValueFromArray(currentTarget.value, selectedContentIds)
+											setSelectedGroupSessionIds(
+												AddOrRemoveValueFromArray(currentTarget.value, selectedGroupSessionIds)
 											);
 										}}
 									/>
 									<div
 										className={classes.imagePreview}
-										style={{ backgroundImage: `url(${c.imageUrl})` }}
+										style={{ backgroundImage: `url(${gs.imageUrl})` }}
 									/>
 									<div className="overflow-hidden">
-										<span className="d-block text-truncate">{c.title}</span>
-										<span className="d-block text-truncate">{c.author}</span>
+										<span className="d-block text-truncate">{gs.title}</span>
+										<span className="d-block text-truncate">{gs.facilitatorName}</span>
 									</div>
 								</li>
 							))}
@@ -191,9 +188,9 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 					</div>
 					<div className={classes.addedCol}>
 						<ul>
-							{selectedContentIds.map((cid) => {
-								const content = contents.find((c) => c.contentId === cid);
-								return <li key={cid}>{content?.title}</li>;
+							{selectedGroupSessionIds.map((gsid) => {
+								const groupSession = groupSessions.find((gs) => gs.groupSessionId === gsid);
+								return <li key={gsid}>{groupSession?.title}</li>;
 							})}
 						</ul>
 					</div>
@@ -209,10 +206,10 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 						className="ms-2"
 						variant="primary"
 						onClick={() => {
-							onAdd(selectedContentIds);
+							onAdd(selectedGroupSessionIds);
 						}}
 					>
-						Add Resources
+						Add Group Sessions
 					</Button>
 				</div>
 			</Modal.Footer>

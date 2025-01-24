@@ -15,5 +15,6 @@ export * from './row-settings-three-columns';
 export * from './row-settings-two-columns';
 export * from './section-hero-settings-form';
 export * from './section-settings-form';
+export * from './select-group-sessions-modal';
 export * from './select-resources-modal';
 export * from './settings-tab';
