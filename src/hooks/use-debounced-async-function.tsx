@@ -3,7 +3,7 @@ import { useRef } from 'react';
 
 function useDebouncedAsyncFunction(
 	asyncFunction: (...args: any[]) => Promise<void>,
-	wait = 1500
+	wait = 500
 ): (...args: any[]) => void {
 	const debouncedFunction = useRef(
 		debounce(async (...args: any[]) => {
