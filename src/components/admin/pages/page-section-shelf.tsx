@@ -119,37 +119,41 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							title={currentPageSection?.name ?? ''}
 							bodyClassName={currentPageSection?.pageSectionId !== HERO_SECTION_ID ? 'pt-0' : ''}
 						>
-							{currentPageSection?.pageSectionId === HERO_SECTION_ID ? (
-								<SectionHeroSettingsForm />
-							) : (
-								<SectionSettingsForm
-									onAddRowButtonClick={() => {
-										setIsNext(true);
-										setPageState(PAGE_STATES.ADD_ROW);
-									}}
-									onRowButtonClick={(pageRow) => {
-										setCurrentPageRowId(pageRow.pageRowId);
-										setIsNext(true);
-										if (pageRow.rowTypeId === ROW_TYPE_ID.RESOURCES) {
-											setPageState(PAGE_STATES.RESOURCES_ROW_SETTINGS);
-										}
-										if (pageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS) {
-											setPageState(PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS);
-										}
-										if (pageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP) {
-											setPageState(PAGE_STATES.TAG_GROUP_ROW_SETTINGS);
-										}
-										if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE) {
-											setPageState(PAGE_STATES.ONE_COLUMN_ROW_SETTINGS);
-										}
-										if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE) {
-											setPageState(PAGE_STATES.TWO_COLUMN_ROW_SETTINGS);
-										}
-										if (pageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE) {
-											setPageState(PAGE_STATES.THREE_COLUMN_ROW_SETTINGS);
-										}
-									}}
-								/>
+							{currentPageSection && (
+								<>
+									{currentPageSection.pageSectionId === HERO_SECTION_ID ? (
+										<SectionHeroSettingsForm />
+									) : (
+										<SectionSettingsForm
+											onAddRowButtonClick={() => {
+												setIsNext(true);
+												setPageState(PAGE_STATES.ADD_ROW);
+											}}
+											onRowButtonClick={(pageRow) => {
+												setCurrentPageRowId(pageRow.pageRowId);
+												setIsNext(true);
+												if (pageRow.rowTypeId === ROW_TYPE_ID.RESOURCES) {
+													setPageState(PAGE_STATES.RESOURCES_ROW_SETTINGS);
+												}
+												if (pageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS) {
+													setPageState(PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS);
+												}
+												if (pageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP) {
+													setPageState(PAGE_STATES.TAG_GROUP_ROW_SETTINGS);
+												}
+												if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE) {
+													setPageState(PAGE_STATES.ONE_COLUMN_ROW_SETTINGS);
+												}
+												if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE) {
+													setPageState(PAGE_STATES.TWO_COLUMN_ROW_SETTINGS);
+												}
+												if (pageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE) {
+													setPageState(PAGE_STATES.THREE_COLUMN_ROW_SETTINGS);
+												}
+											}}
+										/>
+									)}
+								</>
 							)}
 						</PageSectionShelfPage>
 					)}

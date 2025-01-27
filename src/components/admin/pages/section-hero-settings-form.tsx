@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -13,7 +13,6 @@ export const HERO_SECTION_ID = 'HERO';
 export const SectionHeroSettingsForm = () => {
 	const handleError = useHandleError();
 	const { page, setPage, setIsSaving } = usePageBuilderContext();
-	const headlineInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		headline: '',
 		description: '',
@@ -64,7 +63,6 @@ export const SectionHeroSettingsForm = () => {
 	return (
 		<Form>
 			<InputHelper
-				ref={headlineInputRef}
 				className="mb-4"
 				type="text"
 				label="Headline"
@@ -106,7 +104,6 @@ export const SectionHeroSettingsForm = () => {
 				}}
 			/>
 			<InputHelper
-				className="mb-4"
 				type="text"
 				label="Image alt text"
 				value={formValues.imageAltText}
