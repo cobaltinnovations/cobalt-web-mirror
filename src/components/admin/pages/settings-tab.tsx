@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form } from 'react-bootstrap';
 import { PAGE_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
+import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
 const pageTypes = [
 	{
@@ -20,7 +21,6 @@ const pageTypes = [
 export const SettingsTab = () => {
 	const handleError = useHandleError();
 	const { page, setPage, setIsSaving } = usePageBuilderContext();
-	const pageNameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState({
 		pageName: '',
 		friendlyUrl: '',
@@ -28,8 +28,6 @@ export const SettingsTab = () => {
 	});
 
 	useEffect(() => {
-		pageNameInputRef.current?.focus();
-
 		setFormValues({
 			pageName: page?.name ?? '',
 			friendlyUrl: page?.urlName ?? '',
@@ -37,8 +35,7 @@ export const SettingsTab = () => {
 		});
 	}, [page?.name, page?.pageTypeId, page?.urlName]);
 
-	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
@@ -48,9 +45,9 @@ export const SettingsTab = () => {
 
 			const response = await pagesService
 				.updatePageSettings(page.pageId, {
-					name: formValues.pageName,
-					urlName: formValues.friendlyUrl,
-					pageTypeId: formValues.pageTypeId,
+					name: fv.pageName,
+					urlName: fv.friendlyUrl,
+					pageTypeId: fv.pageTypeId,
 				})
 				.fetch();
 
@@ -60,12 +57,15 @@ export const SettingsTab = () => {
 		} finally {
 			setIsSaving(false);
 		}
-	};
+	});
+
+	useEffect(() => {
+		debouncedSubmission(formValues);
+	}, [debouncedSubmission, formValues]);
 
 	return (
-		<Form onSubmit={handleFormSubmit}>
+		<Form>
 			<InputHelper
-				ref={pageNameInputRef}
 				className="mb-4"
 				type="text"
 				label="Page name"
@@ -113,9 +113,6 @@ export const SettingsTab = () => {
 					</option>
 				))}
 			</InputHelper>
-			<Button type="submit" variant="warning" className="mt-4">
-				Temp Submit Button (No live saving yet)
-			</Button>
 		</Form>
 	);
 };
