@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
+import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
 export const HERO_SECTION_ID = 'HERO';
 
@@ -29,12 +30,9 @@ export const SectionHeroSettingsForm = () => {
 			imageUrl: page?.imageUrl ?? '',
 			imageAltText: page?.imageAltText ?? '',
 		});
-
-		headlineInputRef.current?.focus();
 	}, [page?.description, page?.headline, page?.imageAltText, page?.imageFileUploadId, page?.imageUrl]);
 
-	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const debouncedSubmission = useDebouncedAsyncFunction(async (requestBody: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
@@ -44,10 +42,10 @@ export const SectionHeroSettingsForm = () => {
 
 			const response = await pagesService
 				.updatePageHero(page.pageId, {
-					headline: formValues.headline,
-					description: formValues.description,
-					imageFileUploadId: formValues.imageFileUploadId,
-					imageAltText: formValues.imageAltText,
+					headline: requestBody.headline,
+					description: requestBody.description,
+					imageFileUploadId: requestBody.imageFileUploadId,
+					imageAltText: requestBody.imageAltText,
 				})
 				.fetch();
 
@@ -57,10 +55,14 @@ export const SectionHeroSettingsForm = () => {
 		} finally {
 			setIsSaving(false);
 		}
-	};
+	});
+
+	useEffect(() => {
+		debouncedSubmission(formValues);
+	}, [debouncedSubmission, formValues]);
 
 	return (
-		<Form onSubmit={handleFormSubmit}>
+		<Form>
 			<InputHelper
 				ref={headlineInputRef}
 				className="mb-4"
@@ -115,9 +117,6 @@ export const SectionHeroSettingsForm = () => {
 					}));
 				}}
 			/>
-			<Button type="submit" variant="warning">
-				Temp Submit Button (No live saving yet)
-			</Button>
 		</Form>
 	);
 };

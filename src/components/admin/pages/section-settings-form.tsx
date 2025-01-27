@@ -23,6 +23,7 @@ import { DraggableItem } from './draggable-item';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
 interface SectionSettingsFormProps {
 	onAddRowButtonClick(): void;
@@ -40,8 +41,6 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 	});
 
 	useEffect(() => {
-		headlineInputRef.current?.focus();
-
 		setFormValues({
 			headline: currentPageSection?.headline ?? '',
 			description: currentPageSection?.description ?? '',
@@ -92,8 +91,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		return '';
 	};
 
-	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const debouncedSubmission = useDebouncedAsyncFunction(async (requestBody: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
@@ -104,9 +102,9 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			const response = await pagesService
 				.updatePageSection(currentPageSection.pageSectionId, {
 					name: currentPageSection.name,
-					headline: formValues.headline,
-					description: formValues.description,
-					backgroundColorId: formValues.backgroundColor,
+					headline: requestBody.headline,
+					description: requestBody.description,
+					backgroundColorId: requestBody.backgroundColor,
 					displayOrder: currentPageSection.displayOrder,
 				})
 				.fetch();
@@ -117,7 +115,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		} finally {
 			setIsSaving(false);
 		}
-	};
+	});
 
 	const handleDragEnd = async ({ source, destination }: DropResult) => {
 		if (!destination) {
@@ -136,10 +134,14 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		updatePageSection(pageSectionClone);
 	};
 
+	useEffect(() => {
+		debouncedSubmission(formValues);
+	}, [debouncedSubmission, formValues]);
+
 	return (
 		<>
 			<CollapseButton title="Basics" initialShow>
-				<Form onSubmit={handleFormSubmit}>
+				<Form>
 					<InputHelper
 						ref={headlineInputRef}
 						className="mb-4"
@@ -196,9 +198,6 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 							}}
 						/>
 					</Form.Group>
-					<Button type="submit" variant="warning" className="mb-4">
-						Temp Submit Button (No live saving yet)
-					</Button>
 				</Form>
 			</CollapseButton>
 			<hr />

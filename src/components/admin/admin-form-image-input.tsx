@@ -1,6 +1,6 @@
 import useHandleError from '@/hooks/use-handle-error';
 import { imageUploader } from '@/lib/services';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ImageUploadCard from '../image-upload-card';
 import SessionCropModal from '../session-crop-modal';
 import { PresignedUploadResponse } from '@/lib/models';
@@ -24,10 +24,6 @@ export const AdminFormImageInput = ({
 	const [imagePreviewSrc, setImagePreviewSrc] = useState(imageSrc);
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
-
-	useEffect(() => {
-		setImagePreviewSrc(imageSrc);
-	}, [imageSrc]);
 
 	return (
 		<>
