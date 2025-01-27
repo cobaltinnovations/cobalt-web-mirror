@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
@@ -90,7 +90,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		return '';
 	};
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (requestBody: typeof formValues) => {
+	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
@@ -101,9 +101,9 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			const response = await pagesService
 				.updatePageSection(currentPageSection.pageSectionId, {
 					name: currentPageSection.name,
-					headline: requestBody.headline,
-					description: requestBody.description,
-					backgroundColorId: requestBody.backgroundColor,
+					headline: fv.headline,
+					description: fv.description,
+					backgroundColorId: fv.backgroundColor,
 					displayOrder: currentPageSection.displayOrder,
 				})
 				.fetch();
@@ -133,9 +133,20 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		updatePageSection(pageSectionClone);
 	};
 
-	useEffect(() => {
-		debouncedSubmission(formValues);
-	}, [debouncedSubmission, formValues]);
+	const handleInputChange = useCallback(
+		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+			setFormValues((previousValue) => {
+				const newValue = {
+					...previousValue,
+					[currentTarget.name]: currentTarget.value,
+				};
+
+				debouncedSubmission(newValue);
+				return newValue;
+			});
+		},
+		[debouncedSubmission]
+	);
 
 	return (
 		<>
@@ -145,55 +156,37 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 						className="mb-4"
 						type="text"
 						label="Headline"
+						name="headline"
 						value={formValues.headline}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								headline: currentTarget.value,
-							}));
-						}}
+						onChange={handleInputChange}
 					/>
 					<InputHelper
 						className="mb-4"
 						as="textarea"
 						label="Description"
+						name="description"
 						value={formValues.description}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								description: currentTarget.value,
-							}));
-						}}
+						onChange={handleInputChange}
 					/>
 					<Form.Group className="mb-6">
 						<Form.Label className="mb-2">Background color</Form.Label>
 						<Form.Check
 							type="radio"
-							name="background-color"
 							id="background-color--white"
 							label="White"
+							name="backgroundColor"
 							value={BACKGROUND_COLOR_ID.WHITE}
 							checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.WHITE}
-							onChange={() => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									backgroundColor: BACKGROUND_COLOR_ID.WHITE,
-								}));
-							}}
+							onChange={handleInputChange}
 						/>
 						<Form.Check
 							type="radio"
-							name="background-color"
 							id="background-color--neutral"
 							label="Neutral"
+							name="backgroundColor"
 							value={BACKGROUND_COLOR_ID.NEUTRAL}
 							checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.NEUTRAL}
-							onChange={() => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									backgroundColor: BACKGROUND_COLOR_ID.NEUTRAL,
-								}));
-							}}
+							onChange={handleInputChange}
 						/>
 					</Form.Group>
 				</Form>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { PAGE_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
@@ -59,9 +59,20 @@ export const SettingsTab = () => {
 		}
 	});
 
-	useEffect(() => {
-		debouncedSubmission(formValues);
-	}, [debouncedSubmission, formValues]);
+	const handleInputChange = useCallback(
+		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+			setFormValues((previousValue) => {
+				const newValue = {
+					...previousValue,
+					[currentTarget.name]: currentTarget.value,
+				};
+
+				debouncedSubmission(newValue);
+				return newValue;
+			});
+		},
+		[debouncedSubmission]
+	);
 
 	return (
 		<Form>
@@ -69,38 +80,26 @@ export const SettingsTab = () => {
 				className="mb-4"
 				type="text"
 				label="Page name"
+				name="pageName"
 				value={formValues.pageName}
-				onChange={({ currentTarget }) => {
-					setFormValues((previousValue) => ({
-						...previousValue,
-						pageName: currentTarget.value,
-					}));
-				}}
+				onChange={handleInputChange}
 				required
 			/>
 			<InputHelper
 				className="mb-4"
 				type="text"
 				label="Friendly url"
+				name="friendlyUrl"
 				value={formValues.friendlyUrl}
-				onChange={({ currentTarget }) => {
-					setFormValues((previousValue) => ({
-						...previousValue,
-						friendlyUrl: currentTarget.value,
-					}));
-				}}
+				onChange={handleInputChange}
 				required
 			/>
 			<InputHelper
 				as="select"
 				label="Page Type"
+				name="pageTypeId"
 				value={formValues.pageTypeId}
-				onChange={({ currentTarget }) => {
-					setFormValues((previousValue) => ({
-						...previousValue,
-						pageTypeId: currentTarget.value as PAGE_TYPE_ID,
-					}));
-				}}
+				onChange={handleInputChange}
 				helperText="The type determines where the content lives on Cobalt"
 				required
 			>
