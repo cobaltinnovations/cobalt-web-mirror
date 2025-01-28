@@ -9,8 +9,9 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { AccountSource, AccountSourceDisplayStyleId, INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb } from '@/lib/models';
 import { institutionService } from '@/lib/services';
 
-import AsyncWrapper from '../async-page';
-import Blurb from '../blurb';
+import AsyncWrapper from '@/components/async-page';
+import Blurb from '@/components/blurb';
+import InlineAlert from '@/components/inline-alert';
 
 export interface SignInCobaltProps {
 	onAccountSourceClick: (accountSource: AccountSource) => Promise<void>;
@@ -82,19 +83,30 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 										accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] || 'primary';
 
 									return (
-										<Button
-											key={`account-source-${index}`}
-											className={classNames('d-block w-100', {
-												'mb-4': !isLast,
-											})}
-											variant={variant}
-											data-testid={`signIn-${accountSource.accountSourceId}`}
-											onClick={() => {
-												onAccountSourceClick(accountSource);
-											}}
-										>
-											{accountSource.authenticationDescription}
-										</Button>
+										<>
+											{accountSource.supplementMessage && (
+												<InlineAlert
+													className="mb-4 text-left"
+													variant={
+														(accountSource.supplementMessageStyle as 'primary') ?? 'info'
+													}
+													title={accountSource.supplementMessage}
+												/>
+											)}
+											<Button
+												key={`account-source-${index}`}
+												className={classNames('d-block w-100', {
+													'mb-4': !isLast,
+												})}
+												variant={variant}
+												data-testid={`signIn-${accountSource.accountSourceId}`}
+												onClick={() => {
+													onAccountSourceClick(accountSource);
+												}}
+											>
+												{accountSource.authenticationDescription}
+											</Button>
+										</>
 									);
 								})}
 							</div>

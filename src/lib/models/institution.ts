@@ -123,6 +123,8 @@ export interface AccountSource {
 	accountSourceId: AccountSourceId;
 	authenticationDescription: string;
 	description: string;
+	supplementMessage?: string;
+	supplementMessageStyle?: string;
 	ssoUrl?: string;
 }
 
