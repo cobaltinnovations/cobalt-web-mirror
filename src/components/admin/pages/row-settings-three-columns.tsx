@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Form } from 'react-bootstrap';
 import { ThreeColumnImageRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -9,6 +9,7 @@ import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
+import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
 export const RowSettingsThreeColumns = () => {
 	const handleError = useHandleError();
@@ -50,8 +51,7 @@ export const RowSettingsThreeColumns = () => {
 		});
 	}, [threeColumnImageRow]);
 
-	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
@@ -61,9 +61,9 @@ export const RowSettingsThreeColumns = () => {
 
 			const response = await pagesService
 				.updateThreeColumnRow(currentPageRow.pageRowId, {
-					columnOne: formValues.columnOne,
-					columnTwo: formValues.columnTwo,
-					columnThree: formValues.columnThree,
+					columnOne: fv.columnOne,
+					columnTwo: fv.columnTwo,
+					columnThree: fv.columnThree,
 				})
 				.fetch();
 
@@ -73,24 +73,96 @@ export const RowSettingsThreeColumns = () => {
 		} finally {
 			setIsSaving(false);
 		}
-	};
+	});
+
+	const handleInputChange = useCallback(
+		(
+			column: keyof typeof formValues,
+			{ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+		) => {
+			setFormValues((previousValue) => {
+				const newValue = {
+					...previousValue,
+					[column]: {
+						...previousValue[column],
+						[currentTarget.name]: currentTarget.value,
+					},
+				};
+
+				debouncedSubmission(newValue);
+				return newValue;
+			});
+		},
+		[debouncedSubmission]
+	);
+
+	const handleQuillChange = useCallback(
+		(column: keyof typeof formValues, description: string) => {
+			setFormValues((previousValue) => {
+				const newValue = {
+					...previousValue,
+					[column]: {
+						...previousValue[column],
+						description,
+					},
+				};
+
+				debouncedSubmission(newValue);
+				return newValue;
+			});
+		},
+		[debouncedSubmission]
+	);
+
+	const handleImageChange = useCallback(
+		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
+			setFormValues((previousValue) => ({
+				...previousValue,
+				[column]: {
+					...previousValue[column],
+					imageFileUploadId: nextId,
+					imageUrl: nextSrc,
+				},
+			}));
+
+			setIsSaving(true);
+
+			try {
+				if (!threeColumnImageRow) {
+					throw new Error('threeColumnImageRow is undefined.');
+				}
+
+				const response = await pagesService
+					.updateThreeColumnRow(threeColumnImageRow.pageRowId, {
+						...formValues,
+						[column]: {
+							...formValues[column],
+							imageFileUploadId: nextId,
+						},
+					})
+					.fetch();
+
+				updatePageRow(response.pageRow);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSaving(false);
+			}
+		},
+		[formValues, handleError, setIsSaving, threeColumnImageRow, updatePageRow]
+	);
 
 	return (
-		<Form onSubmit={handleFormSubmit}>
+		<>
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"
 					type="text"
 					label="Headline"
+					name="headline"
 					value={formValues.columnOne.headline}
-					onChange={({ currentTarget }) => {
-						setFormValues((previousValue) => ({
-							...previousValue,
-							columnOne: {
-								...previousValue.columnOne,
-								headline: currentTarget.value,
-							},
-						}));
+					onChange={(event) => {
+						handleInputChange('columnOne', event);
 					}}
 				/>
 				<Form.Group className="mb-4">
@@ -99,13 +171,7 @@ export const RowSettingsThreeColumns = () => {
 						height={228}
 						value={formValues.columnOne.description}
 						onChange={(value) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnOne: {
-									...previousValue.columnOne,
-									description: value,
-								},
-							}));
+							handleQuillChange('columnOne', value);
 						}}
 					/>
 				</Form.Group>
@@ -115,14 +181,7 @@ export const RowSettingsThreeColumns = () => {
 						className="mb-4"
 						imageSrc={formValues.columnOne.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnOne: {
-									...previousValue.columnOne,
-									imageFileUploadId: nextId,
-									imageUrl: nextSrc,
-								},
-							}));
+							handleImageChange('columnOne', { nextId, nextSrc });
 						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({
@@ -134,15 +193,10 @@ export const RowSettingsThreeColumns = () => {
 					<InputHelper
 						type="text"
 						label="Image alt text"
+						name="imageAltText"
 						value={formValues.columnOne.imageAltText}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnOne: {
-									...previousValue.columnOne,
-									imageAltText: currentTarget.value,
-								},
-							}));
+						onChange={(event) => {
+							handleInputChange('columnOne', event);
 						}}
 					/>
 				</Form.Group>
@@ -153,15 +207,10 @@ export const RowSettingsThreeColumns = () => {
 					className="mb-4"
 					type="text"
 					label="Headline"
+					name="headline"
 					value={formValues.columnTwo.headline}
-					onChange={({ currentTarget }) => {
-						setFormValues((previousValue) => ({
-							...previousValue,
-							columnTwo: {
-								...previousValue.columnTwo,
-								headline: currentTarget.value,
-							},
-						}));
+					onChange={(event) => {
+						handleInputChange('columnTwo', event);
 					}}
 				/>
 				<Form.Group className="mb-4">
@@ -170,13 +219,7 @@ export const RowSettingsThreeColumns = () => {
 						height={228}
 						value={formValues.columnTwo.description}
 						onChange={(value) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnTwo: {
-									...previousValue.columnTwo,
-									description: value,
-								},
-							}));
+							handleQuillChange('columnTwo', value);
 						}}
 					/>
 				</Form.Group>
@@ -186,14 +229,7 @@ export const RowSettingsThreeColumns = () => {
 						className="mb-4"
 						imageSrc={formValues.columnTwo.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnTwo: {
-									...previousValue.columnTwo,
-									imageFileUploadId: nextId,
-									imageUrl: nextSrc,
-								},
-							}));
+							handleImageChange('columnTwo', { nextId, nextSrc });
 						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({
@@ -205,15 +241,10 @@ export const RowSettingsThreeColumns = () => {
 					<InputHelper
 						type="text"
 						label="Image alt text"
+						name="imageAltText"
 						value={formValues.columnTwo.imageAltText}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnTwo: {
-									...previousValue.columnTwo,
-									imageAltText: currentTarget.value,
-								},
-							}));
+						onChange={(event) => {
+							handleInputChange('columnTwo', event);
 						}}
 					/>
 				</Form.Group>
@@ -224,15 +255,10 @@ export const RowSettingsThreeColumns = () => {
 					className="mb-4"
 					type="text"
 					label="Headline"
+					name="headline"
 					value={formValues.columnThree.headline}
-					onChange={({ currentTarget }) => {
-						setFormValues((previousValue) => ({
-							...previousValue,
-							columnThree: {
-								...previousValue.columnThree,
-								headline: currentTarget.value,
-							},
-						}));
+					onChange={(event) => {
+						handleInputChange('columnThree', event);
 					}}
 				/>
 				<Form.Group className="mb-4">
@@ -241,13 +267,7 @@ export const RowSettingsThreeColumns = () => {
 						height={228}
 						value={formValues.columnThree.description}
 						onChange={(value) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnThree: {
-									...previousValue.columnThree,
-									description: value,
-								},
-							}));
+							handleQuillChange('columnThree', value);
 						}}
 					/>
 				</Form.Group>
@@ -257,14 +277,7 @@ export const RowSettingsThreeColumns = () => {
 						className="mb-4"
 						imageSrc={formValues.columnThree.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnThree: {
-									...previousValue.columnThree,
-									imageFileUploadId: nextId,
-									imageUrl: nextSrc,
-								},
-							}));
+							handleImageChange('columnThree', { nextId, nextSrc });
 						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({
@@ -276,22 +289,14 @@ export const RowSettingsThreeColumns = () => {
 					<InputHelper
 						type="text"
 						label="Image alt text"
+						name="imageAltText"
 						value={formValues.columnThree.imageAltText}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								columnThree: {
-									...previousValue.columnThree,
-									imageAltText: currentTarget.value,
-								},
-							}));
+						onChange={(event) => {
+							handleInputChange('columnThree', event);
 						}}
 					/>
 				</Form.Group>
 			</CollapseButton>
-			<Button type="submit" variant="warning">
-				Temp Submit Button (No live saving yet)
-			</Button>
-		</Form>
+		</>
 	);
 };

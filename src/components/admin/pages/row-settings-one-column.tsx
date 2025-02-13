@@ -16,11 +16,7 @@ export const RowSettingsOneColumn = () => {
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const oneColumnImageRow = useMemo(() => currentPageRow as OneColumnImageRowModel | undefined, [currentPageRow]);
 	const [formValues, setFormValues] = useState({
-		headline: '',
-		description: '',
-		imageFileUploadId: '',
-		imageUrl: '',
-		imageAltText: '',
+		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 	});
 
 	useEffect(() => {
@@ -29,11 +25,13 @@ export const RowSettingsOneColumn = () => {
 		}
 
 		setFormValues({
-			headline: oneColumnImageRow.columnOne.headline,
-			description: oneColumnImageRow.columnOne.description,
-			imageFileUploadId: oneColumnImageRow.columnOne.imageFileUploadId,
-			imageUrl: oneColumnImageRow.columnOne.imageUrl,
-			imageAltText: oneColumnImageRow.columnOne.imageAltText,
+			columnOne: {
+				headline: oneColumnImageRow.columnOne.headline,
+				description: oneColumnImageRow.columnOne.description,
+				imageFileUploadId: oneColumnImageRow.columnOne.imageFileUploadId,
+				imageUrl: oneColumnImageRow.columnOne.imageUrl,
+				imageAltText: oneColumnImageRow.columnOne.imageAltText,
+			},
 		});
 	}, [oneColumnImageRow]);
 
@@ -47,12 +45,7 @@ export const RowSettingsOneColumn = () => {
 
 			const response = await pagesService
 				.updateOneColumnRow(oneColumnImageRow.pageRowId, {
-					columnOne: {
-						headline: fv.headline,
-						description: fv.description,
-						imageFileUploadId: fv.imageFileUploadId,
-						imageAltText: fv.imageAltText,
-					},
+					columnOne: fv.columnOne,
 				})
 				.fetch();
 
@@ -65,11 +58,17 @@ export const RowSettingsOneColumn = () => {
 	});
 
 	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+		(
+			column: keyof typeof formValues,
+			{ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+		) => {
 			setFormValues((previousValue) => {
 				const newValue = {
 					...previousValue,
-					[currentTarget.name]: currentTarget.value,
+					[column]: {
+						...previousValue[column],
+						[currentTarget.name]: currentTarget.value,
+					},
 				};
 
 				debouncedSubmission(newValue);
@@ -80,11 +79,14 @@ export const RowSettingsOneColumn = () => {
 	);
 
 	const handleQuillChange = useCallback(
-		(value: string) => {
+		(column: keyof typeof formValues, description: string) => {
 			setFormValues((previousValue) => {
 				const newValue = {
 					...previousValue,
-					description: value,
+					[column]: {
+						...previousValue[column],
+						description,
+					},
 				};
 
 				debouncedSubmission(newValue);
@@ -95,11 +97,14 @@ export const RowSettingsOneColumn = () => {
 	);
 
 	const handleImageChange = useCallback(
-		async (nextId: string, nextSrc: string) => {
+		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
 			setFormValues((previousValue) => ({
 				...previousValue,
-				imageFileUploadId: nextId,
-				imageUrl: nextSrc,
+				[column]: {
+					...previousValue[column],
+					imageFileUploadId: nextId,
+					imageUrl: nextSrc,
+				},
 			}));
 
 			setIsSaving(true);
@@ -111,11 +116,10 @@ export const RowSettingsOneColumn = () => {
 
 				const response = await pagesService
 					.updateOneColumnRow(oneColumnImageRow.pageRowId, {
-						columnOne: {
-							headline: formValues.headline,
-							description: formValues.description,
+						...formValues,
+						[column]: {
+							...formValues[column],
 							imageFileUploadId: nextId,
-							imageAltText: formValues.imageAltText,
 						},
 					})
 					.fetch();
@@ -127,7 +131,7 @@ export const RowSettingsOneColumn = () => {
 				setIsSaving(false);
 			}
 		},
-		[oneColumnImageRow, formValues, handleError, setIsSaving, updatePageRow]
+		[formValues, handleError, oneColumnImageRow, setIsSaving, updatePageRow]
 	);
 
 	return (
@@ -138,19 +142,29 @@ export const RowSettingsOneColumn = () => {
 					type="text"
 					label="Headline"
 					name="headline"
-					value={formValues.headline}
-					onChange={handleInputChange}
+					value={formValues.columnOne.headline}
+					onChange={(event) => {
+						handleInputChange('columnOne', event);
+					}}
 				/>
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
-					<WysiwygBasic height={228} value={formValues.description} onChange={handleQuillChange} />
+					<WysiwygBasic
+						height={228}
+						value={formValues.columnOne.description}
+						onChange={(value) => {
+							handleQuillChange('columnOne', value);
+						}}
+					/>
 				</Form.Group>
 				<Form.Group className="mb-6">
 					<Form.Label className="mb-2">Image</Form.Label>
 					<AdminFormImageInput
 						className="mb-4"
-						imageSrc={formValues.imageUrl}
-						onSrcChange={handleImageChange}
+						imageSrc={formValues.columnOne.imageUrl}
+						onSrcChange={(nextId, nextSrc) => {
+							handleImageChange('columnOne', { nextId, nextSrc });
+						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
@@ -162,8 +176,10 @@ export const RowSettingsOneColumn = () => {
 						type="text"
 						label="Image alt text"
 						name="imageAltText"
-						value={formValues.imageAltText}
-						onChange={handleInputChange}
+						value={formValues.columnOne.imageAltText}
+						onChange={(event) => {
+							handleInputChange('columnOne', event);
+						}}
 					/>
 				</Form.Group>
 			</CollapseButton>
