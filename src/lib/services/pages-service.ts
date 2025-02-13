@@ -8,6 +8,7 @@ import {
 	PAGE_TYPE_ID,
 	PageDetailModel,
 	PageModel,
+	PageRowUnionModel,
 	PageSectionDetailModel,
 	PageSectionModel,
 	PresignedUploadResponse,
@@ -321,6 +322,15 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'DELETE',
 			url: `/pages/row/${pageRowId}`,
+		});
+	},
+	reorderPageSectionRows(pageSectionId: string, data: { pageRowIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRows: PageRowUnionModel[];
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageSectionId}`,
+			data,
 		});
 	},
 	createPresignedFileUpload(data: { contentType: string; filename: string }) {

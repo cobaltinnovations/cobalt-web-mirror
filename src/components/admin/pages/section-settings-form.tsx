@@ -137,8 +137,23 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		const [removedContent] = pageSectionClone.pageRows.splice(source.index, 1);
 		pageSectionClone.pageRows.splice(destination.index, 0, removedContent);
 
-		window.alert('[TODO]: API call to reorder rows');
 		updatePageSection(pageSectionClone);
+		setIsSaving(true);
+
+		try {
+			const { pageRows } = await pagesService
+				.reorderPageSectionRows(currentPageSection.pageSectionId, {
+					pageRowIds: pageSectionClone.pageRows.map((pr) => pr.pageRowId),
+				})
+				.fetch();
+
+			pageSectionClone.pageRows = pageRows;
+			updatePageSection(pageSectionClone);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const handleInputChange = useCallback(
