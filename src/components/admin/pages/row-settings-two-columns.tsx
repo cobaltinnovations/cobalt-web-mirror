@@ -1,15 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { TwoColumnImageRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
-import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
 export const RowSettingsTwoColumns = () => {
 	const handleError = useHandleError();

@@ -21,27 +21,31 @@ export const RowSettingsThreeColumns = () => {
 	});
 
 	useEffect(() => {
+		if (!threeColumnImageRow) {
+			return;
+		}
+
 		setFormValues({
 			columnOne: {
-				headline: threeColumnImageRow?.columnOne.headline ?? '',
-				description: threeColumnImageRow?.columnOne.description ?? '',
-				imageFileUploadId: threeColumnImageRow?.columnOne.imageFileUploadId ?? '',
-				imageUrl: threeColumnImageRow?.columnOne.imageUrl ?? '',
-				imageAltText: threeColumnImageRow?.columnOne.imageAltText ?? '',
+				headline: threeColumnImageRow.columnOne.headline,
+				description: threeColumnImageRow.columnOne.description,
+				imageFileUploadId: threeColumnImageRow.columnOne.imageFileUploadId,
+				imageUrl: threeColumnImageRow.columnOne.imageUrl,
+				imageAltText: threeColumnImageRow.columnOne.imageAltText,
 			},
 			columnTwo: {
-				headline: threeColumnImageRow?.columnTwo.headline ?? '',
-				description: threeColumnImageRow?.columnTwo.description ?? '',
-				imageFileUploadId: threeColumnImageRow?.columnTwo.imageFileUploadId ?? '',
-				imageUrl: threeColumnImageRow?.columnTwo.imageUrl ?? '',
-				imageAltText: threeColumnImageRow?.columnTwo.imageAltText ?? '',
+				headline: threeColumnImageRow.columnTwo.headline,
+				description: threeColumnImageRow.columnTwo.description,
+				imageFileUploadId: threeColumnImageRow.columnTwo.imageFileUploadId,
+				imageUrl: threeColumnImageRow.columnTwo.imageUrl,
+				imageAltText: threeColumnImageRow.columnTwo.imageAltText,
 			},
 			columnThree: {
-				headline: threeColumnImageRow?.columnThree.headline ?? '',
-				description: threeColumnImageRow?.columnThree.description ?? '',
-				imageFileUploadId: threeColumnImageRow?.columnThree.imageFileUploadId ?? '',
-				imageUrl: threeColumnImageRow?.columnThree.imageUrl ?? '',
-				imageAltText: threeColumnImageRow?.columnThree.imageAltText ?? '',
+				headline: threeColumnImageRow.columnThree.headline,
+				description: threeColumnImageRow.columnThree.description,
+				imageFileUploadId: threeColumnImageRow.columnThree.imageFileUploadId,
+				imageUrl: threeColumnImageRow.columnThree.imageUrl,
+				imageAltText: threeColumnImageRow.columnThree.imageAltText,
 			},
 		});
 	}, [threeColumnImageRow]);
