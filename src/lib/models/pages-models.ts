@@ -58,7 +58,7 @@ export interface PageSectionModel {
 export interface PageRowModel {
 	pageRowId: string;
 	pageSectionId: string;
-	rowTypeId: string;
+	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
 }
 

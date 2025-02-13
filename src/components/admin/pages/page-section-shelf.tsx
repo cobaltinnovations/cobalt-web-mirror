@@ -78,12 +78,6 @@ interface SectionShelfProps {
 enum PAGE_STATES {
 	SECTION_SETTINGS = 'SECTION_SETTINGS',
 	ADD_ROW = 'ADD_ROW',
-	RESOURCES_ROW_SETTINGS = 'RESOURCES_ROW_SETTINGS',
-	GROUP_SESSIONS_ROW_SETTINGS = 'GROUP_SESSIONS_ROW_SETTINGS',
-	TAG_GROUP_ROW_SETTINGS = 'TAG_GROUP_ROW_SETTINGS',
-	ONE_COLUMN_ROW_SETTINGS = 'ONE_COLUMN_ROW_SETTINGS',
-	TWO_COLUMN_ROW_SETTINGS = 'TWO_COLUMN_ROW_SETTINGS',
-	THREE_COLUMN_ROW_SETTINGS = 'THREE_COLUMN_ROW_SETTINGS',
 }
 
 export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: SectionShelfProps) => {
@@ -98,7 +92,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 		deletePageRow,
 		setIsSaving,
 	} = usePageBuilderContext();
-	const [pageState, setPageState] = useState(PAGE_STATES.SECTION_SETTINGS);
+	const [pageState, setPageState] = useState<PAGE_STATES | ROW_TYPE_ID>(PAGE_STATES.SECTION_SETTINGS);
 	const [isNext, setIsNext] = useState(true);
 	const [showRowDeleteModal, setShowRowDeleteModal] = useState(false);
 
@@ -106,6 +100,12 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 		setIsNext(false);
 		setPageState(PAGE_STATES.SECTION_SETTINGS);
 	}, [currentPageSection?.pageSectionId]);
+
+	const handleRowBack = useCallback(() => {
+		setCurrentPageRowId('');
+		setIsNext(false);
+		setPageState(PAGE_STATES.SECTION_SETTINGS);
+	}, [setCurrentPageRowId]);
 
 	const handleRowDelete = useCallback(async () => {
 		setIsSaving(true);
@@ -119,16 +119,13 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 
 			deletePageRow(currentPageRow.pageRowId);
 			setShowRowDeleteModal(false);
-
-			setCurrentPageRowId('');
-			setIsNext(false);
-			setPageState(PAGE_STATES.SECTION_SETTINGS);
+			handleRowBack();
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsSaving(false);
 		}
-	}, [currentPageRow, deletePageRow, handleError, setCurrentPageRowId, setIsSaving]);
+	}, [currentPageRow, deletePageRow, handleError, handleRowBack, setIsSaving]);
 
 	return (
 		<>
@@ -177,30 +174,14 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 										) : (
 											<SectionSettingsForm
 												onAddRowButtonClick={() => {
+													setCurrentPageRowId('');
 													setIsNext(true);
 													setPageState(PAGE_STATES.ADD_ROW);
 												}}
 												onRowButtonClick={(pageRow) => {
 													setCurrentPageRowId(pageRow.pageRowId);
 													setIsNext(true);
-													if (pageRow.rowTypeId === ROW_TYPE_ID.RESOURCES) {
-														setPageState(PAGE_STATES.RESOURCES_ROW_SETTINGS);
-													}
-													if (pageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS) {
-														setPageState(PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS);
-													}
-													if (pageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP) {
-														setPageState(PAGE_STATES.TAG_GROUP_ROW_SETTINGS);
-													}
-													if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE) {
-														setPageState(PAGE_STATES.ONE_COLUMN_ROW_SETTINGS);
-													}
-													if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE) {
-														setPageState(PAGE_STATES.TWO_COLUMN_ROW_SETTINGS);
-													}
-													if (pageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE) {
-														setPageState(PAGE_STATES.THREE_COLUMN_ROW_SETTINGS);
-													}
+													setPageState(pageRow.rowTypeId);
 												}}
 											/>
 										)}
@@ -212,10 +193,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 						{pageState === PAGE_STATES.ADD_ROW && (
 							<PageSectionShelfPage
 								showBackButton
-								onBackButtonClick={() => {
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								title="Select row type to add"
 								bodyClassName="pt-0"
 							>
@@ -228,53 +206,37 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							</PageSectionShelfPage>
 						)}
 
-						{pageState === PAGE_STATES.RESOURCES_ROW_SETTINGS && (
+						{pageState === ROW_TYPE_ID.RESOURCES && (
 							<RowSettingsResources
-								onBackButtonClick={() => {
-									setCurrentPageRowId('');
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
 								}}
 							/>
 						)}
 
-						{pageState === PAGE_STATES.GROUP_SESSIONS_ROW_SETTINGS && (
+						{pageState === ROW_TYPE_ID.GROUP_SESSIONS && (
 							<RowSettingsGroupSessions
-								onBackButtonClick={() => {
-									setCurrentPageRowId('');
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
 								}}
 							/>
 						)}
 
-						{pageState === PAGE_STATES.TAG_GROUP_ROW_SETTINGS && (
+						{pageState === ROW_TYPE_ID.TAG_GROUP && (
 							<RowSettingsTagGroup
-								onBackButtonClick={() => {
-									setCurrentPageRowId('');
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
 								}}
 							/>
 						)}
 
-						{pageState === PAGE_STATES.ONE_COLUMN_ROW_SETTINGS && (
+						{pageState === ROW_TYPE_ID.ONE_COLUMN_IMAGE && (
 							<PageSectionShelfPage
 								showBackButton
-								onBackButtonClick={() => {
-									setCurrentPageRowId('');
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								showDeleteButton
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
@@ -286,14 +248,10 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							</PageSectionShelfPage>
 						)}
 
-						{pageState === PAGE_STATES.TWO_COLUMN_ROW_SETTINGS && (
+						{pageState === ROW_TYPE_ID.TWO_COLUMN_IMAGE && (
 							<PageSectionShelfPage
 								showBackButton
-								onBackButtonClick={() => {
-									setCurrentPageRowId('');
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								showDeleteButton
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
@@ -305,14 +263,10 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							</PageSectionShelfPage>
 						)}
 
-						{pageState === PAGE_STATES.THREE_COLUMN_ROW_SETTINGS && (
+						{pageState === ROW_TYPE_ID.THREE_COLUMN_IMAGE && (
 							<PageSectionShelfPage
 								showBackButton
-								onBackButtonClick={() => {
-									setCurrentPageRowId('');
-									setIsNext(false);
-									setPageState(PAGE_STATES.SECTION_SETTINGS);
-								}}
+								onBackButtonClick={handleRowBack}
 								showDeleteButton
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
