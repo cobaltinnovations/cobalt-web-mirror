@@ -10,6 +10,8 @@ import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-righ
 import { DraggableItem } from './draggable-item';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { cloneDeep } from 'lodash';
+import { pagesService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionItem: {
@@ -49,7 +51,8 @@ interface LayoutTabProps {
 
 export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 	const classes = useStyles();
-	const { page, setPage, setCurrentPageSectionId, currentPageSection } = usePageBuilderContext();
+	const handleError = useHandleError();
+	const { page, setPage, setCurrentPageSectionId, currentPageSection, setIsSaving } = usePageBuilderContext();
 
 	const handleDragEnd = async ({ source, destination }: DropResult) => {
 		if (!destination) {
@@ -64,8 +67,27 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 		const [removedSection] = pageClone.pageSections.splice(source.index, 1);
 		pageClone.pageSections.splice(destination.index, 0, removedSection);
 
-		window.alert('[TODO]: API call to reorder sections');
 		setPage(pageClone);
+		setIsSaving(true);
+
+		try {
+			if (!page) {
+				throw new Error('page is undefined.');
+			}
+
+			const { pageSections } = await pagesService
+				.reorderPageSections(page.pageId, {
+					pageSectionIds: pageClone.pageSections.map((ps) => ps.pageSectionId),
+				})
+				.fetch();
+
+			pageClone.pageSections = pageSections;
+			setPage(pageClone);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	return (

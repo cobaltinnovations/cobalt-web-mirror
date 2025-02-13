@@ -136,6 +136,15 @@ export const pagesService = {
 			url: `/pages/section/${pageSectionId}`,
 		});
 	},
+	reorderPageSections(pageId: string, data: { pageSectionIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageSections: PageSectionDetailModel[];
+		}>({
+			method: 'PUT',
+			url: `/pages/${pageId}/section`,
+			data,
+		});
+	},
 	createResourcesRow(pageSectionId: string, data: { contentIds: string[] }) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: ResourcesRowModel;
