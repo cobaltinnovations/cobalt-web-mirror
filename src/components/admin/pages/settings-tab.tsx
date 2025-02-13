@@ -79,7 +79,7 @@ export const SettingsTab = () => {
 	);
 
 	return (
-		<Form>
+		<>
 			<InputHelper
 				className="mb-4"
 				type="text"
@@ -116,6 +116,6 @@ export const SettingsTab = () => {
 					</option>
 				))}
 			</InputHelper>
-		</Form>
+		</>
 	);
 };

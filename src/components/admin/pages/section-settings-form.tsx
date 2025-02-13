@@ -159,45 +159,43 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 	return (
 		<>
 			<CollapseButton title="Basics" initialShow>
-				<Form>
-					<InputHelper
-						className="mb-4"
-						type="text"
-						label="Headline"
-						name="headline"
-						value={formValues.headline}
+				<InputHelper
+					className="mb-4"
+					type="text"
+					label="Headline"
+					name="headline"
+					value={formValues.headline}
+					onChange={handleInputChange}
+				/>
+				<InputHelper
+					className="mb-4"
+					as="textarea"
+					label="Description"
+					name="description"
+					value={formValues.description}
+					onChange={handleInputChange}
+				/>
+				<Form.Group className="mb-6">
+					<Form.Label className="mb-2">Background color</Form.Label>
+					<Form.Check
+						type="radio"
+						id="background-color--white"
+						label="White"
+						name="backgroundColor"
+						value={BACKGROUND_COLOR_ID.WHITE}
+						checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.WHITE}
 						onChange={handleInputChange}
 					/>
-					<InputHelper
-						className="mb-4"
-						as="textarea"
-						label="Description"
-						name="description"
-						value={formValues.description}
+					<Form.Check
+						type="radio"
+						id="background-color--neutral"
+						label="Neutral"
+						name="backgroundColor"
+						value={BACKGROUND_COLOR_ID.NEUTRAL}
+						checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.NEUTRAL}
 						onChange={handleInputChange}
 					/>
-					<Form.Group className="mb-6">
-						<Form.Label className="mb-2">Background color</Form.Label>
-						<Form.Check
-							type="radio"
-							id="background-color--white"
-							label="White"
-							name="backgroundColor"
-							value={BACKGROUND_COLOR_ID.WHITE}
-							checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.WHITE}
-							onChange={handleInputChange}
-						/>
-						<Form.Check
-							type="radio"
-							id="background-color--neutral"
-							label="Neutral"
-							name="backgroundColor"
-							value={BACKGROUND_COLOR_ID.NEUTRAL}
-							checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.NEUTRAL}
-							onChange={handleInputChange}
-						/>
-					</Form.Group>
-				</Form>
+				</Form.Group>
 			</CollapseButton>
 			<hr />
 			<Form.Group className="py-6 d-flex align-items-center justify-content-between">

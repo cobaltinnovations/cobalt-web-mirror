@@ -110,7 +110,7 @@ export const SectionHeroSettingsForm = () => {
 	);
 
 	return (
-		<Form>
+		<>
 			<InputHelper
 				className="mb-4"
 				type="text"
@@ -145,6 +145,6 @@ export const SectionHeroSettingsForm = () => {
 				value={formValues.imageAltText}
 				onChange={handleInputChange}
 			/>
-		</Form>
+		</>
 	);
 };
