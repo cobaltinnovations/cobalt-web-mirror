@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { ResourcesRowModel } from '@/lib/models';
@@ -7,6 +7,7 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { DraggableItem, PageSectionShelfPage, SelectResourcesModal } from '@/components/admin/pages';
+import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 
 interface RowSettingsResourcesProps {
 	onBackButtonClick(event?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -69,6 +70,25 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 		}
 	};
 
+	const handleRemoveItem = useCallback(
+		async (contentId: string) => {
+			try {
+				if (!currentPageRow) {
+					throw new Error('currentPageRow is undefined.');
+				}
+
+				const { pageRow } = await pagesService
+					.deleteResourcesRowContent(currentPageRow.pageRowId, contentId)
+					.fetch();
+
+				updatePageRow(pageRow);
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[currentPageRow, handleError, updatePageRow]
+	);
+
 	return (
 		<>
 			<SelectResourcesModal
@@ -106,6 +126,17 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 												draggableProvided={draggableProvided}
 												draggableSnapshot={draggableSnapshot}
 												title={content.title}
+												aside={
+													<Button
+														className="p-2"
+														variant="danger"
+														onClick={() => {
+															handleRemoveItem(content.contentId);
+														}}
+													>
+														<MinusIcon className="d-flex" />
+													</Button>
+												}
 											/>
 										)}
 									</Draggable>

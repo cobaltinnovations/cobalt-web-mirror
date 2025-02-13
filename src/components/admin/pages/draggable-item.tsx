@@ -48,6 +48,7 @@ interface DraggableItemProps {
 	subTitle?: string;
 	active?: boolean;
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	aside?: JSX.Element | null;
 }
 
 export const DraggableItem = ({
@@ -57,6 +58,7 @@ export const DraggableItem = ({
 	subTitle,
 	active,
 	onClick,
+	aside,
 }: DraggableItemProps) => {
 	const classes = useStyles({ clickable: !!onClick });
 
@@ -87,6 +89,7 @@ export const DraggableItem = ({
 					<span className="text-truncate">{title}</span>
 					<div className="d-flex flex-shrink-0 align-items-center">
 						<span className="text-n500">{subTitle}</span>
+						{aside}
 					</div>
 				</div>
 			)}

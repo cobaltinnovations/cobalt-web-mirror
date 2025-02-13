@@ -154,6 +154,14 @@ export const pagesService = {
 			data,
 		});
 	},
+	deleteResourcesRowContent(pageRowId: string, contentId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: ResourcesRowModel;
+		}>({
+			method: 'DELETE',
+			url: `/pages/row/${pageRowId}/content/${contentId}`,
+		});
+	},
 	createGroupSessionsRow(pageSectionId: string, data: { groupSessionIds: string[] }) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: GroupSessionsRowModel;
@@ -170,6 +178,14 @@ export const pagesService = {
 			method: 'PUT',
 			url: `/pages/row/${pageRowId}/group-session`,
 			data,
+		});
+	},
+	deleteGroupSessionsRowGroupSession(pageRowId: string, groupSessionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: GroupSessionsRowModel;
+		}>({
+			method: 'DELETE',
+			url: `/pages/row/${pageRowId}/group-session/${groupSessionId}`,
 		});
 	},
 	createTagGroupRow(pageSectionId: string, data: { tagGroupId: string }) {
