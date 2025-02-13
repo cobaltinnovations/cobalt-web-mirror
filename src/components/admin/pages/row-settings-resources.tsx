@@ -129,9 +129,10 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 												draggableProvided={draggableProvided}
 												draggableSnapshot={draggableSnapshot}
 												title={content.title}
+												subTitle={content.author}
 												aside={
 													<Button
-														className="p-2"
+														className="flex-shrink-0 ms-2 p-2"
 														variant="danger"
 														onClick={() => {
 															handleRemoveItem(content.contentId);

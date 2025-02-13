@@ -46,19 +46,21 @@ interface DraggableItemProps {
 	draggableSnapshot: DraggableStateSnapshot;
 	title: string;
 	subTitle?: string;
+	asideTitle?: string;
+	aside?: JSX.Element | null;
 	active?: boolean;
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-	aside?: JSX.Element | null;
 }
 
 export const DraggableItem = ({
 	draggableProvided,
 	draggableSnapshot,
 	title,
+	asideTitle,
 	subTitle,
+	aside,
 	active,
 	onClick,
-	aside,
 }: DraggableItemProps) => {
 	const classes = useStyles({ clickable: !!onClick });
 
@@ -78,17 +80,23 @@ export const DraggableItem = ({
 			</div>
 			{onClick ? (
 				<button type="button" className={classes.sectionButton} onClick={onClick}>
-					<span className="text-truncate">{title}</span>
+					<div className="text-truncate">
+						<span className="d-block text-truncate">{title}</span>
+						{subTitle && <span className="d-block small text-n500 text-truncate">{subTitle}</span>}
+					</div>
 					<div className="d-flex flex-shrink-0 align-items-center">
-						<span className="text-n500">{subTitle}</span>
+						<span className="text-n500">{asideTitle}</span>
 						<RightChevron className="text-n500" />
 					</div>
 				</button>
 			) : (
 				<div className={classes.sectionButton}>
-					<span className="text-truncate">{title}</span>
+					<div className="text-truncate">
+						<span className="d-block text-truncate">{title}</span>
+						{subTitle && <span className="d-block small text-n500 text-truncate">{subTitle}</span>}
+					</div>
 					<div className="d-flex flex-shrink-0 align-items-center">
-						<span className="text-n500">{subTitle}</span>
+						<span className="text-n500">{asideTitle}</span>
 						{aside}
 					</div>
 				</div>

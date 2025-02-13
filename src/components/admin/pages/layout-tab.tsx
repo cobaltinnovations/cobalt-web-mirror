@@ -105,7 +105,7 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 											active={currentPageSection?.pageSectionId === section.pageSectionId}
 											onClick={() => setCurrentPageSectionId(section.pageSectionId)}
 											title={section.name}
-											subTitle={`${section.pageRows.length} rows`}
+											asideTitle={`${section.pageRows.length} rows`}
 										/>
 									)}
 								</Draggable>

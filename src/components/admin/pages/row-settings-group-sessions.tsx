@@ -132,9 +132,10 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClic
 												draggableProvided={draggableProvided}
 												draggableSnapshot={draggableSnapshot}
 												title={groupSession.title}
+												subTitle={`${groupSession.facilitatorName} • ${groupSession.startDateTimeDescription}`}
 												aside={
 													<Button
-														className="p-2"
+														className="flex-shrink-0 ms-2 p-2"
 														variant="danger"
 														onClick={() => {
 															handleRemoveItem(groupSession.groupSessionId);
