@@ -55,13 +55,6 @@ export interface PageSectionModel {
 	displayOrder: number;
 }
 
-export interface PageRowModel {
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
-}
-
 export interface PageFriendlyUrlValidationResult {
 	available: boolean;
 	recommendation: string;

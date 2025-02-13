@@ -13,7 +13,6 @@ import {
 	isTagGroupRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
-	PageRowModel,
 	PageRowUnionModel,
 	ResourcesRowModel,
 	TagGroupRowModel,
@@ -27,7 +26,7 @@ import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
 interface SectionSettingsFormProps {
 	onAddRowButtonClick(): void;
-	onRowButtonClick(pageRow: PageRowModel): void;
+	onRowButtonClick(pageRow: PageRowUnionModel): void;
 }
 
 export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: SectionSettingsFormProps) => {
