@@ -73,10 +73,15 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 
 	const getSubTitleForPageRow = (pageRow: PageRowUnionModel) => {
 		const rowTypeMap = [
-			{ check: isResourcesRow, getSubtitle: (row: ResourcesRowModel) => `${row.contents.length} Resources` },
+			{
+				check: isResourcesRow,
+				getSubtitle: (row: ResourcesRowModel) =>
+					`${row.contents.length} Resource${row.contents.length === 1 ? '' : 's'}`,
+			},
 			{
 				check: isGroupSessionsRow,
-				getSubtitle: (row: GroupSessionsRowModel) => `${row.groupSessions.length} Sessions`,
+				getSubtitle: (row: GroupSessionsRowModel) =>
+					`${row.groupSessions.length} Session${row.groupSessions.length === 1 ? '' : 's'}`,
 			},
 			{ check: isTagGroupRow, getSubtitle: (row: TagGroupRowModel) => row.tagGroup.name },
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
