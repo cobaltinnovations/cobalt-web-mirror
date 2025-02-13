@@ -28,12 +28,16 @@ export const SettingsTab = () => {
 	});
 
 	useEffect(() => {
+		if (!page) {
+			return;
+		}
+
 		setFormValues({
-			pageName: page?.name ?? '',
-			friendlyUrl: page?.urlName ?? '',
-			pageTypeId: page?.pageTypeId ?? PAGE_TYPE_ID.TOPIC_CENTER,
+			pageName: page.name,
+			friendlyUrl: page.urlName,
+			pageTypeId: page.pageTypeId,
 		});
-	}, [page?.name, page?.pageTypeId, page?.urlName]);
+	}, [page]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
 		setIsSaving(true);

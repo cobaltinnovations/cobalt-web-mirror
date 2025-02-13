@@ -40,12 +40,16 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 	});
 
 	useEffect(() => {
+		if (!currentPageSection) {
+			return;
+		}
+
 		setFormValues({
-			headline: currentPageSection?.headline ?? '',
-			description: currentPageSection?.description ?? '',
-			backgroundColor: currentPageSection?.backgroundColorId ?? BACKGROUND_COLOR_ID.WHITE,
+			headline: currentPageSection.headline,
+			description: currentPageSection.description,
+			backgroundColor: currentPageSection.backgroundColorId,
 		});
-	}, [currentPageSection?.backgroundColorId, currentPageSection?.description, currentPageSection?.headline]);
+	}, [currentPageSection]);
 
 	const getTitleForPageRow = (pageRow: PageRowUnionModel) => {
 		const rowTypeMap = [

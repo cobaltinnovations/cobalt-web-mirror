@@ -22,14 +22,18 @@ export const SectionHeroSettingsForm = () => {
 	});
 
 	useEffect(() => {
+		if (!page) {
+			return;
+		}
+
 		setFormValues({
-			headline: page?.headline ?? '',
-			description: page?.description ?? '',
-			imageFileUploadId: page?.imageFileUploadId ?? '',
-			imageUrl: page?.imageUrl ?? '',
-			imageAltText: page?.imageAltText ?? '',
+			headline: page.headline,
+			description: page.description,
+			imageFileUploadId: page.imageFileUploadId,
+			imageUrl: page.imageUrl,
+			imageAltText: page.imageAltText,
 		});
-	}, [page?.description, page?.headline, page?.imageAltText, page?.imageFileUploadId, page?.imageUrl]);
+	}, [page]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
 		setIsSaving(true);
