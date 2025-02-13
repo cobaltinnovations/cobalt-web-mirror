@@ -19,6 +19,7 @@ import AsyncWrapper from '@/components/async-page';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { PageBuilderProvider } from '@/contexts/page-builder-context';
 import classNames from 'classnames';
+import useHandleError from '@/hooks/use-handle-error';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -112,8 +113,10 @@ const PageBuilder = () => {
 	const { pageId } = useParams<{ pageId: string }>();
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const handleError = useHandleError();
 
-	const { page, setPage, setCurrentPageSectionId, currentPageSection, isSaving } = usePageBuilderContext();
+	const { page, setPage, setCurrentPageSectionId, currentPageSection, deletePageSection, isSaving } =
+		usePageBuilderContext();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
@@ -127,9 +130,21 @@ const PageBuilder = () => {
 		setPage(response.page);
 	}, [pageId, setPage]);
 
-	const deleteCurrentSection = () => {
-		window.alert('[TODO]: Delete Section');
-	};
+	const deleteCurrentSection = useCallback(async () => {
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			await pagesService.deletePageSection(currentPageSection.pageSectionId).fetch();
+
+			deletePageSection(currentPageSection.pageSectionId);
+			setCurrentPageSectionId('');
+			setShowDeleteSectionModal(false);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [currentPageSection, deletePageSection, handleError, setCurrentPageSectionId]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -151,10 +166,7 @@ const PageBuilder = () => {
 				onHide={() => {
 					setShowDeleteSectionModal(false);
 				}}
-				onConfirm={() => {
-					deleteCurrentSection();
-					setShowDeleteSectionModal(false);
-				}}
+				onConfirm={deleteCurrentSection}
 			/>
 
 			<div className={classes.wrapper}>

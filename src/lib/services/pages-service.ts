@@ -54,6 +54,12 @@ export const pagesService = {
 			url: `/pages/${pageId}`,
 		});
 	},
+	deletePage(pageId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'DELETE',
+			url: `/pages/${pageId}`,
+		});
+	},
 	updatePageSettings(
 		pageId: string,
 		data: {
@@ -122,6 +128,12 @@ export const pagesService = {
 			method: 'PUT',
 			url: `/pages/section/${pageSectionId}`,
 			data,
+		});
+	},
+	deletePageSection(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'DELETE',
+			url: `/pages/section/${pageSectionId}`,
 		});
 	},
 	createResourcesRow(pageSectionId: string, data: { contentIds: string[] }) {

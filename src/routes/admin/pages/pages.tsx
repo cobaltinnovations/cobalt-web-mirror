@@ -1,72 +1,47 @@
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-	Await,
-	defer,
-	Link,
-	LoaderFunctionArgs,
-	useNavigate,
-	useRouteLoaderData,
-	useSearchParams,
-} from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
-import { GetPagesResponse, pagesService } from '@/lib/services';
+import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { AddPageModal, PageActionsDropdown } from '@/components/admin/pages';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 
-interface AdminPagesLoaderData {
-	pagesPromise: Promise<GetPagesResponse>;
-}
-
-export function useAdminGroupSessionsLoaderData() {
-	return useRouteLoaderData('admin-pages') as AdminPagesLoaderData;
-}
-
-export async function loader({ request }: LoaderFunctionArgs) {
-	const url = new URL(request.url);
-	const pageNumber = url.searchParams.get('pageNumber');
-	const pageSize = url.searchParams.get('pageSize');
-	const orderBy = url.searchParams.get('orderBy');
-
-	const pagesPromise = pagesService
-		.getPages({
-			...(pageNumber && { pageNumber }),
-			...(pageSize && { pageSize }),
-			...(orderBy && { orderBy }),
-		})
-		.fetch();
-
-	return defer({ pagesPromise });
+export async function loader() {
+	return null;
 }
 
 export const Component = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
+	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '', [searchParams]);
+	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '', [searchParams]);
+	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
 
-	const { pagesPromise } = useAdminGroupSessionsLoaderData();
 	const [isLoading, setIsLoading] = useState(false);
 	const [pages, setPages] = useState<PageModel[]>([]);
 	const [pagesTotalCount, setPagesTotalCount] = useState(0);
 	const [pagesTotalCountDescription, setPagesTotalCountDescription] = useState('0');
 
+	const [selectedPage, setSelectedPage] = useState<PageModel>();
 	const [showAddPageModal, setShowAddPageModal] = useState(false);
 	const [showDeletePageModal, setShowDeletePageModal] = useState(false);
 	const [showUnpublishPageModal, setShowUnpublishPageModal] = useState(false);
 
 	const fetchPages = useCallback(async () => {
-		if (!pagesPromise) {
-			return;
-		}
-
 		setIsLoading(true);
 
 		try {
-			const { pages, totalCount, totalCountDescription } = await pagesPromise;
+			const { pages, totalCount, totalCountDescription } = await pagesService
+				.getPages({
+					...(pageNumber && { pageNumber }),
+					...(pageSize && { pageSize }),
+					...(orderBy && { orderBy }),
+				})
+				.fetch();
 
 			setPages(pages);
 			setPagesTotalCount(totalCount);
@@ -76,11 +51,31 @@ export const Component = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, pagesPromise]);
+	}, [handleError, orderBy, pageNumber, pageSize]);
 
 	useEffect(() => {
 		fetchPages();
 	}, [fetchPages]);
+
+	const handleDeletePage = useCallback(async () => {
+		setIsLoading(true);
+
+		try {
+			if (!selectedPage) {
+				throw new Error('selectedPage is undefined.');
+			}
+
+			await pagesService.deletePage(selectedPage.pageId).fetch();
+
+			setSelectedPage(undefined);
+			setShowDeletePageModal(false);
+			fetchPages();
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [fetchPages, handleError, selectedPage]);
 
 	const handlePaginationClick = (pageIndex: number) => {
 		searchParams.set('pageNumber', String(pageIndex));
@@ -111,9 +106,7 @@ export const Component = () => {
 				onHide={() => {
 					setShowDeletePageModal(false);
 				}}
-				onConfirm={() => {
-					setShowDeletePageModal(false);
-				}}
+				onConfirm={handleDeletePage}
 			/>
 
 			<ConfirmDialog
@@ -149,110 +142,101 @@ export const Component = () => {
 						<hr />
 					</Col>
 				</Row>
-				<Suspense>
-					<Await resolve={pagesPromise}>
-						<Row className="mb-8">
-							<Col>
-								<Table isLoading={isLoading}>
-									<TableHead>
-										<TableRow>
-											<TableCell header width="48%">
-												Name
+
+				<Row className="mb-8">
+					<Col>
+						<Table isLoading={isLoading}>
+							<TableHead>
+								<TableRow>
+									<TableCell header width="48%">
+										Name
+									</TableCell>
+									<TableCell header>Status</TableCell>
+									<TableCell header>Created</TableCell>
+									<TableCell header>Modified</TableCell>
+									<TableCell header>Published</TableCell>
+									<TableCell header />
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{pages.length <= 0 && (
+									<TableRow>
+										<TableCell colSpan={6}>
+											<NoData title="No pages" actions={[]} />
+										</TableCell>
+									</TableRow>
+								)}
+								{pages.map((page) => {
+									return (
+										<TableRow key={page.pageId}>
+											<TableCell className="text-nowrap" width="48%">
+												<Link
+													className="text-decoration-none"
+													to={`/admin/pages/${page.pageId}`}
+												>
+													{page.name}
+												</Link>
 											</TableCell>
-											<TableCell header>Status</TableCell>
-											<TableCell header>Created</TableCell>
-											<TableCell header>Modified</TableCell>
-											<TableCell header>Published</TableCell>
-											<TableCell header />
+											<TableCell>
+												<div>
+													{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
+														<Badge pill bg="outline-dark" className="text-nowrap">
+															Draft
+														</Badge>
+													)}
+													{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
+														<Badge pill bg="outline-success" className="text-nowrap">
+															Live
+														</Badge>
+													)}
+												</div>
+											</TableCell>
+											<TableCell className="text-nowrap">{page.createdDescription}</TableCell>
+											<TableCell className="text-nowrap">{page.lastUpdatedDescription}</TableCell>
+											<TableCell className="text-nowrap">
+												{page.publishedDateDescription}
+											</TableCell>
+											<TableCell className="text-right">
+												<PageActionsDropdown
+													page={page}
+													onDelete={() => {
+														setSelectedPage(page);
+														setShowDeletePageModal(true);
+													}}
+													onUnpublish={() => {
+														setSelectedPage(page);
+														setShowUnpublishPageModal(true);
+													}}
+												/>
+											</TableCell>
 										</TableRow>
-									</TableHead>
-									<TableBody>
-										{pages.length <= 0 && (
-											<TableRow>
-												<TableCell colSpan={6}>
-													<NoData title="No pages" actions={[]} />
-												</TableCell>
-											</TableRow>
-										)}
-										{pages.map((page) => {
-											return (
-												<TableRow key={page.pageId}>
-													<TableCell className="text-nowrap" width="48%">
-														<Link
-															className="text-decoration-none"
-															to={`/admin/pages/${page.pageId}`}
-														>
-															{page.name}
-														</Link>
-													</TableCell>
-													<TableCell>
-														<div>
-															{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
-																<Badge pill bg="outline-dark" className="text-nowrap">
-																	Draft
-																</Badge>
-															)}
-															{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
-																<Badge
-																	pill
-																	bg="outline-success"
-																	className="text-nowrap"
-																>
-																	Live
-																</Badge>
-															)}
-														</div>
-													</TableCell>
-													<TableCell className="text-nowrap">
-														{page.createdDescription}
-													</TableCell>
-													<TableCell className="text-nowrap">
-														{page.lastUpdatedDescription}
-													</TableCell>
-													<TableCell className="text-nowrap">
-														{page.publishedDateDescription}
-													</TableCell>
-													<TableCell className="text-right">
-														<PageActionsDropdown
-															page={page}
-															onDelete={() => {
-																setShowDeletePageModal(true);
-															}}
-															onUnpublish={() => {
-																setShowUnpublishPageModal(true);
-															}}
-														/>
-													</TableCell>
-												</TableRow>
-											);
-										})}
-									</TableBody>
-								</Table>
-							</Col>
-						</Row>
-						<Row>
-							<Col xs={{ span: 4, offset: 4 }}>
-								<div className="d-flex justify-content-center align-items-center">
-									<TablePagination
-										total={pagesTotalCount}
-										page={parseInt(pageNumber, 10)}
-										size={15}
-										onClick={handlePaginationClick}
-										disabled={isLoading}
-									/>
-								</div>
-							</Col>
-							<Col xs={4}>
-								<div className="d-flex justify-content-end align-items-center">
-									<p className="mb-0 fw-semibold text-gray">
-										<span className="text-dark">{pages.length}</span> of{' '}
-										<span className="text-dark">{pagesTotalCountDescription}</span> Pages
-									</p>
-								</div>
-							</Col>
-						</Row>
-					</Await>
-				</Suspense>
+									);
+								})}
+							</TableBody>
+						</Table>
+					</Col>
+				</Row>
+				<Row>
+					<Col xs={{ span: 4, offset: 4 }}>
+						<div className="d-flex justify-content-center align-items-center">
+							<TablePagination
+								total={pagesTotalCount}
+								page={parseInt(pageNumber, 10)}
+								size={15}
+								onClick={handlePaginationClick}
+								disabled={isLoading}
+							/>
+						</div>
+					</Col>
+					<Col xs={4}>
+						<div className="d-flex justify-content-end align-items-center">
+							<p className="mb-0 fw-semibold text-gray">
+								<span className="text-dark">{pages.length}</span> of{' '}
+								<span className="text-dark">{pagesTotalCountDescription}</span> Pages
+							</p>
+						</div>
+					</Col>
+				</Row>
 			</Container>
 		</>
 	);

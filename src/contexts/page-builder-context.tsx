@@ -10,6 +10,7 @@ type PageBuilderContextConfig = {
 	currentPageSection?: PageSectionDetailModel;
 	addPageSection(pageSection: PageSectionDetailModel): void;
 	updatePageSection(pageSection: PageSectionDetailModel): void;
+	deletePageSection(pageSectionId: string): void;
 	addPageRowToCurrentPageSection(pageRow: PageRowUnionModel): void;
 	setCurrentPageRowId: React.Dispatch<React.SetStateAction<string>>;
 	currentPageRow?: PageRowUnionModel;
@@ -72,6 +73,19 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 				pageSections: previousValue.pageSections.map((ps) =>
 					ps.pageSectionId === pageSection.pageSectionId ? pageSection : ps
 				),
+			};
+		});
+	};
+
+	const deletePageSection = (pageSectionId: string) => {
+		setPage((previousValue) => {
+			if (!previousValue) {
+				return undefined;
+			}
+
+			return {
+				...previousValue,
+				pageSections: previousValue.pageSections.filter((ps) => ps.pageSectionId !== pageSectionId),
 			};
 		});
 	};
@@ -143,6 +157,7 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		currentPageSection,
 		addPageSection,
 		updatePageSection,
+		deletePageSection,
 		addPageRowToCurrentPageSection,
 		setCurrentPageRowId,
 		currentPageRow,
