@@ -74,6 +74,8 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClic
 
 	const handleRemoveItem = useCallback(
 		async (groupSessionId: string) => {
+			setIsSaving(true);
+
 			try {
 				if (!currentPageRow) {
 					throw new Error('currentPageRow is undefined.');
@@ -86,9 +88,11 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClic
 				updatePageRow(pageRow);
 			} catch (error) {
 				handleError(error);
+			} finally {
+				setIsSaving(false);
 			}
 		},
-		[currentPageRow, handleError, updatePageRow]
+		[currentPageRow, handleError, setIsSaving, updatePageRow]
 	);
 
 	return (

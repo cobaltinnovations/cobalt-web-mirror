@@ -72,6 +72,8 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 
 	const handleRemoveItem = useCallback(
 		async (contentId: string) => {
+			setIsSaving(true);
+
 			try {
 				if (!currentPageRow) {
 					throw new Error('currentPageRow is undefined.');
@@ -84,9 +86,10 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 				updatePageRow(pageRow);
 			} catch (error) {
 				handleError(error);
+				setIsSaving(false);
 			}
 		},
-		[currentPageRow, handleError, updatePageRow]
+		[currentPageRow, handleError, setIsSaving, updatePageRow]
 	);
 
 	return (
