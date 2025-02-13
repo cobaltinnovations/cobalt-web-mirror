@@ -12,6 +12,7 @@ export * from './faqs-service';
 export * from './feedback-service';
 export * from './group-sessions-service';
 export * from './image-upload-service';
+export * from './institution-referrers-service';
 export * from './institution-service';
 export * from './integrated-care-service';
 export * from './interaction-service';

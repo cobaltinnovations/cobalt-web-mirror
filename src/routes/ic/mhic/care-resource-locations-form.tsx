@@ -18,6 +18,7 @@ import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import ToggledInput from '@/components/toggled-input';
+import { CobaltError } from '@/lib/http-client';
 
 interface FormValues {
 	careResourceId: string;
@@ -163,7 +164,7 @@ export const Component = () => {
 					? CARE_RESOURCE_LOCATION_STATUS.AVAILABLE
 					: CARE_RESOURCE_LOCATION_STATUS.UNAVAILABLE
 				: CARE_RESOURCE_LOCATION_STATUS.AVAILABLE,
-		phoneNumber: careResourceLocation?.phoneNumber ?? '',
+		phoneNumber: careResourceLocation?.formattedPhoneNumber ?? '',
 		emailAddress: careResourceLocation?.emailAddress ?? '',
 		website: careResourceLocation?.websiteUrl ?? '',
 		appointmentTypeInPerson: careResourceLocation?.appointmentTypeInPerson ?? false,
@@ -220,13 +221,13 @@ export const Component = () => {
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
-			if (!formValues.address) {
-				throw new Error('address is undefined.');
+			if (formValues.appointmentTypeInPerson && !formValues.address) {
+				throw CobaltError.fromValidationFailed('Address is required for in person appointments.');
 			}
 
 			const requestBody = {
 				careResourceId: formValues.careResourceId,
-				googlePlaceId: formValues.address.placeId,
+				...(formValues.address?.placeId && { googlePlaceId: formValues.address.placeId }),
 				name: formValues.locationName,
 				notes: formValues.notes,
 				emailAddress: formValues.emailAddress,
@@ -459,6 +460,12 @@ export const Component = () => {
 									}
 									onFetchResolve={({ places }) => setPlacesOptions(places)}
 									options={placesOptions}
+									filterBy={(option, props) => {
+										const str = (option as PlaceModel).text.toLowerCase();
+										const search = props.text.toLowerCase().trim();
+
+										return str.indexOf(search) > -1;
+									}}
 									selected={formValues.address ? [formValues.address] : []}
 									onChange={([selected]) => {
 										setFormValues((previousValues) => ({
@@ -506,7 +513,7 @@ export const Component = () => {
 									onChange={(selected) => {
 										setFormValues((previousValues) => ({
 											...previousValues,
-											facilityType: selected as CareResourceTag[],
+											facilityTypes: selected as CareResourceTag[],
 										}));
 									}}
 								/>

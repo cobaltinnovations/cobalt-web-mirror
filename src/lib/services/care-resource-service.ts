@@ -29,7 +29,7 @@ type CareResourceLocationRequestBody = {
 	ethnicityIds: string[];
 	facilityTypes: string[];
 	genderIds: string[];
-	googlePlaceId: string;
+	googlePlaceId?: string;
 	insuranceNotes: string;
 	languageIds: string[];
 	name: string;

@@ -11,6 +11,7 @@ import {
 	PatientOrderIntakeLocationStatusId,
 	PatientOrderIntakeWantsServicesStatusId,
 	PatientOrderModel,
+	PatientOrderReferralSourceId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderTriageStatusId,
 } from '@/lib/models';
@@ -132,24 +133,49 @@ export const PatientAssessmentResults = () => {
 
 							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 								<>
-									<p className="mb-6 fs-large">
-										Based on the symptoms reported and your provider's request, we recommend that
-										you meet with a <strong>Mental Health Provider</strong> in your primary care
-										practice.
-									</p>
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.PROVIDER && (
+										<p className="mb-6 fs-large">
+											Based on the symptoms reported and your provider's request, we recommend
+											that you meet with a <strong>Mental Health Provider</strong> in your primary
+											care practice.
+										</p>
+									)}
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.SELF && (
+										<p className="mb-6 fs-large">
+											Based on the symptoms reported, we recommend that you meet with a{' '}
+											<strong>Mental Health Provider</strong>.
+										</p>
+									)}
 									<p className="mb-6 fs-large">
 										The Mental Health Provider will discuss treatment options that will work in
 										collaboration with your primary care provider.
 									</p>
-									<p className="mb-6 fs-large">
-										You can <strong>schedule a telehealth appointment</strong> with a Mental Health
-										Provider by browsing the list of providers and choosing an available appointment
-										time. If you need an in-person appointment, please call us at{' '}
-										<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
-											{institution?.integratedCarePhoneNumberDescription}
-										</a>{' '}
-										{institution.integratedCareAvailabilityDescription}.
-									</p>
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.PROVIDER && (
+										<p className="mb-6 fs-large">
+											You can <strong>schedule a telehealth appointment</strong> with a Mental
+											Health Provider by browsing the list of providers and choosing an available
+											appointment time. If you need an in-person appointment, please call us at{' '}
+											<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+												{institution?.integratedCarePhoneNumberDescription}
+											</a>{' '}
+											{institution.integratedCareAvailabilityDescription}.
+										</p>
+									)}
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.SELF && (
+										<p className="mb-6 fs-large">
+											You can <strong>schedule an initial in-person appointment</strong> with a
+											Mental Health Provider by browsing the list of providers and choosing an
+											available appointment time. If you have any questions, please call us at{' '}
+											<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+												{institution?.integratedCarePhoneNumberDescription}
+											</a>{' '}
+											{institution.integratedCareAvailabilityDescription}.
+										</p>
+									)}
 									<div className="mb-4 text-center">
 										<Button
 											size="lg"

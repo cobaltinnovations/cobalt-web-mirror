@@ -445,6 +445,10 @@ export const routes: RouteObject[] = [
 						],
 					},
 					{
+						path: 'referrals/:urlName',
+						lazy: () => import('@/routes/institution-referrer'),
+					},
+					{
 						path: 'confirm-appointment',
 						element: <ConfirmAppointment />,
 					},

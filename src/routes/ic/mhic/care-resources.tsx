@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Form, Link, useSearchParams } from 'react-router-dom';
+import { Form, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
@@ -21,6 +21,7 @@ export const loader = async () => {
 };
 
 export const Component = () => {
+	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
@@ -138,9 +139,8 @@ export const Component = () => {
 				onHide={() => {
 					setShowFormModal(false);
 				}}
-				onSave={() => {
-					setShowFormModal(false);
-					fetchData();
+				onSave={(cr) => {
+					navigate(`./${cr.careResourceId}`);
 				}}
 			/>
 

@@ -528,9 +528,14 @@ export const MhicPatientOrderTable = ({
 
 											{columnConfig.practice && (
 												<TableCell width={240}>
-													<span className="text-nowrap text-truncate">
-														{po.referringPracticeName} ({po.referringPracticeId})
-													</span>
+													{po.referringPracticeName && po.referringPracticeId && (
+														<span className="text-nowrap text-truncate">
+															{po.referringPracticeName} ({po.referringPracticeId})
+														</span>
+													)}
+													{!po.referringPracticeName && !po.referringPracticeId && (
+														<span>N/A</span>
+													)}
 												</TableCell>
 											)}
 											{columnConfig.referralReason && (

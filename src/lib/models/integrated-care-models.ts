@@ -259,6 +259,8 @@ export interface PatientOrderModel {
 	// New for care resource packets
 	// Only exists if patient order requires resources
 	resourcePacket?: ResourcePacketModel;
+
+	patientOrderReferralSourceId: PatientOrderReferralSourceId;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {
@@ -472,6 +474,11 @@ export enum MessageStatusId {
 export enum MessageTypeId {
 	EMAIL = 'EMAIL',
 	SMS = 'SMS',
+}
+
+export enum PatientOrderReferralSourceId {
+	PROVIDER = 'PROVIDER',
+	SELF = 'SELF',
 }
 
 export interface PatientAddressModel {
