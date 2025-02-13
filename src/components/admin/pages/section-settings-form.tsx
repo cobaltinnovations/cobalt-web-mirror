@@ -44,9 +44,9 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		}
 
 		setFormValues({
-			headline: currentPageSection.headline,
-			description: currentPageSection.description,
-			backgroundColor: currentPageSection.backgroundColorId,
+			headline: currentPageSection.headline ?? '',
+			description: currentPageSection.description ?? '',
+			backgroundColor: currentPageSection.backgroundColorId ?? '',
 		});
 	}, [currentPageSection]);
 

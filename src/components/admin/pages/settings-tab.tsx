@@ -33,9 +33,9 @@ export const SettingsTab = () => {
 		}
 
 		setFormValues({
-			pageName: page.name,
-			friendlyUrl: page.urlName,
-			pageTypeId: page.pageTypeId,
+			pageName: page.name ?? '',
+			friendlyUrl: page.urlName ?? '',
+			pageTypeId: page.pageTypeId ?? '',
 		});
 	}, [page]);
 

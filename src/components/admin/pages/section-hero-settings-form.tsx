@@ -27,11 +27,11 @@ export const SectionHeroSettingsForm = () => {
 		}
 
 		setFormValues({
-			headline: page.headline,
-			description: page.description,
-			imageFileUploadId: page.imageFileUploadId,
-			imageUrl: page.imageUrl,
-			imageAltText: page.imageAltText,
+			headline: page.headline ?? '',
+			description: page.description ?? '',
+			imageFileUploadId: page.imageFileUploadId ?? '',
+			imageUrl: page.imageUrl ?? '',
+			imageAltText: page.imageAltText ?? '',
 		});
 	}, [page]);
 

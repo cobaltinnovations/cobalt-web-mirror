@@ -26,11 +26,11 @@ export const RowSettingsOneColumn = () => {
 
 		setFormValues({
 			columnOne: {
-				headline: oneColumnImageRow.columnOne.headline,
-				description: oneColumnImageRow.columnOne.description,
-				imageFileUploadId: oneColumnImageRow.columnOne.imageFileUploadId,
-				imageUrl: oneColumnImageRow.columnOne.imageUrl,
-				imageAltText: oneColumnImageRow.columnOne.imageAltText,
+				headline: oneColumnImageRow.columnOne.headline ?? '',
+				description: oneColumnImageRow.columnOne.description ?? '',
+				imageFileUploadId: oneColumnImageRow.columnOne.imageFileUploadId ?? '',
+				imageUrl: oneColumnImageRow.columnOne.imageUrl ?? '',
+				imageAltText: oneColumnImageRow.columnOne.imageAltText ?? '',
 			},
 		});
 	}, [oneColumnImageRow]);

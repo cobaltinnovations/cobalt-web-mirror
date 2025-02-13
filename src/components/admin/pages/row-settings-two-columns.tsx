@@ -27,18 +27,18 @@ export const RowSettingsTwoColumns = () => {
 
 		setFormValues({
 			columnOne: {
-				headline: twoColumnImageRow.columnOne.headline,
-				description: twoColumnImageRow.columnOne.description,
-				imageFileUploadId: twoColumnImageRow.columnOne.imageFileUploadId,
-				imageUrl: twoColumnImageRow.columnOne.imageUrl,
-				imageAltText: twoColumnImageRow.columnOne.imageAltText,
+				headline: twoColumnImageRow.columnOne.headline ?? '',
+				description: twoColumnImageRow.columnOne.description ?? '',
+				imageFileUploadId: twoColumnImageRow.columnOne.imageFileUploadId ?? '',
+				imageUrl: twoColumnImageRow.columnOne.imageUrl ?? '',
+				imageAltText: twoColumnImageRow.columnOne.imageAltText ?? '',
 			},
 			columnTwo: {
-				headline: twoColumnImageRow.columnTwo.headline,
-				description: twoColumnImageRow.columnTwo.description,
-				imageFileUploadId: twoColumnImageRow.columnTwo.imageFileUploadId,
-				imageUrl: twoColumnImageRow.columnTwo.imageUrl,
-				imageAltText: twoColumnImageRow.columnTwo.imageAltText,
+				headline: twoColumnImageRow.columnTwo.headline ?? '',
+				description: twoColumnImageRow.columnTwo.description ?? '',
+				imageFileUploadId: twoColumnImageRow.columnTwo.imageFileUploadId ?? '',
+				imageUrl: twoColumnImageRow.columnTwo.imageUrl ?? '',
+				imageAltText: twoColumnImageRow.columnTwo.imageAltText ?? '',
 			},
 		});
 	}, [twoColumnImageRow]);
