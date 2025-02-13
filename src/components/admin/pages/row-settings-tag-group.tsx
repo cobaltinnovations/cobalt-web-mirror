@@ -9,9 +9,10 @@ import InputHelper from '@/components/input-helper';
 
 interface RowSettingsTagGroupProps {
 	onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onDeleteButtonClick(): void;
 }
 
-export const RowSettingsTagGroup = ({ onBackButtonClick }: RowSettingsTagGroupProps) => {
+export const RowSettingsTagGroup = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsTagGroupProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as TagGroupRowModel | undefined, [currentPageRow]);
@@ -55,9 +56,7 @@ export const RowSettingsTagGroup = ({ onBackButtonClick }: RowSettingsTagGroupPr
 			showBackButton
 			onBackButtonClick={onBackButtonClick}
 			showDeleteButton
-			onDeleteButtonClick={() => {
-				window.alert('[TODO]: Delete tag group row');
-			}}
+			onDeleteButtonClick={onDeleteButtonClick}
 			title="Tag Group"
 		>
 			<AsyncWrapper fetchData={fetchData}>

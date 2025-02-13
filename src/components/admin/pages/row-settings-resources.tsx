@@ -9,10 +9,11 @@ import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { DraggableItem, PageSectionShelfPage, SelectResourcesModal } from '@/components/admin/pages';
 
 interface RowSettingsResourcesProps {
-	onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onBackButtonClick(event?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onDeleteButtonClick(): void;
 }
 
-export const RowSettingsResources = ({ onBackButtonClick }: RowSettingsResourcesProps) => {
+export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsResourcesProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as ResourcesRowModel | undefined, [currentPageRow]);
@@ -81,9 +82,7 @@ export const RowSettingsResources = ({ onBackButtonClick }: RowSettingsResources
 				showBackButton
 				onBackButtonClick={onBackButtonClick}
 				showDeleteButton
-				onDeleteButtonClick={() => {
-					window.alert('[TODO]: Delete resource row');
-				}}
+				onDeleteButtonClick={onDeleteButtonClick}
 				title={`Resources (${(resourcesRow?.contents ?? []).length})`}
 				customHeaderElements={
 					<Button className="me-2" size="sm" onClick={() => setShowSelectResourcesModal(true)}>

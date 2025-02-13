@@ -292,6 +292,12 @@ export const pagesService = {
 			data,
 		});
 	},
+	deletePageRow(pageRowId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'DELETE',
+			url: `/pages/row/${pageRowId}`,
+		});
+	},
 	createPresignedFileUpload(data: { contentType: string; filename: string }) {
 		return httpSingleton.orchestrateRequest<PresignedUploadResponse>({
 			method: 'POST',

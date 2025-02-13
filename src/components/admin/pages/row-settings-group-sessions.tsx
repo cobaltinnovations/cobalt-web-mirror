@@ -10,9 +10,10 @@ import { DraggableItem, PageSectionShelfPage, SelectGroupSessionsModal } from '@
 
 interface RowSettingsGroupSessionsProps {
 	onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
+	onDeleteButtonClick(): void;
 }
 
-export const RowSettingsGroupSessions = ({ onBackButtonClick }: RowSettingsGroupSessionsProps) => {
+export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsGroupSessionsProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const groupSessionsRow = useMemo(() => currentPageRow as GroupSessionsRowModel | undefined, [currentPageRow]);
@@ -83,9 +84,7 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick }: RowSettingsGroup
 				showBackButton
 				onBackButtonClick={onBackButtonClick}
 				showDeleteButton
-				onDeleteButtonClick={() => {
-					window.alert('[TODO]: Delete group sessions row');
-				}}
+				onDeleteButtonClick={onDeleteButtonClick}
 				title={`Group Sessions (${(groupSessionsRow?.groupSessions ?? []).length})`}
 				customHeaderElements={
 					<Button className="me-2" size="sm" onClick={() => setShowSelectGroupSessionsModal(true)}>
