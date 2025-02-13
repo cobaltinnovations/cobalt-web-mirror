@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';

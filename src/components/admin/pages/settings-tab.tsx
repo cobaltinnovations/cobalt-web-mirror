@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
 import { PAGE_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
