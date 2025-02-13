@@ -1,7 +1,8 @@
-import React, { FC, createContext, useState, PropsWithChildren, useMemo } from 'react';
+import React, { FC, createContext, useState, PropsWithChildren, useMemo, useEffect } from 'react';
 import { BACKGROUND_COLOR_ID, PageDetailModel, PageRowUnionModel, PageSectionDetailModel } from '@/lib/models';
 import { HERO_SECTION_ID } from '@/components/admin/pages';
 import { cloneDeep } from 'lodash';
+import moment from 'moment';
 
 type PageBuilderContextConfig = {
 	page?: PageDetailModel;
@@ -18,6 +19,7 @@ type PageBuilderContextConfig = {
 	deletePageRow(pageRowId: string): void;
 	isSaving: boolean;
 	setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
+	lastSaved: string;
 };
 
 const PageBuilderContext = createContext({} as PageBuilderContextConfig);
@@ -27,6 +29,7 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [currentPageSectionId, setCurrentPageSectionId] = useState('');
 	const [currentPageRowId, setCurrentPageRowId] = useState('');
 	const [isSaving, setIsSaving] = useState(false);
+	const [lastSaved, setLastSaved] = useState(page?.lastUpdatedDescription ?? '');
 
 	const currentPageSection = useMemo(() => {
 		if (!page) {
@@ -179,6 +182,13 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		});
 	};
 
+	useEffect(() => {
+		if (!isSaving) {
+			const momentDate = moment(new Date());
+			setLastSaved(momentDate.format('MMM DD, yyyy @ h:mm:ss a'));
+		}
+	}, [isSaving]);
+
 	const value = {
 		page,
 		setPage,
@@ -194,6 +204,7 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 		deletePageRow,
 		isSaving,
 		setIsSaving,
+		lastSaved,
 	};
 
 	return <PageBuilderContext.Provider value={value}>{children}</PageBuilderContext.Provider>;

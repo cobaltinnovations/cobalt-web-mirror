@@ -115,7 +115,7 @@ const PageBuilder = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 
-	const { page, setPage, setCurrentPageSectionId, currentPageSection, deletePageSection, isSaving } =
+	const { page, setPage, setCurrentPageSectionId, currentPageSection, deletePageSection, isSaving, lastSaved } =
 		usePageBuilderContext();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
@@ -186,19 +186,16 @@ const PageBuilder = () => {
 						)}
 					</div>
 					<div className="d-flex align-items-center">
-						{isSaving ? (
-							<span className="me-4 fw-bold text-n500">Saving...</span>
-						) : (
-							<Button
-								variant="link"
-								className="text-decoration-none"
-								onClick={() => {
-									navigate(-1);
-								}}
-							>
-								Finish Later
-							</Button>
-						)}
+						<span className="fw-semibold text-n500">{isSaving ? 'Saving...' : `Updated ${lastSaved}`}</span>
+						<Button
+							variant="link"
+							className="text-decoration-none"
+							onClick={() => {
+								navigate(-1);
+							}}
+						>
+							Finish Later
+						</Button>
 						<Button onClick={() => navigate(-1)}>Publish</Button>
 					</div>
 				</div>
