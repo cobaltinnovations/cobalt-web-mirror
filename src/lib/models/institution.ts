@@ -81,6 +81,8 @@ export interface Institution {
 	tableauEnabled?: boolean;
 	contentAudiencesEnabled?: boolean;
 	resourcePacketsEnabled?: boolean;
+	integratedCarePatientDemographicsRequired: boolean;
+	integratedCarePatientCarePreferenceVisible: boolean;
 }
 
 export interface InstitutionFeature {

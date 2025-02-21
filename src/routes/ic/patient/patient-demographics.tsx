@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { PatientOrderCarePreferenceId, PatientOrderModel } from '@/lib/models';
+import { PatientOrderCarePreferenceId, PatientOrderModel, PatientOrderReferralSourceId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { useIntegratedCareLoaderData } from '../landing';
 import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
 
 const careRadii = [
 	{
@@ -39,6 +40,7 @@ const careRadii = [
 ];
 
 const PatientDemographics = () => {
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
@@ -118,10 +120,18 @@ const PatientDemographics = () => {
 					<Row className="mb-6">
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<h3 className="mb-2">Verify your information</h3>
-							<p className="mb-8">
-								Your primary care team gave us a head start filling out this information. Please make
-								sure all information is correct and complete before continuing.
-							</p>
+							{patientOrder?.patientOrderReferralSourceId === PatientOrderReferralSourceId.PROVIDER && (
+								<p className="mb-8">
+									Your primary care team gave us a head start filling out this information. Please
+									make sure all information is correct and complete before continuing.
+								</p>
+							)}
+
+							{patientOrder?.patientOrderReferralSourceId === PatientOrderReferralSourceId.SELF && (
+								<p className="mb-8">
+									Please make sure all information is correct and complete before continuing.
+								</p>
+							)}
 							<hr />
 						</Col>
 					</Row>
@@ -161,72 +171,87 @@ const PatientDemographics = () => {
 								<hr />
 							</Col>
 						</Row>
-						<Row className="mb-6">
-							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								<h4 className="mb-6">Care Preference</h4>
-								<Form.Group className="mb-6">
-									<h5 className="mb-2">
-										How would you prefer to connect with a mental health care provider?
-									</h5>
-									{referenceDataResponse.patientOrderCarePreferences.map((carePreference) => (
-										<Form.Check
-											key={carePreference.patientOrderCarePreferenceId}
-											type="radio"
-											name="care-preference"
-											id={`care-preference--${carePreference.patientOrderCarePreferenceId}`}
-											label={carePreference.description}
-											value={carePreference.patientOrderCarePreferenceId}
-											checked={
-												formValues.patientOrderCarePreferenceId ===
-												carePreference.patientOrderCarePreferenceId
-											}
-											onChange={({ currentTarget }) => {
-												setFormValues((previousValue) => ({
-													...previousValue,
-													patientOrderCarePreferenceId: currentTarget.value,
-												}));
-											}}
-											disabled={isSaving || readOnly}
-										/>
-									))}
-								</Form.Group>
-								{formValues.patientOrderCarePreferenceId === PatientOrderCarePreferenceId.IN_PERSON && (
+						{institution.integratedCarePatientCarePreferenceVisible && (
+							<Row className="mb-6">
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
+									<h4 className="mb-6">Care Preference</h4>
 									<Form.Group className="mb-6">
 										<h5 className="mb-2">
-											How far would you be willing to travel from your location (
-											{patientOrder?.patientAddress?.postalCode}) to see an in-person provider?
+											How would you prefer to connect with a mental health care provider?
 										</h5>
-										{careRadii.map((careRadius) => (
+										{referenceDataResponse.patientOrderCarePreferences.map((carePreference) => (
 											<Form.Check
-												key={careRadius.inPersonCareRadiusId}
+												key={carePreference.patientOrderCarePreferenceId}
 												type="radio"
-												name="care-radius"
-												id={`care-radius--${careRadius.inPersonCareRadiusId}`}
-												label={careRadius.title}
-												value={careRadius.inPersonCareRadius}
+												name="care-preference"
+												id={`care-preference--${carePreference.patientOrderCarePreferenceId}`}
+												label={carePreference.description}
+												value={carePreference.patientOrderCarePreferenceId}
 												checked={
-													formValues.inPersonCareRadius === careRadius.inPersonCareRadius
+													formValues.patientOrderCarePreferenceId ===
+													carePreference.patientOrderCarePreferenceId
 												}
 												onChange={({ currentTarget }) => {
 													setFormValues((previousValue) => ({
 														...previousValue,
-														inPersonCareRadius: parseInt(currentTarget.value, 10),
+														patientOrderCarePreferenceId: currentTarget.value,
 													}));
 												}}
 												disabled={isSaving || readOnly}
 											/>
 										))}
 									</Form.Group>
-								)}
-								<hr />
-							</Col>
-						</Row>
+									{formValues.patientOrderCarePreferenceId ===
+										PatientOrderCarePreferenceId.IN_PERSON && (
+										<Form.Group className="mb-6">
+											<h5 className="mb-2">
+												How far would you be willing to travel from your location (
+												{patientOrder?.patientAddress?.postalCode}) to see an in-person
+												provider?
+											</h5>
+											{careRadii.map((careRadius) => (
+												<Form.Check
+													key={careRadius.inPersonCareRadiusId}
+													type="radio"
+													name="care-radius"
+													id={`care-radius--${careRadius.inPersonCareRadiusId}`}
+													label={careRadius.title}
+													value={careRadius.inPersonCareRadius}
+													checked={
+														formValues.inPersonCareRadius === careRadius.inPersonCareRadius
+													}
+													onChange={({ currentTarget }) => {
+														setFormValues((previousValue) => ({
+															...previousValue,
+															inPersonCareRadius: parseInt(currentTarget.value, 10),
+														}));
+													}}
+													disabled={isSaving || readOnly}
+												/>
+											))}
+										</Form.Group>
+									)}
+									<hr />
+								</Col>
+							</Row>
+						)}
 						<Row className="mb-6">
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 								<h4 className="mb-2">About You</h4>
-								<p className="mb-6">
-									This information is not required but can be helpful for your care team to know.{' '}
-								</p>
+								{!institution.integratedCarePatientDemographicsRequired && (
+									<p className="mb-6">
+										This information is not required but can be helpful for your care team to know.{' '}
+									</p>
+								)}
+
+								{institution.integratedCarePatientDemographicsRequired && (
+									<p className="mb-6">This information is required. </p>
+								)}
+
 								<InputHelper
 									className="mb-2"
 									label="Preferred Language"
@@ -239,6 +264,7 @@ const PatientDemographics = () => {
 										}));
 									}}
 									disabled={isSaving || readOnly}
+									required={institution.integratedCarePatientDemographicsRequired}
 								>
 									<option value="">Select...</option>
 									{referenceDataResponse.languages.map((language) => {
@@ -261,6 +287,7 @@ const PatientDemographics = () => {
 										}));
 									}}
 									disabled={isSaving || readOnly}
+									required={institution.integratedCarePatientDemographicsRequired}
 								>
 									<option value="">Select...</option>
 									{referenceDataResponse.races.map((race) => {
@@ -283,6 +310,7 @@ const PatientDemographics = () => {
 										}));
 									}}
 									disabled={isSaving || readOnly}
+									required={institution.integratedCarePatientDemographicsRequired}
 								>
 									<option value="">Select...</option>
 									{referenceDataResponse.ethnicities.map((ethnicity) => {
@@ -305,6 +333,7 @@ const PatientDemographics = () => {
 										}));
 									}}
 									disabled={isSaving || readOnly}
+									required={institution.integratedCarePatientDemographicsRequired}
 								>
 									<option value="">Select...</option>
 									{referenceDataResponse.birthSexes.map((birthSex) => {
@@ -327,6 +356,7 @@ const PatientDemographics = () => {
 										}));
 									}}
 									disabled={isSaving || readOnly}
+									required={institution.integratedCarePatientDemographicsRequired}
 								>
 									<option value="">Select...</option>
 									{referenceDataResponse.genderIdentities.map((genderIdentity) => {

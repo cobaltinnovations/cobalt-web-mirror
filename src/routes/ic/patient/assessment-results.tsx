@@ -126,10 +126,46 @@ export const PatientAssessmentResults = () => {
 					<Row className="mb-6">
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 							<h1 className="mb-1">Assessment Results</h1>
-							<p className="mb-6 fs-large text-gray">
-								Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription ?? 'N/A'}
-							</p>
+							{patientOrder?.mostRecentScreeningSessionCompletedAtDescription && (
+								<p className="mb-6 fs-large text-gray">
+									Completed {patientOrder?.mostRecentScreeningSessionCompletedAtDescription}
+								</p>
+							)}
+
 							<hr className="mb-8" />
+
+							{/* This is when the patient is ineligible per the intake assessment */}
+							{patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied &&
+								!patientOrder.mostRecentScreeningSessionId && (
+									<>
+										<p className="mb-6 fs-large">
+											Based on your responses, you are not currently eligible for this program.
+										</p>
+
+										<p className="mb-6 fs-large">
+											Please call us at{' '}
+											<strong>
+												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+													{institution?.integratedCarePhoneNumberDescription}
+												</a>
+											</strong>{' '}
+											{institution.integratedCareAvailabilityDescription} if you have any
+											questions or would like to speak with us about your options.
+										</p>
+
+										<div className="text-center">
+											<Button
+												variant="outline-primary"
+												size="lg"
+												onClick={() => {
+													navigate('/ic/patient');
+												}}
+											>
+												Return to Home
+											</Button>
+										</div>
+									</>
+								)}
 
 							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
 								<>
@@ -141,17 +177,15 @@ export const PatientAssessmentResults = () => {
 											care practice.
 										</p>
 									)}
+
 									{patientOrder.patientOrderReferralSourceId ===
-										PatientOrderReferralSourceId.SELF && (
+										PatientOrderReferralSourceId.PROVIDER && (
 										<p className="mb-6 fs-large">
-											Based on the symptoms reported, we recommend that you meet with a{' '}
-											<strong>Mental Health Provider</strong>.
+											The Mental Health Provider will discuss treatment options that will work in
+											collaboration with your primary care provider.
 										</p>
 									)}
-									<p className="mb-6 fs-large">
-										The Mental Health Provider will discuss treatment options that will work in
-										collaboration with your primary care provider.
-									</p>
+
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.PROVIDER && (
 										<p className="mb-6 fs-large">
@@ -164,6 +198,15 @@ export const PatientAssessmentResults = () => {
 											{institution.integratedCareAvailabilityDescription}.
 										</p>
 									)}
+
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.SELF && (
+										<p className="mb-6 fs-large">
+											Based on the symptoms reported, we recommend that you meet with a{' '}
+											<strong>Mental Health Provider</strong>.
+										</p>
+									)}
+
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.SELF && (
 										<p className="mb-6 fs-large">
@@ -202,20 +245,49 @@ export const PatientAssessmentResults = () => {
 
 							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
 								<>
-									<p className="mb-6 fs-large">
-										Based on the symptoms reported and your provider's request, we would like to set
-										you up with a <strong>Mental Health Specialist</strong> in your area.
-									</p>
-									<p className="mb-6 fs-large">
-										Please call us at{' '}
-										<strong>
-											<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
-												{institution?.integratedCarePhoneNumberDescription}
-											</a>
-										</strong>{' '}
-										{institution.integratedCareAvailabilityDescription} to speak to a Mental Health
-										Intake Coordinator about your options.
-									</p>
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.PROVIDER && (
+										<p className="mb-6 fs-large">
+											Based on the symptoms reported and your provider's request, we would like to
+											set you up with a <strong>Mental Health Specialist</strong> in your area.
+										</p>
+									)}
+
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.PROVIDER && (
+										<p className="mb-6 fs-large">
+											Please call us at{' '}
+											<strong>
+												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+													{institution?.integratedCarePhoneNumberDescription}
+												</a>
+											</strong>{' '}
+											{institution.integratedCareAvailabilityDescription} to speak to a Mental
+											Health Intake Coordinator about your options.
+										</p>
+									)}
+
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.SELF && (
+										<p className="mb-6 fs-large">
+											Based on the symptoms reported, a followup conversation is needed.
+										</p>
+									)}
+
+									{patientOrder.patientOrderReferralSourceId ===
+										PatientOrderReferralSourceId.SELF && (
+										<p className="mb-6 fs-large">
+											Please call us at{' '}
+											<strong>
+												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+													{institution?.integratedCarePhoneNumberDescription}
+												</a>
+											</strong>{' '}
+											{institution.integratedCareAvailabilityDescription} to discuss your options
+											for care.
+										</p>
+									)}
+
 									<div className="text-center">
 										<Button
 											size="lg"

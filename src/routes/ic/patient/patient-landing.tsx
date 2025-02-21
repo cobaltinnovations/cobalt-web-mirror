@@ -349,7 +349,10 @@ export const Component = () => {
 															title="Step 2: Complete the assessment"
 															description={
 																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
-																	? `Completed ${patientOrder?.mostRecentScreeningSessionCompletedAtDescription}`
+																	? `Completed ${
+																			patientOrder?.mostRecentScreeningSessionCompletedAtDescription ??
+																			patientOrder?.mostRecentIntakeScreeningSessionCompletedAtDescription
+																	  }`
 																	: homescreenState ===
 																	  PAGE_STATES.ASSESSMENT_IN_PROGRESS
 																	? ''
