@@ -288,9 +288,15 @@ const PageBuilder = () => {
 											</Col>
 										</Row>
 									)}
-									{ps.pageRows.map((r) => (
-										<React.Fragment key={r.pageRowId}>{getRendererForPageRow(r)}</React.Fragment>
-									))}
+									{ps.pageRows.map((r, rowIndex) => {
+										const isLast = ps.pageRows.length - 1 === rowIndex;
+
+										return (
+											<React.Fragment key={r.pageRowId}>
+												{getRendererForPageRow(r, isLast)}
+											</React.Fragment>
+										);
+									})}
 								</Container>
 							</Container>
 						))}

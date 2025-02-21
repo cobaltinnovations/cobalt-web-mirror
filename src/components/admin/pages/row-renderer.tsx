@@ -27,7 +27,12 @@ import { resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import Carousel from '@/components/carousel';
 
-const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
+interface RowRendererProps<T = PageRowUnionModel> {
+	pageRow: T;
+	className?: string;
+}
+
+const ResourcesRowRenderer = ({ pageRow, className }: RowRendererProps<ResourcesRowModel>) => {
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 
 	const fetchDefaultContent = useCallback(async () => {
@@ -49,7 +54,7 @@ const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
 
 	return (
 		<AsyncWrapper fetchData={fetchDefaultContent}>
-			<Row className="mb-16">
+			<Row className={className}>
 				{pageRow.contents.map((content) => (
 					<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
 						<ResourceLibraryCard
@@ -80,9 +85,9 @@ const ResourcesRowRenderer = ({ pageRow }: { pageRow: ResourcesRowModel }) => {
 	);
 };
 
-const GroupSessionsRowRenderer = ({ pageRow }: { pageRow: GroupSessionsRowModel }) => {
+const GroupSessionsRowRenderer = ({ pageRow, className }: RowRendererProps<GroupSessionsRowModel>) => {
 	return (
-		<Row className="mb-16">
+		<Row className={className}>
 			{pageRow.groupSessions.map((groupSession) => (
 				<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
 					<Link className="d-block text-decoration-none h-100" to={`/group-sessions/${groupSession.urlName}`}>
@@ -94,7 +99,7 @@ const GroupSessionsRowRenderer = ({ pageRow }: { pageRow: GroupSessionsRowModel 
 	);
 };
 
-const TagGroupRowRenderer = ({ pageRow }: { pageRow: TagGroupRowModel }) => {
+const TagGroupRowRenderer = ({ pageRow, className }: RowRendererProps<TagGroupRowModel>) => {
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 
@@ -120,7 +125,7 @@ const TagGroupRowRenderer = ({ pageRow }: { pageRow: TagGroupRowModel }) => {
 
 	return (
 		<AsyncWrapper fetchData={fetchDefaultContent}>
-			<Row className="mb-16">
+			<Row className={className}>
 				<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 					<ResourceLibrarySubtopicCard
 						className="h-100"
@@ -168,9 +173,9 @@ const TagGroupRowRenderer = ({ pageRow }: { pageRow: TagGroupRowModel }) => {
 	);
 };
 
-const OneColRowRenderer = ({ pageRow }: { pageRow: OneColumnImageRowModel }) => {
+const OneColRowRenderer = ({ pageRow, className }: RowRendererProps<OneColumnImageRowModel>) => {
 	return (
-		<Row className="mb-16 align-items-center">
+		<Row className={`align-items-center ${className}`}>
 			<Col>
 				{pageRow.columnOne.imageUrl && (
 					<img
@@ -194,9 +199,9 @@ const OneColRowRenderer = ({ pageRow }: { pageRow: OneColumnImageRowModel }) => 
 	);
 };
 
-const TwoColRowRenderer = ({ pageRow }: { pageRow: TwoColumnImageRowModel }) => {
+const TwoColRowRenderer = ({ pageRow, className }: RowRendererProps<TwoColumnImageRowModel>) => {
 	return (
-		<Row className="mb-16">
+		<Row className={className}>
 			<Col>
 				<img
 					className="mb-10 w-100"
@@ -219,9 +224,9 @@ const TwoColRowRenderer = ({ pageRow }: { pageRow: TwoColumnImageRowModel }) => 
 	);
 };
 
-const ThreeColRowRenderer = ({ pageRow }: { pageRow: ThreeColumnImageRowModel }) => {
+const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColumnImageRowModel>) => {
 	return (
-		<Row className="mb-16">
+		<Row className={className}>
 			<Col>
 				<img
 					className="mb-10 w-100"
@@ -253,31 +258,31 @@ const ThreeColRowRenderer = ({ pageRow }: { pageRow: ThreeColumnImageRowModel })
 	);
 };
 
-export const getRendererForPageRow = (pageRow: PageRowUnionModel) => {
+export const getRendererForPageRow = (pageRow: PageRowUnionModel, isLast: boolean) => {
 	const rowTypeMap = [
 		{
 			check: isResourcesRow,
-			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} />,
+			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
 		},
 		{
 			check: isGroupSessionsRow,
-			getRow: (row: any) => <GroupSessionsRowRenderer pageRow={row} />,
+			getRow: (row: any) => <GroupSessionsRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
 		},
 		{
 			check: isTagGroupRow,
-			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} />,
+			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
 		},
 		{
 			check: isOneColumnImageRow,
-			getRow: (row: any) => <OneColRowRenderer pageRow={row} />,
+			getRow: (row: any) => <OneColRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
 		},
 		{
 			check: isTwoColumnImageRow,
-			getRow: (row: any) => <TwoColRowRenderer pageRow={row} />,
+			getRow: (row: any) => <TwoColRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
 		},
 		{
 			check: isThreeColumnImageRow,
-			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} />,
+			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
 		},
 	];
 
