@@ -1,16 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { Badge, Button, Col, Container, Row, Tab } from 'react-bootstrap';
+import { Badge, Button, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { BACKGROUND_COLOR_ID, PAGE_STATUS_ID } from '@/lib/models';
-import PageHeader from '@/components/page-header';
+import { PAGE_STATUS_ID } from '@/lib/models';
 import TabBar from '@/components/tab-bar';
-import {
-	AddPageSectionModal,
-	getRendererForPageRow,
-	LayoutTab,
-	PageSectionShelf,
-	SettingsTab,
-} from '@/components/admin/pages';
+import { AddPageSectionModal, LayoutTab, PagePreview, PageSectionShelf, SettingsTab } from '@/components/admin/pages';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -18,7 +11,6 @@ import { pagesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { PageBuilderProvider } from '@/contexts/page-builder-context';
-import classNames from 'classnames';
 import useHandleError from '@/hooks/use-handle-error';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
@@ -255,52 +247,7 @@ const PageBuilder = () => {
 					</div>
 				</CSSTransition>
 				<div className={classes.previewPane}>
-					<div className={classes.previewPage}>
-						<PageHeader
-							className="bg-p700 text-white"
-							title={<h1>{page?.headline ?? 'No hero headline'}</h1>}
-							descriptionHtml={page?.description ?? 'No hero description'}
-							imageAlt={page?.imageAltText ?? ''}
-							imageUrl={page?.imageUrl ?? ''}
-						/>
-						{(page?.pageSections ?? []).map((ps) => (
-							<Container
-								key={ps.pageSectionId}
-								fluid
-								className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
-							>
-								<Container className="py-16">
-									{(ps.headline || ps.description) && (
-										<Row className="mb-16">
-											<Col>
-												{ps.headline && (
-													<h2
-														className={classNames('text-center', {
-															'mb-6': ps.description,
-														})}
-													>
-														{ps.headline}
-													</h2>
-												)}
-												{ps.description && (
-													<p className="mb-0 fs-large text-center">{ps.description}</p>
-												)}
-											</Col>
-										</Row>
-									)}
-									{ps.pageRows.map((r, rowIndex) => {
-										const isLast = ps.pageRows.length - 1 === rowIndex;
-
-										return (
-											<React.Fragment key={r.pageRowId}>
-												{getRendererForPageRow(r, isLast)}
-											</React.Fragment>
-										);
-									})}
-								</Container>
-							</Container>
-						))}
-					</div>
+					<div className={classes.previewPage}>{page && <PagePreview page={page} />}</div>
 				</div>
 			</div>
 		</AsyncWrapper>

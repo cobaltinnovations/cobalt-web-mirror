@@ -5,6 +5,7 @@ export * from './custom-row-button';
 export * from './draggable-item';
 export * from './layout-tab';
 export * from './page-actions-dropdown';
+export * from './page-preview';
 export * from './page-section-shelf-page';
 export * from './page-section-shelf';
 export * from './row-renderer';

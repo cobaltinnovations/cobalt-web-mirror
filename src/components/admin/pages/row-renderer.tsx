@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -19,69 +19,40 @@ import {
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
 } from '@/lib/models';
-import { resourceLibraryService } from '@/lib/services';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import StudioEvent from '@/components/studio-event';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
-import AsyncWrapper from '@/components/async-page';
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageRow: T;
+	contentsByTagGroupId: Record<string, Content[]>;
+	tagsByTagId: Record<string, Tag>;
 	className?: string;
 }
 
-const ResourcesRowRenderer = ({ pageRow, className }: RowRendererProps<ResourcesRowModel>) => {
-	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
-
-	const fetchDefaultContent = useCallback(async () => {
-		const filtersResponse = await resourceLibraryService.getResourceLibraryFilters().fetch();
-
-		setTagsByTagId(
-			filtersResponse.tagGroups
-				.map((tg) => tg.tags ?? [])
-				.flat()
-				.reduce(
-					(accumulator, value) => ({
-						...accumulator,
-						[value.tagId]: value,
-					}),
-					{}
-				)
-		);
-	}, []);
-
+const ResourcesRowRenderer = ({ pageRow, className, tagsByTagId }: RowRendererProps<ResourcesRowModel>) => {
 	return (
-		<AsyncWrapper fetchData={fetchDefaultContent}>
-			<Row className={className}>
-				{pageRow.contents.map((content) => (
-					<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
-						<ResourceLibraryCard
-							key={content.contentId}
-							linkTo={`/resource-library/${content.contentId}`}
-							className="h-100"
-							imageUrl={content.imageUrl}
-							badgeTitle={content.newFlag ? 'New' : ''}
-							title={content.title}
-							author={content.author}
-							description={content.description}
-							tags={
-								tagsByTagId
-									? content.tagIds
-											.map((tagId) => {
-												return tagsByTagId?.[tagId] ?? null;
-											})
-											.filter(Boolean)
-									: []
-							}
-							contentTypeId={content.contentTypeId}
-							duration={content.durationInMinutesDescription}
-						/>
-					</Col>
-				))}
-			</Row>
-		</AsyncWrapper>
+		<Row className={className}>
+			{pageRow.contents.map((content) => (
+				<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+					<ResourceLibraryCard
+						key={content.contentId}
+						linkTo={`/resource-library/${content.contentId}`}
+						className="h-100"
+						imageUrl={content.imageUrl}
+						badgeTitle={content.newFlag ? 'New' : ''}
+						title={content.title}
+						author={content.author}
+						description={content.description}
+						tags={content.tagIds.map((tagId) => tagsByTagId?.[tagId] ?? null).filter(Boolean)}
+						contentTypeId={content.contentTypeId}
+						duration={content.durationInMinutesDescription}
+					/>
+				</Col>
+			))}
+		</Row>
 	);
 };
 
@@ -99,77 +70,49 @@ const GroupSessionsRowRenderer = ({ pageRow, className }: RowRendererProps<Group
 	);
 };
 
-const TagGroupRowRenderer = ({ pageRow, className }: RowRendererProps<TagGroupRowModel>) => {
-	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
-	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
-
-	const fetchDefaultContent = useCallback(async () => {
-		const [libraryResponse, filtersResponse] = await Promise.all([
-			resourceLibraryService.getResourceLibrary().fetch(),
-			resourceLibraryService.getResourceLibraryFilters().fetch(),
-		]);
-		setContentsByTagGroupId(libraryResponse.contentsByTagGroupId);
-		setTagsByTagId(
-			filtersResponse.tagGroups
-				.map((tg) => tg.tags ?? [])
-				.flat()
-				.reduce(
-					(accumulator, value) => ({
-						...accumulator,
-						[value.tagId]: value,
-					}),
-					{}
-				)
-		);
-	}, []);
-
+const TagGroupRowRenderer = ({
+	pageRow,
+	className,
+	contentsByTagGroupId,
+	tagsByTagId,
+}: RowRendererProps<TagGroupRowModel>) => {
 	return (
-		<AsyncWrapper fetchData={fetchDefaultContent}>
-			<Row className={className}>
-				<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-					<ResourceLibrarySubtopicCard
-						className="h-100"
-						colorId={pageRow.tagGroup.colorId}
-						title={pageRow.tagGroup.name}
-						description={pageRow.tagGroup.description}
-						to={`/resource-library/tag-groups/${pageRow.tagGroup.urlName}`}
-					/>
-				</Col>
-				<Col lg={9}>
-					<Carousel
-						responsive={resourceLibraryCarouselConfig}
-						trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-						floatingButtonGroup
-					>
-						{(contentsByTagGroupId?.[pageRow.tagGroup.tagGroupId] ?? []).map((content) => {
-							return (
-								<ResourceLibraryCard
-									key={content.contentId}
-									linkTo={`/resource-library/${content.contentId}`}
-									className="h-100"
-									imageUrl={content.imageUrl}
-									badgeTitle={content.newFlag ? 'New' : ''}
-									title={content.title}
-									author={content.author}
-									description={content.description}
-									tags={
-										tagsByTagId
-											? content.tagIds
-													.map((tagId) => {
-														return tagsByTagId?.[tagId] ?? null;
-													})
-													.filter(Boolean)
-											: []
-									}
-									contentTypeId={content.contentTypeId}
-									duration={content.durationInMinutesDescription}
-								/>
-							);
-						})}
-					</Carousel>
-				</Col>
-			</Row>
-		</AsyncWrapper>
+		<Row className={className}>
+			<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+				<ResourceLibrarySubtopicCard
+					className="h-100"
+					colorId={pageRow.tagGroup.colorId}
+					title={pageRow.tagGroup.name}
+					description={pageRow.tagGroup.description}
+					to={`/resource-library/tag-groups/${pageRow.tagGroup.urlName}`}
+				/>
+			</Col>
+			<Col lg={9}>
+				<Carousel
+					responsive={resourceLibraryCarouselConfig}
+					trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+					floatingButtonGroup
+				>
+					{(contentsByTagGroupId?.[pageRow.tagGroup.tagGroupId] ?? []).map((content) => {
+						return (
+							<ResourceLibraryCard
+								key={content.contentId}
+								linkTo={`/resource-library/${content.contentId}`}
+								className="h-100"
+								imageUrl={content.imageUrl}
+								badgeTitle={content.newFlag ? 'New' : ''}
+								title={content.title}
+								author={content.author}
+								description={content.description}
+								tags={content.tagIds.map((tagId) => tagsByTagId?.[tagId] ?? null).filter(Boolean)}
+								contentTypeId={content.contentTypeId}
+								duration={content.durationInMinutesDescription}
+							/>
+						);
+					})}
+				</Carousel>
+			</Col>
+		</Row>
 	);
 };
 
@@ -258,33 +201,78 @@ const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColum
 	);
 };
 
-export const getRendererForPageRow = (pageRow: PageRowUnionModel, isLast: boolean) => {
+export const getRendererForPageRow = (
+	pageRow: PageRowUnionModel,
+	contentsByTagGroupId: Record<string, Content[]>,
+	tagsByTagId: Record<string, Tag>,
+	isLast: boolean
+) => {
 	const rowTypeMap = [
 		{
 			check: isResourcesRow,
-			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
+			getRow: (row: any) => (
+				<ResourcesRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
 		},
 		{
 			check: isGroupSessionsRow,
 			getRow: (row: any) => (
-				<GroupSessionsRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />
+				<GroupSessionsRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
 			),
 		},
 		{
 			check: isTagGroupRow,
-			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
+			getRow: (row: any) => (
+				<TagGroupRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
 		},
 		{
 			check: isOneColumnImageRow,
-			getRow: (row: any) => <OneColRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
+			getRow: (row: any) => (
+				<OneColRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
 		},
 		{
 			check: isTwoColumnImageRow,
-			getRow: (row: any) => <TwoColRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
+			getRow: (row: any) => (
+				<TwoColRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
 		},
 		{
 			check: isThreeColumnImageRow,
-			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
+			getRow: (row: any) => (
+				<ThreeColRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
 		},
 	];
 
