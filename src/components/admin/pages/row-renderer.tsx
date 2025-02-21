@@ -19,13 +19,13 @@ import {
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
 } from '@/lib/models';
+import { resourceLibraryService } from '@/lib/services';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import StudioEvent from '@/components/studio-event';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
-import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
-import { resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import Carousel from '@/components/carousel';
+import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageRow: T;
@@ -175,7 +175,7 @@ const TagGroupRowRenderer = ({ pageRow, className }: RowRendererProps<TagGroupRo
 
 const OneColRowRenderer = ({ pageRow, className }: RowRendererProps<OneColumnImageRowModel>) => {
 	return (
-		<Row className={`align-items-center ${className}`}>
+		<Row className={classNames('align-items-center', className)}>
 			<Col>
 				{pageRow.columnOne.imageUrl && (
 					<img
@@ -262,27 +262,29 @@ export const getRendererForPageRow = (pageRow: PageRowUnionModel, isLast: boolea
 	const rowTypeMap = [
 		{
 			check: isResourcesRow,
-			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
+			getRow: (row: any) => <ResourcesRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
 		},
 		{
 			check: isGroupSessionsRow,
-			getRow: (row: any) => <GroupSessionsRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
+			getRow: (row: any) => (
+				<GroupSessionsRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />
+			),
 		},
 		{
 			check: isTagGroupRow,
-			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
+			getRow: (row: any) => <TagGroupRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
 		},
 		{
 			check: isOneColumnImageRow,
-			getRow: (row: any) => <OneColRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
+			getRow: (row: any) => <OneColRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
 		},
 		{
 			check: isTwoColumnImageRow,
-			getRow: (row: any) => <TwoColRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
+			getRow: (row: any) => <TwoColRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
 		},
 		{
 			check: isThreeColumnImageRow,
-			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} className={isLast ? '' : 'mb-16'} />,
+			getRow: (row: any) => <ThreeColRowRenderer pageRow={row} className={classNames({ 'mb-16': !isLast })} />,
 		},
 	];
 
