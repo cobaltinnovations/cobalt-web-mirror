@@ -87,6 +87,7 @@ export const SettingsTab = () => {
 				value={formValues.pageName}
 				onChange={handleInputChange}
 				required
+				disabled
 			/>
 			<InputHelper
 				className="mb-4"
@@ -96,6 +97,7 @@ export const SettingsTab = () => {
 				value={formValues.friendlyUrl}
 				onChange={handleInputChange}
 				required
+				disabled
 			/>
 			<InputHelper
 				as="select"
