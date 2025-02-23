@@ -43,6 +43,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 	const [debouncedUrlNameQuery] = useDebouncedState(formValues.friendlyUrl);
 	const [urlNameSetByUser, setUrlNameSetByUser] = useState(false);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, PageFriendlyUrlValidationResult>>({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleOnEnter = () => {
 		setFormValues(initialFormValues);
@@ -54,6 +55,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setIsSubmitting(true);
 
 		try {
 			const response = await pagesService
@@ -67,6 +69,8 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 			onContinue(response.page.pageId);
 		} catch (error) {
 			handleError(error);
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -76,100 +80,103 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 				<Modal.Title>Create page</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
-				<Modal.Body>
-					<InputHelper
-						as="select"
-						className="mb-4"
-						label="Page Type"
-						value={formValues.pageTypeId}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								pageTypeId: currentTarget.value as PAGE_TYPE_ID,
-							}));
-						}}
-						required
-					>
-						<option value="" disabled>
-							Select page type...
-						</option>
-						{pageTypes.map((pt) => (
-							<option key={pt.pageTypeId} value={pt.pageTypeId}>
-								{pt.title}
+				<fieldset disabled={isSubmitting}>
+					<Modal.Body>
+						<InputHelper
+							as="select"
+							className="mb-4"
+							label="Page Type"
+							value={formValues.pageTypeId}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									pageTypeId: currentTarget.value as PAGE_TYPE_ID,
+								}));
+							}}
+							required
+						>
+							<option value="" disabled>
+								Select page type...
 							</option>
-						))}
-					</InputHelper>
-					<InputHelper
-						ref={nameInputRef}
-						className="mb-4"
-						type="text"
-						label="Page Name"
-						value={formValues.pageName}
-						onChange={({ currentTarget }) => {
-							setFormValues((previousValue) => ({
-								...previousValue,
-								pageName: currentTarget.value,
-							}));
-						}}
-						required
-					/>
-					<InputHelper
-						className="mb-1"
-						type="text"
-						label="Friendly url"
-						error={
-							urlNameValidations[debouncedUrlNameQuery]?.available === false ? (
-								<>
-									URL is in use. We suggest{' '}
-									<Button
-										size="sm"
-										variant="link"
-										className="p-0 d-inline-block"
-										onClick={() => {
-											setFormValues((previousValue) => ({
-												...previousValue,
-												friendlyUrl: urlNameValidations[debouncedUrlNameQuery].recommendation,
-											}));
-										}}
-									>
-										{urlNameValidations[debouncedUrlNameQuery].recommendation}
-									</Button>{' '}
-									instead.
-								</>
-							) : undefined
-						}
-						value={formValues.friendlyUrl}
-						onChange={({ currentTarget }) => {
-							setUrlNameSetByUser(true);
-							setFormValues((previousValue) => ({
-								...previousValue,
-								friendlyUrl: currentTarget.value,
-							}));
-						}}
-						onBlur={() => {
-							if (!formValues.friendlyUrl) {
-								setUrlNameSetByUser(false);
+							{pageTypes.map((pt) => (
+								<option key={pt.pageTypeId} value={pt.pageTypeId}>
+									{pt.title}
+								</option>
+							))}
+						</InputHelper>
+						<InputHelper
+							ref={nameInputRef}
+							className="mb-4"
+							type="text"
+							label="Page Name"
+							value={formValues.pageName}
+							onChange={({ currentTarget }) => {
+								setFormValues((previousValue) => ({
+									...previousValue,
+									pageName: currentTarget.value,
+								}));
+							}}
+							required
+						/>
+						<InputHelper
+							className="mb-1"
+							type="text"
+							label="Friendly url"
+							error={
+								urlNameValidations[debouncedUrlNameQuery]?.available === false ? (
+									<>
+										URL is in use. We suggest{' '}
+										<Button
+											size="sm"
+											variant="link"
+											className="p-0 d-inline-block"
+											onClick={() => {
+												setFormValues((previousValue) => ({
+													...previousValue,
+													friendlyUrl:
+														urlNameValidations[debouncedUrlNameQuery].recommendation,
+												}));
+											}}
+										>
+											{urlNameValidations[debouncedUrlNameQuery].recommendation}
+										</Button>{' '}
+										instead.
+									</>
+								) : undefined
 							}
-						}}
-						required
-					/>
-					<div className="d-flex align-items-center">
-						<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
-						<p className="mb-0 small">
-							{window.location.host}/topic/<span className="fw-bold">{formValues.friendlyUrl}</span>
-						</p>
-					</div>
-				</Modal.Body>
-				<Modal.Footer>
-					<div className="text-right">
-						<Button type="button" variant="outline-primary" onClick={props.onHide}>
-							Cancel
-						</Button>
-						<Button type="submit" className="ms-2" variant="primary">
-							Continue
-						</Button>
-					</div>
-				</Modal.Footer>
+							value={formValues.friendlyUrl}
+							onChange={({ currentTarget }) => {
+								setUrlNameSetByUser(true);
+								setFormValues((previousValue) => ({
+									...previousValue,
+									friendlyUrl: currentTarget.value,
+								}));
+							}}
+							onBlur={() => {
+								if (!formValues.friendlyUrl) {
+									setUrlNameSetByUser(false);
+								}
+							}}
+							required
+						/>
+						<div className="d-flex align-items-center">
+							<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
+							<p className="mb-0 small">
+								{window.location.host}/topic/<span className="fw-bold">{formValues.friendlyUrl}</span>
+							</p>
+						</div>
+					</Modal.Body>
+					<Modal.Footer>
+						<div className="text-right">
+							<Button type="button" variant="outline-primary" onClick={props.onHide}>
+								Cancel
+							</Button>
+							<Button type="submit" className="ms-2" variant="primary">
+								Continue
+							</Button>
+						</div>
+					</Modal.Footer>
+				</fieldset>
 			</Form>
 		</Modal>
 	);
