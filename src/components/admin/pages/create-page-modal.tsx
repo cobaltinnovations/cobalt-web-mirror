@@ -40,8 +40,11 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 	const classes = useStyles();
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState(initialFormValues);
-	const [debouncedUrlNameQuery] = useDebouncedState(formValues.friendlyUrl);
-	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, PageFriendlyUrlValidationResult>>({});
+
+	const [debouncedPageNameQuery] = useDebouncedState(formValues.pageName);
+	const [debouncedFriendlyUrlQuery] = useDebouncedState(formValues.friendlyUrl);
+	const [urlNameSetByUser, setUrlNameSetByUser] = useState(false);
+	const [urlNameValidation, setUrlNameValidation] = useState<PageFriendlyUrlValidationResult>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleOnEnter = () => {
@@ -53,22 +56,33 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 	};
 
 	useEffect(() => {
-		if (!debouncedUrlNameQuery) {
+		if (!debouncedPageNameQuery || urlNameSetByUser) {
 			return;
 		}
 
-		const validateUrl = async () => {
-			const response = await pagesService.validatePageUrl({ searchQuery: debouncedUrlNameQuery }).fetch();
-			setUrlNameValidations((validations) => {
-				return {
-					...validations,
-					[debouncedUrlNameQuery]: response.pageUrlNameValidationResult,
-				};
+		pagesService
+			.validatePageUrl({ searchQuery: debouncedPageNameQuery })
+			.fetch()
+			.then((response) => {
+				setFormValues((previousValues) => ({
+					...previousValues,
+					friendlyUrl: response.pageUrlNameValidationResult.recommendation,
+				}));
 			});
-		};
+	}, [debouncedPageNameQuery, urlNameSetByUser]);
 
-		validateUrl();
-	}, [debouncedUrlNameQuery]);
+	useEffect(() => {
+		if (!debouncedFriendlyUrlQuery) {
+			return;
+		}
+
+		pagesService
+			.validatePageUrl({ searchQuery: debouncedFriendlyUrlQuery })
+			.fetch()
+			.then((response) => {
+				setUrlNameValidation(response.pageUrlNameValidationResult);
+			});
+	}, [debouncedFriendlyUrlQuery]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -140,7 +154,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 							type="text"
 							label="Friendly URL"
 							error={
-								urlNameValidations[debouncedUrlNameQuery]?.available === false ? (
+								urlNameValidation?.available === false ? (
 									<>
 										URL is in use. We suggest{' '}
 										<Button
@@ -150,12 +164,11 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 											onClick={() => {
 												setFormValues((previousValue) => ({
 													...previousValue,
-													friendlyUrl:
-														urlNameValidations[debouncedUrlNameQuery].recommendation,
+													friendlyUrl: urlNameValidation.recommendation,
 												}));
 											}}
 										>
-											{urlNameValidations[debouncedUrlNameQuery].recommendation}
+											{urlNameValidation.recommendation}
 										</Button>{' '}
 										instead.
 									</>
@@ -163,19 +176,28 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 							}
 							value={formValues.friendlyUrl}
 							onChange={({ currentTarget }) => {
+								setUrlNameSetByUser(true);
 								setFormValues((previousValue) => ({
 									...previousValue,
 									friendlyUrl: currentTarget.value,
 								}));
 							}}
+							onBlur={() => {
+								if (!formValues.friendlyUrl) {
+									setUrlNameSetByUser(false);
+								}
+							}}
 							required
 						/>
-						<div className="d-flex align-items-center">
-							<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
-							<p className="mb-0 small">
-								{window.location.host}/topic/<span className="fw-bold">{formValues.friendlyUrl}</span>
-							</p>
-						</div>
+						{!formValues.pageName || urlNameValidation?.available === false ? null : (
+							<div className="d-flex align-items-center">
+								<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
+								<p className="mb-0 small">
+									{window.location.host}/topic/
+									<span className="fw-bold">{formValues.friendlyUrl}</span>
+								</p>
+							</div>
+						)}
 					</Modal.Body>
 					<Modal.Footer>
 						<div className="text-right">

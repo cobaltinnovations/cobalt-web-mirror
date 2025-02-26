@@ -169,6 +169,7 @@ const PageBuilder = () => {
 			});
 		} catch (error) {
 			handleError(error);
+			setIsSaving(false);
 		}
 	}, [addFlag, handleError, navigate, page, setIsSaving]);
 

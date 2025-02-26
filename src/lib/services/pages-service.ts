@@ -8,7 +8,6 @@ import {
 	PAGE_TYPE_ID,
 	PageDetailModel,
 	PageFriendlyUrlValidationResult,
-	PageModel,
 	PageRowUnionModel,
 	PageSectionDetailModel,
 	PageSectionModel,
@@ -22,7 +21,7 @@ import {
 export interface GetPagesResponse {
 	totalCountDescription: string;
 	totalCount: number;
-	pages: PageModel[];
+	pages: PageDetailModel[];
 }
 
 export const pagesService = {
@@ -45,7 +44,7 @@ export const pagesService = {
 		imageAltText?: string;
 	}) {
 		return httpSingleton.orchestrateRequest<{
-			page: PageModel;
+			page: PageDetailModel;
 		}>({
 			method: 'POST',
 			url: '/pages',

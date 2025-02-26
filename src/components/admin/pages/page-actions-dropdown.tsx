@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 
-import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageDetailModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
@@ -13,9 +13,9 @@ import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg
 import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 
 interface PageActionsDropdownProps {
-	page: PageModel;
-	onDelete(page: PageModel): void;
-	onUnpublish(page: PageModel): void;
+	page: PageDetailModel;
+	onDelete(page: PageDetailModel): void;
+	onUnpublish(page: PageDetailModel): void;
 }
 
 export const PageActionsDropdown = ({ page, onDelete, onUnpublish }: PageActionsDropdownProps) => {
@@ -62,15 +62,7 @@ export const PageActionsDropdown = ({ page, onDelete, onUnpublish }: PageActions
 						<Dropdown.Item
 							className="d-flex align-items-center"
 							onClick={() => {
-								let pathname = '';
-
-								if (page.pageTypeId === PAGE_TYPE_ID.COMMUNITY) {
-									pathname = `/community/${page.urlName}`;
-								} else if (page.pageTypeId === PAGE_TYPE_ID.TOPIC_CENTER) {
-									pathname = `/topic/${page.urlName}`;
-								}
-
-								window.open(`${window.location.origin}${pathname}`, '_blank', 'noopener, noreferrer');
+								window.open(page.relativeUrl, '_blank', 'noopener, noreferrer');
 							}}
 						>
 							<ExternalIcon className="me-2 text-n500" width={20} height={20} />

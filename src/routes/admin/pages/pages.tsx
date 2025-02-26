@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
@@ -24,11 +24,11 @@ export const Component = () => {
 	const { addFlag } = useFlags();
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [pages, setPages] = useState<PageModel[]>([]);
+	const [pages, setPages] = useState<PageDetailModel[]>([]);
 	const [pagesTotalCount, setPagesTotalCount] = useState(0);
 	const [pagesTotalCountDescription, setPagesTotalCountDescription] = useState('0');
 
-	const [selectedPage, setSelectedPage] = useState<PageModel>();
+	const [selectedPage, setSelectedPage] = useState<PageDetailModel>();
 	const [showAddPageModal, setShowAddPageModal] = useState(false);
 	const [showDeletePageModal, setShowDeletePageModal] = useState(false);
 	const [showUnpublishPageModal, setShowUnpublishPageModal] = useState(false);

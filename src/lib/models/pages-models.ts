@@ -26,25 +26,6 @@ export enum ROW_TYPE_ID {
 	THREE_COLUMN_IMAGE = 'THREE_COLUMN_IMAGE',
 }
 
-export interface PageModel {
-	pageId: string;
-	name: string;
-	urlName: string;
-	pageTypeId: PAGE_TYPE_ID;
-	pageStatusId: PAGE_STATUS_ID;
-	headline: string;
-	description: string;
-	imageFileUploadId: string;
-	imageAltText: string;
-	imageUrl: string;
-	publishedDate: string;
-	publishedDateDescription: string;
-	created: string;
-	createdDescription: string;
-	lastUpdated: string;
-	lastUpdatedDescription: string;
-}
-
 export interface PageSectionModel {
 	pageSectionId: string;
 	pageId: string;
@@ -78,6 +59,7 @@ export interface PageDetailModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	pageSections: PageSectionDetailModel[];
+	relativeUrl: string;
 }
 
 export interface PageSectionDetailModel {
