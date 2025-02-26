@@ -185,7 +185,7 @@ const PageBuilderProvider: FC<PropsWithChildren> = ({ children }) => {
 	useEffect(() => {
 		if (!isSaving) {
 			const momentDate = moment(new Date());
-			setLastSaved(momentDate.format('MMM DD, yyyy @ h:mm:ss a'));
+			setLastSaved(momentDate.format('MMM DD, yyyy @h:mma'));
 		}
 	}, [isSaving]);
 

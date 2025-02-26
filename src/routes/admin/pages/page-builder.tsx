@@ -109,12 +109,21 @@ const PageBuilder = () => {
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
 
-	const { page, setPage, setCurrentPageSectionId, currentPageSection, deletePageSection, isSaving, lastSaved } =
-		usePageBuilderContext();
+	const {
+		page,
+		setPage,
+		setCurrentPageSectionId,
+		currentPageSection,
+		deletePageSection,
+		isSaving,
+		setIsSaving,
+		lastSaved,
+	} = usePageBuilderContext();
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
 	const [showPublishModal, setShowPublishModal] = useState(false);
+	const [showUnpublishModal, setShowUnpublishModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!pageId) {
@@ -142,6 +151,8 @@ const PageBuilder = () => {
 	}, [currentPageSection, deletePageSection, handleError, setCurrentPageSectionId]);
 
 	const handlePublishConfirm = useCallback(async () => {
+		setIsSaving(true);
+
 		try {
 			if (!page) {
 				throw new Error('page is undefined.');
@@ -158,10 +169,31 @@ const PageBuilder = () => {
 			});
 		} catch (error) {
 			handleError(error);
-		} finally {
-			setShowPublishModal(false);
 		}
-	}, [addFlag, handleError, navigate, page]);
+	}, [addFlag, handleError, navigate, page, setIsSaving]);
+
+	const handleUnpublish = useCallback(async () => {
+		setIsSaving(true);
+
+		try {
+			if (!page) {
+				throw new Error('page is undefined.');
+			}
+
+			const response = await pagesService.unpublishPage(page.pageId).fetch();
+
+			navigate('/admin/pages');
+			addFlag({
+				variant: 'success',
+				title: `${response.page.pageTypeId} page unpublished.`,
+				description: `Your page is no longer available on Cobalt.`,
+				actions: [],
+			});
+		} catch (error) {
+			handleError(error);
+			setIsSaving(false);
+		}
+	}, [addFlag, handleError, navigate, page, setIsSaving]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -184,6 +216,21 @@ const PageBuilder = () => {
 					setShowPublishModal(false);
 				}}
 				onConfirm={deleteCurrentSection}
+			/>
+
+			<ConfirmDialog
+				show={showUnpublishModal}
+				size="lg"
+				titleText="Unpublish Page"
+				bodyText={`Are you sure you want to unpublish ${page?.name}?`}
+				detailText={<p className="mt-2 mb-0">“{page?.name}” will be removed from Cobalt immediately.</p>}
+				dismissText="Cancel"
+				confirmText="Unpublish"
+				destructive
+				onHide={() => {
+					setShowUnpublishModal(false);
+				}}
+				onConfirm={handleUnpublish}
 			/>
 
 			<ConfirmDialog
@@ -225,22 +272,42 @@ const PageBuilder = () => {
 						)}
 					</div>
 					<div className="d-flex align-items-center">
-						<span className="fw-semibold text-n500">{isSaving ? 'Saving...' : `Updated ${lastSaved}`}</span>
+						<span className="fw-semibold text-n500">
+							{isSaving
+								? 'Saving...'
+								: page?.pageStatusId === PAGE_STATUS_ID.DRAFT
+								? `Draft saved on ${lastSaved}`
+								: `Updates saved on ${lastSaved}`}
+						</span>
+						{page?.pageStatusId === PAGE_STATUS_ID.LIVE && (
+							<>
+								<Button
+									variant="link"
+									className="text-decoration-none"
+									onClick={() => {
+										setShowUnpublishModal(true);
+									}}
+								>
+									Unpublish
+								</Button>
+								<div className="vr me-4" />
+							</>
+						)}
 						<Button
-							variant="link"
-							className="text-decoration-none"
+							variant={page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'link' : 'outline-primary'}
+							className={page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'text-decoration-none' : 'me-2'}
 							onClick={() => {
 								navigate(-1);
 							}}
 						>
-							Finish Later
+							{page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'Finish Later' : 'Cancel Editing'}
 						</Button>
 						<Button
 							onClick={() => {
 								setShowPublishModal(true);
 							}}
 						>
-							Publish
+							{page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'Publish' : 'Publish Updates'}
 						</Button>
 					</div>
 				</div>
