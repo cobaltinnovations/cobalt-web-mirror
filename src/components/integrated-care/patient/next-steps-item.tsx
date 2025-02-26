@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import classNames from 'classnames';
+import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	checkOuter: {
@@ -21,6 +22,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		color: theme.colors.s500,
 		backgroundColor: theme.colors.s50,
 		border: `2px solid ${theme.colors.s300}`,
+	},
+	infoOuter: {
+		display: 'flex',
+		paddingLeft: 16,
+		[mediaQueries.lg]: {
+			display: 'block',
+		},
 	},
 }));
 
@@ -55,16 +63,18 @@ export const NextStepsItem = ({
 					>
 						<CheckIcon width={24} height={24} />
 					</div>
-					<div className="ps-4 flex-grow-1">
-						<p className="mb-1 fs-large fw-semibold">{title}</p>
-						<p className="mb-0 text-gray">{description}</p>
-					</div>
-					<div>
-						{button && (
-							<Button className="text-nowrap" variant={button.variant} onClick={button.onClick}>
-								{button.title}
-							</Button>
-						)}
+					<div className={classes.infoOuter}>
+						<div className="mb-4 pe-0 pe-lg-4 mb-lg-0 flex-grow-1">
+							<p className="mb-1 fs-large fw-semibold">{title}</p>
+							<p className="mb-0 text-gray">{description}</p>
+						</div>
+						<div>
+							{button && (
+								<Button className="text-nowrap" variant={button.variant} onClick={button.onClick}>
+									{button.title}
+								</Button>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
