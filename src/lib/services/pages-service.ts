@@ -349,4 +349,12 @@ export const pagesService = {
 			data,
 		});
 	},
+	publishPage(pageId: string) {
+		return httpSingleton.orchestrateRequest<{
+			page: PageDetailModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/${pageId}/publish`,
+		});
+	},
 };

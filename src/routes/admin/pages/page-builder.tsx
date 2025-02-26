@@ -112,6 +112,7 @@ const PageBuilder = () => {
 	const [currentTab, setCurrentTab] = useState('LAYOUT');
 	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
+	const [showPublishModal, setShowPublishModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!pageId) {
@@ -138,6 +139,20 @@ const PageBuilder = () => {
 		}
 	}, [currentPageSection, deletePageSection, handleError, setCurrentPageSectionId]);
 
+	const handlePublishConfirm = useCallback(async () => {
+		try {
+			if (!page) {
+				throw new Error('page is undefined.');
+			}
+
+			await pagesService.publishPage(page.pageId).fetch();
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setShowPublishModal(false);
+		}
+	}, [handleError, page]);
+
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			<AddPageSectionModal
@@ -156,9 +171,31 @@ const PageBuilder = () => {
 				confirmText="Delete"
 				destructive
 				onHide={() => {
-					setShowDeleteSectionModal(false);
+					setShowPublishModal(false);
 				}}
 				onConfirm={deleteCurrentSection}
+			/>
+
+			<ConfirmDialog
+				show={showPublishModal}
+				size="lg"
+				titleText={`Publish ${page?.pageTypeId} Page`}
+				bodyText={`Are you ready to publish ${page?.name} to Cobalt?`}
+				detailText={
+					<div className="mt-4">
+						<p>This page will become live on Cobalt immediately at {page?.urlName}</p>
+						<p className="mb-0">
+							IMPORTANT: If you would like to make this page a featured page on the homescreen or include
+							it in the main navigation, please contact Mark Allen at [TODO].
+						</p>
+					</div>
+				}
+				dismissText="Cancel"
+				confirmText="Publish"
+				onHide={() => {
+					setShowPublishModal(false);
+				}}
+				onConfirm={handlePublishConfirm}
 			/>
 
 			<div className={classes.wrapper}>
@@ -188,7 +225,13 @@ const PageBuilder = () => {
 						>
 							Finish Later
 						</Button>
-						<Button onClick={() => navigate(-1)}>Publish</Button>
+						<Button
+							onClick={() => {
+								setShowPublishModal(true);
+							}}
+						>
+							Publish
+						</Button>
 					</div>
 				</div>
 				<div className={classes.aside}>
