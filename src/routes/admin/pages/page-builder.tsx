@@ -2,16 +2,17 @@ import React, { useCallback, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import { PAGE_STATUS_ID } from '@/lib/models';
+import { pagesService } from '@/lib/services';
+import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
+import { PageBuilderProvider } from '@/contexts/page-builder-context';
 import TabBar from '@/components/tab-bar';
 import { AddPageSectionModal, LayoutTab, PagePreview, PageSectionShelf, SettingsTab } from '@/components/admin/pages';
-import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
-import { useNavigate, useParams } from 'react-router-dom';
-import { pagesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import usePageBuilderContext from '@/hooks/use-page-builder-context';
-import { PageBuilderProvider } from '@/contexts/page-builder-context';
-import useHandleError from '@/hooks/use-handle-error';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -106,6 +107,7 @@ const PageBuilder = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 
 	const { page, setPage, setCurrentPageSectionId, currentPageSection, deletePageSection, isSaving, lastSaved } =
 		usePageBuilderContext();
@@ -145,13 +147,21 @@ const PageBuilder = () => {
 				throw new Error('page is undefined.');
 			}
 
-			await pagesService.publishPage(page.pageId).fetch();
+			const response = await pagesService.publishPage(page.pageId).fetch();
+			setPage(response.page);
+
+			addFlag({
+				variant: 'success',
+				title: `${response.page.pageTypeId} page published.`,
+				description: `Your page is now available on Cobalt.`,
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setShowPublishModal(false);
 		}
-	}, [handleError, page]);
+	}, [addFlag, handleError, page, setPage]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
