@@ -148,8 +148,8 @@ const PageBuilder = () => {
 			}
 
 			const response = await pagesService.publishPage(page.pageId).fetch();
-			setPage(response.page);
 
+			navigate('/admin/pages');
 			addFlag({
 				variant: 'success',
 				title: `${response.page.pageTypeId} page published.`,
@@ -161,7 +161,7 @@ const PageBuilder = () => {
 		} finally {
 			setShowPublishModal(false);
 		}
-	}, [addFlag, handleError, page, setPage]);
+	}, [addFlag, handleError, navigate, page]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>

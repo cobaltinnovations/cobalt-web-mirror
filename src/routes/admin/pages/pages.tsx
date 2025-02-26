@@ -4,6 +4,7 @@ import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import { PAGE_STATUS_ID, PageModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { AddPageModal, PageActionsDropdown } from '@/components/admin/pages';
 import NoData from '@/components/no-data';
@@ -20,6 +21,7 @@ export const Component = () => {
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '', [searchParams]);
 	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '', [searchParams]);
 	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
+	const { addFlag } = useFlags();
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [pages, setPages] = useState<PageModel[]>([]);
@@ -77,6 +79,33 @@ export const Component = () => {
 		}
 	}, [fetchPages, handleError, selectedPage]);
 
+	const handleUnpublish = useCallback(async () => {
+		setIsLoading(true);
+
+		try {
+			if (!selectedPage) {
+				throw new Error('selectedPage is undefined.');
+			}
+
+			const response = await pagesService.unpublishPage(selectedPage.pageId).fetch();
+
+			setSelectedPage(undefined);
+			setShowUnpublishPageModal(false);
+			fetchPages();
+
+			addFlag({
+				variant: 'success',
+				title: `${response.page.pageTypeId} page unpublished.`,
+				description: `Your page is no longer available on Cobalt.`,
+				actions: [],
+			});
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [addFlag, fetchPages, handleError, selectedPage]);
+
 	const handlePaginationClick = (pageIndex: number) => {
 		searchParams.set('pageNumber', String(pageIndex));
 		setSearchParams(searchParams);
@@ -113,17 +142,17 @@ export const Component = () => {
 				show={showUnpublishPageModal}
 				size="lg"
 				titleText="Unpublish Page"
-				bodyText={`Are you sure you want to unpublish ${'[TODO]: Page Name'}?`}
-				detailText={<p className="mt-2 mb-0">“[TODO]: Page Name” will be removed from Cobalt immediately.</p>}
+				bodyText={`Are you sure you want to unpublish ${selectedPage?.name}?`}
+				detailText={
+					<p className="mt-2 mb-0">“{selectedPage?.name}” will be removed from Cobalt immediately.</p>
+				}
 				dismissText="Cancel"
 				confirmText="Unpublish"
 				destructive
 				onHide={() => {
 					setShowUnpublishPageModal(false);
 				}}
-				onConfirm={() => {
-					setShowUnpublishPageModal(false);
-				}}
+				onConfirm={handleUnpublish}
 			/>
 
 			<Container fluid className="px-8 py-8">

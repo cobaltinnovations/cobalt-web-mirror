@@ -357,4 +357,12 @@ export const pagesService = {
 			url: `/pages/${pageId}/publish`,
 		});
 	},
+	unpublishPage(pageId: string) {
+		return httpSingleton.orchestrateRequest<{
+			page: PageDetailModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/${pageId}/unpublish`,
+		});
+	},
 };
