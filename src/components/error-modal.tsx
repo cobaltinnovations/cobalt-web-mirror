@@ -33,7 +33,16 @@ const ErrorModal: FC = () => {
 
 	const ErrorBody = useCallback(() => {
 		if (error?.code === ERROR_CODES.VALIDATION_FAILED) {
-			return <p className="mb-0 fw-bold">{error?.message}</p>;
+			return (
+				<p className="mb-0 fw-bold">
+					{error?.message.split('\n').map((line, index) => (
+						<React.Fragment key={index}>
+							{line}
+							{index < error?.message.split('\n').length - 1 && <br />}
+						</React.Fragment>
+					))}
+				</p>
+			);
 		}
 
 		if (isIntegratedCarePatient) {

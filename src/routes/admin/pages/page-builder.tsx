@@ -8,11 +8,19 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { PageBuilderProvider } from '@/contexts/page-builder-context';
 import TabBar from '@/components/tab-bar';
-import { AddPageSectionModal, LayoutTab, PagePreview, PageSectionShelf, SettingsTab } from '@/components/admin/pages';
+import {
+	AddPageSectionModal,
+	HERO_SECTION_ID,
+	LayoutTab,
+	PagePreview,
+	PageSectionShelf,
+	SettingsTab,
+} from '@/components/admin/pages';
 import ConfirmDialog from '@/components/confirm-dialog';
 import AsyncWrapper from '@/components/async-page';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createUseThemedStyles } from '@/jss/theme';
+import { CobaltError } from '@/lib/http-client';
 
 const SHELF_TRANSITION_DURATION_MS = 600;
 
@@ -112,8 +120,9 @@ const PageBuilder = () => {
 	const {
 		page,
 		setPage,
-		setCurrentPageSectionId,
 		currentPageSection,
+		setCurrentPageSectionId,
+		setCurrentPageRowId,
 		deletePageSection,
 		isSaving,
 		setIsSaving,
@@ -168,10 +177,24 @@ const PageBuilder = () => {
 				actions: [],
 			});
 		} catch (error) {
+			if (error instanceof CobaltError && error.apiError) {
+				const { metadata } = error.apiError;
+
+				if (metadata?.pageId) {
+					setCurrentPageSectionId(HERO_SECTION_ID);
+				} else if (metadata?.sectionId && !metadata?.rowId) {
+					setCurrentPageSectionId(`${metadata?.sectionId}`);
+				} else if (metadata?.sectionId && metadata?.rowId) {
+					setCurrentPageSectionId(`${metadata?.sectionId}`);
+					setCurrentPageRowId(`${metadata?.rowId}`);
+				}
+			}
+
+			setShowPublishModal(false);
 			handleError(error);
 			setIsSaving(false);
 		}
-	}, [addFlag, handleError, navigate, page, setIsSaving]);
+	}, [addFlag, handleError, navigate, page, setCurrentPageRowId, setCurrentPageSectionId, setIsSaving]);
 
 	const handleUnpublish = useCallback(async () => {
 		setIsSaving(true);

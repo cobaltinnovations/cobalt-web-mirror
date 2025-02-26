@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 
-import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageDetailModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
