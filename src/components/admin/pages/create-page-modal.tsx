@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageFriendlyUrlValidationResult } from '@/lib/models';
@@ -41,7 +41,6 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [formValues, setFormValues] = useState(initialFormValues);
 	const [debouncedUrlNameQuery] = useDebouncedState(formValues.friendlyUrl);
-	const [urlNameSetByUser, setUrlNameSetByUser] = useState(false);
 	const [urlNameValidations, setUrlNameValidations] = useState<Record<string, PageFriendlyUrlValidationResult>>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,6 +51,24 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 	const handleOnEntered = () => {
 		nameInputRef.current?.focus();
 	};
+
+	useEffect(() => {
+		if (!debouncedUrlNameQuery) {
+			return;
+		}
+
+		const validateUrl = async () => {
+			const response = await pagesService.validatePageUrl({ searchQuery: debouncedUrlNameQuery }).fetch();
+			setUrlNameValidations((validations) => {
+				return {
+					...validations,
+					[debouncedUrlNameQuery]: response.pageUrlNameValidationResult,
+				};
+			});
+		};
+
+		validateUrl();
+	}, [debouncedUrlNameQuery]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -121,7 +138,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 						<InputHelper
 							className="mb-1"
 							type="text"
-							label="Friendly url"
+							label="Friendly URL"
 							error={
 								urlNameValidations[debouncedUrlNameQuery]?.available === false ? (
 									<>
@@ -146,16 +163,10 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 							}
 							value={formValues.friendlyUrl}
 							onChange={({ currentTarget }) => {
-								setUrlNameSetByUser(true);
 								setFormValues((previousValue) => ({
 									...previousValue,
 									friendlyUrl: currentTarget.value,
 								}));
-							}}
-							onBlur={() => {
-								if (!formValues.friendlyUrl) {
-									setUrlNameSetByUser(false);
-								}
 							}}
 							required
 						/>

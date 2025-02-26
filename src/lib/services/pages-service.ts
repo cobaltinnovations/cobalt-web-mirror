@@ -7,6 +7,7 @@ import {
 	PAGE_STATUS_ID,
 	PAGE_TYPE_ID,
 	PageDetailModel,
+	PageFriendlyUrlValidationResult,
 	PageModel,
 	PageRowUnionModel,
 	PageSectionDetailModel,
@@ -25,6 +26,14 @@ export interface GetPagesResponse {
 }
 
 export const pagesService = {
+	validatePageUrl(searchParameters?: { searchQuery?: string; pageId?: string }) {
+		return httpSingleton.orchestrateRequest<{
+			pageUrlNameValidationResult: PageFriendlyUrlValidationResult;
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl('/pages/validate-url-name', searchParameters),
+		});
+	},
 	createPage(data: {
 		name: string;
 		urlName: string;
