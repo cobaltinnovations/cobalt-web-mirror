@@ -107,6 +107,16 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 		setPageState(PAGE_STATES.SECTION_SETTINGS);
 	}, [setCurrentPageRowId]);
 
+	// Auto open row if one is set, typically from publish errors.
+	useEffect(() => {
+		if (!currentPageRow) {
+			return;
+		}
+
+		setIsNext(true);
+		setPageState(currentPageRow.rowTypeId);
+	}, [currentPageRow]);
+
 	const handleRowDelete = useCallback(async () => {
 		setIsSaving(true);
 
@@ -180,8 +190,6 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 												}}
 												onRowButtonClick={(pageRow) => {
 													setCurrentPageRowId(pageRow.pageRowId);
-													setIsNext(true);
-													setPageState(pageRow.rowTypeId);
 												}}
 											/>
 										)}
@@ -197,12 +205,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								title="Select row type to add"
 								bodyClassName="pt-0"
 							>
-								<RowSelectionForm
-									onRowAdded={() => {
-										setIsNext(false);
-										setPageState(PAGE_STATES.SECTION_SETTINGS);
-									}}
-								/>
+								<RowSelectionForm onRowAdded={handleRowBack} />
 							</PageSectionShelfPage>
 						)}
 
