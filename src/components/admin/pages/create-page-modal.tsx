@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import useDebouncedState from '@/hooks/use-debounced-state';
-import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageFriendlyUrlValidationResult } from '@/lib/models';
+import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
@@ -15,6 +15,7 @@ const useStyles = createUseThemedStyles((_theme) => ({
 }));
 
 interface AddPageModalProps extends ModalProps {
+	page?: PageDetailModel;
 	onContinue(pageId: string): void;
 }
 
@@ -35,7 +36,7 @@ const initialFormValues = {
 	friendlyUrl: '',
 };
 
-export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) => {
+export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props }) => {
 	const handleError = useHandleError();
 	const classes = useStyles();
 	const nameInputRef = useRef<HTMLInputElement>(null);
@@ -89,14 +90,24 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 		setIsSubmitting(true);
 
 		try {
-			const response = await pagesService
-				.createPage({
-					name: formValues.pageName,
-					urlName: formValues.friendlyUrl,
-					pageTypeId: formValues.pageTypeId,
-					pageStatusId: PAGE_STATUS_ID.DRAFT,
-				})
-				.fetch();
+			const response = page
+				? await pagesService
+						.duplicatePage(page.pageId, {
+							name: formValues.pageName,
+							urlName: formValues.friendlyUrl,
+							pageTypeId: formValues.pageTypeId,
+							copyForEditing: false,
+						})
+						.fetch()
+				: await pagesService
+						.createPage({
+							name: formValues.pageName,
+							urlName: formValues.friendlyUrl,
+							pageTypeId: formValues.pageTypeId,
+							pageStatusId: PAGE_STATUS_ID.DRAFT,
+						})
+						.fetch();
+
 			onContinue(response.page.pageId);
 		} catch (error) {
 			handleError(error);
@@ -108,7 +119,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ onContinue, ...props }) =>
 	return (
 		<Modal dialogClassName={classes.modal} centered onEnter={handleOnEnter} onEntered={handleOnEntered} {...props}>
 			<Modal.Header closeButton>
-				<Modal.Title>Create page</Modal.Title>
+				<Modal.Title>{page ? `Duplicate "${page.name}"` : 'Create Page'}</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<fieldset disabled={isSubmitting}>

@@ -114,8 +114,10 @@ export const Component = () => {
 	return (
 		<>
 			<AddPageModal
+				page={selectedPage}
 				show={showAddPageModal}
 				onHide={() => {
+					setSelectedPage(undefined);
 					setShowAddPageModal(false);
 				}}
 				onContinue={(pageId) => {
@@ -133,6 +135,7 @@ export const Component = () => {
 				confirmText="Delete"
 				destructive
 				onHide={() => {
+					setSelectedPage(undefined);
 					setShowDeletePageModal(false);
 				}}
 				onConfirm={handleDeletePage}
@@ -150,6 +153,7 @@ export const Component = () => {
 				confirmText="Unpublish"
 				destructive
 				onHide={() => {
+					setSelectedPage(undefined);
 					setShowUnpublishPageModal(false);
 				}}
 				onConfirm={handleUnpublish}
@@ -228,6 +232,10 @@ export const Component = () => {
 											<TableCell className="text-right">
 												<PageActionsDropdown
 													page={page}
+													onDuplicate={() => {
+														setSelectedPage(page);
+														setShowAddPageModal(true);
+													}}
 													onDelete={() => {
 														setSelectedPage(page);
 														setShowDeletePageModal(true);

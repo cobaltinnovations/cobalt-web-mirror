@@ -364,4 +364,21 @@ export const pagesService = {
 			url: `/pages/${pageId}/unpublish`,
 		});
 	},
+	duplicatePage(
+		pageId: string,
+		data: {
+			name: string;
+			urlName: string;
+			pageTypeId: PAGE_TYPE_ID;
+			copyForEditing: boolean;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			page: PageDetailModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/${pageId}/duplicate`,
+			data,
+		});
+	},
 };

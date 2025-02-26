@@ -14,11 +14,12 @@ import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 
 interface PageActionsDropdownProps {
 	page: PageDetailModel;
+	onDuplicate(page: PageDetailModel): void;
 	onDelete(page: PageDetailModel): void;
 	onUnpublish(page: PageDetailModel): void;
 }
 
-export const PageActionsDropdown = ({ page, onDelete, onUnpublish }: PageActionsDropdownProps) => {
+export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }: PageActionsDropdownProps) => {
 	const navigate = useNavigate();
 
 	return (
@@ -39,7 +40,7 @@ export const PageActionsDropdown = ({ page, onDelete, onUnpublish }: PageActions
 				<Dropdown.Item
 					className="d-flex align-items-center"
 					onClick={() => {
-						return;
+						onDuplicate(page);
 					}}
 				>
 					<CopyIcon className="me-2 text-n500" width={20} height={20} />
