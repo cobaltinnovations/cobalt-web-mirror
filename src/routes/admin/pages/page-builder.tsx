@@ -236,19 +236,27 @@ const PageBuilder = () => {
 			<ConfirmDialog
 				show={showPublishModal}
 				size="lg"
-				titleText={`Publish ${page?.pageTypeId} Page`}
-				bodyText={`Are you ready to publish ${page?.name} to Cobalt?`}
+				titleText={
+					page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? `Publish ${page?.pageTypeId} Page` : 'Publish Updates'
+				}
+				bodyText={
+					page?.pageStatusId === PAGE_STATUS_ID.DRAFT
+						? `Are you ready to publish ${page?.name} to Cobalt?`
+						: 'Updates will be published to Cobalt immediately.'
+				}
 				detailText={
-					<div className="mt-4">
-						<p>This page will become live on Cobalt immediately at {page?.urlName}</p>
-						<p className="mb-0">
-							IMPORTANT: If you would like to make this page a featured page on the homescreen or include
-							it in the main navigation, please contact Mark Allen at [TODO].
-						</p>
-					</div>
+					page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? (
+						<div className="mt-4">
+							<p>This page will become live on Cobalt immediately at {page?.urlName}</p>
+							<p className="mb-0">
+								IMPORTANT: If you would like to make this page a featured page on the homescreen or
+								include it in the main navigation, please contact Mark Allen at [TODO].
+							</p>
+						</div>
+					) : undefined
 				}
 				dismissText="Cancel"
-				confirmText="Publish"
+				confirmText={page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'Publish' : 'Publish Updates'}
 				onHide={() => {
 					setShowPublishModal(false);
 				}}
