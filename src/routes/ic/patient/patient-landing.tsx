@@ -13,6 +13,7 @@ import {
 	PatientOrderIntakeInsuranceStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderReferralSourceId,
+	PatientOrderConsentStatusId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import { CobaltError } from '@/lib/http-client';
@@ -134,19 +135,21 @@ export const Component = () => {
 			// if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 			// 	navigate('/ic/patient/consent');
 			// 	return;
-			// } else if (response?.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
-			// 	setHomescreenState(PAGE_STATES.TERMINAL);
-			// 	setIntroductionText('');
-			// 	setTerminalTitle('No further action is required');
-			// 	setTerminalDescription(
-			// 		`Thank you. We will let your primary care provider know, but you should feel free to call the ${institution.integratedCareProgramName} Resource Center at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
-			// 	);
-			// 	return;
 			// }
 
 			/* ------------------------------------------------------------------ */
 			/* All the terminal conditions */
 			/* ------------------------------------------------------------------ */
+			if (response.patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED) {
+				setHomescreenState(PAGE_STATES.TERMINAL);
+				setIntroductionText('');
+				setTerminalTitle('No further action is required');
+				setTerminalDescription(
+					`Thank you. We will let your primary care provider know, but you should feel free to call the ${institution.integratedCareProgramName} Resource Center at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+				);
+				return;
+			}
+
 			if (
 				response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.CLOSED ||
 				response.patientOrder.patientOrderDispositionId === PatientOrderDispositionId.ARCHIVED

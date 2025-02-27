@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet';
 
 import {
 	AnalyticsNativeEventTypeId,
+	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
 	PatientOrderModel,
 	PatientOrderSafetyPlanningStatusId,
@@ -34,6 +35,7 @@ import AsyncWrapper from '@/components/async-page';
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useHandleError from '@/hooks/use-handle-error';
+import InlineAlert from '@/components/inline-alert';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -209,6 +211,16 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										<MhicFlagOrderForSafetyPlanning patientOrderId={patientOrder.patientOrderId} />
 									)}
 								</div>
+								{patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.REJECTED && (
+									<Row className="mb-4">
+										<Col>
+											<InlineAlert
+												variant="warning"
+												title="Patient rejected consent to Integrated Care services"
+											/>
+										</Col>
+									</Row>
+								)}
 								<MhicNextStepsAlerts
 									patientOrder={patientOrder}
 									referenceData={referenceDataResponse}
