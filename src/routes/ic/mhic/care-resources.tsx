@@ -235,8 +235,24 @@ export const Component = () => {
 												{careResource.name}
 											</Link>
 										</TableCell>
-										<TableCell>{careResource.formattedPhoneNumber ?? 'Not provided'}</TableCell>
-										<TableCell>{careResource.websiteUrl ?? 'Not provided'}</TableCell>
+										<TableCell>
+											{careResource.formattedPhoneNumber ? (
+												<a href={`tel:${careResource.formattedPhoneNumber}`}>
+													{careResource.formattedPhoneNumber}
+												</a>
+											) : (
+												'Not provided'
+											)}
+										</TableCell>
+										<TableCell>
+											{careResource.websiteUrl ? (
+												<a href={careResource.websiteUrl} target="_blank" rel="noreferrer">
+													{careResource.websiteUrl}
+												</a>
+											) : (
+												'Not provided'
+											)}
+										</TableCell>
 										<TableCell className="text-right">
 											{careResource.careResourceLocations.length}
 										</TableCell>
