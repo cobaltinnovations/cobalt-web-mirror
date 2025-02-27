@@ -766,8 +766,13 @@ export const routes: RouteObject[] = [
 						} as RouteHandle,
 					},
 					{
-						path: '/featured-topics/current',
+						path: 'featured-topics/current',
 						element: <RedirectToCurrentFeaturedTopic />,
+					},
+					{
+						id: 'page-detail',
+						path: 'pages/:urlName',
+						lazy: () => import('@/routes/page-detail'),
 					},
 					{
 						path: '*',

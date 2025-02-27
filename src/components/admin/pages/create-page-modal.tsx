@@ -168,7 +168,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 							<div className="d-flex align-items-center">
 								<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
 								<p className="mb-0 small">
-									{window.location.host}/topic/
+									{window.location.host}/pages/
 									<span className="fw-bold">{formValues.friendlyUrl}</span>
 								</p>
 							</div>

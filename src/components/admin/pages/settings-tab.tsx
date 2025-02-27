@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
-import InputHelper from '@/components/input-helper';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
+import InputHelper from '@/components/input-helper';
+import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
@@ -74,6 +75,7 @@ export const SettingsTab = () => {
 				required
 			/>
 			<InputHelper
+				className="mb-1"
 				type="text"
 				label="Friendly url"
 				name="friendlyUrl"
@@ -82,6 +84,13 @@ export const SettingsTab = () => {
 				required
 				disabled
 			/>
+			<div className="d-flex align-items-center">
+				<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
+				<p className="mb-0 small">
+					{window.location.host}/pages/
+					<span className="fw-bold">{formValues.friendlyUrl}</span>
+				</p>
+			</div>
 		</>
 	);
 };
