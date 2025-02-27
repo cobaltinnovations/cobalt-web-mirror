@@ -5,7 +5,6 @@ import {
 	GroupSessionsRowModel,
 	OneColumnImageRowModel,
 	PAGE_STATUS_ID,
-	PAGE_TYPE_ID,
 	PageDetailModel,
 	PageFriendlyUrlValidationResult,
 	PageRowUnionModel,
@@ -36,7 +35,6 @@ export const pagesService = {
 	createPage(data: {
 		name: string;
 		urlName: string;
-		pageTypeId: string;
 		pageStatusId: PAGE_STATUS_ID;
 		headline?: string;
 		description?: string;
@@ -74,7 +72,6 @@ export const pagesService = {
 		data: {
 			name: string;
 			urlName: string;
-			pageTypeId: PAGE_TYPE_ID;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -369,7 +366,6 @@ export const pagesService = {
 		data: {
 			name: string;
 			urlName: string;
-			pageTypeId: PAGE_TYPE_ID;
 			copyForEditing: boolean;
 		}
 	) {

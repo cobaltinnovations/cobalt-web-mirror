@@ -7,11 +7,6 @@ export enum PAGE_STATUS_ID {
 	DRAFT = 'DRAFT',
 }
 
-export enum PAGE_TYPE_ID {
-	TOPIC_CENTER = 'TOPIC_CENTER',
-	COMMUNITY = 'COMMUNITY',
-}
-
 export enum BACKGROUND_COLOR_ID {
 	WHITE = 'WHITE',
 	NEUTRAL = 'NEUTRAL',
@@ -45,7 +40,6 @@ export interface PageDetailModel {
 	pageId: string;
 	name: string;
 	urlName: string;
-	pageTypeId: PAGE_TYPE_ID;
 	pageStatusId: PAGE_STATUS_ID;
 	headline: string;
 	description: string;

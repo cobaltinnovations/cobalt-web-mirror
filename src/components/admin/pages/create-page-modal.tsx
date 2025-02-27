@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import useDebouncedState from '@/hooks/use-debounced-state';
-import { PAGE_STATUS_ID, PAGE_TYPE_ID, PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
+import { PAGE_STATUS_ID, PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
@@ -19,19 +19,7 @@ interface AddPageModalProps extends ModalProps {
 	onContinue(pageId: string): void;
 }
 
-const pageTypes = [
-	{
-		pageTypeId: PAGE_TYPE_ID.TOPIC_CENTER,
-		title: 'Topic Center',
-	},
-	{
-		pageTypeId: PAGE_TYPE_ID.COMMUNITY,
-		title: 'Community',
-	},
-];
-
 const initialFormValues = {
-	pageTypeId: PAGE_TYPE_ID.TOPIC_CENTER,
 	pageName: '',
 	friendlyUrl: '',
 };
@@ -95,7 +83,6 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 						.duplicatePage(page.pageId, {
 							name: formValues.pageName,
 							urlName: formValues.friendlyUrl,
-							pageTypeId: formValues.pageTypeId,
 							copyForEditing: false,
 						})
 						.fetch()
@@ -103,7 +90,6 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 						.createPage({
 							name: formValues.pageName,
 							urlName: formValues.friendlyUrl,
-							pageTypeId: formValues.pageTypeId,
 							pageStatusId: PAGE_STATUS_ID.DRAFT,
 						})
 						.fetch();
@@ -124,28 +110,6 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 			<Form onSubmit={handleFormSubmit}>
 				<fieldset disabled={isSubmitting}>
 					<Modal.Body>
-						<InputHelper
-							as="select"
-							className="mb-4"
-							label="Page Type"
-							value={formValues.pageTypeId}
-							onChange={({ currentTarget }) => {
-								setFormValues((previousValue) => ({
-									...previousValue,
-									pageTypeId: currentTarget.value as PAGE_TYPE_ID,
-								}));
-							}}
-							required
-						>
-							<option value="" disabled>
-								Select page type...
-							</option>
-							{pageTypes.map((pt) => (
-								<option key={pt.pageTypeId} value={pt.pageTypeId}>
-									{pt.title}
-								</option>
-							))}
-						</InputHelper>
 						<InputHelper
 							ref={nameInputRef}
 							className="mb-4"

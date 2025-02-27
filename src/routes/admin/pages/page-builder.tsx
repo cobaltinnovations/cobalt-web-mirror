@@ -172,7 +172,7 @@ const PageBuilder = () => {
 			navigate('/admin/pages');
 			addFlag({
 				variant: 'success',
-				title: `${response.page.pageTypeId} page published.`,
+				title: `${response.page.name} page published.`,
 				description: `Your page is now available on Cobalt.`,
 				actions: [],
 			});
@@ -209,7 +209,7 @@ const PageBuilder = () => {
 			navigate('/admin/pages');
 			addFlag({
 				variant: 'success',
-				title: `${response.page.pageTypeId} page unpublished.`,
+				title: `${response.page.name} page unpublished.`,
 				description: `Your page is no longer available on Cobalt.`,
 				actions: [],
 			});
@@ -261,7 +261,7 @@ const PageBuilder = () => {
 				show={showPublishModal}
 				size="lg"
 				titleText={
-					page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? `Publish ${page?.pageTypeId} Page` : 'Publish Updates'
+					page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? `Publish "${page?.name}" Page` : 'Publish Updates'
 				}
 				bodyText={
 					page?.pageStatusId === PAGE_STATUS_ID.DRAFT

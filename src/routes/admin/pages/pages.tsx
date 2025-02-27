@@ -95,7 +95,7 @@ export const Component = () => {
 
 			addFlag({
 				variant: 'success',
-				title: `${response.page.pageTypeId} page unpublished.`,
+				title: `${response.page.name} page unpublished.`,
 				description: `Your page is no longer available on Cobalt.`,
 				actions: [],
 			});

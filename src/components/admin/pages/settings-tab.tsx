@@ -1,21 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { PAGE_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
-
-const pageTypes = [
-	{
-		pageTypeId: PAGE_TYPE_ID.TOPIC_CENTER,
-		title: 'Topic Center',
-	},
-	{
-		pageTypeId: PAGE_TYPE_ID.COMMUNITY,
-		title: 'Community',
-	},
-];
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
@@ -23,7 +11,6 @@ export const SettingsTab = () => {
 	const [formValues, setFormValues] = useState({
 		pageName: '',
 		friendlyUrl: '',
-		pageTypeId: PAGE_TYPE_ID.TOPIC_CENTER,
 	});
 
 	useEffect(() => {
@@ -34,7 +21,6 @@ export const SettingsTab = () => {
 		setFormValues({
 			pageName: page.name ?? '',
 			friendlyUrl: page.urlName ?? '',
-			pageTypeId: page.pageTypeId ?? '',
 		});
 	}, [page]);
 
@@ -50,7 +36,6 @@ export const SettingsTab = () => {
 				.updatePageSettings(page.pageId, {
 					name: fv.pageName,
 					urlName: fv.friendlyUrl,
-					pageTypeId: fv.pageTypeId,
 				})
 				.fetch();
 
@@ -87,10 +72,8 @@ export const SettingsTab = () => {
 				value={formValues.pageName}
 				onChange={handleInputChange}
 				required
-				disabled
 			/>
 			<InputHelper
-				className="mb-4"
 				type="text"
 				label="Friendly url"
 				name="friendlyUrl"
@@ -99,24 +82,6 @@ export const SettingsTab = () => {
 				required
 				disabled
 			/>
-			<InputHelper
-				as="select"
-				label="Page Type"
-				name="pageTypeId"
-				value={formValues.pageTypeId}
-				onChange={handleInputChange}
-				helperText="The type determines where the content lives on Cobalt"
-				required
-			>
-				<option value="" disabled>
-					Select page type...
-				</option>
-				{pageTypes.map((pt) => (
-					<option key={pt.pageTypeId} value={pt.pageTypeId}>
-						{pt.title}
-					</option>
-				))}
-			</InputHelper>
 		</>
 	);
 };
