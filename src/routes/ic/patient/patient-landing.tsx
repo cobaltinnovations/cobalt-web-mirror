@@ -13,6 +13,7 @@ import {
 	PatientOrderIntakeInsuranceStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderReferralSourceId,
+	PatientOrderTriageStatusId,
 } from '@/lib/models';
 import { LatestPatientOrderResponse, integratedCareService } from '@/lib/services';
 import { CobaltError } from '@/lib/http-client';
@@ -413,6 +414,33 @@ export const Component = () => {
 														</NextStepsItem>
 													</>
 												)}
+												{patientOrder?.patientOrderTriageStatusId ===
+													PatientOrderTriageStatusId.SPECIALTY_CARE &&
+													!institution.resourcePacketsEnabled &&
+													patientOrder.resourcesSentFlag && (
+														<>
+															<hr />
+															<NextStepsItem
+																complete
+																title="Step 3: Receive Resources"
+																description={`Resources were sent to ${
+																	institution?.myChartName ?? 'MyChart'
+																} on ${patientOrder.resourcesSentAtDescription}`}
+																button={{
+																	variant: 'outline-primary',
+																	title: `Check ${
+																		institution?.myChartName ?? 'MyChart'
+																	}`,
+																	onClick: () => {
+																		window.open(
+																			institution.myChartDefaultUrl,
+																			'_blank'
+																		);
+																	},
+																}}
+															/>
+														</>
+													)}
 											</Card.Body>
 										</Card>
 									</>
