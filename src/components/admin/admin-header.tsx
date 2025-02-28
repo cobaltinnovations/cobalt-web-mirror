@@ -164,13 +164,17 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			{
-				testId: '',
-				navigationItemId: 'PAGES',
-				title: 'Pages',
-				to: '/admin/pages',
-				active: !!pagesMatch,
-			},
+			...(account?.accountCapabilityFlags.canCreatePages
+				? [
+						{
+							testId: '',
+							navigationItemId: 'PAGES',
+							title: 'Pages',
+							to: '/admin/pages',
+							active: !!pagesMatch,
+						},
+				  ]
+				: []),
 			...(account?.accountCapabilityFlags.canViewProviderReports
 				? [
 						{
@@ -226,6 +230,7 @@ export const AdminHeader = () => {
 		[
 			account?.accountCapabilityFlags.canAdministerContent,
 			account?.accountCapabilityFlags.canAdministerGroupSessions,
+			account?.accountCapabilityFlags.canCreatePages,
 			account?.accountCapabilityFlags.canViewAnalytics,
 			account?.accountCapabilityFlags.canViewProviderReports,
 			account?.accountCapabilityFlags.canViewStudyInsights,

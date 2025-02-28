@@ -78,6 +78,7 @@ export interface AccountModel {
 		canViewProviderReportAppointmentCancelations: boolean; // `PROVIDER_APPOINTMENT_CANCELATIONS` report option in dropdown
 		canViewProviderReportUnusedAvailability: boolean; // `PROVIDER_UNUSED_AVAILABILITY` report option in dropdown
 		canManageCareResources: boolean;
+		canCreatePages: boolean;
 	};
 }
 
