@@ -120,7 +120,7 @@ const TagGroupRowRenderer = ({
 const OneColRowRenderer = ({ pageRow, className }: RowRendererProps<OneColumnImageRowModel>) => {
 	return (
 		<Row className={classNames('align-items-center', className)}>
-			<Col>
+			<Col xs={12} lg={6} className="mb-10 mb-lg-0">
 				{pageRow.columnOne.imageUrl && (
 					<img
 						className="w-100"
@@ -129,7 +129,7 @@ const OneColRowRenderer = ({ pageRow, className }: RowRendererProps<OneColumnIma
 					/>
 				)}
 			</Col>
-			<Col>
+			<Col xs={12} lg={6}>
 				{pageRow.columnOne.headline && (
 					<h3 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
 						{pageRow.columnOne.headline}
@@ -144,7 +144,7 @@ const OneColRowRenderer = ({ pageRow, className }: RowRendererProps<OneColumnIma
 const TwoColRowRenderer = ({ pageRow, className }: RowRendererProps<TwoColumnImageRowModel>) => {
 	return (
 		<Row className={className}>
-			<Col>
+			<Col xs={12} lg={6} className="mb-16 mb-lg-0">
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnOne.imageUrl}
@@ -153,7 +153,7 @@ const TwoColRowRenderer = ({ pageRow, className }: RowRendererProps<TwoColumnIma
 				<h3 className="mb-6">{pageRow.columnOne.headline}</h3>
 				<WysiwygDisplay html={pageRow.columnOne.description ?? ''} />
 			</Col>
-			<Col>
+			<Col xs={12} lg={6}>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnTwo.imageUrl}
@@ -169,7 +169,7 @@ const TwoColRowRenderer = ({ pageRow, className }: RowRendererProps<TwoColumnIma
 const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColumnImageRowModel>) => {
 	return (
 		<Row className={className}>
-			<Col>
+			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnOne.imageUrl}
@@ -178,7 +178,7 @@ const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColum
 				<h3 className="mb-6">{pageRow.columnOne.headline}</h3>
 				<WysiwygDisplay html={pageRow.columnOne.description ?? ''} />
 			</Col>
-			<Col>
+			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnTwo.imageUrl}
@@ -187,7 +187,7 @@ const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColum
 				<h3 className="mb-6">{pageRow.columnTwo.headline}</h3>
 				<WysiwygDisplay html={pageRow.columnTwo.description ?? ''} />
 			</Col>
-			<Col>
+			<Col xs={12} lg={4}>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnThree.imageUrl}

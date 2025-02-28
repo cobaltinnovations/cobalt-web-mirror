@@ -380,7 +380,7 @@ export const pagesService = {
 	getPublicPage(pageIdentifier: string) {
 		return httpSingleton.orchestrateRequest<{ page: PageDetailModel }>({
 			method: 'GET',
-			url: `/pages/published${pageIdentifier}`,
+			url: `/pages/published/${pageIdentifier}`,
 		});
 	},
 };
