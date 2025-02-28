@@ -54,7 +54,11 @@ export const PagePreview = ({ page }: PagePreviewProps) => {
 					<Container className="py-16">
 						{(ps.headline || ps.description) && (
 							<Row className="mb-16">
-								<Col>
+								<Col
+									md={{ span: 10, offset: 1 }}
+									lg={{ span: 8, offset: 2 }}
+									xl={{ span: 6, offset: 3 }}
+								>
 									{ps.headline && (
 										<h2
 											className={classNames('text-center', {
