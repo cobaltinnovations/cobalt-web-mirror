@@ -1,4 +1,5 @@
-import React, { RefObject, useMemo } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import React, { RefObject, useMemo, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -55,9 +56,11 @@ const WysiwygBasic = React.forwardRef(
 			}),
 			[]
 		);
+		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
 
 		return (
 			<ReactQuill
+				id={reactQuillId}
 				className={classNames(classes.quill, className)}
 				ref={ref}
 				theme="snow"
@@ -66,6 +69,7 @@ const WysiwygBasic = React.forwardRef(
 				modules={quillModules}
 				readOnly={disabled}
 				formats={formats}
+				bounds={`#${reactQuillId}`}
 			/>
 		);
 	}
