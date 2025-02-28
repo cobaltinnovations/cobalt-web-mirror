@@ -24,6 +24,7 @@ import StudioEvent from '@/components/studio-event';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageRow: T;
@@ -134,9 +135,7 @@ const OneColRowRenderer = ({ pageRow, className }: RowRendererProps<OneColumnIma
 						{pageRow.columnOne.headline}
 					</h3>
 				)}
-				{pageRow.columnOne.description && (
-					<div dangerouslySetInnerHTML={{ __html: pageRow.columnOne.description ?? '' }} />
-				)}
+				{pageRow.columnOne.description && <WysiwygDisplay html={pageRow.columnOne.description ?? ''} />}
 			</Col>
 		</Row>
 	);
@@ -152,7 +151,7 @@ const TwoColRowRenderer = ({ pageRow, className }: RowRendererProps<TwoColumnIma
 					alt={pageRow.columnOne.imageAltText ?? ''}
 				/>
 				<h3 className="mb-6">{pageRow.columnOne.headline}</h3>
-				<div dangerouslySetInnerHTML={{ __html: pageRow.columnOne.description ?? '' }} />
+				<WysiwygDisplay html={pageRow.columnOne.description ?? ''} />
 			</Col>
 			<Col>
 				<img
@@ -161,7 +160,7 @@ const TwoColRowRenderer = ({ pageRow, className }: RowRendererProps<TwoColumnIma
 					alt={pageRow.columnTwo.imageAltText ?? ''}
 				/>
 				<h3 className="mb-6">{pageRow.columnTwo.headline}</h3>
-				<div dangerouslySetInnerHTML={{ __html: pageRow.columnTwo.description ?? '' }} />
+				<WysiwygDisplay html={pageRow.columnTwo.description ?? ''} />
 			</Col>
 		</Row>
 	);
@@ -177,7 +176,7 @@ const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColum
 					alt={pageRow.columnOne.imageAltText ?? ''}
 				/>
 				<h3 className="mb-6">{pageRow.columnOne.headline}</h3>
-				<div dangerouslySetInnerHTML={{ __html: pageRow.columnOne.description ?? '' }} />
+				<WysiwygDisplay html={pageRow.columnOne.description ?? ''} />
 			</Col>
 			<Col>
 				<img
@@ -186,7 +185,7 @@ const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColum
 					alt={pageRow.columnTwo.imageAltText ?? ''}
 				/>
 				<h3 className="mb-6">{pageRow.columnTwo.headline}</h3>
-				<div dangerouslySetInnerHTML={{ __html: pageRow.columnTwo.description ?? '' }} />
+				<WysiwygDisplay html={pageRow.columnTwo.description ?? ''} />
 			</Col>
 			<Col>
 				<img
@@ -195,7 +194,7 @@ const ThreeColRowRenderer = ({ pageRow, className }: RowRendererProps<ThreeColum
 					alt={pageRow.columnThree.imageAltText ?? ''}
 				/>
 				<h3 className="mb-6">{pageRow.columnThree.headline}</h3>
-				<div dangerouslySetInnerHTML={{ __html: pageRow.columnThree.description ?? '' }} />
+				<WysiwygDisplay html={pageRow.columnThree.description ?? ''} />
 			</Col>
 		</Row>
 	);
