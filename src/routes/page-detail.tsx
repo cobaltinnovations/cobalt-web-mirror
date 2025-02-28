@@ -10,7 +10,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		throw new Error('urlName is undefined.');
 	}
 
-	const { page } = await pagesService.getPage(urlName).fetch();
+	const { page } = await pagesService.getPublicPage(urlName).fetch();
 	return { page };
 };
 
