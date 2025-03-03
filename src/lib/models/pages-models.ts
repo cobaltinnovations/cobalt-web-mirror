@@ -160,3 +160,13 @@ export const isTwoColumnImageRow = (x: PageRowUnionModel): x is TwoColumnImageRo
 export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnImageRowModel => {
 	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
 };
+
+export interface PageSiteLocationModel {
+	pageId: string;
+	relativeUrl: string;
+	headline: string;
+	description: string;
+	imageAltText: string;
+	imageUrl: string;
+	callToAction: string;
+}

@@ -10,6 +10,7 @@ import {
 	PageRowUnionModel,
 	PageSectionDetailModel,
 	PageSectionModel,
+	PageSiteLocationModel,
 	PresignedUploadResponse,
 	ResourcesRowModel,
 	TagGroupRowModel,
@@ -381,6 +382,12 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<{ page: PageDetailModel }>({
 			method: 'GET',
 			url: `/pages/published/${pageIdentifier}`,
+		});
+	},
+	getPageSiteLocations(siteLocationId: string) {
+		return httpSingleton.orchestrateRequest<{ pageSiteLocations: PageSiteLocationModel }>({
+			method: 'GET',
+			url: `/pages/site-location/${siteLocationId}`,
 		});
 	},
 };
