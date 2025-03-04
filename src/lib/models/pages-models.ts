@@ -54,6 +54,7 @@ export interface PageDetailModel {
 	lastUpdatedDescription: string;
 	pageSections: PageSectionDetailModel[];
 	relativeUrl: string;
+	editingLivePage: boolean;
 }
 
 export interface PageSectionDetailModel {

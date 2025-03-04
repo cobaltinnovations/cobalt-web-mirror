@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
-import { PAGE_STATUS_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
@@ -260,16 +259,14 @@ const PageBuilder = () => {
 			<ConfirmDialog
 				show={showPublishModal}
 				size="lg"
-				titleText={
-					page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? `Publish "${page?.name}" Page` : 'Publish Updates'
-				}
+				titleText={page?.editingLivePage ? 'Publish Updates' : `Publish "${page?.name}" Page`}
 				bodyText={
-					page?.pageStatusId === PAGE_STATUS_ID.DRAFT
-						? `Are you ready to publish ${page?.name} to Cobalt?`
-						: 'Updates will be published to Cobalt immediately.'
+					page?.editingLivePage
+						? 'Updates will be published to Cobalt immediately.'
+						: `Are you ready to publish ${page?.name} to Cobalt?`
 				}
 				detailText={
-					page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? (
+					page?.editingLivePage ? undefined : (
 						<div className="mt-4">
 							<p>This page will become live on Cobalt immediately at {page?.urlName}</p>
 							<p className="mb-0">
@@ -277,10 +274,10 @@ const PageBuilder = () => {
 								include it in the main navigation, please contact Mark Allen at [TODO].
 							</p>
 						</div>
-					) : undefined
+					)
 				}
 				dismissText="Cancel"
-				confirmText={page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'Publish' : 'Publish Updates'}
+				confirmText={page?.editingLivePage ? 'Publish Updates' : 'Publish'}
 				onHide={() => {
 					setShowPublishModal(false);
 				}}
@@ -292,14 +289,13 @@ const PageBuilder = () => {
 				<div className={classes.header}>
 					<div className="d-flex align-items-center">
 						<h5 className="mb-0 me-4">{page?.name}</h5>
-						{page?.pageStatusId === PAGE_STATUS_ID.DRAFT && (
-							<Badge pill bg="outline-dark" className="text-nowrap">
-								Draft
-							</Badge>
-						)}
-						{page?.pageStatusId === PAGE_STATUS_ID.LIVE && (
+						{page?.editingLivePage ? (
 							<Badge pill bg="outline-success" className="text-nowrap">
 								Live
+							</Badge>
+						) : (
+							<Badge pill bg="outline-dark" className="text-nowrap">
+								Draft
 							</Badge>
 						)}
 					</div>
@@ -307,11 +303,11 @@ const PageBuilder = () => {
 						<span className="fw-semibold text-n500">
 							{isSaving
 								? 'Saving...'
-								: page?.pageStatusId === PAGE_STATUS_ID.DRAFT
-								? `Draft saved on ${lastSaved}`
-								: `Updates saved on ${lastSaved}`}
+								: page?.editingLivePage
+								? `Updates saved on ${lastSaved}`
+								: `Draft saved on ${lastSaved}`}
 						</span>
-						{page?.pageStatusId === PAGE_STATUS_ID.LIVE && (
+						{page?.editingLivePage && (
 							<>
 								<Button
 									variant="link"
@@ -326,20 +322,20 @@ const PageBuilder = () => {
 							</>
 						)}
 						<Button
-							variant={page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'link' : 'outline-primary'}
-							className={page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'text-decoration-none' : 'me-2'}
+							variant={page?.editingLivePage ? 'outline-primary' : 'link'}
+							className={page?.editingLivePage ? 'me-2' : 'text-decoration-none'}
 							onClick={() => {
 								navigate(-1);
 							}}
 						>
-							{page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'Finish Later' : 'Cancel Editing'}
+							{page?.editingLivePage ? 'Cancel Editing' : 'Finish Later'}
 						</Button>
 						<Button
 							onClick={() => {
 								setShowPublishModal(true);
 							}}
 						>
-							{page?.pageStatusId === PAGE_STATUS_ID.DRAFT ? 'Publish' : 'Publish Updates'}
+							{page?.editingLivePage ? 'Publish Updates' : 'Publish'}
 						</Button>
 					</div>
 				</div>
