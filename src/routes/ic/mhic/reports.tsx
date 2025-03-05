@@ -16,6 +16,7 @@ enum REPORT_TYPE_ID {
 	IC_PIPELINE = 'IC_PIPELINE',
 	IC_OUTREACH = 'IC_OUTREACH',
 	IC_ASSESSMENT = 'IC_ASSESSMENT',
+	IC_SAFETY_PLANNING = 'IC_SAFETY_PLANNING',
 }
 
 const reportTypes = [
@@ -30,6 +31,10 @@ const reportTypes = [
 	{
 		reportTypeId: REPORT_TYPE_ID.IC_ASSESSMENT,
 		title: 'Assessment',
+	},
+	{
+		reportTypeId: REPORT_TYPE_ID.IC_SAFETY_PLANNING,
+		title: 'Safety Planning',
 	},
 ];
 
