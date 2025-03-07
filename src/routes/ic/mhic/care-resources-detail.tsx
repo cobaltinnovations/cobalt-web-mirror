@@ -120,7 +120,15 @@ export const Component = () => {
 											<p className="m-0 text-gray">Phone</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">{careResource.formattedPhoneNumber ?? 'Not provided'}</p>
+											<p className="m-0">
+												{careResource.formattedPhoneNumber ? (
+													<a href={`tel:${careResource.formattedPhoneNumber}`}>
+														{careResource.formattedPhoneNumber}
+													</a>
+												) : (
+													'Not provided'
+												)}
+											</p>
 										</Col>
 									</Row>
 									<Row className="mb-4">
@@ -128,7 +136,15 @@ export const Component = () => {
 											<p className="m-0 text-gray">Email</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">{careResource.emailAddress ?? 'Not provided'}</p>
+											<p className="m-0">
+												{careResource.emailAddress ? (
+													<a href={`mailto:${careResource.emailAddress}`}>
+														{careResource.emailAddress}
+													</a>
+												) : (
+													'Not provided'
+												)}
+											</p>
 										</Col>
 									</Row>
 									<Row>
@@ -136,7 +152,15 @@ export const Component = () => {
 											<p className="m-0 text-gray">Website</p>
 										</Col>
 										<Col xs={9}>
-											<p className="m-0">{careResource.websiteUrl ?? 'Not provided'}</p>
+											<p className="m-0">
+												{careResource.websiteUrl ? (
+													<a href={careResource.websiteUrl} target="_blank" rel="noreferrer">
+														{careResource.websiteUrl}
+													</a>
+												) : (
+													'Not provided'
+												)}
+											</p>
 										</Col>
 									</Row>
 								</Container>

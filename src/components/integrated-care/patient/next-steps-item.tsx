@@ -24,6 +24,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		border: `2px solid ${theme.colors.s300}`,
 	},
 	infoOuter: {
+		flex: 1,
 		display: 'flex',
 		paddingLeft: 16,
 		[mediaQueries.lg]: {
