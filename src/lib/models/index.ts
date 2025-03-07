@@ -15,6 +15,7 @@ export * from './institution-referrer-models';
 export * from './institution';
 export * from './integrated-care-models';
 export * from './interaction-models';
+export * from './pages-models';
 export * from './presigned-upload-models';
 export * from './provider';
 export * from './reference-data';

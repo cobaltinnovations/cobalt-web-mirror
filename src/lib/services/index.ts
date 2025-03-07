@@ -16,6 +16,7 @@ export * from './institution-referrers-service';
 export * from './institution-service';
 export * from './integrated-care-service';
 export * from './interaction-service';
+export * from './pages-service';
 export * from './provider-service';
 export * from './recommendations-service';
 export * from './reporting-service';

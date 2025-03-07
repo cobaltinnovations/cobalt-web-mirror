@@ -9,7 +9,7 @@ const useStyles = createUseStyles({
 		maxWidth: 295,
 	},
 	largeModal: {
-		maxWidth: 490,
+		maxWidth: 480,
 	},
 });
 

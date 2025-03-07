@@ -766,8 +766,13 @@ export const routes: RouteObject[] = [
 						} as RouteHandle,
 					},
 					{
-						path: '/featured-topics/current',
+						path: 'featured-topics/current',
 						element: <RedirectToCurrentFeaturedTopic />,
+					},
+					{
+						id: 'page-detail',
+						path: 'pages/:urlName',
+						lazy: () => import('@/routes/page-detail'),
 					},
 					{
 						path: '*',
@@ -820,6 +825,21 @@ export const routes: RouteObject[] = [
 										id: 'admin-resource-form',
 										path: ':action?/:contentId?',
 										lazy: () => import('@/routes/admin/resources/resource-form'),
+									},
+								],
+							},
+							{
+								path: 'pages',
+								children: [
+									{
+										id: 'admin-pages',
+										index: true,
+										lazy: () => import('@/routes/admin/pages/pages'),
+									},
+									{
+										id: 'admin-page-builder',
+										path: ':pageId?',
+										lazy: () => import('@/routes/admin/pages/page-builder'),
 									},
 								],
 							},

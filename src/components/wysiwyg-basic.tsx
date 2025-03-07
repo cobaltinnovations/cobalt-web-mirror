@@ -1,8 +1,13 @@
-import React, { RefObject, useMemo } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import React, { RefObject, useMemo, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import 'react-quill/dist/quill.snow.css';
+
+interface UseWysiwygStylesProps {
+	height?: number;
+}
 
 const useWysiwygStyles = createUseThemedStyles((theme) => ({
 	quill: {
@@ -17,6 +22,9 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 			borderBottomRightRadius: 8,
 			borderColor: theme.colors.n100,
 			backgroundColor: theme.colors.n0,
+			'& .ql-editor': {
+				minHeight: ({ height }: UseWysiwygStylesProps) => height ?? 400,
+			},
 		},
 	},
 }));
@@ -26,16 +34,17 @@ interface WysiwygProps {
 	onChange(value: string, delta: unknown, source: unknown, editor: ReactQuill.UnprivilegedEditor): void;
 	disabled?: boolean;
 	className?: string;
+	height?: number;
 }
 
 const formats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
 
 const WysiwygBasic = React.forwardRef(
 	(
-		{ value, onChange, disabled, className }: WysiwygProps,
+		{ value, onChange, disabled, className, height }: WysiwygProps,
 		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
 	) => {
-		const classes = useWysiwygStyles();
+		const classes = useWysiwygStyles({ height });
 		const quillModules = useMemo(
 			() => ({
 				toolbar: [
@@ -47,9 +56,11 @@ const WysiwygBasic = React.forwardRef(
 			}),
 			[]
 		);
+		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
 
 		return (
 			<ReactQuill
+				id={reactQuillId}
 				className={classNames(classes.quill, className)}
 				ref={ref}
 				theme="snow"
@@ -58,6 +69,7 @@ const WysiwygBasic = React.forwardRef(
 				modules={quillModules}
 				readOnly={disabled}
 				formats={formats}
+				bounds={`#${reactQuillId}`}
 			/>
 		);
 	}

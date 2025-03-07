@@ -1,6 +1,6 @@
 import useHandleError from '@/hooks/use-handle-error';
 import { imageUploader } from '@/lib/services';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ImageUploadCard from '../image-upload-card';
 import SessionCropModal from '../session-crop-modal';
 import { PresignedUploadResponse } from '@/lib/models';
@@ -9,15 +9,31 @@ export interface AdminFormImageInputProps {
 	imageSrc: string;
 	onSrcChange: (newId: string, newSrc: string) => void;
 	presignedUploadGetter: (blob: Blob) => () => Promise<PresignedUploadResponse>;
+	className?: string;
 }
 
-export const AdminFormImageInput = ({ imageSrc, onSrcChange, presignedUploadGetter }: AdminFormImageInputProps) => {
+export const AdminFormImageInput = ({
+	imageSrc,
+	onSrcChange,
+	presignedUploadGetter,
+	className,
+}: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 	const [cropModalImageSrc, setCropModalImageSrc] = useState(imageSrc);
-	const [imagePreviewSrc, setImagePreviewSrc] = useState(imageSrc);
+	const [imagePreviewSrc, setImagePreviewSrc] = useState('');
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
+
+	useEffect(() => {
+		setImagePreviewSrc((previousValue) => {
+			if (!previousValue) {
+				return imageSrc;
+			}
+
+			return previousValue;
+		});
+	}, [imageSrc]);
 
 	return (
 		<>
@@ -57,6 +73,7 @@ export const AdminFormImageInput = ({ imageSrc, onSrcChange, presignedUploadGett
 			/>
 
 			<ImageUploadCard
+				className={className}
 				imagePreview={imagePreviewSrc}
 				isUploading={isUploading}
 				progress={progress}
