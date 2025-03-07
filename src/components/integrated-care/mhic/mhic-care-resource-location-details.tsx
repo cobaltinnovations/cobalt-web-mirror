@@ -150,8 +150,15 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 														</Col>
 														<Col xs={9}>
 															<p className="m-0">
-																{careResourceLocation.formattedPhoneNumber ??
-																	'Not provided'}
+																{careResourceLocation.formattedPhoneNumber ? (
+																	<a
+																		href={`tel:${careResourceLocation.formattedPhoneNumber}`}
+																	>
+																		{careResourceLocation.formattedPhoneNumber}
+																	</a>
+																) : (
+																	'Not provided'
+																)}
 															</p>
 														</Col>
 													</Row>
@@ -161,7 +168,15 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 														</Col>
 														<Col xs={9}>
 															<p className="m-0">
-																{careResourceLocation.emailAddress ?? 'Not provided'}
+																{careResourceLocation.emailAddress ? (
+																	<a
+																		href={`mailto:${careResourceLocation.emailAddress}`}
+																	>
+																		{careResourceLocation.emailAddress}
+																	</a>
+																) : (
+																	'Not provided'
+																)}
 															</p>
 														</Col>
 													</Row>
@@ -171,7 +186,17 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 														</Col>
 														<Col xs={9}>
 															<p className="m-0">
-																{careResourceLocation.websiteUrl ?? 'Not provided'}
+																{careResourceLocation.websiteUrl ? (
+																	<a
+																		href={careResourceLocation.websiteUrl}
+																		target="_blank"
+																		rel="noreferrer"
+																	>
+																		{careResourceLocation.websiteUrl}
+																	</a>
+																) : (
+																	'Not provided'
+																)}
 															</p>
 														</Col>
 													</Row>
