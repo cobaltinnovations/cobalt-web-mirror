@@ -19,6 +19,7 @@ import {
 	PatientOrderOutreachStatusId,
 	PatientOrderResourceCheckInResponseStatusId,
 	PatientOrderResourcingStatusId,
+	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
 
@@ -139,6 +140,20 @@ const availableFilters: Filter[] = [
 			{
 				title: 'Assigned',
 				value: PatientOrderAssignmentStatusId.ASSIGNED,
+			},
+		],
+	},
+	{
+		filterId: 'patientOrderSafetyPlanningStatusId',
+		title: 'Safety Planning Status',
+		options: [
+			{
+				title: 'Needs Safety Planning',
+				value: PatientOrderSafetyPlanningStatusId.NEEDS_SAFETY_PLANNING,
+			},
+			{
+				title: 'Connected To Safety Planning',
+				value: PatientOrderSafetyPlanningStatusId.CONNECTED_TO_SAFETY_PLANNING,
 			},
 		],
 	},
