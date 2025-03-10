@@ -271,7 +271,8 @@ const PageBuilder = () => {
 							<p>This page will become live on Cobalt immediately at {page?.urlName}</p>
 							<p className="mb-0">
 								IMPORTANT: If you would like to make this page a featured page on the homescreen or
-								include it in the main navigation, please contact Mark Allen at [TODO].
+								include it in the main navigation, please contact{' '}
+								<a href="mailto:support@cobaltinnovations.org">support@cobaltinnovations.org</a>
 							</p>
 						</div>
 					)
