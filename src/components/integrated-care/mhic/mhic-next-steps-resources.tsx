@@ -156,19 +156,21 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 							variant="warning"
 							title="Patient needs resources"
 							description={
-								<>
-									Remember to send a{' '}
-									<Button
-										variant="link"
-										className="p-0 m-0 fw-normal"
-										onClick={() => {
-											setShowExampleMessageModal(true);
-										}}
-									>
-										{institution.myChartName} message
-									</Button>{' '}
-									to the patient once resources are available.
-								</>
+								institution.resourcePacketsEnabled ? (
+									<>
+										Remember to send a{' '}
+										<Button
+											variant="link"
+											className="p-0 m-0 fw-normal"
+											onClick={() => {
+												setShowExampleMessageModal(true);
+											}}
+										>
+											{institution.myChartName} message
+										</Button>{' '}
+										to the patient once resources are available.
+									</>
+								) : undefined
 							}
 							action={{
 								title: 'Mark as sent',
@@ -187,18 +189,20 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 						variant="success"
 						title={`Resources sent on ${patientOrder.resourcesSentAtDescription}`}
 						description={
-							<>
-								View{' '}
-								<Button
-									variant="link"
-									className="p-0 m-0 fw-normal"
-									onClick={() => {
-										setShowExampleMessageModal(true);
-									}}
-								>
-									{institution.myChartName} example message
-								</Button>
-							</>
+							institution.resourcePacketsEnabled ? (
+								<>
+									View{' '}
+									<Button
+										variant="link"
+										className="p-0 m-0 fw-normal"
+										onClick={() => {
+											setShowExampleMessageModal(true);
+										}}
+									>
+										{institution.myChartName} example message
+									</Button>
+								</>
+							) : undefined
 						}
 					/>
 				)}
