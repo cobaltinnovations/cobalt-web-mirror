@@ -30,7 +30,7 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 		try {
 			const { accessToken } = await accountService
 				.createAnonymousAccount({
-					subdomain,
+					accountSourceId: AccountSourceId.ANONYMOUS,
 				})
 				.fetch();
 
@@ -41,7 +41,7 @@ export const SignInShell = ({ defaultView }: SignInShellProps) => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [handleError, navigate, subdomain]);
+	}, [handleError, navigate]);
 
 	const handleAccountSourceClick = useCallback(
 		async (accountSource: AccountSource) => {

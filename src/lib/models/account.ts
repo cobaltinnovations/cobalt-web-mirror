@@ -4,6 +4,7 @@ import { FeatureId } from './institution';
 export enum AccountSourceId {
 	COBALT_SSO = 'COBALT_SSO',
 	ANONYMOUS = 'ANONYMOUS',
+	ANONYMOUS_IMPLICIT = 'ANONYMOUS_IMPLICIT',
 	EMAIL_PASSWORD = 'EMAIL_PASSWORD',
 	MYCHART = 'MYCHART',
 }
