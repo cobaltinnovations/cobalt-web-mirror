@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { LoaderFunctionArgs, redirect, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import { getSubdomain } from '@/lib/utils';
-import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import { AccountSourceId, AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 function useStudyOnboardingLoaderData() {
 	return useRouteLoaderData('study-onboarding') as Awaited<ReturnType<typeof loader>>;
@@ -37,7 +37,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 		// If the user is not authenticated, create an anonymous account for them,
 		// set the redirect url to the onboarding url, and direct them to the auth route.
-		const accountRequest = accountService.createAnonymousAccount({ subdomain });
+		const accountRequest = accountService.createAnonymousAccount({
+			accountSourceId: AccountSourceId.ANONYMOUS_IMPLICIT,
+		});
+
 		request.signal.addEventListener('abort', accountRequest.abort);
 		const { accessToken } = await accountRequest.fetch();
 

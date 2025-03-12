@@ -9,6 +9,7 @@ import {
 	Institution,
 	AccountSupportRole,
 	AccountFeature,
+	AccountSourceId,
 } from '@/lib/models';
 
 export interface AccountResponse {
@@ -98,7 +99,7 @@ export interface EpicPatientData {
 }
 
 export interface CreateAnonymousAccountRequestBody {
-	subdomain?: string;
+	accountSourceId: AccountSourceId;
 }
 
 export interface InviteAccountRequestBody {
