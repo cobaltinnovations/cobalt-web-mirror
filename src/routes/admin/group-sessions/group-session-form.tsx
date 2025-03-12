@@ -913,14 +913,14 @@ export const Component = () => {
 											Feature either a person's face, a calming piece of art, or an abstract image
 											of nature
 										</li>
-										<li>Are at lesat 850x450 pixels in size</li>
+										<li>Are at least 800x450 pixels in size</li>
 										<li>Can be cropped to different sizes without losing important details</li>
 									</ul>
 									<h6 className="text-gray text-uppercase fw-normal">Inappropriate Images</h6>
 									<ul>
 										<li>Depict scenes of low mood, anxiety, or other distress</li>
 										<li>Include clichés</li>
-										<li>Are smaller than 850x450 pixels</li>
+										<li>Are smaller than 800x450 pixels</li>
 									</ul>
 								</div>
 							}
@@ -934,7 +934,7 @@ export const Component = () => {
 						<p className="mb-4">
 							Add an image that represents the subject matter of your post.
 							<br />
-							Your image shold be at least 850x450px. It will be cropped to a 16:9 ratio.
+							Your image should be at least 800x450px. It will be cropped to a 16:9 ratio.
 						</p>
 						<Button
 							type="button"
