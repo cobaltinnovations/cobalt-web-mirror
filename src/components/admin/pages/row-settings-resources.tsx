@@ -16,7 +16,8 @@ interface RowSettingsResourcesProps {
 
 export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsResourcesProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
+	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
+		usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as ResourcesRowModel | undefined, [currentPageRow]);
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 
@@ -106,6 +107,11 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 				onBackButtonClick={onBackButtonClick}
 				showDeleteButton
 				onDeleteButtonClick={onDeleteButtonClick}
+				showCloseButton
+				onCloseButtonButtonClick={() => {
+					setCurrentPageSectionId('');
+					setCurrentPageRowId('');
+				}}
 				title={`Resources (${(resourcesRow?.contents ?? []).length})`}
 				customHeaderElements={
 					<Button className="me-2" size="sm" onClick={() => setShowSelectResourcesModal(true)}>

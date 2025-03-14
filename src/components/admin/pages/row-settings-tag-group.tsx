@@ -14,7 +14,8 @@ interface RowSettingsTagGroupProps {
 
 export const RowSettingsTagGroup = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsTagGroupProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
+	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
+		usePageBuilderContext();
 	const resourcesRow = useMemo(() => currentPageRow as TagGroupRowModel | undefined, [currentPageRow]);
 	const [tagGroupOptions, setTagGroupOptions] = useState<TagGroup[]>([]);
 	const [formValues, setFormValues] = useState({ tagGroupId: '' });
@@ -57,6 +58,11 @@ export const RowSettingsTagGroup = ({ onBackButtonClick, onDeleteButtonClick }: 
 			onBackButtonClick={onBackButtonClick}
 			showDeleteButton
 			onDeleteButtonClick={onDeleteButtonClick}
+			showCloseButton
+			onCloseButtonButtonClick={() => {
+				setCurrentPageSectionId('');
+				setCurrentPageRowId('');
+			}}
 			title="Tag Group"
 		>
 			<AsyncWrapper fetchData={fetchData}>
