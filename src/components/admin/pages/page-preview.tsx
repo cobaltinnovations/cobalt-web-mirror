@@ -1,17 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
-import { BACKGROUND_COLOR_ID, Content, PageDetailModel, Tag } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, BACKGROUND_COLOR_ID, Content, PageDetailModel, Tag } from '@/lib/models';
 import PageHeader from '@/components/page-header';
 import { getRendererForPageRow } from '@/components/admin/pages';
-import { resourceLibraryService } from '@/lib/services';
+import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 interface PagePreviewProps {
 	page: PageDetailModel;
+	enableAnalytics: boolean;
 }
 
-export const PagePreview = ({ page }: PagePreviewProps) => {
+export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
 
@@ -34,7 +35,11 @@ export const PagePreview = ({ page }: PagePreviewProps) => {
 					{}
 				)
 		);
-	}, []);
+
+		if (enableAnalytics) {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PAGE, { pageId: page.pageId });
+		}
+	}, [enableAnalytics, page.pageId]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -77,7 +82,14 @@ export const PagePreview = ({ page }: PagePreviewProps) => {
 
 							return (
 								<React.Fragment key={r.pageRowId}>
-									{getRendererForPageRow(r, contentsByTagGroupId ?? {}, tagsByTagId ?? {}, isLast)}
+									{getRendererForPageRow({
+										pageId: page.pageId,
+										pageRow: r,
+										contentsByTagGroupId: contentsByTagGroupId ?? {},
+										tagsByTagId: tagsByTagId ?? {},
+										isLast,
+										enableAnalytics,
+									})}
 								</React.Fragment>
 							);
 						})}

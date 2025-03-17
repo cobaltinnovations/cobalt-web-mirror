@@ -16,5 +16,5 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { page } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-	return <PagePreview page={page} />;
+	return <PagePreview page={page} enableAnalytics={true} />;
 };

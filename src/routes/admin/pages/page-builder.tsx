@@ -396,7 +396,9 @@ const PageBuilder = () => {
 					</div>
 				</CSSTransition>
 				<div className={classes.previewPane}>
-					<div className={classes.previewPage}>{page && <PagePreview page={page} />}</div>
+					<div className={classes.previewPage}>
+						{page && <PagePreview page={page} enableAnalytics={false} />}
+					</div>
 				</div>
 			</div>
 		</AsyncWrapper>
