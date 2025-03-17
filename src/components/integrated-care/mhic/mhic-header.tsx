@@ -172,7 +172,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 				title: 'Admin',
 				active: adminMatch,
 				items: [
-					...(account?.accountCapabilityFlags.canManageCareResources && institution?.resourcePacketsEnabled
+					...(account?.accountCapabilityFlags.canManageCareResources
 						? [
 								{
 									testId: '',
@@ -213,7 +213,6 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 			account?.accountCapabilityFlags.canManageCareResources,
 			account?.accountCapabilityFlags.canViewIcReports,
 			adminMatch,
-			institution?.resourcePacketsEnabled,
 			myPatientsMatch,
 			overviewMatch,
 			patientOrdersMatch,
