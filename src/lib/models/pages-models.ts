@@ -1,6 +1,4 @@
-import { Content } from '@/lib/models/content';
-import { GroupSessionModel } from '@/lib/models/group-session-models';
-import { TagGroup } from './tag-groups';
+import { COLOR_IDS, Content, GroupSessionModel, Tag, TagGroup } from '@/lib/models';
 
 export enum PAGE_STATUS_ID {
 	LIVE = 'LIVE',
@@ -16,6 +14,7 @@ export enum ROW_TYPE_ID {
 	RESOURCES = 'RESOURCES',
 	GROUP_SESSIONS = 'GROUP_SESSIONS',
 	TAG_GROUP = 'TAG_GROUP',
+	TAG = 'TAG',
 	ONE_COLUMN_IMAGE = 'ONE_COLUMN_IMAGE',
 	TWO_COLUMN_IMAGE = 'TWO_COLUMN_IMAGE',
 	THREE_COLUMN_IMAGE = 'THREE_COLUMN_IMAGE',
@@ -72,6 +71,7 @@ export type PageRowUnionModel =
 	| ResourcesRowModel
 	| GroupSessionsRowModel
 	| TagGroupRowModel
+	| TagRowModel
 	| OneColumnImageRowModel
 	| TwoColumnImageRowModel
 	| ThreeColumnImageRowModel;
@@ -98,6 +98,15 @@ export interface TagGroupRowModel {
 	rowTypeId: ROW_TYPE_ID;
 	displayOrder: number;
 	tagGroup: TagGroup;
+}
+
+export interface TagRowModel {
+	tagGroupColorId: COLOR_IDS;
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	displayOrder: number;
+	tag: Tag;
 }
 
 export interface OneColumnImageRowModel {
@@ -148,6 +157,10 @@ export const isGroupSessionsRow = (x: PageRowUnionModel): x is GroupSessionsRowM
 
 export const isTagGroupRow = (x: PageRowUnionModel): x is TagGroupRowModel => {
 	return x.hasOwnProperty('tagGroup');
+};
+
+export const isTagRow = (x: PageRowUnionModel): x is TagRowModel => {
+	return x.hasOwnProperty('tag');
 };
 
 export const isOneColumnImageRow = (x: PageRowUnionModel): x is OneColumnImageRowModel => {

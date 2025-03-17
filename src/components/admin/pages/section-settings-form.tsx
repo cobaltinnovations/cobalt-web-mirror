@@ -11,11 +11,13 @@ import {
 	isOneColumnImageRow,
 	isResourcesRow,
 	isTagGroupRow,
+	isTagRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
 	PageRowUnionModel,
 	ResourcesRowModel,
 	TagGroupRowModel,
+	TagRowModel,
 } from '@/lib/models';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { DraggableItem } from './draggable-item';
@@ -55,6 +57,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			{ check: isResourcesRow, title: 'Resources' },
 			{ check: isGroupSessionsRow, title: 'Group Sessions' },
 			{ check: isTagGroupRow, title: 'Tag Group' },
+			{ check: isTagRow, title: 'Tag' },
 			{
 				check: (row: PageRowUnionModel) =>
 					isOneColumnImageRow(row) || isTwoColumnImageRow(row) || isThreeColumnImageRow(row),
@@ -84,6 +87,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					`${row.groupSessions.length} Session${row.groupSessions.length === 1 ? '' : 's'}`,
 			},
 			{ check: isTagGroupRow, getSubtitle: (row: TagGroupRowModel) => row.tagGroup.name },
+			{ check: isTagRow, getSubtitle: (row: TagRowModel) => row.tag.name },
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
