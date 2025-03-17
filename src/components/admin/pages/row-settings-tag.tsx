@@ -14,7 +14,8 @@ interface RowSettingsTagProps {
 
 export const RowSettingsTag = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsTagProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
+	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
+		usePageBuilderContext();
 	const tagRow = useMemo(() => currentPageRow as TagRowModel | undefined, [currentPageRow]);
 	const [tagGroupOptions, setTagGroupOptions] = useState<TagGroup[]>([]);
 	const [formValues, setFormValues] = useState({ tagId: '' });
@@ -57,6 +58,11 @@ export const RowSettingsTag = ({ onBackButtonClick, onDeleteButtonClick }: RowSe
 			onBackButtonClick={onBackButtonClick}
 			showDeleteButton
 			onDeleteButtonClick={onDeleteButtonClick}
+			showCloseButton
+			onCloseButtonButtonClick={() => {
+				setCurrentPageSectionId('');
+				setCurrentPageRowId('');
+			}}
 			title="Tag"
 		>
 			<AsyncWrapper fetchData={fetchData}>
