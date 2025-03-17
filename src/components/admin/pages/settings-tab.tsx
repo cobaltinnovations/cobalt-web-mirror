@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import InputHelper from '@/components/input-helper';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
+import { EditUrlModal } from '@/components/admin/pages';
+import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
 	const { page, setPage, setIsSaving } = usePageBuilderContext();
+	const [showEditUrlModal, setShowEditUrlModal] = useState(false);
 	const [formValues, setFormValues] = useState({
 		pageName: '',
 		friendlyUrl: '',
@@ -65,6 +68,15 @@ export const SettingsTab = () => {
 
 	return (
 		<>
+			<EditUrlModal
+				show={showEditUrlModal}
+				onHide={() => {
+					setShowEditUrlModal(false);
+				}}
+				onSave={() => {
+					setShowEditUrlModal(false);
+				}}
+			/>
 			<InputHelper
 				className="mb-4"
 				type="text"
@@ -75,21 +87,29 @@ export const SettingsTab = () => {
 				required
 			/>
 			<InputHelper
-				className="mb-1"
+				className="mb-4"
 				type="text"
 				label="Friendly url"
 				name="friendlyUrl"
 				value={formValues.friendlyUrl}
-				onChange={handleInputChange}
+				onChange={() => {
+					return;
+				}}
 				required
 				disabled
 			/>
-			<div className="d-flex align-items-center">
-				<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
-				<p className="mb-0 small">
-					{window.location.host}/pages/
-					<span className="fw-bold">{formValues.friendlyUrl}</span>
-				</p>
+			<div className="d-flex justify-content-end">
+				<Button
+					variant="light"
+					className="d-flex align-items-center"
+					onClick={() => {
+						setShowEditUrlModal(true);
+					}}
+					disabled={page?.editingLivePage}
+				>
+					<EditIcon className="me-2" width={20} height={20} />
+					Edit URL
+				</Button>
 			</div>
 		</>
 	);
