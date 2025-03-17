@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { RefObject, useMemo, useRef } from 'react';
-import ReactQuill from 'react-quill';
+import React, { RefObject, useRef } from 'react';
+import ReactQuill, { Quill } from 'react-quill';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import 'react-quill/dist/quill.snow.css';
@@ -9,6 +9,24 @@ interface UseWysiwygStylesProps {
 	height?: number;
 }
 
+const customFontSizes = [
+	{
+		title: 'Small',
+		fontSize: 14,
+		lineHeight: 20,
+	},
+	{
+		title: 'Normal',
+		fontSize: 16,
+		lineHeight: 24,
+	},
+	{
+		title: 'Large',
+		fontSize: 18,
+		lineHeight: 28,
+	},
+];
+
 const useWysiwygStyles = createUseThemedStyles((theme) => ({
 	quill: {
 		'& .ql-toolbar': {
@@ -16,6 +34,26 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 			borderTopRightRadius: 8,
 			borderColor: theme.colors.n100,
 			backgroundColor: theme.colors.n75,
+			...customFontSizes.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[`& .ql-picker.ql-size .ql-picker-label[data-value="${currentValue.fontSize}px"]::before`]: {
+						content: `"${currentValue.title}" !important`,
+					},
+				}),
+				{} as Record<string, object>
+			),
+			...customFontSizes.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[`& .ql-picker.ql-size .ql-picker-item[data-value="${currentValue.fontSize}px"]::before`]: {
+						content: `"${currentValue.title}" !important`,
+						fontSize: `${currentValue.fontSize}px !important`,
+						lineHeight: `${currentValue.lineHeight}px !important`,
+					},
+				}),
+				{} as Record<string, object>
+			),
 		},
 		'& .ql-container': {
 			borderBottomLeftRadius: 8,
@@ -37,7 +75,17 @@ interface WysiwygProps {
 	height?: number;
 }
 
-const formats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
+const SizeStyle = Quill.import('attributors/style/size');
+SizeStyle.whitelist = customFontSizes.map((cfs) => `${cfs.fontSize}px`);
+Quill.register(SizeStyle, true);
+const quillModules = {
+	toolbar: [
+		[{ size: customFontSizes.map((cfs) => `${cfs.fontSize}px`) }],
+		['bold', 'italic', 'underline', 'strike'],
+		[{ list: 'ordered' }, { list: 'bullet' }],
+		['link', 'clean'],
+	],
+};
 
 const WysiwygBasic = React.forwardRef(
 	(
@@ -45,17 +93,6 @@ const WysiwygBasic = React.forwardRef(
 		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
 	) => {
 		const classes = useWysiwygStyles({ height });
-		const quillModules = useMemo(
-			() => ({
-				toolbar: [
-					[{ size: ['small', false, 'large', 'huge'] }],
-					['bold', 'italic', 'underline', 'strike'],
-					[{ list: 'ordered' }, { list: 'bullet' }],
-					['link', 'clean'],
-				],
-			}),
-			[]
-		);
 		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
 
 		return (
@@ -68,7 +105,6 @@ const WysiwygBasic = React.forwardRef(
 				onChange={onChange}
 				modules={quillModules}
 				readOnly={disabled}
-				formats={formats}
 				bounds={`#${reactQuillId}`}
 			/>
 		);
