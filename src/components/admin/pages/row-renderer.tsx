@@ -40,7 +40,13 @@ interface RowRendererProps<T = PageRowUnionModel> {
 	className?: string;
 }
 
-const ResourcesRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRendererProps<ResourcesRowModel>) => {
+const ResourcesRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	tagsByTagId,
+	enableAnalytics,
+}: RowRendererProps<ResourcesRowModel>) => {
 	return (
 		<Row className={className}>
 			{pageRow.contents.map((content) => (
@@ -58,12 +64,20 @@ const ResourcesRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRe
 						contentTypeId={content.contentTypeId}
 						duration={content.durationInMinutesDescription}
 						trackEvent={() => {
+							if (!enableAnalytics) {
+								return;
+							}
+
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CONTENT, {
 								pageId,
 								contentId: content.contentId,
 							});
 						}}
 						trackTagEvent={(tag) => {
+							if (!enableAnalytics) {
+								return;
+							}
+
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 								pageId,
 								tagId: tag.tagId,
@@ -76,7 +90,12 @@ const ResourcesRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRe
 	);
 };
 
-const GroupSessionsRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<GroupSessionsRowModel>) => {
+const GroupSessionsRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+}: RowRendererProps<GroupSessionsRowModel>) => {
 	return (
 		<Row className={className}>
 			{pageRow.groupSessions.map((groupSession) => (
@@ -85,6 +104,10 @@ const GroupSessionsRowRenderer = ({ pageId, pageRow, className }: RowRendererPro
 						className="d-block text-decoration-none h-100"
 						to={`/group-sessions/${groupSession.urlName}`}
 						onClick={() => {
+							if (!enableAnalytics) {
+								return;
+							}
+
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_GROUP_SESSION, {
 								pageId,
 								groupSessionId: groupSession.groupSessionId,
@@ -105,6 +128,7 @@ const TagGroupRowRenderer = ({
 	className,
 	contentsByTagGroupId,
 	tagsByTagId,
+	enableAnalytics,
 }: RowRendererProps<TagGroupRowModel>) => {
 	return (
 		<Row className={className}>
@@ -116,6 +140,10 @@ const TagGroupRowRenderer = ({
 					description={pageRow.tagGroup.description}
 					to={`/resource-library/tag-groups/${pageRow.tagGroup.urlName}`}
 					onClick={() => {
+						if (!enableAnalytics) {
+							return;
+						}
+
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG_GROUP, {
 							pageId,
 							tagId: pageRow.tagGroup.tagGroupId,
@@ -144,6 +172,10 @@ const TagGroupRowRenderer = ({
 								contentTypeId={content.contentTypeId}
 								duration={content.durationInMinutesDescription}
 								trackEvent={() => {
+									if (!enableAnalytics) {
+										return;
+									}
+
 									analyticsService.persistEvent(
 										AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CONTENT,
 										{
@@ -153,6 +185,10 @@ const TagGroupRowRenderer = ({
 									);
 								}}
 								trackTagEvent={(tag) => {
+									if (!enableAnalytics) {
+										return;
+									}
+
 									analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 										pageId,
 										tagId: tag.tagId,
@@ -167,7 +203,13 @@ const TagGroupRowRenderer = ({
 	);
 };
 
-const TagRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRendererProps<TagRowModel>) => {
+const TagRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	tagsByTagId,
+	enableAnalytics,
+}: RowRendererProps<TagRowModel>) => {
 	const [content, setContent] = useState<Content[]>([]);
 
 	const fetchContent = useCallback(async () => {
@@ -196,6 +238,10 @@ const TagRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRenderer
 						description={pageRow.tag.description}
 						to={`/resource-library/tags/${pageRow.tag.urlName}`}
 						onClick={() => {
+							if (!enableAnalytics) {
+								return;
+							}
+
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 								pageId,
 								tagId: pageRow.tag.tagId,
@@ -224,6 +270,10 @@ const TagRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRenderer
 									contentTypeId={content.contentTypeId}
 									duration={content.durationInMinutesDescription}
 									trackEvent={() => {
+										if (!enableAnalytics) {
+											return;
+										}
+
 										analyticsService.persistEvent(
 											AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CONTENT,
 											{
@@ -233,6 +283,10 @@ const TagRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRenderer
 										);
 									}}
 									trackTagEvent={(tag) => {
+										if (!enableAnalytics) {
+											return;
+										}
+
 										analyticsService.persistEvent(
 											AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG,
 											{
@@ -251,7 +305,12 @@ const TagRowRenderer = ({ pageId, pageRow, className, tagsByTagId }: RowRenderer
 	);
 };
 
-const OneColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<OneColumnImageRowModel>) => {
+const OneColRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+}: RowRendererProps<OneColumnImageRowModel>) => {
 	return (
 		<Row className={classNames('align-items-center', className)}>
 			<Col xs={12} lg={6} className="mb-10 mb-lg-0">
@@ -273,6 +332,10 @@ const OneColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<OneC
 					<WysiwygDisplay
 						html={pageRow.columnOne.description ?? ''}
 						onClick={({ linkUrl, linkText }) => {
+							if (!enableAnalytics) {
+								return;
+							}
+
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
 								pageId,
 								linkUrl,
@@ -286,7 +349,12 @@ const OneColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<OneC
 	);
 };
 
-const TwoColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<TwoColumnImageRowModel>) => {
+const TwoColRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+}: RowRendererProps<TwoColumnImageRowModel>) => {
 	return (
 		<Row className={className}>
 			<Col xs={12} lg={6} className="mb-16 mb-lg-0">
@@ -299,6 +367,10 @@ const TwoColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<TwoC
 				<WysiwygDisplay
 					html={pageRow.columnOne.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
+						if (!enableAnalytics) {
+							return;
+						}
+
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
 							pageId,
 							linkUrl,
@@ -317,6 +389,10 @@ const TwoColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<TwoC
 				<WysiwygDisplay
 					html={pageRow.columnTwo.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
+						if (!enableAnalytics) {
+							return;
+						}
+
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
 							pageId,
 							linkUrl,
@@ -329,7 +405,12 @@ const TwoColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<TwoC
 	);
 };
 
-const ThreeColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<ThreeColumnImageRowModel>) => {
+const ThreeColRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+}: RowRendererProps<ThreeColumnImageRowModel>) => {
 	return (
 		<Row className={className}>
 			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
@@ -342,6 +423,10 @@ const ThreeColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<Th
 				<WysiwygDisplay
 					html={pageRow.columnOne.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
+						if (!enableAnalytics) {
+							return;
+						}
+
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
 							pageId,
 							linkUrl,
@@ -360,6 +445,10 @@ const ThreeColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<Th
 				<WysiwygDisplay
 					html={pageRow.columnTwo.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
+						if (!enableAnalytics) {
+							return;
+						}
+
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
 							pageId,
 							linkUrl,
@@ -378,6 +467,10 @@ const ThreeColRowRenderer = ({ pageId, pageRow, className }: RowRendererProps<Th
 				<WysiwygDisplay
 					html={pageRow.columnThree.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
+						if (!enableAnalytics) {
+							return;
+						}
+
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
 							pageId,
 							linkUrl,
