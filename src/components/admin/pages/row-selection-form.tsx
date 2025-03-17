@@ -11,14 +11,11 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
-interface RowSelectionFormProps {
-	onRowAdded(): void;
-}
-
-export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
+export const RowSelectionForm = () => {
 	const handleError = useHandleError();
 
-	const { currentPageSection, addPageRowToCurrentPageSection, setIsSaving } = usePageBuilderContext();
+	const { currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
+		usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 	const [showSelectTagModal, setShowSelectTagModal] = useState(false);
@@ -36,7 +33,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 				.fetch();
 			addPageRowToCurrentPageSection(pageRow);
 			setShowSelectResourcesModal(false);
-			onRowAdded();
+			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -57,7 +54,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 				.fetch();
 			addPageRowToCurrentPageSection(pageRow);
 			setShowSelectGroupSessionsModal(false);
-			onRowAdded();
+			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -72,8 +69,8 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 			}
 			const { pageRow } = await pagesService.createTagRow(currentPageSection.pageSectionId, { tagId }).fetch();
 			addPageRowToCurrentPageSection(pageRow);
-			setShowSelectTagModal(false);
-			onRowAdded();
+			setShowSelectTagGroupModal(false);
+			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -91,7 +88,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 
 			const { pageRow } = await pagesService.createOneColumnRow(currentPageSection.pageSectionId).fetch();
 			addPageRowToCurrentPageSection(pageRow);
-			onRowAdded();
+			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -109,7 +106,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 
 			const { pageRow } = await pagesService.createTwoColumnRow(currentPageSection.pageSectionId).fetch();
 			addPageRowToCurrentPageSection(pageRow);
-			onRowAdded();
+			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -127,7 +124,7 @@ export const RowSelectionForm = ({ onRowAdded }: RowSelectionFormProps) => {
 
 			const { pageRow } = await pagesService.createThreeColumnRow(currentPageSection.pageSectionId).fetch();
 			addPageRowToCurrentPageSection(pageRow);
-			onRowAdded();
+			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
