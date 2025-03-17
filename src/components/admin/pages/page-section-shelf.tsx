@@ -8,6 +8,7 @@ import {
 	RowSettingsGroupSessions,
 	RowSettingsOneColumn,
 	RowSettingsResources,
+	RowSettingsTag,
 	RowSettingsTagGroup,
 	RowSettingsThreeColumns,
 	RowSettingsTwoColumns,
@@ -233,6 +234,15 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 
 						{pageState === ROW_TYPE_ID.TAG_GROUP && (
 							<RowSettingsTagGroup
+								onBackButtonClick={handleRowBack}
+								onDeleteButtonClick={() => {
+									setShowRowDeleteModal(true);
+								}}
+							/>
+						)}
+
+						{pageState === ROW_TYPE_ID.TAG && (
+							<RowSettingsTag
 								onBackButtonClick={handleRowBack}
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);

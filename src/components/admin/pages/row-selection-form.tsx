@@ -5,7 +5,7 @@ import {
 	CustomRowButton,
 	SelectGroupSessionsModal,
 	SelectResourcesModal,
-	SelectTagGroupModal,
+	SelectTagModal,
 } from '@/components/admin/pages';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -18,7 +18,7 @@ export const RowSelectionForm = () => {
 		usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
-	const [showSelectTagGroupModal, setShowSelectTagGroupModal] = useState(false);
+	const [showSelectTagModal, setShowSelectTagModal] = useState(false);
 
 	const handleResourcesAdd = async (contentIds: string[]) => {
 		setIsSaving(true);
@@ -62,17 +62,12 @@ export const RowSelectionForm = () => {
 		}
 	};
 
-	const handleTagGroupAdd = async (tagGroupId: string) => {
-		setIsSaving(true);
-
+	const handleTagAdd = async (tagId: string) => {
 		try {
 			if (!currentPageSection) {
 				throw new Error('currentPageSection is undefined.');
 			}
-
-			const { pageRow } = await pagesService
-				.createTagGroupRow(currentPageSection.pageSectionId, { tagGroupId })
-				.fetch();
+			const { pageRow } = await pagesService.createTagRow(currentPageSection.pageSectionId, { tagId }).fetch();
 			addPageRowToCurrentPageSection(pageRow);
 			setShowSelectTagGroupModal(false);
 			setCurrentPageRowId(pageRow.pageRowId);
@@ -157,12 +152,12 @@ export const RowSelectionForm = () => {
 				}}
 			/>
 
-			<SelectTagGroupModal
-				tagGroupId=""
-				show={showSelectTagGroupModal}
-				onAdd={handleTagGroupAdd}
+			<SelectTagModal
+				tagId=""
+				show={showSelectTagModal}
+				onAdd={handleTagAdd}
 				onHide={() => {
-					setShowSelectTagGroupModal(false);
+					setShowSelectTagModal(false);
 				}}
 			/>
 
@@ -189,10 +184,10 @@ export const RowSelectionForm = () => {
 						<Button
 							className="ms-1 flex-fill"
 							onClick={() => {
-								setShowSelectTagGroupModal(true);
+								setShowSelectTagModal(true);
 							}}
 						>
-							Tag Group
+							Tag
 						</Button>
 					</div>
 				</div>

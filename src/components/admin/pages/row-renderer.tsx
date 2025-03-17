@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -9,6 +9,7 @@ import {
 	isOneColumnImageRow,
 	isResourcesRow,
 	isTagGroupRow,
+	isTagRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
 	OneColumnImageRowModel,
@@ -16,6 +17,7 @@ import {
 	ResourcesRowModel,
 	Tag,
 	TagGroupRowModel,
+	TagRowModel,
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
 } from '@/lib/models';
@@ -25,6 +27,8 @@ import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
+import { resourceLibraryService } from '@/lib/services';
+import AsyncWrapper from '@/components/async-page';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageRow: T;
@@ -114,6 +118,66 @@ const TagGroupRowRenderer = ({
 				</Carousel>
 			</Col>
 		</Row>
+	);
+};
+
+const TagRowRenderer = ({ pageRow, className, tagsByTagId }: RowRendererProps<TagRowModel>) => {
+	const [content, setContent] = useState<Content[]>([]);
+
+	const fetchContent = useCallback(async () => {
+		if (!pageRow.tag.urlName) {
+			throw new Error('pageRow.tag.urlName is undefined.');
+		}
+
+		const { findResult } = await resourceLibraryService
+			.getResourceLibraryContentByUrlName(pageRow.tag.urlName, {
+				pageNumber: 0,
+				pageSize: 200,
+			})
+			.fetch();
+
+		setContent(findResult.contents);
+	}, [pageRow.tag.urlName]);
+
+	return (
+		<AsyncWrapper fetchData={fetchContent}>
+			<Row className={className}>
+				<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+					<ResourceLibrarySubtopicCard
+						className="h-100"
+						colorId={pageRow.tagGroupColorId}
+						title={pageRow.tag.name}
+						description={pageRow.tag.description}
+						to={`/resource-library/tags/${pageRow.tag.urlName}`}
+					/>
+				</Col>
+				<Col lg={9}>
+					<Carousel
+						responsive={resourceLibraryCarouselConfig}
+						trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+						floatingButtonGroup
+					>
+						{content.map((content) => {
+							return (
+								<ResourceLibraryCard
+									key={content.contentId}
+									linkTo={`/resource-library/${content.contentId}`}
+									className="h-100"
+									imageUrl={content.imageUrl}
+									badgeTitle={content.newFlag ? 'New' : ''}
+									title={content.title}
+									author={content.author}
+									description={content.description}
+									tags={content.tagIds.map((tagId) => tagsByTagId?.[tagId] ?? null).filter(Boolean)}
+									contentTypeId={content.contentTypeId}
+									duration={content.durationInMinutesDescription}
+								/>
+							);
+						})}
+					</Carousel>
+				</Col>
+			</Row>
+		</AsyncWrapper>
 	);
 };
 
@@ -233,6 +297,17 @@ export const getRendererForPageRow = (
 			check: isTagGroupRow,
 			getRow: (row: any) => (
 				<TagGroupRowRenderer
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
+		},
+		{
+			check: isTagRow,
+			getRow: (row: any) => (
+				<TagRowRenderer
 					pageRow={row}
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
