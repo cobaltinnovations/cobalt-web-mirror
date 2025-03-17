@@ -114,17 +114,8 @@ export const RowSettingsThreeColumns = () => {
 		[debouncedSubmission]
 	);
 
-	const handleImageChange = useCallback(
-		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
-				[column]: {
-					...previousValue[column],
-					imageFileUploadId: nextId,
-					imageUrl: nextSrc,
-				},
-			}));
-
+	const handleUploadComplete = useCallback(
+		async (column: keyof typeof formValues, imageFileUploadId: string) => {
 			setIsSaving(true);
 
 			try {
@@ -137,7 +128,7 @@ export const RowSettingsThreeColumns = () => {
 						...formValues,
 						[column]: {
 							...formValues[column],
-							imageFileUploadId: nextId,
+							imageFileUploadId,
 						},
 					})
 					.fetch();
@@ -150,6 +141,24 @@ export const RowSettingsThreeColumns = () => {
 			}
 		},
 		[formValues, handleError, setIsSaving, threeColumnImageRow, updatePageRow]
+	);
+
+	const handleImageChange = useCallback(
+		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
+			setFormValues((previousValue) => ({
+				...previousValue,
+				[column]: {
+					...previousValue[column],
+					imageFileUploadId: nextId,
+					imageUrl: nextSrc,
+				},
+			}));
+
+			if (!nextId && !nextSrc) {
+				handleUploadComplete(column, '');
+			}
+		},
+		[handleUploadComplete]
 	);
 
 	return (
@@ -182,6 +191,9 @@ export const RowSettingsThreeColumns = () => {
 						imageSrc={formValues.columnOne.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
 							handleImageChange('columnOne', { nextId, nextSrc });
+						}}
+						onUploadComplete={(fileUploadId) => {
+							handleUploadComplete('columnOne', fileUploadId);
 						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({
@@ -231,6 +243,9 @@ export const RowSettingsThreeColumns = () => {
 						onSrcChange={(nextId, nextSrc) => {
 							handleImageChange('columnTwo', { nextId, nextSrc });
 						}}
+						onUploadComplete={(fileUploadId) => {
+							handleUploadComplete('columnTwo', fileUploadId);
+						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
@@ -278,6 +293,9 @@ export const RowSettingsThreeColumns = () => {
 						imageSrc={formValues.columnThree.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
 							handleImageChange('columnThree', { nextId, nextSrc });
+						}}
+						onUploadComplete={(fileUploadId) => {
+							handleUploadComplete('columnThree', fileUploadId);
 						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({

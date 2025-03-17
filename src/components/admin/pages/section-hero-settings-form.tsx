@@ -74,14 +74,8 @@ export const SectionHeroSettingsForm = () => {
 		[debouncedSubmission]
 	);
 
-	const handleImageChange = useCallback(
-		async (nextId: string, nextSrc: string) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
-				imageFileUploadId: nextId,
-				imageUrl: nextSrc,
-			}));
-
+	const handleUploadComplete = useCallback(
+		async (fileUploadId?: string) => {
 			setIsSaving(true);
 
 			try {
@@ -93,7 +87,7 @@ export const SectionHeroSettingsForm = () => {
 					.updatePageHero(page.pageId, {
 						headline: page.headline,
 						description: page.description,
-						imageFileUploadId: nextId,
+						imageFileUploadId: fileUploadId ?? '',
 						imageAltText: page.imageAltText,
 					})
 					.fetch();
@@ -106,6 +100,24 @@ export const SectionHeroSettingsForm = () => {
 			}
 		},
 		[handleError, page, setIsSaving, setPage]
+	);
+
+	const handleImageChange = useCallback(
+		async (nextId: string, nextSrc: string) => {
+			console.log('nextId', nextId);
+			console.log('nextSrc', nextSrc);
+
+			setFormValues((previousValue) => ({
+				...previousValue,
+				imageFileUploadId: nextId,
+				imageUrl: nextSrc,
+			}));
+
+			if (!nextId && !nextSrc) {
+				handleUploadComplete('');
+			}
+		},
+		[handleUploadComplete]
 	);
 
 	return (
@@ -130,6 +142,7 @@ export const SectionHeroSettingsForm = () => {
 				className="mb-4"
 				imageSrc={formValues.imageUrl}
 				onSrcChange={handleImageChange}
+				onUploadComplete={handleUploadComplete}
 				presignedUploadGetter={(blob) => {
 					return pagesService.createPresignedFileUpload({
 						contentType: blob.type,

@@ -96,17 +96,8 @@ export const RowSettingsOneColumn = () => {
 		[debouncedSubmission]
 	);
 
-	const handleImageChange = useCallback(
-		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
-				[column]: {
-					...previousValue[column],
-					imageFileUploadId: nextId,
-					imageUrl: nextSrc,
-				},
-			}));
-
+	const handleUploadComplete = useCallback(
+		async (column: keyof typeof formValues, imageFileUploadId: string) => {
 			setIsSaving(true);
 
 			try {
@@ -119,7 +110,7 @@ export const RowSettingsOneColumn = () => {
 						...formValues,
 						[column]: {
 							...formValues[column],
-							imageFileUploadId: nextId,
+							imageFileUploadId,
 						},
 					})
 					.fetch();
@@ -132,6 +123,24 @@ export const RowSettingsOneColumn = () => {
 			}
 		},
 		[formValues, handleError, oneColumnImageRow, setIsSaving, updatePageRow]
+	);
+
+	const handleImageChange = useCallback(
+		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
+			setFormValues((previousValue) => ({
+				...previousValue,
+				[column]: {
+					...previousValue[column],
+					imageFileUploadId: nextId,
+					imageUrl: nextSrc,
+				},
+			}));
+
+			if (!nextId && !nextSrc) {
+				handleUploadComplete(column, '');
+			}
+		},
+		[handleUploadComplete]
 	);
 
 	return (
@@ -164,6 +173,9 @@ export const RowSettingsOneColumn = () => {
 						imageSrc={formValues.columnOne.imageUrl}
 						onSrcChange={(nextId, nextSrc) => {
 							handleImageChange('columnOne', { nextId, nextSrc });
+						}}
+						onUploadComplete={(fileUploadId) => {
+							handleUploadComplete('columnOne', fileUploadId);
 						}}
 						presignedUploadGetter={(blob) => {
 							return pagesService.createPresignedFileUpload({

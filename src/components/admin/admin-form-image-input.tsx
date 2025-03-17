@@ -10,6 +10,7 @@ export interface AdminFormImageInputProps {
 	onSrcChange: (newId: string, newSrc: string) => void;
 	presignedUploadGetter: (blob: Blob) => () => Promise<PresignedUploadResponse>;
 	className?: string;
+	onUploadComplete?(fileUploadId: string): void;
 }
 
 export const AdminFormImageInput = ({
@@ -17,6 +18,7 @@ export const AdminFormImageInput = ({
 	onSrcChange,
 	presignedUploadGetter,
 	className,
+	onUploadComplete,
 }: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -46,11 +48,15 @@ export const AdminFormImageInput = ({
 				onSave={async (blob) => {
 					setIsCropModalOpen(false);
 
+					let fileUploadId = '';
+
 					imageUploader(blob, presignedUploadGetter(blob))
 						.onBeforeUpload((previewImageUrl) => {
 							setImagePreviewSrc(previewImageUrl);
 						})
 						.onPresignedUploadObtained(({ fileUploadResult }) => {
+							fileUploadId = fileUploadResult.fileUploadId;
+
 							setIsUploading(true);
 							onSrcChange(fileUploadResult.fileUploadId, fileUploadResult.presignedUpload.accessUrl);
 						})
@@ -60,12 +66,11 @@ export const AdminFormImageInput = ({
 						.onComplete((accessUrl) => {
 							setIsUploading(false);
 							setImagePreviewSrc(accessUrl);
+							onUploadComplete?.(fileUploadId);
 						})
 						.onError((error: any) => {
 							handleError(error);
-
 							setIsUploading(false);
-
 							setImagePreviewSrc('');
 						})
 						.start();
