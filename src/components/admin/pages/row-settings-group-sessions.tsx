@@ -16,7 +16,8 @@ interface RowSettingsGroupSessionsProps {
 
 export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsGroupSessionsProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
+	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
+		usePageBuilderContext();
 	const groupSessionsRow = useMemo(() => currentPageRow as GroupSessionsRowModel | undefined, [currentPageRow]);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 
@@ -109,6 +110,11 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClic
 				onBackButtonClick={onBackButtonClick}
 				showDeleteButton
 				onDeleteButtonClick={onDeleteButtonClick}
+				showCloseButton
+				onCloseButtonButtonClick={() => {
+					setCurrentPageSectionId('');
+					setCurrentPageRowId('');
+				}}
 				title={`Group Sessions (${(groupSessionsRow?.groupSessions ?? []).length})`}
 				customHeaderElements={
 					<Button className="me-2" size="sm" onClick={() => setShowSelectGroupSessionsModal(true)}>

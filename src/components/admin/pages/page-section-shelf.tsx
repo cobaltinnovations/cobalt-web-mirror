@@ -202,10 +202,14 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 							<PageSectionShelfPage
 								showBackButton
 								onBackButtonClick={handleRowBack}
+								showCloseButton
+								onCloseButtonButtonClick={() => {
+									setCurrentPageSectionId('');
+								}}
 								title="Select row type to add"
 								bodyClassName="pt-0"
 							>
-								<RowSelectionForm onRowAdded={handleRowBack} />
+								<RowSelectionForm />
 							</PageSectionShelfPage>
 						)}
 
@@ -244,6 +248,11 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
 								}}
+								showCloseButton
+								onCloseButtonButtonClick={() => {
+									setCurrentPageSectionId('');
+									setCurrentPageRowId('');
+								}}
 								title="Custom Row (1 Item)"
 								bodyClassName="pt-0"
 							>
@@ -259,6 +268,11 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
 								}}
+								showCloseButton
+								onCloseButtonButtonClick={() => {
+									setCurrentPageSectionId('');
+									setCurrentPageRowId('');
+								}}
 								title="Custom Row (2 Items)"
 								bodyClassName="pt-0"
 							>
@@ -273,6 +287,11 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								showDeleteButton
 								onDeleteButtonClick={() => {
 									setShowRowDeleteModal(true);
+								}}
+								showCloseButton
+								onCloseButtonButtonClick={() => {
+									setCurrentPageSectionId('');
+									setCurrentPageRowId('');
 								}}
 								title="Custom Row (3 Items)"
 								bodyClassName="pt-0"
