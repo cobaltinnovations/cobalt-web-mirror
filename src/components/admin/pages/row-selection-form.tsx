@@ -69,7 +69,7 @@ export const RowSelectionForm = () => {
 			}
 			const { pageRow } = await pagesService.createTagRow(currentPageSection.pageSectionId, { tagId }).fetch();
 			addPageRowToCurrentPageSection(pageRow);
-			setShowSelectTagGroupModal(false);
+			setShowSelectTagModal(false);
 			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
