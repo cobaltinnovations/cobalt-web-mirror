@@ -198,16 +198,31 @@ const useWysiwygDisplayStyles = createUseThemedStyles((theme) => ({
 
 interface WysiwygDisplayProps {
 	html: string;
+	onClick?: ({ linkUrl, linkText }: { linkUrl: string; linkText: string }) => void;
 	className?: string;
 }
 
-export const WysiwygDisplay = ({ html, className }: WysiwygDisplayProps) => {
+export const WysiwygDisplay = ({ html, onClick, className }: WysiwygDisplayProps) => {
 	const classes = useWysiwygDisplayStyles();
+
+	const handleDangerousHtmlClick = (event: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
+		const { nativeEvent } = event;
+		const clickedElement = nativeEvent.target;
+
+		if (clickedElement instanceof HTMLElement) {
+			const link = clickedElement.closest('a');
+
+			if (link) {
+				onClick?.({ linkUrl: link.href, linkText: link.textContent ?? '' });
+			}
+		}
+	};
 
 	return (
 		<div
 			className={classNames(classes.wysiwygDisplay, className)}
 			dangerouslySetInnerHTML={{ __html: html ?? '' }}
+			onClick={handleDangerousHtmlClick}
 		/>
 	);
 };
