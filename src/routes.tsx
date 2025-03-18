@@ -504,7 +504,6 @@ export const routes: RouteObject[] = [
 							},
 						],
 					},
-
 					{
 						element: (
 							<ToggledOutlet
@@ -773,6 +772,18 @@ export const routes: RouteObject[] = [
 						id: 'page-detail',
 						path: 'pages/:urlName',
 						lazy: () => import('@/routes/page-detail'),
+					},
+					{
+						id: 'courses',
+						path: 'courses',
+						element: <Outlet />,
+						children: [
+							{
+								id: 'courses-test',
+								path: 'test',
+								lazy: () => import('@/routes/courses/test'),
+							},
+						],
 					},
 					{
 						path: '*',
