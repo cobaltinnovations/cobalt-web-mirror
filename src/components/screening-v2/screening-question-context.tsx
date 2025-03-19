@@ -4,6 +4,7 @@ import { ScreeningAnswerSelection, ScreeningConfirmationPrompt, ScreeningQuestio
 import { screeningService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
+import { CobaltError } from '@/lib/http-client';
 
 interface ScreeningQuestionContextProps {
 	initialScreeningQuestionContextId: string;
@@ -66,6 +67,20 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 					window.alert('Screening complete.');
 				}
 			} catch (error) {
+				if (error instanceof CobaltError) {
+					const confirmationPrompt = error.apiError?.metadata?.screeningConfirmationPrompt as
+						| ScreeningConfirmationPrompt
+						| undefined;
+
+					if (!confirmationPrompt) {
+						handleError(error);
+						return;
+					}
+
+					setConfirmationPrompt(confirmationPrompt);
+					return;
+				}
+
 				handleError(error);
 			} finally {
 				setIsLoading(false);
