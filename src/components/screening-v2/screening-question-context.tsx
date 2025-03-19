@@ -16,6 +16,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	const [screeningQuestionContextId, setScreeningQuestionContextId] = useState(initialScreeningQuestionContextId);
 	const [screeningQuestionContext, setScreeningQuestionContext] = useState<ScreeningQuestionContextResponse>();
 	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt>();
+	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 	const [selectedAnswers, setSelectedAnswers] = useState<ScreeningAnswerSelection[]>([]);
 
 	const fetchData = useCallback(async () => {
@@ -26,6 +27,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 
 			setScreeningQuestionContext(response);
 			setConfirmationPrompt(response.preQuestionScreeningConfirmationPrompt);
+			setIsSubmitPrompt(false);
 			setSelectedAnswers(
 				response.screeningAnswers.map((answer) => ({
 					screeningAnswerOptionId: answer.screeningAnswerOptionId,
@@ -52,13 +54,13 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	}, [screeningQuestionContext?.previousScreeningQuestionContextId]);
 
 	const handleFormSubmit = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
-			event.preventDefault();
+		async (event?: React.FormEvent<HTMLFormElement>, force?: boolean) => {
+			event?.preventDefault();
 			setIsLoading(true);
 
 			try {
 				const { nextScreeningQuestionContextId } = await screeningService
-					.answerQuestion(screeningQuestionContextId, selectedAnswers)
+					.answerQuestion(screeningQuestionContextId, selectedAnswers, force)
 					.fetch();
 
 				if (nextScreeningQuestionContextId) {
@@ -78,6 +80,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 					}
 
 					setConfirmationPrompt(confirmationPrompt);
+					setIsSubmitPrompt(true);
 					return;
 				}
 
@@ -92,9 +95,23 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	if (confirmationPrompt) {
 		return (
 			<ScreeningQuestionPrompt
+				showPreviousButton={!!screeningQuestionContext?.previousScreeningQuestionContextId || isSubmitPrompt}
 				screeningConfirmationPrompt={confirmationPrompt}
-				onDismiss={() => {
-					setConfirmationPrompt(undefined);
+				onPreviousButtonClick={() => {
+					if (isSubmitPrompt) {
+						setConfirmationPrompt(undefined);
+						setIsSubmitPrompt(false);
+					} else {
+						handlePreviousButtonClick();
+					}
+				}}
+				onSubmitButtonClick={() => {
+					if (isSubmitPrompt) {
+						handleFormSubmit(undefined, true);
+					} else {
+						setConfirmationPrompt(undefined);
+						setIsSubmitPrompt(false);
+					}
 				}}
 			/>
 		);
@@ -129,7 +146,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 					<div>
 						{screeningQuestionContext.previousScreeningQuestionContextId && (
 							<Button type="button" onClick={handlePreviousButtonClick}>
-								Prev
+								Previous
 							</Button>
 						)}
 					</div>
