@@ -9,7 +9,7 @@ export const config: iConfig = {
 	ga4MeasurementId: undefined,
 	mixPanelId: undefined,
 
-	showDebug: false,
+	showDebug: true,
 
 	localhostSubdomain: undefined,
 

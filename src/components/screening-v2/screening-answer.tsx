@@ -1,0 +1,38 @@
+import React from 'react';
+import {
+	ScreeningAnswerFormatId,
+	ScreeningAnswerOption,
+	ScreeningAnswerSelection,
+	ScreeningQuestion as ScreeningQuestionModel,
+} from '@/lib/models';
+import { ScreeningAnswerFreeformText, ScreeningAnswerSingleSelect } from '@/components/screening-v2';
+
+interface ScreeningAnswerProps {
+	question: ScreeningQuestionModel;
+	answerOptions: ScreeningAnswerOption[];
+	value: ScreeningAnswerSelection[];
+	onChange(value: ScreeningAnswerSelection[]): void;
+	className?: string;
+}
+
+export const ScreeningAnswer = ({ question, answerOptions, value, onChange, className }: ScreeningAnswerProps) => {
+	return (
+		<div className={className}>
+			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.CARD_SORT && (
+				<p className="text-danger">[TODO]: Card Sort</p>
+			)}
+			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.FREEFORM_TEXT && (
+				<ScreeningAnswerFreeformText options={answerOptions} value={value} onChange={onChange} />
+			)}
+			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.MULTI_SELECT && (
+				<p className="text-danger">[TODO]: Multi Select</p>
+			)}
+			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.REORDER && (
+				<p className="text-danger">[TODO]: Reorder</p>
+			)}
+			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.SINGLE_SELECT && (
+				<ScreeningAnswerSingleSelect options={answerOptions} value={value} onChange={onChange} />
+			)}
+		</div>
+	);
+};

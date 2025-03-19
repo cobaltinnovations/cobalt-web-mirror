@@ -1,53 +1,36 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
-import { ScreeningSession } from '@/lib/models';
 import { screeningService } from '@/lib/services';
-import useHandleError from '@/hooks/use-handle-error';
-import RenderJson from '@/components/render-json';
+import { ScreeningQuestionContext } from '@/components/screening-v2';
+import AsyncWrapper from '../async-page';
 
 interface ScreeningProps {
 	screeningFlowId: string;
 }
 
 export const ScreeningFlow = ({ screeningFlowId }: ScreeningProps) => {
-	const handleError = useHandleError();
-	const [isLoading, setIsLoading] = useState(false);
-	const [screeningFlowResponse, setScreeningFlowResponse] = useState<ScreeningSession>();
+	const [initialScreeningQuestionContextId, setInitialScreeningQuestionContextId] = useState('');
 
 	const fetchData = useCallback(async () => {
-		setIsLoading(true);
+		const { screeningSession } = await screeningService.createScreeningSession({ screeningFlowId }).fetch();
+		const { nextScreeningQuestionContextId } = screeningSession;
 
-		try {
-			const { activeScreeningFlowVersionId } = await screeningService
-				.getScreeningFlowVersionsByFlowId({
-					screeningFlowId,
-				})
-				.fetch();
-			const { screeningSession } = await screeningService
-				.createScreeningSession({
-					screeningFlowVersionId: activeScreeningFlowVersionId,
-				})
-				.fetch();
-
-			setScreeningFlowResponse(screeningSession);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsLoading(false);
+		if (!nextScreeningQuestionContextId) {
+			window.alert('screening complete, redirect or something.');
+			return;
 		}
-	}, [handleError, screeningFlowId]);
+
+		setInitialScreeningQuestionContextId(nextScreeningQuestionContextId);
+	}, [screeningFlowId]);
 
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
 
 	return (
-		<div>
-			<Form>
-				<fieldset disabled={isLoading}>
-					<RenderJson json={screeningFlowResponse} />
-				</fieldset>
-			</Form>
-		</div>
+		<AsyncWrapper fetchData={fetchData}>
+			{initialScreeningQuestionContextId && (
+				<ScreeningQuestionContext initialScreeningQuestionContextId={initialScreeningQuestionContextId} />
+			)}
+		</AsyncWrapper>
 	);
 };

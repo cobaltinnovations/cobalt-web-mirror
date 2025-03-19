@@ -24,6 +24,7 @@ export enum FeatureId {
 	PSYCHOTHERAPIST = 'PSYCHOTHERAPIST',
 	RESOURCE_NAVIGATOR = 'RESOURCE_NAVIGATOR',
 	COUNSELING_SERVICES = 'COUNSELING_SERVICES',
+	COURSE = 'COURSE',
 }
 
 export interface Institution {
@@ -83,6 +84,7 @@ export interface Institution {
 	resourcePacketsEnabled?: boolean;
 	integratedCarePatientDemographicsRequired: boolean;
 	integratedCarePatientCarePreferenceVisible: boolean;
+	onboardingScreeningFlowId?: string;
 }
 
 export interface InstitutionFeature {

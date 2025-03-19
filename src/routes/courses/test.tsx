@@ -2,12 +2,15 @@ import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { ScreeningFlow } from '@/components/screening-v2';
+import useAccount from '@/hooks/use-account';
 
 export async function loader() {
 	return null;
 }
 
 export const Component = () => {
+	const { institution } = useAccount();
+
 	return (
 		<>
 			<Helmet>
@@ -15,13 +18,10 @@ export const Component = () => {
 			</Helmet>
 			<Container>
 				<Row>
-					<Col>
-						<h2>Courses</h2>
-					</Col>
-				</Row>
-				<Row>
-					<Col>
-						<ScreeningFlow screeningFlowId="1e5d618d-388b-4a4e-9d3a-34aca36914ca" />
+					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+						{institution.onboardingScreeningFlowId && (
+							<ScreeningFlow screeningFlowId={institution.onboardingScreeningFlowId} />
+						)}
 					</Col>
 				</Row>
 			</Container>
