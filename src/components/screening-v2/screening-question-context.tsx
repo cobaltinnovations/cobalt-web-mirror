@@ -7,7 +7,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
 import { CobaltError } from '@/lib/http-client';
 import { createUseThemedStyles } from '@/jss/theme';
-import Loader from '../loader';
 
 const QUESTION_TRANSITION_DURATION_MS = 600;
 
