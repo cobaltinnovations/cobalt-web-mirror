@@ -1,6 +1,7 @@
 import React from 'react';
 import { Collapse, Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
+import InputHelper from '@/components/input-helper';
 
 interface ScreeningAnswerMultiSelectProps {
 	name: string;
@@ -38,9 +39,9 @@ export const ScreeningAnswerMultiSelect = ({ name, options, value, onChange }: S
 						{option.freeformSupplement && (
 							<Collapse in={isChecked}>
 								<div>
-									<Form.Control
-										type="text"
-										placeholder={option.freeformSupplementText}
+									<InputHelper
+										as="textarea"
+										label={option.freeformSupplementText ?? ''}
 										value={supplementText}
 										onChange={({ currentTarget }) => {
 											onChange(

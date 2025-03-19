@@ -16,7 +16,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	const [screeningQuestionContextId, setScreeningQuestionContextId] = useState(initialScreeningQuestionContextId);
 	const [screeningQuestionContext, setScreeningQuestionContext] = useState<ScreeningQuestionContextResponse>();
 	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt>();
-	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
+	const [isSubmitConfirmationPrompt, setIsSubmitConfirmationPrompt] = useState(false);
 	const [selectedAnswers, setSelectedAnswers] = useState<ScreeningAnswerSelection[]>([]);
 
 	const fetchData = useCallback(async () => {
@@ -27,7 +27,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 
 			setScreeningQuestionContext(response);
 			setConfirmationPrompt(response.preQuestionScreeningConfirmationPrompt);
-			setIsSubmitPrompt(false);
+			setIsSubmitConfirmationPrompt(false);
 			setSelectedAnswers(
 				response.screeningAnswers.map((answer) => ({
 					screeningAnswerOptionId: answer.screeningAnswerOptionId,
@@ -80,7 +80,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 					}
 
 					setConfirmationPrompt(confirmationPrompt);
-					setIsSubmitPrompt(true);
+					setIsSubmitConfirmationPrompt(true);
 					return;
 				}
 
@@ -95,22 +95,24 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	if (confirmationPrompt) {
 		return (
 			<ScreeningQuestionPrompt
-				showPreviousButton={!!screeningQuestionContext?.previousScreeningQuestionContextId || isSubmitPrompt}
+				showPreviousButton={
+					!!screeningQuestionContext?.previousScreeningQuestionContextId || isSubmitConfirmationPrompt
+				}
 				screeningConfirmationPrompt={confirmationPrompt}
 				onPreviousButtonClick={() => {
-					if (isSubmitPrompt) {
+					if (isSubmitConfirmationPrompt) {
 						setConfirmationPrompt(undefined);
-						setIsSubmitPrompt(false);
+						setIsSubmitConfirmationPrompt(false);
 					} else {
 						handlePreviousButtonClick();
 					}
 				}}
 				onSubmitButtonClick={() => {
-					if (isSubmitPrompt) {
+					if (isSubmitConfirmationPrompt) {
 						handleFormSubmit(undefined, true);
 					} else {
 						setConfirmationPrompt(undefined);
-						setIsSubmitPrompt(false);
+						setIsSubmitConfirmationPrompt(false);
 					}
 				}}
 			/>
@@ -153,6 +155,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 					<div>
 						{screeningQuestionContext.screeningQuestion.minimumAnswerCount === 0 && (
 							<Button
+								className="me-2"
 								type="button"
 								variant="outline-primary"
 								onClick={() => {
@@ -162,15 +165,15 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 								Skip
 							</Button>
 						)}
+						<Button
+							type="submit"
+							disabled={
+								selectedAnswers.length < screeningQuestionContext.screeningQuestion.minimumAnswerCount
+							}
+						>
+							Submit
+						</Button>
 					</div>
-					<Button
-						type="submit"
-						disabled={
-							selectedAnswers.length < screeningQuestionContext.screeningQuestion.minimumAnswerCount
-						}
-					>
-						Submit
-					</Button>
 				</div>
 			</fieldset>
 		</Form>
