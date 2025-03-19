@@ -17,7 +17,7 @@ export const ScreeningQuestionPrompt = ({
 	onSubmitButtonClick,
 }: ScreeningQuestionPromptPromps) => {
 	return (
-		<div className="pt-6">
+		<div className="py-10">
 			{screeningConfirmationPrompt.screeningImageId && (
 				<ScreeningPromptImage
 					className="mb-6 mx-auto d-block"

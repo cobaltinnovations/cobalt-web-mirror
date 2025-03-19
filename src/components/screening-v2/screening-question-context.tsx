@@ -132,7 +132,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 							isSubmitConfirmationPrompt: false,
 						});
 					} else {
-						if (!screeningQuestionContext) {
+						if (!screeningQuestionContext?.previousScreeningQuestionContextId) {
 							return;
 						}
 
@@ -158,16 +158,16 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	}
 
 	return (
-		<Form onSubmit={handleFormSubmit}>
+		<Form onSubmit={handleFormSubmit} className="py-10">
 			<fieldset disabled={isLoading}>
 				{screeningQuestionContext.screeningQuestion.introText && (
-					<p>{screeningQuestionContext.screeningQuestion.introText}</p>
+					<p className="mb-2">{screeningQuestionContext.screeningQuestion.introText}</p>
 				)}
 
-				<h2>{screeningQuestionContext.screeningQuestion.questionText}</h2>
+				<h2 className="mb-6">{screeningQuestionContext.screeningQuestion.questionText}</h2>
 
 				<ScreeningAnswer
-					className="mb-4"
+					className="mb-6"
 					question={screeningQuestionContext.screeningQuestion}
 					answerOptions={screeningQuestionContext.screeningAnswerOptions}
 					value={selectedAnswers}
@@ -175,7 +175,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 				/>
 
 				{screeningQuestionContext.screeningQuestion.footerText && (
-					<p>{screeningQuestionContext.screeningQuestion.footerText}</p>
+					<p className="mb-6">{screeningQuestionContext.screeningQuestion.footerText}</p>
 				)}
 
 				<div className="d-flex align-items-center justify-content-between">

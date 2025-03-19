@@ -163,7 +163,7 @@ export interface ScreeningConfirmationPrompt {
 }
 
 export interface ScreeningQuestionContextResponse {
-	previousScreeningQuestionContextId: string;
+	previousScreeningQuestionContextId?: string;
 	screening: {
 		screeningId: string;
 		name: string;
