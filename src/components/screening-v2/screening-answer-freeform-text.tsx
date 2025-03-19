@@ -1,6 +1,6 @@
-import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 import React from 'react';
 import { Form } from 'react-bootstrap';
+import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 
 interface ScreeningAnswerFreeformTextProps {
 	options: ScreeningAnswerOption[];

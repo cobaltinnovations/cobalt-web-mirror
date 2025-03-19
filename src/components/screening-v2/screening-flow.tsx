@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { screeningService } from '@/lib/services';
 import { ScreeningQuestionContext } from '@/components/screening-v2';
 import AsyncWrapper from '../async-page';
@@ -21,10 +21,6 @@ export const ScreeningFlow = ({ screeningFlowId }: ScreeningProps) => {
 
 		setInitialScreeningQuestionContextId(nextScreeningQuestionContextId);
 	}, [screeningFlowId]);
-
-	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>

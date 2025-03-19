@@ -6,8 +6,10 @@ import {
 	ScreeningQuestion as ScreeningQuestionModel,
 } from '@/lib/models';
 import {
+	ScreeningAnswerCardSort,
 	ScreeningAnswerFreeformText,
 	ScreeningAnswerMultiSelect,
+	ScreeningAnswerReorder,
 	ScreeningAnswerSingleSelect,
 } from '@/components/screening-v2';
 
@@ -23,7 +25,7 @@ export const ScreeningAnswer = ({ question, answerOptions, value, onChange, clas
 	return (
 		<div className={className}>
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.CARD_SORT && (
-				<p className="text-danger">[TODO]: Card Sort</p>
+				<ScreeningAnswerCardSort options={answerOptions} value={value} onChange={onChange} />
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.FREEFORM_TEXT && (
 				<ScreeningAnswerFreeformText options={answerOptions} value={value} onChange={onChange} />
@@ -37,7 +39,7 @@ export const ScreeningAnswer = ({ question, answerOptions, value, onChange, clas
 				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.REORDER && (
-				<p className="text-danger">[TODO]: Reorder</p>
+				<ScreeningAnswerReorder options={answerOptions} value={value} onChange={onChange} />
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.SINGLE_SELECT && (
 				<ScreeningAnswerSingleSelect
