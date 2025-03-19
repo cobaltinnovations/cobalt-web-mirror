@@ -2,14 +2,14 @@ import React from 'react';
 import { Collapse, Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 
-interface ScreeningAnswerSingleSelectProps {
+interface ScreeningAnswerMultiSelectProps {
 	name: string;
 	options: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
 	onChange(value: ScreeningAnswerSelection[]): void;
 }
 
-export const ScreeningAnswerSingleSelect = ({ name, options, value, onChange }: ScreeningAnswerSingleSelectProps) => {
+export const ScreeningAnswerMultiSelect = ({ name, options, value, onChange }: ScreeningAnswerMultiSelectProps) => {
 	return (
 		<Form.Group>
 			{options.map((option) => {
@@ -22,13 +22,17 @@ export const ScreeningAnswerSingleSelect = ({ name, options, value, onChange }: 
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
 						<Form.Check
-							type="radio"
+							type="checkbox"
 							name={name}
 							label={option.answerOptionText}
 							value={option.screeningAnswerOptionId}
 							checked={isChecked}
 							onChange={({ currentTarget }) => {
-								onChange([{ screeningAnswerOptionId: currentTarget.value }]);
+								onChange(
+									isChecked
+										? value.filter((v) => v.screeningAnswerOptionId !== currentTarget.value)
+										: [...value, { screeningAnswerOptionId: currentTarget.value }]
+								);
 							}}
 						/>
 						{option.freeformSupplement && (

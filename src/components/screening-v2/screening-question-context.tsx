@@ -63,7 +63,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 				if (nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
 				} else {
-					console.log('Screening complete.');
+					window.alert('Screening complete.');
 				}
 			} catch (error) {
 				handleError(error);
@@ -113,7 +113,22 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 				<div className="d-flex align-items-center justify-content-between">
 					<div>
 						{screeningQuestionContext.previousScreeningQuestionContextId && (
-							<Button onClick={handlePreviousButtonClick}>Prev</Button>
+							<Button type="button" onClick={handlePreviousButtonClick}>
+								Prev
+							</Button>
+						)}
+					</div>
+					<div>
+						{screeningQuestionContext.screeningQuestion.minimumAnswerCount === 0 && (
+							<Button
+								type="button"
+								variant="outline-primary"
+								onClick={() => {
+									window.alert('[TODO]: Skip');
+								}}
+							>
+								Skip
+							</Button>
 						)}
 					</div>
 					<Button

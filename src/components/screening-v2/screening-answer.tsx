@@ -5,7 +5,11 @@ import {
 	ScreeningAnswerSelection,
 	ScreeningQuestion as ScreeningQuestionModel,
 } from '@/lib/models';
-import { ScreeningAnswerFreeformText, ScreeningAnswerSingleSelect } from '@/components/screening-v2';
+import {
+	ScreeningAnswerFreeformText,
+	ScreeningAnswerMultiSelect,
+	ScreeningAnswerSingleSelect,
+} from '@/components/screening-v2';
 
 interface ScreeningAnswerProps {
 	question: ScreeningQuestionModel;
@@ -25,13 +29,23 @@ export const ScreeningAnswer = ({ question, answerOptions, value, onChange, clas
 				<ScreeningAnswerFreeformText options={answerOptions} value={value} onChange={onChange} />
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.MULTI_SELECT && (
-				<p className="text-danger">[TODO]: Multi Select</p>
+				<ScreeningAnswerMultiSelect
+					name={question.screeningQuestionId}
+					options={answerOptions}
+					value={value}
+					onChange={onChange}
+				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.REORDER && (
 				<p className="text-danger">[TODO]: Reorder</p>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.SINGLE_SELECT && (
-				<ScreeningAnswerSingleSelect options={answerOptions} value={value} onChange={onChange} />
+				<ScreeningAnswerSingleSelect
+					name={question.screeningQuestionId}
+					options={answerOptions}
+					value={value}
+					onChange={onChange}
+				/>
 			)}
 		</div>
 	);
