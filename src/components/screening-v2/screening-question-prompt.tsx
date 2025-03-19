@@ -8,6 +8,7 @@ interface ScreeningQuestionPromptPromps {
 	showPreviousButton: boolean;
 	onPreviousButtonClick(): void;
 	onSubmitButtonClick(): void;
+	className?: string;
 }
 
 export const ScreeningQuestionPrompt = ({
@@ -15,9 +16,10 @@ export const ScreeningQuestionPrompt = ({
 	showPreviousButton,
 	onPreviousButtonClick,
 	onSubmitButtonClick,
+	className,
 }: ScreeningQuestionPromptPromps) => {
 	return (
-		<div className="py-10">
+		<div className={className}>
 			{screeningConfirmationPrompt.screeningImageId && (
 				<ScreeningPromptImage
 					className="mb-6 mx-auto d-block"
