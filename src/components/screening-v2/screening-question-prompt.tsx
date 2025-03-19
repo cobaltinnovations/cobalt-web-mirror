@@ -17,12 +17,17 @@ export const ScreeningQuestionPrompt = ({
 	onSubmitButtonClick,
 }: ScreeningQuestionPromptPromps) => {
 	return (
-		<div>
+		<div className="pt-6">
 			{screeningConfirmationPrompt.screeningImageId && (
-				<ScreeningPromptImage screeningImageId={screeningConfirmationPrompt.screeningImageId} />
+				<ScreeningPromptImage
+					className="mb-6 mx-auto d-block"
+					screeningImageId={screeningConfirmationPrompt.screeningImageId}
+				/>
 			)}
-			<h1>{screeningConfirmationPrompt.titleText}</h1>
-			<p>{screeningConfirmationPrompt.text}</p>
+			{screeningConfirmationPrompt.titleText && (
+				<h1 className="mb-6 text-center">{screeningConfirmationPrompt.titleText}</h1>
+			)}
+			<p className="mb-6 text-center">{screeningConfirmationPrompt.text}</p>
 			<div className="d-flex align-items-center justify-content-between">
 				<div>
 					{showPreviousButton && (

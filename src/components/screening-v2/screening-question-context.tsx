@@ -15,8 +15,13 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	const [isLoading, setIsLoading] = useState(false);
 	const [screeningQuestionContextId, setScreeningQuestionContextId] = useState(initialScreeningQuestionContextId);
 	const [screeningQuestionContext, setScreeningQuestionContext] = useState<ScreeningQuestionContextResponse>();
-	const [confirmationPrompt, setConfirmationPrompt] = useState<ScreeningConfirmationPrompt>();
-	const [isSubmitConfirmationPrompt, setIsSubmitConfirmationPrompt] = useState(false);
+	const [confirmationPrompt, setConfirmationPrompt] = useState<{
+		screeningConfirmationPrompt: ScreeningConfirmationPrompt | undefined;
+		isSubmitConfirmationPrompt: boolean;
+	}>({
+		screeningConfirmationPrompt: undefined,
+		isSubmitConfirmationPrompt: false,
+	});
 	const [selectedAnswers, setSelectedAnswers] = useState<ScreeningAnswerSelection[]>([]);
 
 	const fetchData = useCallback(async () => {
@@ -26,8 +31,12 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 			const response = await screeningService.getScreeningQuestionContext(screeningQuestionContextId).fetch();
 
 			setScreeningQuestionContext(response);
-			setConfirmationPrompt(response.preQuestionScreeningConfirmationPrompt);
-			setIsSubmitConfirmationPrompt(false);
+			setConfirmationPrompt({
+				screeningConfirmationPrompt: response.previouslyAnswered
+					? undefined
+					: response.preQuestionScreeningConfirmationPrompt,
+				isSubmitConfirmationPrompt: false,
+			});
 			setSelectedAnswers(
 				response.screeningAnswers.map((answer) => ({
 					screeningAnswerOptionId: answer.screeningAnswerOptionId,
@@ -46,12 +55,26 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 	}, [fetchData]);
 
 	const handlePreviousButtonClick = useCallback(() => {
-		if (!screeningQuestionContext?.previousScreeningQuestionContextId) {
+		if (!screeningQuestionContext) {
 			return;
 		}
 
-		setScreeningQuestionContextId(screeningQuestionContext.previousScreeningQuestionContextId);
-	}, [screeningQuestionContext?.previousScreeningQuestionContextId]);
+		const { preQuestionScreeningConfirmationPrompt, previousScreeningQuestionContextId } = screeningQuestionContext;
+
+		if (preQuestionScreeningConfirmationPrompt) {
+			setConfirmationPrompt({
+				screeningConfirmationPrompt: preQuestionScreeningConfirmationPrompt,
+				isSubmitConfirmationPrompt: false,
+			});
+			return;
+		}
+
+		if (!previousScreeningQuestionContextId) {
+			return;
+		}
+
+		setScreeningQuestionContextId(previousScreeningQuestionContextId);
+	}, [screeningQuestionContext]);
 
 	const handleFormSubmit = useCallback(
 		async (event?: React.FormEvent<HTMLFormElement>, force?: boolean) => {
@@ -79,8 +102,10 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 						return;
 					}
 
-					setConfirmationPrompt(confirmationPrompt);
-					setIsSubmitConfirmationPrompt(true);
+					setConfirmationPrompt({
+						screeningConfirmationPrompt: confirmationPrompt,
+						isSubmitConfirmationPrompt: true,
+					});
 					return;
 				}
 
@@ -92,27 +117,36 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 		[handleError, screeningQuestionContextId, selectedAnswers]
 	);
 
-	if (confirmationPrompt) {
+	if (confirmationPrompt.screeningConfirmationPrompt) {
 		return (
 			<ScreeningQuestionPrompt
 				showPreviousButton={
-					!!screeningQuestionContext?.previousScreeningQuestionContextId || isSubmitConfirmationPrompt
+					!!screeningQuestionContext?.previousScreeningQuestionContextId ||
+					confirmationPrompt.isSubmitConfirmationPrompt
 				}
-				screeningConfirmationPrompt={confirmationPrompt}
+				screeningConfirmationPrompt={confirmationPrompt.screeningConfirmationPrompt}
 				onPreviousButtonClick={() => {
-					if (isSubmitConfirmationPrompt) {
-						setConfirmationPrompt(undefined);
-						setIsSubmitConfirmationPrompt(false);
+					if (confirmationPrompt.isSubmitConfirmationPrompt) {
+						setConfirmationPrompt({
+							screeningConfirmationPrompt: undefined,
+							isSubmitConfirmationPrompt: false,
+						});
 					} else {
-						handlePreviousButtonClick();
+						if (!screeningQuestionContext) {
+							return;
+						}
+
+						setScreeningQuestionContextId(screeningQuestionContext.previousScreeningQuestionContextId);
 					}
 				}}
 				onSubmitButtonClick={() => {
-					if (isSubmitConfirmationPrompt) {
+					if (confirmationPrompt.isSubmitConfirmationPrompt) {
 						handleFormSubmit(undefined, true);
 					} else {
-						setConfirmationPrompt(undefined);
-						setIsSubmitConfirmationPrompt(false);
+						setConfirmationPrompt({
+							screeningConfirmationPrompt: undefined,
+							isSubmitConfirmationPrompt: false,
+						});
 					}
 				}}
 			/>
@@ -146,7 +180,8 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 
 				<div className="d-flex align-items-center justify-content-between">
 					<div>
-						{screeningQuestionContext.previousScreeningQuestionContextId && (
+						{(screeningQuestionContext.previousScreeningQuestionContextId ||
+							screeningQuestionContext.preQuestionScreeningConfirmationPrompt) && (
 							<Button type="button" onClick={handlePreviousButtonClick}>
 								Previous
 							</Button>
