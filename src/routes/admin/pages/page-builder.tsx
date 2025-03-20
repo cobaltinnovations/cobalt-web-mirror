@@ -51,7 +51,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		bottom: 0,
 		zIndex: 2,
-		width: 376,
+		width: 344,
 		position: 'absolute',
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
@@ -65,7 +65,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	asideShelf: {
 		top: 60,
-		left: 376,
+		left: 344,
 		bottom: 0,
 		width: 576,
 		zIndex: 1,
@@ -76,7 +76,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	previewPane: {
 		top: 60,
-		left: 376,
+		left: 344,
 		right: 0,
 		bottom: 0,
 		zIndex: 0,
