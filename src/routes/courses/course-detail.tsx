@@ -1,12 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Col, Container, Row, Tab } from 'react-bootstrap';
+import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
+import { CourseModule } from '@/components/courses';
+import classNames from 'classnames';
 
 export async function loader() {
 	return null;
@@ -71,7 +73,24 @@ export const Component = () => {
 								/>
 								<Tab.Content>
 									<Tab.Pane eventKey={TABS.COURSE_OVERVIEW} mountOnEnter unmountOnExit>
-										course overview
+										<div className="pt-6 mb-11 d-flex align-items-center justify-content-between">
+											<h2 className="mb-0">Course Content</h2>
+											<Button type="button">Start Course</Button>
+										</div>
+										{(course?.courseModules ?? []).map((courseModule, courseModuleIndex) => {
+											const isLast =
+												(course?.courseModules ?? []).length - 1 === courseModuleIndex;
+
+											return (
+												<CourseModule
+													className={classNames({
+														'mb-4': !isLast,
+													})}
+													key={courseModule.courseModuleId}
+													courseModule={courseModule}
+												/>
+											);
+										})}
 									</Tab.Pane>
 									<Tab.Pane eventKey={TABS.ADDITIONAL_RESOURCES} mountOnEnter unmountOnExit>
 										Additonal Resources
