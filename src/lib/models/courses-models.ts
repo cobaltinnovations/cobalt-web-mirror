@@ -29,14 +29,21 @@ export interface CourseModuleModel {
 }
 
 export interface CourseUnitModel {
+	courseModuleId: string;
 	courseUnitId: string;
 	courseUnitTypeId: CourseUnitTypeId;
-	courseModuleId: string;
-	title: string;
+	courseUnitTypeIdDescription: string;
+	created: string;
+	createdDescription: string;
 	description?: string;
-	videoId?: string;
-	screeningFlowId?: string;
+	estimatedCompletionTimeInMinutes: number;
+	estimatedCompletionTimeInMinutesDescription: string;
 	imageUrl?: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	screeningFlowId?: string;
+	title: string;
+	videoId?: string;
 }
 
 export interface CourseSessionModel {

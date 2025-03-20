@@ -10,16 +10,17 @@ import {
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
-import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
+import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as VideoIcon } from '@/assets/icons/icon-video.svg';
+import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
 
 const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, JSX.Element | null> = {
+	CARD_SORT: <WorksheetIcon width={24} height={24} />,
+	HOMEWORK: <ResourceIcon width={24} height={24} />,
+	INFOGRAPHIC: <ResourceIcon width={24} height={24} />,
+	QUIZ: <WorksheetIcon width={24} height={24} />,
+	REORDER: <WorksheetIcon width={24} height={24} />,
 	VIDEO: <VideoIcon width={24} height={24} />,
-	INFOGRAPHIC: null,
-	HOMEWORK: null,
-	CARD_SORT: null,
-	QUIZ: <ClipboardIcon width={24} height={24} />,
-	REORDER: null,
 };
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -96,11 +97,11 @@ export const CourseModule = ({ courseModule, courseUnitLockStatusesByCourseUnitI
 											<LockIcon width={24} height={24} />
 										)}
 									</div>
-									<div>
+									<div className="ps-4">
 										<span className="d-block fs-large">{courseUnit.title}</span>
 										<span className="d-block fs-default text-gray">
-											<span className="text-danger">[TODO]: unitTypeDescription</span> &bull;
-											<span className="text-danger">[TODO]: completionTimeDescription</span>
+											{courseUnit.courseUnitTypeIdDescription} &bull;{' '}
+											{courseUnit.estimatedCompletionTimeInMinutesDescription}
 										</span>
 									</div>
 								</li>
