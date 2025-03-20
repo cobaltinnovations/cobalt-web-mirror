@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
@@ -7,7 +7,7 @@ import AsyncWrapper from '@/components/async-page';
 import { createUseThemedStyles } from '@/jss/theme';
 import useAccount from '@/hooks/use-account';
 import { ScreeningFlow } from '@/components/screening-v2';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -31,7 +31,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '0 24px',
 		position: 'absolute',
 		alignItems: 'center',
-		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
@@ -67,8 +66,9 @@ export async function loader() {
 export const Component = () => {
 	const classes = useStyles();
 	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
-	const [course, setCourse] = useState<CourseModel>();
+	const navigate = useNavigate();
 	const { institution } = useAccount();
+	const [course, setCourse] = useState<CourseModel>();
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
@@ -86,7 +86,17 @@ export const Component = () => {
 			</Helmet>
 			<AsyncWrapper fetchData={fetchData}>
 				<div className={classes.wrapper}>
-					<div className={classes.header}>{course?.title}</div>
+					<div className={classes.header}>
+						<Button
+							className="me-2"
+							onClick={() => {
+								navigate(-1);
+							}}
+						>
+							Go Back
+						</Button>
+						{course?.title}
+					</div>
 					<div className={classes.aside}>
 						aside content{' '}
 						<p>
