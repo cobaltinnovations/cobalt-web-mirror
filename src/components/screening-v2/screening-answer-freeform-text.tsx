@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 
@@ -9,10 +9,17 @@ interface ScreeningAnswerFreeformTextProps {
 }
 
 export const ScreeningAnswerFreeformText = ({ options, value, onChange }: ScreeningAnswerFreeformTextProps) => {
+	const firstOptionRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		firstOptionRef.current?.focus();
+	}, []);
+
 	return (
 		<Form.Group>
-			{options.map((option) => (
+			{options.map((option, optionIndex) => (
 				<Form.Control
+					ref={optionIndex === 0 ? firstOptionRef : undefined}
 					key={option.screeningAnswerOptionId}
 					type="text"
 					placeholder={option.answerOptionText}

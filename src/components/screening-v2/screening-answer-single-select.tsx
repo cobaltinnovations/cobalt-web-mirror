@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Collapse, Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
@@ -11,9 +11,15 @@ interface ScreeningAnswerSingleSelectProps {
 }
 
 export const ScreeningAnswerSingleSelect = ({ name, options, value, onChange }: ScreeningAnswerSingleSelectProps) => {
+	const firstOptionRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		firstOptionRef.current?.focus();
+	}, []);
+
 	return (
 		<Form.Group>
-			{options.map((option) => {
+			{options.map((option, optionIndex) => {
 				const currentValue = value.find(
 					({ screeningAnswerOptionId }) => screeningAnswerOptionId === option.screeningAnswerOptionId
 				);
@@ -23,6 +29,7 @@ export const ScreeningAnswerSingleSelect = ({ name, options, value, onChange }: 
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
 						<Form.Check
+							ref={optionIndex === 0 ? firstOptionRef : undefined}
 							type="radio"
 							name={name}
 							label={option.answerOptionText}

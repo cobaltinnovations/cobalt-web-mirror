@@ -67,9 +67,13 @@ const useStyles = createUseThemedStyles({
 
 interface ScreeningQuestionContextProps {
 	initialScreeningQuestionContextId: string;
+	onScreeningFlowComplete(): void;
 }
 
-export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: ScreeningQuestionContextProps) => {
+export const ScreeningQuestionContext = ({
+	initialScreeningQuestionContextId,
+	onScreeningFlowComplete,
+}: ScreeningQuestionContextProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
@@ -168,7 +172,7 @@ export const ScreeningQuestionContext = ({ initialScreeningQuestionContextId }: 
 				if (nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
 				} else {
-					window.alert('Screening complete.');
+					onScreeningFlowComplete();
 				}
 			} catch (error) {
 				if (error instanceof CobaltError) {

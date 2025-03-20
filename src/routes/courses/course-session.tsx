@@ -125,7 +125,12 @@ export const Component = () => {
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
 									{institution.onboardingScreeningFlowId && (
-										<ScreeningFlow screeningFlowId={institution.onboardingScreeningFlowId} />
+										<ScreeningFlow
+											screeningFlowId={institution.onboardingScreeningFlowId}
+											onScreeningFlowComplete={() => {
+												window.alert('screening flow complete, onto the next unit!');
+											}}
+										/>
 									)}
 								</Col>
 							</Row>

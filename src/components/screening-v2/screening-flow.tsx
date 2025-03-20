@@ -5,9 +5,10 @@ import AsyncWrapper from '../async-page';
 
 interface ScreeningProps {
 	screeningFlowId: string;
+	onScreeningFlowComplete(): void;
 }
 
-export const ScreeningFlow = ({ screeningFlowId }: ScreeningProps) => {
+export const ScreeningFlow = ({ screeningFlowId, onScreeningFlowComplete }: ScreeningProps) => {
 	const [initialScreeningQuestionContextId, setInitialScreeningQuestionContextId] = useState('');
 
 	const fetchData = useCallback(async () => {
@@ -15,17 +16,20 @@ export const ScreeningFlow = ({ screeningFlowId }: ScreeningProps) => {
 		const { nextScreeningQuestionContextId } = screeningSession;
 
 		if (!nextScreeningQuestionContextId) {
-			window.alert('screening complete, redirect or something.');
+			onScreeningFlowComplete();
 			return;
 		}
 
 		setInitialScreeningQuestionContextId(nextScreeningQuestionContextId);
-	}, [screeningFlowId]);
+	}, [onScreeningFlowComplete, screeningFlowId]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
 			{initialScreeningQuestionContextId && (
-				<ScreeningQuestionContext initialScreeningQuestionContextId={initialScreeningQuestionContextId} />
+				<ScreeningQuestionContext
+					initialScreeningQuestionContextId={initialScreeningQuestionContextId}
+					onScreeningFlowComplete={onScreeningFlowComplete}
+				/>
 			)}
 		</AsyncWrapper>
 	);
