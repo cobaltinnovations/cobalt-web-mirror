@@ -47,17 +47,17 @@ export const Component = () => {
 			const unlockedUnitIds = Object.entries(course.defaultCourseUnitLockStatusesByCourseUnitId)
 				.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
 				.map(([k, _v]) => k);
-			const firstUnlockedUnitId = unlockedUnitIds[0];
 
-			if (!firstUnlockedUnitId) {
+			if (unlockedUnitIds.length === 0) {
 				throw new Error('there are no unlocked units');
 			}
 
-			navigate(`./course-units/${unlockedUnitIds[0]}`);
+			const firstUnlockedUnitId = unlockedUnitIds[0];
+			navigate(`/course/${course.urlName}/course-units/${firstUnlockedUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.courseId, course?.defaultCourseUnitLockStatusesByCourseUnitId, handleError, navigate]);
+	}, [course?.courseId, course?.defaultCourseUnitLockStatusesByCourseUnitId, course?.urlName, handleError, navigate]);
 
 	return (
 		<>
