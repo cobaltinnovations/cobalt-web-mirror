@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, PropsWithChildren } from 'react';
-import { Link, matchPath, PathMatch, To, useLocation, useRevalidator } from 'react-router-dom';
+import { Link, matchPath, PathMatch, To, useLocation, useMatches, useRevalidator } from 'react-router-dom';
 import { Button, Collapse, Dropdown } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
@@ -37,6 +37,7 @@ import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-it
 import { useAppRootLoaderData } from '@/routes/root';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import { RouteHandle } from '@/routes';
 
 export const HEADER_HEIGHT = 60;
 
@@ -634,8 +635,12 @@ const HeaderV2 = () => {
 		topicCenterId: featuredTopicCenter.topicCenterId,
 	};
 
-	const hideDefaultHeaderRoutes = ['/courses/:courseIdentifier/session'].some((path) => matchPath(path, pathname));
-	if (hideDefaultHeaderRoutes) {
+	const routeMatches = useMatches();
+	const hideHeader = useMemo(
+		() => routeMatches.some((match) => (match.handle as RouteHandle | undefined)?.hideHeader),
+		[routeMatches]
+	);
+	if (hideHeader) {
 		return null;
 	}
 

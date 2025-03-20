@@ -41,6 +41,7 @@ import PatientCheckIn from './routes/ic/patient/patient-check-in';
 import AsyncWrapper from './components/async-page';
 
 export interface RouteHandle {
+	hideHeader?: boolean;
 	hideFooter?: boolean;
 	hideFooterContactUs?: boolean;
 }
@@ -792,6 +793,10 @@ export const routes: RouteObject[] = [
 								id: 'courses-session',
 								path: ':courseIdentifier/session',
 								lazy: () => import('@/routes/courses/course-session'),
+								handle: {
+									hideHeader: true,
+									hideFooter: true,
+								} as RouteHandle,
 							},
 							{
 								id: 'courses-test',

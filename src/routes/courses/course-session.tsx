@@ -6,6 +6,9 @@ import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { createUseThemedStyles } from '@/jss/theme';
 
+const headerHeight = 60;
+const asideWidth = 344;
+
 const useStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
 		top: 0,
@@ -19,7 +22,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		top: 0,
 		left: 0,
 		right: 0,
-		height: 60,
+		height: headerHeight,
 		zIndex: 3,
 		display: 'flex',
 		padding: '0 24px',
@@ -30,18 +33,20 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
 	aside: {
-		top: 60,
+		top: headerHeight,
 		left: 0,
 		bottom: 0,
 		zIndex: 2,
-		width: 344,
+		width: asideWidth,
+		overflowY: 'auto',
+		padding: '24px 16px',
 		position: 'absolute',
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
 	},
 	previewPane: {
-		top: 60,
-		left: 344,
+		top: headerHeight,
+		left: asideWidth,
 		right: 0,
 		bottom: 0,
 		zIndex: 0,
@@ -77,10 +82,53 @@ export const Component = () => {
 			</Helmet>
 			<AsyncWrapper fetchData={fetchData}>
 				<div className={classes.wrapper}>
-					{/* path matching logic in components/header-v2.tsx hides the default header */}
 					<div className={classes.header}>{course?.title}</div>
-					<div className={classes.aside}>aside content</div>
-					<div className={classes.previewPane}>preview pane content</div>
+					<div className={classes.aside}>
+						aside content{' '}
+						<p>
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vehicula, nulla sed finibus
+							faucibus, mi risus ultricies mauris, sed consequat nunc mi ac sem. Morbi porta neque non
+							risus placerat condimentum. Proin rhoncus tincidunt pellentesque. Phasellus porta sem ac
+							imperdiet ullamcorper. Maecenas vulputate, ex ac hendrerit tristique, erat lectus malesuada
+							nisi, tincidunt sollicitudin sem mi in felis. Morbi ut iaculis lacus, ut iaculis risus. Sed
+							placerat ipsum id lacus volutpat aliquam. Duis porttitor dui a rhoncus blandit. Maecenas
+							aliquam arcu vitae ex porta ornare. Phasellus molestie risus ut nunc interdum, at
+							sollicitudin justo auctor. Nullam arcu lorem, eleifend ac porta et, tincidunt ut ante.
+						</p>
+					</div>
+					<div className={classes.previewPane}>
+						preview pane content{' '}
+						<p>
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vehicula, nulla sed finibus
+							faucibus, mi risus ultricies mauris, sed consequat nunc mi ac sem. Morbi porta neque non
+							risus placerat condimentum. Proin rhoncus tincidunt pellentesque. Phasellus porta sem ac
+							imperdiet ullamcorper. Maecenas vulputate, ex ac hendrerit tristique, erat lectus malesuada
+							nisi, tincidunt sollicitudin sem mi in felis. Morbi ut iaculis lacus, ut iaculis risus. Sed
+							placerat ipsum id lacus volutpat aliquam. Duis porttitor dui a rhoncus blandit. Maecenas
+							aliquam arcu vitae ex porta ornare. Phasellus molestie risus ut nunc interdum, at
+							sollicitudin justo auctor. Nullam arcu lorem, eleifend ac porta et, tincidunt ut ante.
+						</p>
+						<p>
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vehicula, nulla sed finibus
+							faucibus, mi risus ultricies mauris, sed consequat nunc mi ac sem. Morbi porta neque non
+							risus placerat condimentum. Proin rhoncus tincidunt pellentesque. Phasellus porta sem ac
+							imperdiet ullamcorper. Maecenas vulputate, ex ac hendrerit tristique, erat lectus malesuada
+							nisi, tincidunt sollicitudin sem mi in felis. Morbi ut iaculis lacus, ut iaculis risus. Sed
+							placerat ipsum id lacus volutpat aliquam. Duis porttitor dui a rhoncus blandit. Maecenas
+							aliquam arcu vitae ex porta ornare. Phasellus molestie risus ut nunc interdum, at
+							sollicitudin justo auctor. Nullam arcu lorem, eleifend ac porta et, tincidunt ut ante.
+						</p>
+						<p>
+							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vehicula, nulla sed finibus
+							faucibus, mi risus ultricies mauris, sed consequat nunc mi ac sem. Morbi porta neque non
+							risus placerat condimentum. Proin rhoncus tincidunt pellentesque. Phasellus porta sem ac
+							imperdiet ullamcorper. Maecenas vulputate, ex ac hendrerit tristique, erat lectus malesuada
+							nisi, tincidunt sollicitudin sem mi in felis. Morbi ut iaculis lacus, ut iaculis risus. Sed
+							placerat ipsum id lacus volutpat aliquam. Duis porttitor dui a rhoncus blandit. Maecenas
+							aliquam arcu vitae ex porta ornare. Phasellus molestie risus ut nunc interdum, at
+							sollicitudin justo auctor. Nullam arcu lorem, eleifend ac porta et, tincidunt ut ante.
+						</p>
+					</div>
 				</div>
 			</AsyncWrapper>
 		</>
