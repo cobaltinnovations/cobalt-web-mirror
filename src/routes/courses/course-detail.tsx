@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
@@ -22,6 +23,8 @@ enum TABS {
 
 export const Component = () => {
 	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
+	const navigate = useNavigate();
+	const handleError = useHandleError();
 	const [course, setCourse] = useState<CourseModel>();
 	const [currentTab, setCurrentTab] = useState(TABS.COURSE_OVERVIEW);
 
@@ -33,6 +36,19 @@ export const Component = () => {
 		const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
 		setCourse(response.course);
 	}, [courseIdentifier]);
+
+	const handleStartCourseButtonClick = useCallback(async () => {
+		try {
+			if (!course?.courseId) {
+				throw new Error('course.courseId is undefined.');
+			}
+
+			await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
+			navigate(`./session`);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [course?.courseId, handleError, navigate]);
 
 	return (
 		<>
@@ -78,25 +94,34 @@ export const Component = () => {
 											<Col md={12} lg={7}>
 												<div className="pt-6 mb-11 d-flex align-items-center justify-content-between">
 													<h2 className="mb-0">Course Content</h2>
-													<Button type="button">Start Course</Button>
+													<Button type="button" onClick={handleStartCourseButtonClick}>
+														Start Course
+													</Button>
 												</div>
-												{(course?.courseModules ?? []).map(
-													(courseModule, courseModuleIndex) => {
-														const isLast =
-															(course?.courseModules ?? []).length - 1 ===
-															courseModuleIndex;
+												{course &&
+													(course.courseModules ?? []).map(
+														(courseModule, courseModuleIndex) => {
+															const isLast =
+																(course?.courseModules ?? []).length - 1 ===
+																courseModuleIndex;
 
-														return (
-															<CourseModule
-																className={classNames({
-																	'mb-4': !isLast,
-																})}
-																key={courseModule.courseModuleId}
-																courseModule={courseModule}
-															/>
-														);
-													}
-												)}
+															return (
+																<CourseModule
+																	className={classNames({
+																		'mb-4': !isLast,
+																	})}
+																	key={courseModule.courseModuleId}
+																	courseModule={courseModule}
+																	courseUnitLockStatusesByCourseUnitId={
+																		course.currentCourseSession
+																			? course.currentCourseSession
+																					.courseUnitLockStatusesByCourseUnitId
+																			: course.defaultCourseUnitLockStatusesByCourseUnitId
+																	}
+																/>
+															);
+														}
+													)}
 											</Col>
 											<Col md={12} lg={5}>
 												<h3 className="pt-6 mb-4">Course Focus</h3>

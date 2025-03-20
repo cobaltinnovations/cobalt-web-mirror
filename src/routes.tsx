@@ -789,6 +789,11 @@ export const routes: RouteObject[] = [
 								lazy: () => import('@/routes/courses/course-detail'),
 							},
 							{
+								id: 'courses-session',
+								path: ':courseIdentifier/session',
+								lazy: () => import('@/routes/courses/course-session'),
+							},
+							{
 								id: 'courses-test',
 								path: 'test',
 								lazy: () => import('@/routes/courses/test'),

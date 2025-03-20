@@ -5,12 +5,19 @@ export interface CourseModel {
 	focus?: string;
 	imageUrl: string;
 	urlName: string;
-
-	// Additional fields for detail view
 	courseModules: CourseModuleModel[];
 	videos: void[];
-	currentCourseSession: CourseSessionModel;
+	defaultCourseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
+	currentCourseSession?: CourseSessionModel;
 }
+
+export type CourseUnitLockStatusesByCourseUnitId = Record<
+	string,
+	{
+		courseUnitLockTypeId: CourseUnitLockTypeId;
+		determinantCourseUnitIdsByDependencyTypeIds: Record<CourseUnitDependencyTypeId, string[]>;
+	}
+>;
 
 export interface CourseModuleModel {
 	courseModuleId: string;
@@ -37,6 +44,7 @@ export interface CourseSessionModel {
 	courseId: string;
 	accountId: string;
 	courseSessionStatusId: CourseSessionStatusId;
+	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 }
 
 export enum CourseUnitTypeId {}
@@ -45,4 +53,15 @@ export enum CourseSessionStatusId {
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED',
 	CANCELED = 'CANCELED',
+}
+
+export enum CourseUnitDependencyTypeId {
+	WEAK = 'WEAK',
+	STRONG = 'STRONG',
+}
+
+export enum CourseUnitLockTypeId {
+	UNLOCKED = 'UNLOCKED',
+	WEAKLY_LOCKED = 'WEAKLY_LOCKED',
+	STRONGLY_LOCKED = 'STRONGLY_LOCKED',
 }

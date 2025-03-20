@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
-import { CourseModuleModel } from '@/lib/models';
+import { CourseModuleModel, CourseUnitLockStatusesByCourseUnitId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 
@@ -32,10 +32,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface CourseModuleProps {
 	courseModule: CourseModuleModel;
+	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	className?: string;
 }
 
-export const CourseModule = ({ courseModule, className }: CourseModuleProps) => {
+export const CourseModule = ({ courseModule, courseUnitLockStatusesByCourseUnitId, className }: CourseModuleProps) => {
 	const classes = useStyles();
 	const [show, setShow] = useState(true);
 
@@ -60,6 +61,7 @@ export const CourseModule = ({ courseModule, className }: CourseModuleProps) => 
 						<ul className="m-0 list-unstyled">
 							{courseModule.courseUnits.map((courseUnit) => (
 								<li key={courseUnit.courseUnitId} className="d-flex align-items-center">
+									{courseUnitLockStatusesByCourseUnitId[courseUnit.courseUnitId].courseUnitLockTypeId}
 									<div>
 										<span className="d-block fs-large">{courseUnit.title}</span>
 										<span className="d-block fs-default text-gray">

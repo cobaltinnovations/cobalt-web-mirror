@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { CourseModel } from '@/lib/models';
+import { CourseModel, CourseSessionModel } from '@/lib/models';
 
 export const coursesService = {
 	getCourses() {
@@ -12,6 +12,13 @@ export const coursesService = {
 		return httpSingleton.orchestrateRequest<{ course: CourseModel }>({
 			method: 'get',
 			url: `/courses/${courseIdentifier}`,
+		});
+	},
+	createCourseSession(data: { courseId: string }) {
+		return httpSingleton.orchestrateRequest<{ courseSession: CourseSessionModel }>({
+			method: 'post',
+			url: `/course-sessions`,
+			data,
 		});
 	},
 };
