@@ -56,11 +56,6 @@ export const Component = () => {
 						</Col>
 					</Row>
 				</AsyncWrapper>
-				<Row>
-					<Col>
-						<Link to="./test">Test Screening</Link>
-					</Col>
-				</Row>
 			</Container>
 		</>
 	);

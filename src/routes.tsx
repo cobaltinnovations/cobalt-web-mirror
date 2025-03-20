@@ -798,11 +798,6 @@ export const routes: RouteObject[] = [
 									hideFooter: true,
 								} as RouteHandle,
 							},
-							{
-								id: 'courses-test',
-								path: 'test',
-								lazy: () => import('@/routes/courses/test'),
-							},
 						],
 					},
 					{
