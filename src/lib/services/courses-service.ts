@@ -8,4 +8,10 @@ export const coursesService = {
 			url: '/courses',
 		});
 	},
+	getCourseDetail(courseIdentifier: string) {
+		return httpSingleton.orchestrateRequest<{ course: CourseModel }>({
+			method: 'get',
+			url: `/courses/${courseIdentifier}`,
+		});
+	},
 };

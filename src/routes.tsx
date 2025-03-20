@@ -781,7 +781,12 @@ export const routes: RouteObject[] = [
 							{
 								id: 'courses-home',
 								index: true,
-								lazy: () => import('@/routes/courses/home'),
+								lazy: () => import('@/routes/courses/course-home'),
+							},
+							{
+								id: 'courses-detail',
+								path: ':courseIdentifier',
+								lazy: () => import('@/routes/courses/course-detail'),
 							},
 							{
 								id: 'courses-test',
