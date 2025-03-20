@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { CourseModel } from '@/lib/models';
+import { CourseModel, CourseUnitLockTypeId } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
@@ -43,12 +43,21 @@ export const Component = () => {
 				throw new Error('course.courseId is undefined.');
 			}
 
-			const { courseSession } = await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
-			navigate(`./course-units/xxx-xxx-xxx-xxx`);
+			await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
+			const unlockedUnitIds = Object.entries(course.defaultCourseUnitLockStatusesByCourseUnitId)
+				.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
+				.map(([k, _v]) => k);
+			const firstUnlockedUnitId = unlockedUnitIds[0];
+
+			if (!firstUnlockedUnitId) {
+				throw new Error('there are no unlocked units');
+			}
+
+			navigate(`./course-units/${unlockedUnitIds[0]}`);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.courseId, handleError, navigate]);
+	}, [course?.courseId, course?.defaultCourseUnitLockStatusesByCourseUnitId, handleError, navigate]);
 
 	return (
 		<>
