@@ -47,8 +47,6 @@ export interface CourseSessionModel {
 	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 }
 
-export enum CourseUnitTypeId {}
-
 export enum CourseSessionStatusId {
 	IN_PROGRESS = 'IN_PROGRESS',
 	COMPLETED = 'COMPLETED',
@@ -64,4 +62,13 @@ export enum CourseUnitLockTypeId {
 	UNLOCKED = 'UNLOCKED',
 	WEAKLY_LOCKED = 'WEAKLY_LOCKED',
 	STRONGLY_LOCKED = 'STRONGLY_LOCKED',
+}
+
+export enum CourseUnitTypeId {
+	VIDEO = 'VIDEO',
+	INFOGRAPHIC = 'INFOGRAPHIC',
+	HOMEWORK = 'HOMEWORK',
+	CARD_SORT = 'CARD_SORT',
+	QUIZ = 'QUIZ',
+	REORDER = 'REORDER',
 }

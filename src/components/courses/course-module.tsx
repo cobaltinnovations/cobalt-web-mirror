@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import { Button, Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
-import { CourseModuleModel, CourseUnitLockStatusesByCourseUnitId } from '@/lib/models';
+import {
+	CourseModuleModel,
+	CourseUnitLockStatusesByCourseUnitId,
+	CourseUnitLockTypeId,
+	CourseUnitTypeId,
+} from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
+import { ReactComponent as ClipboardIcon } from '@/assets/icons/icon-clipboard.svg';
+import { ReactComponent as VideoIcon } from '@/assets/icons/icon-video.svg';
+
+const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, JSX.Element | null> = {
+	VIDEO: <VideoIcon width={24} height={24} />,
+	INFOGRAPHIC: null,
+	HOMEWORK: null,
+	CARD_SORT: null,
+	QUIZ: <ClipboardIcon width={24} height={24} />,
+	REORDER: null,
+};
 
 const useStyles = createUseThemedStyles((theme) => ({
 	courseModule: {
@@ -27,6 +44,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	body: {
 		borderTop: `1px solid ${theme.colors.border}`,
+	},
+	iconOuter: {
+		width: 32,
+		height: 32,
+		flexShrink: 0,
+		display: 'flex',
+		borderRadius: '50%',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: theme.colors.n75,
 	},
 }));
 
@@ -61,7 +88,14 @@ export const CourseModule = ({ courseModule, courseUnitLockStatusesByCourseUnitI
 						<ul className="m-0 list-unstyled">
 							{courseModule.courseUnits.map((courseUnit) => (
 								<li key={courseUnit.courseUnitId} className="d-flex align-items-center">
-									{courseUnitLockStatusesByCourseUnitId[courseUnit.courseUnitId].courseUnitLockTypeId}
+									<div className={classes.iconOuter}>
+										{courseUnitLockStatusesByCourseUnitId[courseUnit.courseUnitId]
+											.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ? (
+											courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId]
+										) : (
+											<LockIcon width={24} height={24} />
+										)}
+									</div>
 									<div>
 										<span className="d-block fs-large">{courseUnit.title}</span>
 										<span className="d-block fs-default text-gray">
