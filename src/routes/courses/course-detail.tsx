@@ -9,6 +9,7 @@ import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import classNames from 'classnames';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 export async function loader() {
 	return null;
@@ -73,27 +74,41 @@ export const Component = () => {
 								/>
 								<Tab.Content>
 									<Tab.Pane eventKey={TABS.COURSE_OVERVIEW} mountOnEnter unmountOnExit>
-										<div className="pt-6 mb-11 d-flex align-items-center justify-content-between">
-											<h2 className="mb-0">Course Content</h2>
-											<Button type="button">Start Course</Button>
-										</div>
-										{(course?.courseModules ?? []).map((courseModule, courseModuleIndex) => {
-											const isLast =
-												(course?.courseModules ?? []).length - 1 === courseModuleIndex;
+										<Row>
+											<Col md={12} lg={7}>
+												<div className="pt-6 mb-11 d-flex align-items-center justify-content-between">
+													<h2 className="mb-0">Course Content</h2>
+													<Button type="button">Start Course</Button>
+												</div>
+												{(course?.courseModules ?? []).map(
+													(courseModule, courseModuleIndex) => {
+														const isLast =
+															(course?.courseModules ?? []).length - 1 ===
+															courseModuleIndex;
 
-											return (
-												<CourseModule
-													className={classNames({
-														'mb-4': !isLast,
-													})}
-													key={courseModule.courseModuleId}
-													courseModule={courseModule}
-												/>
-											);
-										})}
+														return (
+															<CourseModule
+																className={classNames({
+																	'mb-4': !isLast,
+																})}
+																key={courseModule.courseModuleId}
+																courseModule={courseModule}
+															/>
+														);
+													}
+												)}
+											</Col>
+											<Col md={12} lg={5}>
+												<h3 className="pt-6 mb-4">Course Focus</h3>
+												<WysiwygDisplay className="mb-10" html={course?.focus ?? ''} />
+												<hr />
+												<h3 className="pt-6 mb-4">Need Help?</h3>
+												<a href="mailto:">Reach out to us here</a>
+											</Col>
+										</Row>
 									</Tab.Pane>
 									<Tab.Pane eventKey={TABS.ADDITIONAL_RESOURCES} mountOnEnter unmountOnExit>
-										Additonal Resources
+										<div className="pt-6">Additonal Resources</div>
 									</Tab.Pane>
 								</Tab.Content>
 							</Tab.Container>
