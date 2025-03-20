@@ -634,6 +634,11 @@ const HeaderV2 = () => {
 		topicCenterId: featuredTopicCenter.topicCenterId,
 	};
 
+	const hideDefaultHeaderRoutes = ['/courses/:courseIdentifier/session'].some((path) => matchPath(path, pathname));
+	if (hideDefaultHeaderRoutes) {
+		return null;
+	}
+
 	return (
 		<>
 			<CSSTransition in={menuOpen} timeout={200} classNames="menu-animation" mountOnEnter unmountOnExit>
