@@ -791,8 +791,8 @@ export const routes: RouteObject[] = [
 							},
 							{
 								id: 'courses-session',
-								path: ':courseIdentifier/session',
-								lazy: () => import('@/routes/courses/course-session'),
+								path: ':courseIdentifier/course-units/:unitId',
+								lazy: () => import('@/routes/courses/course-units'),
 								handle: {
 									hideHeader: true,
 									hideFooter: true,

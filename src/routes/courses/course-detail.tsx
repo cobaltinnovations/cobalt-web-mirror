@@ -43,8 +43,8 @@ export const Component = () => {
 				throw new Error('course.courseId is undefined.');
 			}
 
-			await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
-			navigate(`./session`);
+			const { courseSession } = await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
+			navigate(`./course-units/xxx-xxx-xxx-xxx`);
 		} catch (error) {
 			handleError(error);
 		}

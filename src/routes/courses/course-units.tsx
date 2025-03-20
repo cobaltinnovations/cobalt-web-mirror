@@ -2,9 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { CourseModel } from '@/lib/models';
+import { CourseModel, CourseUnitModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
-import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { Button, Col, Container, Row } from 'react-bootstrap';
@@ -67,10 +66,10 @@ export async function loader() {
 
 export const Component = () => {
 	const classes = useStyles();
-	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
+	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
-	const { institution } = useAccount();
 	const [course, setCourse] = useState<CourseModel>();
+	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
@@ -78,8 +77,12 @@ export const Component = () => {
 		}
 
 		const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
+		const courseUnitsFlat = response.course.courseModules.map((courseModule) => courseModule.courseUnits).flat();
+		const desiredCourseUnit = courseUnitsFlat.find((cu) => cu.courseUnitId === unitId);
+
 		setCourse(response.course);
-	}, [courseIdentifier]);
+		setCourseUnit(desiredCourseUnit);
+	}, [courseIdentifier, unitId]);
 
 	return (
 		<>
@@ -124,11 +127,11 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
-									{institution.onboardingScreeningFlowId && (
+									{courseUnit?.screeningFlowId && (
 										<ScreeningFlow
-											screeningFlowId={institution.onboardingScreeningFlowId}
+											screeningFlowId={courseUnit.screeningFlowId}
 											onScreeningFlowComplete={() => {
-												window.alert('screening flow complete, onto the next unit!');
+												window.alert('[TODO]: screening flow complete, load next unit');
 											}}
 										/>
 									)}
