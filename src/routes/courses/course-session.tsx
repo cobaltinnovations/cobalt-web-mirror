@@ -1,13 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import classNames from 'classnames';
 import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
-import AsyncWrapper from '@/components/async-page';
-import { createUseThemedStyles } from '@/jss/theme';
 import useAccount from '@/hooks/use-account';
+import AsyncWrapper from '@/components/async-page';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { CourseModule } from '@/components/courses';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -98,17 +100,25 @@ export const Component = () => {
 						{course?.title}
 					</div>
 					<div className={classes.aside}>
-						aside content{' '}
-						<p>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vehicula, nulla sed finibus
-							faucibus, mi risus ultricies mauris, sed consequat nunc mi ac sem. Morbi porta neque non
-							risus placerat condimentum. Proin rhoncus tincidunt pellentesque. Phasellus porta sem ac
-							imperdiet ullamcorper. Maecenas vulputate, ex ac hendrerit tristique, erat lectus malesuada
-							nisi, tincidunt sollicitudin sem mi in felis. Morbi ut iaculis lacus, ut iaculis risus. Sed
-							placerat ipsum id lacus volutpat aliquam. Duis porttitor dui a rhoncus blandit. Maecenas
-							aliquam arcu vitae ex porta ornare. Phasellus molestie risus ut nunc interdum, at
-							sollicitudin justo auctor. Nullam arcu lorem, eleifend ac porta et, tincidunt ut ante.
-						</p>
+						{course &&
+							(course.courseModules ?? []).map((courseModule, courseModuleIndex) => {
+								const isLast = (course?.courseModules ?? []).length - 1 === courseModuleIndex;
+
+								return (
+									<CourseModule
+										className={classNames({
+											'mb-4': !isLast,
+										})}
+										key={courseModule.courseModuleId}
+										courseModule={courseModule}
+										courseUnitLockStatusesByCourseUnitId={
+											course.currentCourseSession
+												? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
+												: course.defaultCourseUnitLockStatusesByCourseUnitId
+										}
+									/>
+								);
+							})}
 					</div>
 					<div className={classes.previewPane}>
 						<Container>
