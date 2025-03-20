@@ -43,10 +43,10 @@ export const CourseModule = ({ courseModule, className }: CourseModuleProps) => 
 		<div className={classNames(classes.courseModule, className)}>
 			<Button className={classes.header} bsPrefix="collapse-button" onClick={() => setShow(!show)}>
 				<div className="text-left">
-					<span className="d-block fw-bold">{courseModule.title}</span>
-					<span className="d-block">
-						0/{courseModule.courseUnits.length} units &bull;{' '}
-						{courseModule.estimatedCompletionTimeInMinutesDescription}
+					<span className="d-block fs-large fw-bold">{courseModule.title}</span>
+					<span className="d-block fs-default">
+						<span className="text-danger">[TODO]: unitsCompleted</span>/{courseModule.courseUnits.length}{' '}
+						units &bull; {courseModule.estimatedCompletionTimeInMinutesDescription}
 					</span>
 				</div>
 				<DownChevron
@@ -59,7 +59,15 @@ export const CourseModule = ({ courseModule, className }: CourseModuleProps) => 
 					<div className="p-4">
 						<ul className="m-0 list-unstyled">
 							{courseModule.courseUnits.map((courseUnit) => (
-								<li key={courseUnit.courseUnitId}>{courseUnit.title}</li>
+								<li key={courseUnit.courseUnitId} className="d-flex align-items-center">
+									<div>
+										<span className="d-block fs-large">{courseUnit.title}</span>
+										<span className="d-block fs-default text-gray">
+											<span className="text-danger">[TODO]: unitTypeDescription</span> &bull;
+											<span className="text-danger">[TODO]: completionTimeDescription</span>
+										</span>
+									</div>
+								</li>
 							))}
 						</ul>
 					</div>
