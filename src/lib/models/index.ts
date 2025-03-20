@@ -11,6 +11,7 @@ export * from './color-ids';
 export * from './content-feedback-models';
 export * from './content-visibility-type-id-models';
 export * from './content';
+export * from './courses-models';
 export * from './faq-models';
 export * from './ga-events';
 export * from './group-session-models';
