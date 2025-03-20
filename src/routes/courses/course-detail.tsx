@@ -1,14 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import classNames from 'classnames';
 import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
-import classNames from 'classnames';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 export async function loader() {
@@ -103,7 +103,7 @@ export const Component = () => {
 												<WysiwygDisplay className="mb-10" html={course?.focus ?? ''} />
 												<hr />
 												<h3 className="pt-6 mb-4">Need Help?</h3>
-												<a href="mailto:">Reach out to us here</a>
+												<Link to="/feedback">Reach out to us here</Link>
 											</Col>
 										</Row>
 									</Tab.Pane>
