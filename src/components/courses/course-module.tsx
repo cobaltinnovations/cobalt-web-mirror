@@ -53,7 +53,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 	collapseBody: {
 		borderTop: ({ compact }: UseStylesProps) => (compact ? 'none' : `1px solid ${theme.colors.border}`),
 		'& ul li.active': {
+			position: 'relative',
 			backgroundColor: theme.colors.n75,
+			'&:before': {
+				top: 0,
+				left: 0,
+				width: 4,
+				bottom: 0,
+				content: '""',
+				position: 'absolute',
+				backgroundColor: theme.colors.p500,
+			},
 		},
 	},
 	courseUnitButton: {
