@@ -17,6 +17,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -62,10 +63,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 		right: 0,
 		bottom: 0,
 		zIndex: 0,
-		padding: 24,
 		overflowY: 'auto',
+		padding: '40px 24px',
 		position: 'absolute',
 		backgroundColor: theme.colors.n75,
+	},
+	videoPlayerOuter: {
+		width: '100%',
+		aspectRatio: '16/9',
+		borderRadius: 8,
+		overflow: 'hidden',
 	},
 }));
 
@@ -79,7 +86,6 @@ export const Component = () => {
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
 	const [course, setCourse] = useState<CourseModel>();
-
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
 
@@ -208,6 +214,10 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
+									<h2 className="mb-10">{courseUnit?.title}</h2>
+									{courseUnit?.description && (
+										<WysiwygDisplay className="mb-8" html={courseUnit?.description ?? ''} />
+									)}
 									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ? (
 										<>
 											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
@@ -226,12 +236,21 @@ export const Component = () => {
 													/>
 												)}
 											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
-												<div id="kaltura_player" style={{ width: 400, height: 330 }} />
+												<div className={classes.videoPlayerOuter}>
+													<div
+														id="kaltura_player"
+														style={{ width: '100%', height: '100%' }}
+													/>
+												</div>
 											)}
-
-											<Button onClick={handleMarkCourseUnitCompleteButtonClick}>
-												Mark Complete
-											</Button>
+											<div className="pt-10 text-right">
+												<Button
+													variant="light"
+													onClick={handleMarkCourseUnitCompleteButtonClick}
+												>
+													Mark Complete
+												</Button>
+											</div>
 										</>
 									) : (
 										<>
