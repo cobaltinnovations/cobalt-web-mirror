@@ -15,7 +15,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { CourseModule } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKulteraScriptForVideo } from '@/lib/utils';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const headerHeight = 60;
@@ -107,80 +107,22 @@ export const Component = () => {
 		if (courseUnit?.courseUnitTypeId !== CourseUnitTypeId.VIDEO) {
 			return;
 		}
-
 		const video = course?.videos.find((v) => v.videoId === courseUnit.videoId);
-
 		if (!video) {
 			return;
 		}
 
-		const apiScript = document.createElement('script');
-		apiScript.src = `//cdnapisec.kaltura.com/p/${video?.kalturaPartnerId}/sp/${video.kalturaPartnerId}00/embedIframeJs/uiconf_id/${video.kalturaUiconfId}/partner_id/${video.kalturaPartnerId}`;
-		apiScript.async = true;
-		apiScript.onload = () => {
-			document.body.appendChild(embedScript);
-		};
-
-		const kWidget = {
-			targetId: 'kaltura_player',
-			wid: video.kalturaWid,
-			uiconf_id: video.kalturaUiconfId,
-			entry_id: video.kalturaEntryId,
-			readyCallback: (playerID: string) => {
-				const kdp = document.getElementById(playerID);
-				const events = [
-					'layoutBuildDone',
-					'playerReady',
-					'mediaLoaded',
-					'mediaError',
-					'playerStateChange',
-					'firstPlay',
-					'playerPlayed',
-					'playerPaused',
-					'preSeek',
-					'seek',
-					'seeked',
-					'playerUpdatePlayhead',
-					'openFullScreen',
-					'closeFullScreen',
-					'volumeChanged',
-					'mute',
-					'unmute',
-					'bufferChange',
-					'cuePointReached',
-					'playerPlayEnd',
-					'onChangeMedia',
-					'onChangeMediaDone',
-				];
-				for (let i = 0; i < events.length; i++) {
-					((i) => {
-						if (!kdp) {
-							return;
-						}
-
-						// @ts-ignore
-						kdp.kBind(events[i], (event: object) => {
-							console.log(
-								`Kaltura player event triggered: ${events[i]}, event data: ${JSON.stringify(event)}`
-							);
-						});
-					})(i);
-				}
+		const { script } = getKulteraScriptForVideo({
+			videoPlayerId: 'kaltura_player',
+			courseVideo: video,
+			eventCallback: (eventName, event) => {
+				console.log(`Kaltura player event triggered: ${eventName}, event data: ${JSON.stringify(event)}`);
 			},
-		};
+		});
 
-		const embedScript = document.createElement('script');
-		embedScript.type = 'text/javascript';
-		embedScript.async = true;
-		embedScript.text = `kWidget.embed({...${JSON.stringify(
-			kWidget
-		)}, readyCallback: ${kWidget.readyCallback.toString()}});`;
-
-		document.body.appendChild(apiScript);
-
+		document.body.appendChild(script);
 		return () => {
-			document.body.removeChild(apiScript);
-			document.body.removeChild(embedScript);
+			document.body.removeChild(script);
 		};
 	}, [course?.videos, courseUnit?.courseUnitTypeId, courseUnit?.videoId]);
 
