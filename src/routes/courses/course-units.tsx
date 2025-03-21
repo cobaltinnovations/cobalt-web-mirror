@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
@@ -19,6 +19,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
+import InlineAlert from '@/components/inline-alert';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -167,6 +168,22 @@ export const Component = () => {
 		}
 	}, [course, courseUnit, handleError, navigate]);
 
+	const strongCourseUnitDependencies = useMemo(
+		() =>
+			(
+				courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds[CourseUnitDependencyTypeId.STRONG] ??
+				[]
+			).map((dependencyUnitId) => courseUnitByUnitId[dependencyUnitId]),
+		[courseUnitByUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
+	);
+	const weakCourseUnitDependencies = useMemo(
+		() =>
+			(
+				courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds[CourseUnitDependencyTypeId.WEAK] ?? []
+			).map((dependencyUnitId) => courseUnitByUnitId[dependencyUnitId]),
+		[courseUnitByUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
+	);
+
 	return (
 		<>
 			<Helmet>
@@ -225,11 +242,37 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
-									<h2 className="mb-10">{courseUnit?.title}</h2>
 									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ||
 									courseUnitLockStatus?.courseUnitLockTypeId ===
 										CourseUnitLockTypeId.WEAKLY_LOCKED ? (
 										<>
+											{weakCourseUnitDependencies.length > 0 && (
+												<InlineAlert
+													className="mb-10"
+													variant="warning"
+													title="Recommended learning path"
+													description={
+														<>
+															<p>
+																We recommend completing the following units before
+																continuing:
+															</p>
+															<ul className="p-0 mb-0">
+																{weakCourseUnitDependencies.map(
+																	(dependencyCourseUnit) => (
+																		<Link
+																			to={`/courses/${course?.urlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
+																		>
+																			{dependencyCourseUnit.title}
+																		</Link>
+																	)
+																)}
+															</ul>
+														</>
+													}
+												/>
+											)}
+											<h2 className="mb-10">{courseUnit?.title}</h2>
 											{courseUnit?.description && (
 												<WysiwygDisplay className="mb-8" html={courseUnit?.description ?? ''} />
 											)}
@@ -267,28 +310,21 @@ export const Component = () => {
 										</>
 									) : (
 										<>
+											<h2 className="mb-10">{courseUnit?.title}</h2>
 											<h3 className="mb-6">This unit is locked</h3>
 											<p className="fs-large mb-6">
 												Please complete the following modules to unlock this unit:
 											</p>
 											<ul>
-												{(
-													courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds[
-														CourseUnitDependencyTypeId.STRONG
-													] ?? []
-												).map((dependencyUnitId) => {
-													const dependencyUnit = courseUnitByUnitId[dependencyUnitId];
-
-													return (
-														<li key={dependencyUnit.courseUnitId}>
-															<Link
-																to={`/courses/${course?.urlName}/course-units/${dependencyUnit.courseUnitId}`}
-															>
-																{dependencyUnit.title}
-															</Link>
-														</li>
-													);
-												})}
+												{strongCourseUnitDependencies.map((dependencyCourseUnit) => (
+													<li key={dependencyCourseUnit.courseUnitId}>
+														<Link
+															to={`/courses/${course?.urlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
+														>
+															{dependencyCourseUnit.title}
+														</Link>
+													</li>
+												))}
 											</ul>
 										</>
 									)}
