@@ -121,26 +121,60 @@ export const Component = () => {
 			document.body.appendChild(embedScript);
 		};
 
-		const embedScript = document.createElement('script');
-		embedScript.type = 'text/javascript';
-		embedScript.async = true;
-		embedScript.text = `kWidget.embed({
-			'targetId': 'kaltura_player',
-			'wid': '${video.kalturaWid}',
-			'uiconf_id' : '${video.kalturaUiconfId}',
-			'entry_id' : '${video.kalturaEntryId}',
-			'readyCallback': function(playerID) {
-				var kdp = document.getElementById(playerID);
-				var events = ['layoutBuildDone', 'playerReady',  'mediaLoaded', 'mediaError', 'playerStateChange', 'firstPlay', 'playerPlayed', 'playerPaused', 'preSeek', 'seek', 'seeked', 'playerUpdatePlayhead', 'openFullScreen', 'closeFullScreen', 'volumeChanged', 'mute', 'unmute', 'bufferChange', 'cuePointReached', 'playerPlayEnd', 'onChangeMedia', 'onChangeMediaDone'];
-				for ( var i=0; i < events.length; i++ ){
-					(function(i) {
-						kdp.kBind( events[i], function(event){
-							console.log('Kaltura player event triggered: ' + events[i] + ', event data: ' + JSON.stringify(event));
+		const kWidget = {
+			targetId: 'kaltura_player',
+			wid: video.kalturaWid,
+			uiconf_id: video.kalturaUiconfId,
+			entry_id: video.kalturaEntryId,
+			readyCallback: (playerID: string) => {
+				const kdp = document.getElementById(playerID);
+				const events = [
+					'layoutBuildDone',
+					'playerReady',
+					'mediaLoaded',
+					'mediaError',
+					'playerStateChange',
+					'firstPlay',
+					'playerPlayed',
+					'playerPaused',
+					'preSeek',
+					'seek',
+					'seeked',
+					'playerUpdatePlayhead',
+					'openFullScreen',
+					'closeFullScreen',
+					'volumeChanged',
+					'mute',
+					'unmute',
+					'bufferChange',
+					'cuePointReached',
+					'playerPlayEnd',
+					'onChangeMedia',
+					'onChangeMediaDone',
+				];
+				for (let i = 0; i < events.length; i++) {
+					((i) => {
+						if (!kdp) {
+							return;
+						}
+
+						// @ts-ignore
+						kdp.kBind(events[i], (event: object) => {
+							console.log(
+								`Kaltura player event triggered: ${events[i]}, event data: ${JSON.stringify(event)}`
+							);
 						});
 					})(i);
 				}
-			}
-		});`;
+			},
+		};
+
+		const embedScript = document.createElement('script');
+		embedScript.type = 'text/javascript';
+		embedScript.async = true;
+		embedScript.text = `kWidget.embed({...${JSON.stringify(
+			kWidget
+		)}, readyCallback: ${kWidget.readyCallback.toString()}});`;
 
 		document.body.appendChild(apiScript);
 
