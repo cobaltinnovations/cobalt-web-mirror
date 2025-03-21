@@ -2,10 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { screeningService } from '@/lib/services';
 import { ScreeningQuestionContext } from '@/components/screening-v2';
 import AsyncWrapper from '../async-page';
+import { ScreeningSessionDestination } from '@/lib/models';
 
 interface ScreeningProps {
 	screeningFlowId: string;
-	onScreeningFlowComplete(): void;
+	onScreeningFlowComplete(screeningSessionDestination?: ScreeningSessionDestination): void;
 }
 
 export const ScreeningFlow = ({ screeningFlowId, onScreeningFlowComplete }: ScreeningProps) => {
@@ -16,7 +17,7 @@ export const ScreeningFlow = ({ screeningFlowId, onScreeningFlowComplete }: Scre
 		const { nextScreeningQuestionContextId } = screeningSession;
 
 		if (!nextScreeningQuestionContextId) {
-			onScreeningFlowComplete();
+			onScreeningFlowComplete(screeningSession.screeningSessionDestination);
 			return;
 		}
 

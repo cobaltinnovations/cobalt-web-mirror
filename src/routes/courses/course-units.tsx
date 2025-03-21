@@ -135,8 +135,12 @@ export const Component = () => {
 									{courseUnit?.screeningFlowId && (
 										<ScreeningFlow
 											screeningFlowId={courseUnit.screeningFlowId}
-											onScreeningFlowComplete={() => {
-												window.alert('[TODO]: screening flow complete, load next unit');
+											onScreeningFlowComplete={(screeningSessionDestination) => {
+												window.alert('[TODO]: handle screening complete, check console log.');
+												console.log(
+													'[TODO]: screening flow complete, load next unit',
+													screeningSessionDestination
+												);
 											}}
 										/>
 									)}

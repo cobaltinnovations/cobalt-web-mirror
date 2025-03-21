@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { ScreeningAnswerSelection, ScreeningConfirmationPrompt, ScreeningQuestionContextResponse } from '@/lib/models';
+import {
+	ScreeningAnswerSelection,
+	ScreeningConfirmationPrompt,
+	ScreeningQuestionContextResponse,
+	ScreeningSessionDestination,
+} from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
@@ -67,7 +72,7 @@ const useStyles = createUseThemedStyles({
 
 interface ScreeningQuestionContextProps {
 	initialScreeningQuestionContextId: string;
-	onScreeningFlowComplete(): void;
+	onScreeningFlowComplete(screeningSessionDestination?: ScreeningSessionDestination): void;
 }
 
 export const ScreeningQuestionContext = ({
@@ -165,14 +170,14 @@ export const ScreeningQuestionContext = ({
 			setIsLoading(true);
 
 			try {
-				const { nextScreeningQuestionContextId } = await screeningService
+				const { nextScreeningQuestionContextId, screeningSessionDestination } = await screeningService
 					.answerQuestion(screeningQuestionContextId, selectedAnswers, force)
 					.fetch();
 
 				if (nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
 				} else {
-					onScreeningFlowComplete();
+					onScreeningFlowComplete(screeningSessionDestination);
 				}
 			} catch (error) {
 				if (error instanceof CobaltError) {
@@ -198,7 +203,7 @@ export const ScreeningQuestionContext = ({
 				setIsLoading(false);
 			}
 		},
-		[handleError, screeningQuestionContextId, selectedAnswers]
+		[handleError, onScreeningFlowComplete, screeningQuestionContextId, selectedAnswers]
 	);
 
 	const handlePromptSubmit = useCallback(() => {
