@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { CourseModel, CourseUnitLockTypeId } from '@/lib/models';
+import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
@@ -11,6 +11,8 @@ import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
 
 export async function loader() {
 	return null;
@@ -43,21 +45,26 @@ export const Component = () => {
 				throw new Error('course.courseId is undefined.');
 			}
 
-			await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
-			const unlockedUnitIds = Object.entries(course.defaultCourseUnitLockStatusesByCourseUnitId)
-				.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
-				.map(([k, _v]) => k);
-
-			if (unlockedUnitIds.length === 0) {
-				throw new Error('There are no unlocked course units.');
-			}
-
-			const firstUnlockedUnitId = unlockedUnitIds[0];
-			navigate(`/courses/${course.urlName}/course-units/${firstUnlockedUnitId}`);
+			const { courseSession } = await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseSession);
+			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.courseId, course?.defaultCourseUnitLockStatusesByCourseUnitId, course?.urlName, handleError, navigate]);
+	}, [course?.courseId, course?.urlName, handleError, navigate]);
+
+	const handleResumeCourseButtonClick = useCallback(() => {
+		try {
+			if (!course?.currentCourseSession) {
+				throw new Error('course.currentCourseSession is undefined.');
+			}
+
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(course.currentCourseSession);
+			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [course?.currentCourseSession, course?.urlName, handleError, navigate]);
 
 	return (
 		<>
@@ -103,9 +110,29 @@ export const Component = () => {
 											<Col md={12} lg={7}>
 												<div className="pt-6 mb-11 d-flex align-items-center justify-content-between">
 													<h2 className="mb-0">Course Content</h2>
-													<Button type="button" onClick={handleStartCourseButtonClick}>
-														Start Course
-													</Button>
+													{course?.currentCourseSession ? (
+														<div className="d-flex align-items-center">
+															<Button
+																type="button"
+																onClick={handleResumeCourseButtonClick}
+															>
+																Resume Course
+															</Button>
+															<Button
+																type="button"
+																variant="link"
+																className="d-flex align-items-center text-decoration-none"
+																onClick={handleStartCourseButtonClick}
+															>
+																<BeforeIcon className="me-1" />
+																Restart Course
+															</Button>
+														</div>
+													) : (
+														<Button type="button" onClick={handleStartCourseButtonClick}>
+															Start Course
+														</Button>
+													)}
 												</div>
 												{course &&
 													(course.courseModules ?? []).map(

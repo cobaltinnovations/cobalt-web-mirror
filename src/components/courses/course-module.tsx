@@ -106,6 +106,11 @@ export const CourseModule = ({
 	const classes = useStyles({ compact });
 	const [show, setShow] = useState(true);
 
+	const completeCourseUnits = courseModule.courseUnits.filter((cu) =>
+		Object.keys(courseSessionUnitStatusIdsByCourseUnitId).includes(cu.courseUnitId)
+	).length;
+	const totalCourseUnits = courseModule.courseUnits.length;
+
 	return (
 		<div className={classNames(classes.courseModule, className)}>
 			<Button bsPrefix="collapse-button" className={classes.collapseButton} onClick={() => setShow(!show)}>
@@ -120,8 +125,7 @@ export const CourseModule = ({
 					</span>
 					{!compact && (
 						<span className="d-block fs-default">
-							<span className="text-danger">[TODO]: unitsCompleted</span>/
-							{courseModule.courseUnits.length} units &bull;{' '}
+							{completeCourseUnits}/{totalCourseUnits} units &bull;{' '}
 							{courseModule.estimatedCompletionTimeInMinutesDescription}
 						</span>
 					)}
@@ -142,14 +146,10 @@ export const CourseModule = ({
 								const isComplete = Object.keys(courseSessionUnitStatusIdsByCourseUnitId).includes(
 									courseUnit.courseUnitId
 								);
+								const isActive = courseUnit.courseUnitId === activeCourseUnitId;
 
 								return (
-									<li
-										key={courseUnit.courseUnitId}
-										className={classNames({
-											active: courseUnit.courseUnitId === activeCourseUnitId,
-										})}
-									>
+									<li key={courseUnit.courseUnitId} className={classNames({ active: isActive })}>
 										<Button
 											bsPrefix="course-unit-button"
 											className={classes.courseUnitButton}
@@ -157,11 +157,7 @@ export const CourseModule = ({
 												onCourseUnitClick(courseUnit);
 											}}
 										>
-											<div
-												className={classNames(classes.iconOuter, {
-													complete: isComplete,
-												})}
-											>
+											<div className={classNames(classes.iconOuter, { complete: isComplete })}>
 												{isLocked ? (
 													<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
 												) : isComplete ? (

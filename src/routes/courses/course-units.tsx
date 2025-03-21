@@ -9,6 +9,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { CourseModule } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -99,26 +100,20 @@ export const Component = () => {
 			if (!course) {
 				throw new Error('course is undefined.');
 			}
+
 			if (!courseUnit) {
 				throw new Error('courseUnit is undefined.');
 			}
 
 			const { courseSession } = await coursesService.completeCourseUnit(courseUnit.courseUnitId).fetch();
-			const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
-				.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
-				.map(([k, _v]) => k);
-			const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
-			const unlockedAndIncompleteUnitIds = unlockedCourseUnitIds.filter(
-				(uid) => !completedCourseUnitIds.includes(uid)
-			);
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseSession);
 
-			if (unlockedAndIncompleteUnitIds.length === 0) {
-				window.alert('There are no more units to complete, the session is over!');
+			if (!desiredUnitId) {
+				navigate(`/courses/${course.urlName}`);
 				return;
 			}
 
-			const firstUnlockedAndIncompleteCourseUnitId = unlockedAndIncompleteUnitIds[0];
-			navigate(`/courses/${course.urlName}/course-units/${firstUnlockedAndIncompleteCourseUnitId}`);
+			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
