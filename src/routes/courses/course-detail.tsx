@@ -13,6 +13,7 @@ import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 export async function loader() {
 	return null;
@@ -29,6 +30,7 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const [course, setCourse] = useState<CourseModel>();
 	const [currentTab, setCurrentTab] = useState(TABS.COURSE_OVERVIEW);
+	const [showRestartCourseModal, setShowRestartCourseModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
@@ -71,6 +73,19 @@ export const Component = () => {
 			<Helmet>
 				<title>Cobalt | Courses - Detail</title>
 			</Helmet>
+
+			<ConfirmDialog
+				show={showRestartCourseModal}
+				titleText="Restart Course"
+				bodyText="Are you sure you want to restart the course?"
+				detailText="All of your progress will be reset. Any units you completed will be marked as incomplete."
+				dismissText="Cancel"
+				confirmText="Restart"
+				onConfirm={handleStartCourseButtonClick}
+				onHide={() => {
+					setShowRestartCourseModal(false);
+				}}
+			/>
 
 			<AsyncWrapper fetchData={fetchData}>
 				<PageHeader
@@ -122,7 +137,9 @@ export const Component = () => {
 																type="button"
 																variant="link"
 																className="d-flex align-items-center text-decoration-none"
-																onClick={handleStartCourseButtonClick}
+																onClick={() => {
+																	setShowRestartCourseModal(true);
+																}}
 															>
 																<BeforeIcon className="me-1" />
 																Restart Course
