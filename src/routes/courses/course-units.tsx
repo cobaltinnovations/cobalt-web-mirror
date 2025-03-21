@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
 	CourseModel,
+	CourseUnitDependencyTypeId,
 	CourseUnitLockStatus,
 	CourseUnitLockTypeId,
 	CourseUnitModel,
@@ -88,6 +89,7 @@ export const Component = () => {
 	const [course, setCourse] = useState<CourseModel>();
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
+	const [courseUnitByUnitId, setCourseUnitByUnitId] = useState<Record<string, CourseUnitModel>>({});
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
@@ -107,6 +109,15 @@ export const Component = () => {
 		setCourse(response.course);
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
+		setCourseUnitByUnitId(
+			courseUnitsFlat.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[currentValue.courseUnitId]: currentValue,
+				}),
+				{}
+			)
+		);
 	}, [courseIdentifier, unitId]);
 
 	useEffect(() => {
@@ -215,11 +226,13 @@ export const Component = () => {
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
 									<h2 className="mb-10">{courseUnit?.title}</h2>
-									{courseUnit?.description && (
-										<WysiwygDisplay className="mb-8" html={courseUnit?.description ?? ''} />
-									)}
-									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ? (
+									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ||
+									courseUnitLockStatus?.courseUnitLockTypeId ===
+										CourseUnitLockTypeId.WEAKLY_LOCKED ? (
 										<>
+											{courseUnit?.description && (
+												<WysiwygDisplay className="mb-8" html={courseUnit?.description ?? ''} />
+											)}
 											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
 												courseUnit?.screeningFlowId && (
 													<ScreeningFlow
@@ -254,14 +267,29 @@ export const Component = () => {
 										</>
 									) : (
 										<>
-											<h2>{courseUnitLockStatus?.courseUnitLockTypeId}</h2>
-											{Object.entries(
-												courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds ?? {}
-											).map(([k, v]) => (
-												<p>
-													{k}: {v}
-												</p>
-											))}
+											<h3 className="mb-6">This unit is locked</h3>
+											<p className="fs-large mb-6">
+												Please complete the following modules to unlock this unit:
+											</p>
+											<ul>
+												{(
+													courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds[
+														CourseUnitDependencyTypeId.STRONG
+													] ?? []
+												).map((dependencyUnitId) => {
+													const dependencyUnit = courseUnitByUnitId[dependencyUnitId];
+
+													return (
+														<li key={dependencyUnit.courseUnitId}>
+															<Link
+																to={`/courses/${course?.urlName}/course-units/${dependencyUnit.courseUnitId}`}
+															>
+																{dependencyUnit.title}
+															</Link>
+														</li>
+													);
+												})}
+											</ul>
 										</>
 									)}
 								</Col>
