@@ -10,6 +10,7 @@ import { CourseModule } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -33,6 +34,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '0 24px',
 		position: 'absolute',
 		alignItems: 'center',
+		justifyContent: 'space-between',
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
@@ -127,15 +129,27 @@ export const Component = () => {
 			<AsyncWrapper fetchData={fetchData}>
 				<div className={classes.wrapper}>
 					<div className={classes.header}>
+						<div>
+							<Button
+								className="me-2"
+								onClick={() => {
+									navigate(`/courses/${course?.urlName}`);
+								}}
+							>
+								Go Back
+							</Button>
+							<span className="fs-large fw-bold">{course?.title}</span>
+						</div>
 						<Button
-							className="me-2"
+							variant="link"
+							className="d-flex align-items-center text-decoration-none"
 							onClick={() => {
-								navigate(`/courses/${course?.urlName}`);
+								navigate('/feedback');
 							}}
 						>
-							Go Back
+							<QuestionMarkIcon className="me-1" width={20} height={20} />
+							Need Help?
 						</Button>
-						{course?.title}
 					</div>
 					<div className={classes.aside}>
 						{course &&
