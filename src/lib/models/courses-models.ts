@@ -13,13 +13,11 @@ export interface CourseModel {
 
 export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, {}>;
 
-export type CourseUnitLockStatusesByCourseUnitId = Record<
-	string,
-	{
-		courseUnitLockTypeId: CourseUnitLockTypeId;
-		determinantCourseUnitIdsByDependencyTypeIds: Record<CourseUnitDependencyTypeId, string[]>;
-	}
->;
+export type CourseUnitLockStatusesByCourseUnitId = Record<string, CourseUnitLockStatus>;
+export type CourseUnitLockStatus = {
+	courseUnitLockTypeId: CourseUnitLockTypeId;
+	determinantCourseUnitIdsByDependencyTypeIds: Record<CourseUnitDependencyTypeId, string[]>;
+};
 
 export interface CourseModuleModel {
 	courseModuleId: string;

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { CourseModel, CourseUnitModel } from '@/lib/models';
+import { CourseModel, CourseUnitLockStatus, CourseUnitLockTypeId, CourseUnitModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { ScreeningFlow } from '@/components/screening-v2';
@@ -68,7 +68,9 @@ export const Component = () => {
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
 	const [course, setCourse] = useState<CourseModel>();
+
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
+	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
@@ -76,11 +78,18 @@ export const Component = () => {
 		}
 
 		const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
+		const lockStatuses = response.course.currentCourseSession
+			? response.course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
+			: response.course.defaultCourseUnitLockStatusesByCourseUnitId;
 		const courseUnitsFlat = response.course.courseModules.map((courseModule) => courseModule.courseUnits).flat();
 		const desiredCourseUnit = courseUnitsFlat.find((cu) => cu.courseUnitId === unitId);
+		const desiredCourseUnitLockStatus = desiredCourseUnit
+			? lockStatuses[desiredCourseUnit.courseUnitId]
+			: undefined;
 
 		setCourse(response.course);
 		setCourseUnit(desiredCourseUnit);
+		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
 	}, [courseIdentifier, unitId]);
 
 	return (
@@ -129,17 +138,34 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
-									{courseUnit?.screeningFlowId && (
-										<ScreeningFlow
-											screeningFlowId={courseUnit.screeningFlowId}
-											onScreeningFlowComplete={(screeningSessionDestination) => {
-												window.alert('[TODO]: handle screening complete, check console log.');
-												console.log(
-													'[TODO]: screening flow complete, load next unit',
-													screeningSessionDestination
-												);
-											}}
-										/>
+									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ? (
+										<>
+											{courseUnit?.screeningFlowId && (
+												<ScreeningFlow
+													screeningFlowId={courseUnit.screeningFlowId}
+													onScreeningFlowComplete={(screeningSessionDestination) => {
+														window.alert(
+															'[TODO]: handle screening complete, check console log.'
+														);
+														console.log(
+															'[TODO]: screening flow complete, load next unit',
+															screeningSessionDestination
+														);
+													}}
+												/>
+											)}
+										</>
+									) : (
+										<>
+											<h2>{courseUnitLockStatus?.courseUnitLockTypeId}</h2>
+											{Object.entries(
+												courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds ?? {}
+											).map(([k, v]) => (
+												<p>
+													{k}: {v}
+												</p>
+											))}
+										</>
 									)}
 								</Col>
 							</Row>
