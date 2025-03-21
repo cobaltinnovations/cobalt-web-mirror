@@ -6,7 +6,7 @@ export interface CourseModel {
 	imageUrl: string;
 	urlName: string;
 	courseModules: CourseModuleModel[];
-	videos: void[];
+	videos: CourseVideoModel[];
 	defaultCourseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	currentCourseSession?: CourseSessionModel;
 }
@@ -84,4 +84,17 @@ export enum CourseUnitTypeId {
 export enum CourseSessionUnitStatusId {
 	COMPLETED = 'COMPLETED',
 	SKIPPED = 'SKIPPED',
+}
+
+export interface CourseVideoModel {
+	created: string;
+	createdDescription: string;
+	kalturaEntryId: string;
+	kalturaPartnerId: string;
+	kalturaUiconfId: string;
+	kalturaWid: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	videoId: string;
+	videoVendorId: string;
 }

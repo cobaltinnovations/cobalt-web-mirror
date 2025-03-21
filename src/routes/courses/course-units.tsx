@@ -1,7 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { CourseModel, CourseUnitLockStatus, CourseUnitLockTypeId, CourseUnitModel } from '@/lib/models';
+import {
+	CourseModel,
+	CourseUnitLockStatus,
+	CourseUnitLockTypeId,
+	CourseUnitModel,
+	CourseUnitTypeId,
+} from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { ScreeningFlow } from '@/components/screening-v2';
@@ -97,6 +103,53 @@ export const Component = () => {
 		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
 	}, [courseIdentifier, unitId]);
 
+	useEffect(() => {
+		if (courseUnit?.courseUnitTypeId !== CourseUnitTypeId.VIDEO) {
+			return;
+		}
+
+		const video = course?.videos.find((v) => v.videoId === courseUnit.videoId);
+
+		if (!video) {
+			return;
+		}
+
+		const apiScript = document.createElement('script');
+		apiScript.src = `//cdnapisec.kaltura.com/p/${video?.kalturaPartnerId}/sp/${video.kalturaPartnerId}00/embedIframeJs/uiconf_id/${video.kalturaUiconfId}/partner_id/${video.kalturaPartnerId}`;
+		apiScript.async = true;
+		apiScript.onload = () => {
+			document.body.appendChild(embedScript);
+		};
+
+		const embedScript = document.createElement('script');
+		embedScript.type = 'text/javascript';
+		embedScript.async = true;
+		embedScript.text = `kWidget.embed({
+			'targetId': 'kaltura_player',
+			'wid': '${video.kalturaWid}',
+			'uiconf_id' : '${video.kalturaUiconfId}',
+			'entry_id' : '${video.kalturaEntryId}',
+			'readyCallback': function(playerID) {
+				var kdp = document.getElementById(playerID);
+				var events = ['layoutBuildDone', 'playerReady',  'mediaLoaded', 'mediaError', 'playerStateChange', 'firstPlay', 'playerPlayed', 'playerPaused', 'preSeek', 'seek', 'seeked', 'playerUpdatePlayhead', 'openFullScreen', 'closeFullScreen', 'volumeChanged', 'mute', 'unmute', 'bufferChange', 'cuePointReached', 'playerPlayEnd', 'onChangeMedia', 'onChangeMediaDone'];
+				for ( var i=0; i < events.length; i++ ){
+					(function(i) {
+						kdp.kBind( events[i], function(event){
+							console.log('Kaltura player event triggered: ' + events[i] + ', event data: ' + JSON.stringify(event));
+						});
+					})(i);
+				}
+			}
+		});`;
+
+		document.body.appendChild(apiScript);
+
+		return () => {
+			document.body.removeChild(apiScript);
+			document.body.removeChild(embedScript);
+		};
+	}, [course?.videos, courseUnit?.courseUnitTypeId, courseUnit?.videoId]);
+
 	const handleMarkCourseUnitCompleteButtonClick = useCallback(async () => {
 		try {
 			if (!course) {
@@ -153,7 +206,7 @@ export const Component = () => {
 					</div>
 					<div className={classes.aside}>
 						{course &&
-							(course.courseModules ?? []).map((courseModule, courseModuleIndex) => (
+							(course.courseModules ?? []).map((courseModule) => (
 								<CourseModule
 									compact
 									activeCourseUnitId={unitId}
@@ -181,20 +234,25 @@ export const Component = () => {
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
 									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ? (
 										<>
-											{courseUnit?.screeningFlowId && (
-												<ScreeningFlow
-													screeningFlowId={courseUnit.screeningFlowId}
-													onScreeningFlowComplete={(screeningSessionDestination) => {
-														window.alert(
-															'[TODO]: handle screening complete, check console log.'
-														);
-														console.log(
-															'[TODO]: screening flow complete, load next unit',
-															screeningSessionDestination
-														);
-													}}
-												/>
+											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
+												courseUnit?.screeningFlowId && (
+													<ScreeningFlow
+														screeningFlowId={courseUnit.screeningFlowId}
+														onScreeningFlowComplete={(screeningSessionDestination) => {
+															window.alert(
+																'[TODO]: handle screening complete, check console log.'
+															);
+															console.log(
+																'[TODO]: screening flow complete, load next unit',
+																screeningSessionDestination
+															);
+														}}
+													/>
+												)}
+											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
+												<div id="kaltura_player" style={{ width: 400, height: 330 }} />
 											)}
+
 											<Button onClick={handleMarkCourseUnitCompleteButtonClick}>
 												Mark Complete
 											</Button>
