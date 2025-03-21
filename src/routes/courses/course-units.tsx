@@ -96,17 +96,20 @@ export const Component = () => {
 
 	const handleMarkCourseUnitCompleteButtonClick = useCallback(async () => {
 		try {
+			if (!course) {
+				throw new Error('course is undefined.');
+			}
 			if (!courseUnit) {
 				throw new Error('courseUnit is undefined.');
 			}
 
 			const { courseSession } = await coursesService.completeCourseUnit(courseUnit.courseUnitId).fetch();
-			const unlockedUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
+			const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
 				.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
 				.map(([k, _v]) => k);
-			const completeOrSkippedUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
-			const unlockedAndIncompleteUnitIds = unlockedUnitIds.filter(
-				(uid) => !completeOrSkippedUnitIds.includes(uid)
+			const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
+			const unlockedAndIncompleteUnitIds = unlockedCourseUnitIds.filter(
+				(uid) => !completedCourseUnitIds.includes(uid)
 			);
 
 			if (unlockedAndIncompleteUnitIds.length === 0) {
@@ -114,12 +117,12 @@ export const Component = () => {
 				return;
 			}
 
-			const firstUnlockedAndIncompleteUnitId = unlockedAndIncompleteUnitIds[0];
-			navigate(`/courses/${course?.urlName}/course-units/${firstUnlockedAndIncompleteUnitId}`);
+			const firstUnlockedAndIncompleteCourseUnitId = unlockedAndIncompleteUnitIds[0];
+			navigate(`/courses/${course.urlName}/course-units/${firstUnlockedAndIncompleteCourseUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.urlName, courseUnit, handleError, navigate]);
+	}, [course, courseUnit, handleError, navigate]);
 
 	return (
 		<>

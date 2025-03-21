@@ -10,6 +10,7 @@ import {
 	CourseUnitTypeId,
 } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
@@ -77,6 +78,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: theme.colors.n75,
+		'&.complete': {
+			backgroundColor: theme.colors.s500,
+		},
 	},
 }));
 
@@ -92,6 +96,7 @@ interface CourseModuleProps {
 
 export const CourseModule = ({
 	courseModule,
+	courseSessionUnitStatusIdsByCourseUnitId,
 	courseUnitLockStatusesByCourseUnitId,
 	onCourseUnitClick,
 	compact = false,
@@ -130,50 +135,70 @@ export const CourseModule = ({
 				<div className={classes.collapseBody}>
 					<div className={classNames({ 'p-4': !compact })}>
 						<ul className="m-0 list-unstyled">
-							{courseModule.courseUnits.map((courseUnit) => (
-								<li
-									key={courseUnit.courseUnitId}
-									className={classNames({
-										active: courseUnit.courseUnitId === activeCourseUnitId,
-									})}
-								>
-									<Button
-										bsPrefix="course-unit-button"
-										className={classes.courseUnitButton}
-										onClick={() => {
-											onCourseUnitClick(courseUnit);
-										}}
+							{courseModule.courseUnits.map((courseUnit) => {
+								const isLocked =
+									courseUnitLockStatusesByCourseUnitId[courseUnit.courseUnitId]
+										.courseUnitLockTypeId !== CourseUnitLockTypeId.UNLOCKED;
+								const isComplete = Object.keys(courseSessionUnitStatusIdsByCourseUnitId).includes(
+									courseUnit.courseUnitId
+								);
+
+								return (
+									<li
+										key={courseUnit.courseUnitId}
+										className={classNames({
+											active: courseUnit.courseUnitId === activeCourseUnitId,
+										})}
 									>
-										<div className={classes.iconOuter}>
-											{courseUnitLockStatusesByCourseUnitId[courseUnit.courseUnitId]
-												.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ? (
-												courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
-											) : (
-												<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
-											)}
-										</div>
-										<div className="ps-4">
-											<span
-												className={classNames('d-block', {
-													'fs-large': !compact,
-													'fs-default': compact,
+										<Button
+											bsPrefix="course-unit-button"
+											className={classes.courseUnitButton}
+											onClick={() => {
+												onCourseUnitClick(courseUnit);
+											}}
+										>
+											<div
+												className={classNames(classes.iconOuter, {
+													complete: isComplete,
 												})}
 											>
-												{courseUnit.title}
-											</span>
-											<span
-												className={classNames('d-block text-gray', {
-													'fs-default': !compact,
-													'fs-small': compact,
-												})}
-											>
-												{courseUnit.courseUnitTypeIdDescription} &bull;{' '}
-												{courseUnit.estimatedCompletionTimeInMinutesDescription}
-											</span>
-										</div>
-									</Button>
-								</li>
-							))}
+												{isLocked ? (
+													<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
+												) : isComplete ? (
+													<CheckIcon
+														className="text-white"
+														width={compact ? 18 : 24}
+														height={compact ? 18 : 24}
+													/>
+												) : (
+													courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](
+														compact ? 18 : 24
+													)
+												)}
+											</div>
+											<div className="ps-4">
+												<span
+													className={classNames('d-block', {
+														'fs-large': !compact,
+														'fs-default': compact,
+													})}
+												>
+													{courseUnit.title}
+												</span>
+												<span
+													className={classNames('d-block text-gray', {
+														'fs-default': !compact,
+														'fs-small': compact,
+													})}
+												>
+													{courseUnit.courseUnitTypeIdDescription} &bull;{' '}
+													{courseUnit.estimatedCompletionTimeInMinutesDescription}
+												</span>
+											</div>
+										</Button>
+									</li>
+								);
+							})}
 						</ul>
 					</div>
 				</div>
