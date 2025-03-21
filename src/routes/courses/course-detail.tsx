@@ -49,11 +49,11 @@ export const Component = () => {
 				.map(([k, _v]) => k);
 
 			if (unlockedUnitIds.length === 0) {
-				throw new Error('there are no unlocked units');
+				throw new Error('There are no unlocked course units.');
 			}
 
 			const firstUnlockedUnitId = unlockedUnitIds[0];
-			navigate(`/course/${course.urlName}/course-units/${firstUnlockedUnitId}`);
+			navigate(`/courses/${course.urlName}/course-units/${firstUnlockedUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
@@ -121,6 +121,12 @@ export const Component = () => {
 																	})}
 																	key={courseModule.courseModuleId}
 																	courseModule={courseModule}
+																	courseSessionUnitStatusIdsByCourseUnitId={
+																		course.currentCourseSession
+																			? course.currentCourseSession
+																					.courseSessionUnitStatusIdsByCourseUnitId
+																			: {}
+																	}
 																	courseUnitLockStatusesByCourseUnitId={
 																		course.currentCourseSession
 																			? course.currentCourseSession

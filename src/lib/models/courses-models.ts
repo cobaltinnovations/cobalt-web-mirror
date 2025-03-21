@@ -11,6 +11,8 @@ export interface CourseModel {
 	currentCourseSession?: CourseSessionModel;
 }
 
+export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, {}>;
+
 export type CourseUnitLockStatusesByCourseUnitId = Record<
 	string,
 	{
@@ -51,6 +53,7 @@ export interface CourseSessionModel {
 	courseId: string;
 	accountId: string;
 	courseSessionStatusId: CourseSessionStatusId;
+	courseSessionUnitStatusIdsByCourseUnitId: CourseSessionUnitStatusIdsByCourseUnitId;
 	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 }
 

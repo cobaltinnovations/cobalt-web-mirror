@@ -3,6 +3,7 @@ import { Button, Collapse } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	CourseModuleModel,
+	CourseSessionUnitStatusIdsByCourseUnitId,
 	CourseUnitLockStatusesByCourseUnitId,
 	CourseUnitLockTypeId,
 	CourseUnitTypeId,
@@ -60,6 +61,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface CourseModuleProps {
 	courseModule: CourseModuleModel;
+	courseSessionUnitStatusIdsByCourseUnitId: CourseSessionUnitStatusIdsByCourseUnitId;
 	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	className?: string;
 }

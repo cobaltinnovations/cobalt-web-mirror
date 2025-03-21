@@ -114,6 +114,11 @@ export const Component = () => {
 										})}
 										key={courseModule.courseModuleId}
 										courseModule={courseModule}
+										courseSessionUnitStatusIdsByCourseUnitId={
+											course.currentCourseSession
+												? course.currentCourseSession.courseSessionUnitStatusIdsByCourseUnitId
+												: {}
+										}
 										courseUnitLockStatusesByCourseUnitId={
 											course.currentCourseSession
 												? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
