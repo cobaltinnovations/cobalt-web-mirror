@@ -152,7 +152,7 @@ export const CourseModule = ({
 							{courseModule.courseUnits.map((courseUnit) => {
 								const isLocked =
 									courseUnitLockStatusesByCourseUnitId[courseUnit.courseUnitId]
-										.courseUnitLockTypeId !== CourseUnitLockTypeId.UNLOCKED;
+										.courseUnitLockTypeId === CourseUnitLockTypeId.STRONGLY_LOCKED;
 								const isComplete = Object.keys(courseSessionUnitStatusIdsByCourseUnitId).includes(
 									courseUnit.courseUnitId
 								);
