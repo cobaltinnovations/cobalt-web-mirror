@@ -15,7 +15,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { CourseModule } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKulteraScriptForVideo } from '@/lib/utils';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const headerHeight = 60;
@@ -112,7 +112,7 @@ export const Component = () => {
 			return;
 		}
 
-		const { script } = getKulteraScriptForVideo({
+		const { script } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
 			eventCallback: (eventName, event) => {

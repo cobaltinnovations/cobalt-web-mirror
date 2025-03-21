@@ -15,7 +15,7 @@ export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (courseS
 	return '';
 };
 
-export const getKulteraScriptForVideo = ({
+export const getKalturaScriptForVideo = ({
 	videoPlayerId,
 	courseVideo,
 	eventCallback,
