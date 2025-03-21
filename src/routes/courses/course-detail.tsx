@@ -133,6 +133,11 @@ export const Component = () => {
 																					.courseUnitLockStatusesByCourseUnitId
 																			: course.defaultCourseUnitLockStatusesByCourseUnitId
 																	}
+																	onCourseUnitClick={(courseUnit) => {
+																		navigate(
+																			`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+																		);
+																	}}
 																/>
 															);
 														}

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import classNames from 'classnames';
 import { CourseModel, CourseUnitModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
@@ -95,7 +94,7 @@ export const Component = () => {
 						<Button
 							className="me-2"
 							onClick={() => {
-								navigate(-1);
+								navigate(`/courses/${course?.urlName}`);
 							}}
 						>
 							Go Back
@@ -104,29 +103,27 @@ export const Component = () => {
 					</div>
 					<div className={classes.aside}>
 						{course &&
-							(course.courseModules ?? []).map((courseModule, courseModuleIndex) => {
-								const isLast = (course?.courseModules ?? []).length - 1 === courseModuleIndex;
-
-								return (
-									<CourseModule
-										className={classNames({
-											'mb-4': !isLast,
-										})}
-										key={courseModule.courseModuleId}
-										courseModule={courseModule}
-										courseSessionUnitStatusIdsByCourseUnitId={
-											course.currentCourseSession
-												? course.currentCourseSession.courseSessionUnitStatusIdsByCourseUnitId
-												: {}
-										}
-										courseUnitLockStatusesByCourseUnitId={
-											course.currentCourseSession
-												? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
-												: course.defaultCourseUnitLockStatusesByCourseUnitId
-										}
-									/>
-								);
-							})}
+							(course.courseModules ?? []).map((courseModule, courseModuleIndex) => (
+								<CourseModule
+									compact
+									activeCourseUnitId={unitId}
+									key={courseModule.courseModuleId}
+									courseModule={courseModule}
+									courseSessionUnitStatusIdsByCourseUnitId={
+										course.currentCourseSession
+											? course.currentCourseSession.courseSessionUnitStatusIdsByCourseUnitId
+											: {}
+									}
+									courseUnitLockStatusesByCourseUnitId={
+										course.currentCourseSession
+											? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
+											: course.defaultCourseUnitLockStatusesByCourseUnitId
+									}
+									onCourseUnitClick={(courseUnit) => {
+										navigate(`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`);
+									}}
+								/>
+							))}
 					</div>
 					<div className={classes.previewPane}>
 						<Container>
