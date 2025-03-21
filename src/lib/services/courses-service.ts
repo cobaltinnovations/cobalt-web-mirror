@@ -21,4 +21,10 @@ export const coursesService = {
 			data,
 		});
 	},
+	completeCourseUnit(courseUnitId: string) {
+		return httpSingleton.orchestrateRequest<{ courseSession: CourseSessionModel }>({
+			method: 'post',
+			url: `/course-units/${courseUnitId}/complete`,
+		});
+	},
 };

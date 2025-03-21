@@ -11,7 +11,7 @@ export interface CourseModel {
 	currentCourseSession?: CourseSessionModel;
 }
 
-export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, {}>;
+export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, CourseSessionUnitStatusId>;
 
 export type CourseUnitLockStatusesByCourseUnitId = Record<string, CourseUnitLockStatus>;
 export type CourseUnitLockStatus = {
@@ -79,4 +79,9 @@ export enum CourseUnitTypeId {
 	CARD_SORT = 'CARD_SORT',
 	QUIZ = 'QUIZ',
 	REORDER = 'REORDER',
+}
+
+export enum CourseSessionUnitStatusId {
+	COMPLETED = 'COMPLETED',
+	SKIPPED = 'SKIPPED',
 }

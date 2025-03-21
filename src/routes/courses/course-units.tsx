@@ -8,6 +8,7 @@ import { ScreeningFlow } from '@/components/screening-v2';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { CourseModule } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
+import useHandleError from '@/hooks/use-handle-error';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -65,6 +66,7 @@ export async function loader() {
 
 export const Component = () => {
 	const classes = useStyles();
+	const handleError = useHandleError();
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
 	const [course, setCourse] = useState<CourseModel>();
@@ -91,6 +93,33 @@ export const Component = () => {
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
 	}, [courseIdentifier, unitId]);
+
+	const handleMarkCourseUnitCompleteButtonClick = useCallback(async () => {
+		try {
+			if (!courseUnit) {
+				throw new Error('courseUnit is undefined.');
+			}
+
+			const { courseSession } = await coursesService.completeCourseUnit(courseUnit.courseUnitId).fetch();
+			const unlockedUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
+				.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
+				.map(([k, _v]) => k);
+			const completeOrSkippedUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
+			const unlockedAndIncompleteUnitIds = unlockedUnitIds.filter(
+				(uid) => !completeOrSkippedUnitIds.includes(uid)
+			);
+
+			if (unlockedAndIncompleteUnitIds.length === 0) {
+				window.alert('There are no more units to complete, the session is over!');
+				return;
+			}
+
+			const firstUnlockedAndIncompleteUnitId = unlockedAndIncompleteUnitIds[0];
+			navigate(`/courses/${course?.urlName}/course-units/${firstUnlockedAndIncompleteUnitId}`);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [course?.urlName, courseUnit, handleError, navigate]);
 
 	return (
 		<>
@@ -154,6 +183,9 @@ export const Component = () => {
 													}}
 												/>
 											)}
+											<Button onClick={handleMarkCourseUnitCompleteButtonClick}>
+												Mark Complete
+											</Button>
 										</>
 									) : (
 										<>
