@@ -76,6 +76,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderRadius: 8,
 		overflow: 'hidden',
 	},
+	screeningFlowOuter: {
+		padding: 40,
+		borderRadius: 12,
+		backgroundColor: theme.colors.n0,
+		border: `1px solid ${theme.colors.n100}`,
+	},
 }));
 
 export async function loader() {
@@ -241,7 +247,7 @@ export const Component = () => {
 					<div className={classes.previewPane}>
 						<Container>
 							<Row>
-								<Col md={12} lg={{ offset: 1, span: 10 }}>
+								<Col md={12} lg={{ offset: 2, span: 8 }}>
 									{courseUnitLockStatus?.courseUnitLockTypeId !==
 									CourseUnitLockTypeId.STRONGLY_LOCKED ? (
 										<>
@@ -277,18 +283,20 @@ export const Component = () => {
 											)}
 											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
 												courseUnit?.screeningFlowId && (
-													<ScreeningFlow
-														screeningFlowId={courseUnit.screeningFlowId}
-														onScreeningFlowComplete={(screeningSessionDestination) => {
-															window.alert(
-																'[TODO]: handle screening complete, check console log.'
-															);
-															console.log(
-																'[TODO]: screening flow complete, load next unit',
-																screeningSessionDestination
-															);
-														}}
-													/>
+													<div className={classes.screeningFlowOuter}>
+														<ScreeningFlow
+															screeningFlowId={courseUnit.screeningFlowId}
+															onScreeningFlowComplete={(screeningSessionDestination) => {
+																window.alert(
+																	'[TODO]: handle screening complete, check console log.'
+																);
+																console.log(
+																	'[TODO]: screening flow complete, load next unit',
+																	screeningSessionDestination
+																);
+															}}
+														/>
+													</div>
 												)}
 											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
 												<div className={classes.videoPlayerOuter}>

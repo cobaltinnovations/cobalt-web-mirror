@@ -30,6 +30,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 					position: 'relative',
 					...theme.fonts.default,
 					backgroundColor: theme.colors.n0,
+					boxShadow: '0px 1px 0px 0px rgba(26, 26, 26, 0.07), 0px 0px 2px 0px rgba(0, 0, 0, 0.12)',
 					'&:before': {
 						width: 20,
 						height: 20,

@@ -66,7 +66,6 @@ const useStyles = createUseThemedStyles({
 	},
 	question: {
 		display: 'block',
-		padding: '40px 0',
 	},
 });
 
