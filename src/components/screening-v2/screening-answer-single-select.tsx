@@ -3,16 +3,24 @@ import { Collapse, Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
-import checkIcon from '@/assets/icons/check.svg';
+import Color from 'color';
+
+import radioSelected from '@/assets/icons/screening-v2/radio-selected.svg';
+import radioUnselected from '@/assets/icons/screening-v2/radio-unselected.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	'@global': {
 		'.screening-v2__answer': {
-			'& input[type=radio], & input[type=checkbox] ': {
+			marginBottom: 8,
+			position: 'relative',
+			'& input[type=radio], & input[type=checkbox]': {
+				top: 0,
+				left: 0,
 				width: 0,
 				height: 0,
-				display: 'none',
+				opacity: 0,
 				appearance: 'none',
+				position: 'absolute',
 				'& + label': {
 					width: '100%',
 					display: 'flex',
@@ -25,12 +33,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 					'&:before': {
 						width: 20,
 						height: 20,
+						maskSize: 20,
 						content: '""',
 						flexShrink: 0,
 						marginRight: 16,
 						borderRadius: '50%',
 						display: 'inline-block',
-						border: `2px solid ${theme.colors.n100}`,
+						maskPosition: 'center',
+						maskRepeat: 'no-repeat',
+						backgroundColor: theme.colors.n100,
 					},
 					'&:after': {
 						top: 0,
@@ -38,29 +49,51 @@ const useStyles = createUseThemedStyles((theme) => ({
 						right: 0,
 						bottom: 0,
 						content: '""',
-						borderRadius: 26,
 						position: 'absolute',
 						pointerEvents: 'none',
+						borderRadius: 'inherit',
 						border: `1px solid ${theme.colors.n100}`,
 					},
 					'&:hover': {
 						backgroundColor: theme.colors.n50,
-						'&:before, &:after': {
+						'&:before': {
+							backgroundColor: theme.colors.n300,
+						},
+						'&:after': {
 							borderColor: theme.colors.n300,
 						},
 					},
 				},
-				'&:checked': {
-					'& + label:before': {
-						maskSize: 20,
-						maskPosition: 'center',
-						maskRepeat: 'no-repeat',
-						maskImage: `url(${checkIcon})`,
-						borderColor: theme.colors.p500,
-						backgroundColor: theme.colors.p500,
+				'&:focus': {
+					'& + label': {
+						outline: 'none',
+						boxShadow: `0 0 0 4px ${Color(theme.colors.p500).alpha(0.24).string()}`,
 					},
-					'&:hover + label:before': { borderColor: theme.colors.p700 },
 				},
+				'&:checked': {
+					'& + label': {
+						'&:before': {
+							backgroundColor: theme.colors.p500,
+						},
+						'&:hover': {
+							'&:before': {
+								backgroundColor: theme.colors.p700,
+							},
+						},
+					},
+				},
+			},
+			'& input[type=radio] + label:before': {
+				maskImage: `url(${radioUnselected})`,
+			},
+			'& input[type=radio]:checked + label:before': {
+				maskImage: `url(${radioSelected})`,
+			},
+			'& input[type=checkbox] + label:before': {
+				maskImage: `url(${radioUnselected})`,
+			},
+			'& input[type=checkbox]:checked + label:before': {
+				maskImage: `url(${radioSelected})`,
 			},
 		},
 	},
