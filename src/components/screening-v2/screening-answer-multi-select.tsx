@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Collapse, Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
@@ -11,9 +11,15 @@ interface ScreeningAnswerMultiSelectProps {
 }
 
 export const ScreeningAnswerMultiSelect = ({ name, options, value, onChange }: ScreeningAnswerMultiSelectProps) => {
+	const firstOptionRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		firstOptionRef.current?.focus();
+	}, []);
+
 	return (
 		<Form.Group>
-			{options.map((option) => {
+			{options.map((option, optionIndex) => {
 				const currentValue = value.find(
 					({ screeningAnswerOptionId }) => screeningAnswerOptionId === option.screeningAnswerOptionId
 				);
@@ -23,7 +29,10 @@ export const ScreeningAnswerMultiSelect = ({ name, options, value, onChange }: S
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
 						<Form.Check
+							bsPrefix="screening-v2__answer"
 							type="checkbox"
+							ref={optionIndex === 0 ? firstOptionRef : undefined}
+							id={option.screeningAnswerOptionId}
 							name={name}
 							label={option.answerOptionText}
 							value={option.screeningAnswerOptionId}
