@@ -242,9 +242,8 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 1, span: 10 }}>
-									{courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED ||
-									courseUnitLockStatus?.courseUnitLockTypeId ===
-										CourseUnitLockTypeId.WEAKLY_LOCKED ? (
+									{courseUnitLockStatus?.courseUnitLockTypeId !==
+									CourseUnitLockTypeId.STRONGLY_LOCKED ? (
 										<>
 											{weakCourseUnitDependencies.length > 0 && (
 												<InlineAlert
