@@ -9,6 +9,7 @@ import {
 	CourseUnitModel,
 	CourseUnitTypeId,
 } from '@/lib/models';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { ScreeningFlow } from '@/components/screening-v2';
@@ -16,10 +17,10 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { CourseModule } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import InlineAlert from '@/components/inline-alert';
+import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -200,6 +201,7 @@ export const Component = () => {
 					<div className={classes.header}>
 						<div>
 							<Button
+								type="button"
 								className="me-2"
 								onClick={() => {
 									navigate(`/courses/${course?.urlName}`);
@@ -210,6 +212,7 @@ export const Component = () => {
 							<span className="fs-large fw-bold">{course?.title}</span>
 						</div>
 						<Button
+							type="button"
 							variant="link"
 							className="d-flex align-items-center text-decoration-none"
 							onClick={() => {
@@ -306,12 +309,15 @@ export const Component = () => {
 													/>
 												</div>
 											)}
-											<div className="pt-10 text-right">
+											<div className="pt-10 d-flex justify-content-end">
 												<Button
+													type="button"
 													variant="light"
+													className="d-flex align-items-center text-decoration-none pe-3"
 													onClick={handleMarkCourseUnitCompleteButtonClick}
 												>
-													Mark Complete
+													Skip Activity
+													<RightChevron className="ms-1" />
 												</Button>
 											</div>
 										</>
