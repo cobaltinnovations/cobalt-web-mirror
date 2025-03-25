@@ -12,6 +12,8 @@ import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
 import { CobaltError } from '@/lib/http-client';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
+import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const QUESTION_TRANSITION_DURATION_MS = 600;
 
@@ -274,17 +276,23 @@ export const ScreeningQuestionContext = ({
 										<div>
 											{(screeningQuestionContext.previousScreeningQuestionContextId ||
 												screeningQuestionContext.preQuestionScreeningConfirmationPrompt) && (
-												<Button type="button" onClick={handleQuestionPreviousButtonClick}>
-													Previous
+												<Button
+													type="button"
+													variant="link"
+													className="d-flex align-items-center text-decoration-none ps-3"
+													onClick={handleQuestionPreviousButtonClick}
+												>
+													<LeftChevron className="me-2" />
+													Back
 												</Button>
 											)}
 										</div>
 										<div>
 											{screeningQuestionContext.screeningQuestion.minimumAnswerCount === 0 && (
 												<Button
-													className="me-2"
 													type="button"
 													variant="outline-primary"
+													className="d-flex align-items-center text-decoration-none pe-3"
 													onClick={() => {
 														setIsNext(true);
 														setSelectedAnswers([]);
@@ -292,16 +300,20 @@ export const ScreeningQuestionContext = ({
 													}}
 												>
 													Skip
+													<RightChevron className="ms-1" />
 												</Button>
 											)}
 											<Button
 												type="submit"
+												variant="primary"
+												className="d-flex align-items-center text-decoration-none pe-3"
 												disabled={
 													selectedAnswers.length <
 													screeningQuestionContext.screeningQuestion.minimumAnswerCount
 												}
 											>
-												Submit
+												Next
+												<RightChevron className="ms-1" />
 											</Button>
 										</div>
 									</div>
