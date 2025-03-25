@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { CourseModel, ScreeningSessionDestination } from '@/lib/models';
+import { CourseModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import useAccount from '@/hooks/use-account';
@@ -27,13 +27,7 @@ export const Component = () => {
 
 	return (
 		<>
-			<PreviewCanvas
-				title="Courses"
-				show={showOnboardingModal}
-				onHide={() => {
-					setShowOnboardingModal(false);
-				}}
-			>
+			<PreviewCanvas title={institution.name} show={showOnboardingModal}>
 				{institution.onboardingScreeningFlowId && (
 					<Container>
 						<Row>
