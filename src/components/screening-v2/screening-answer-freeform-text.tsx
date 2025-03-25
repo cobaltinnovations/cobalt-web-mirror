@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
+import InputHelper from '@/components/input-helper';
 
 interface ScreeningAnswerFreeformTextProps {
 	options: ScreeningAnswerOption[];
@@ -18,11 +19,10 @@ export const ScreeningAnswerFreeformText = ({ options, value, onChange }: Screen
 	return (
 		<Form.Group>
 			{options.map((option, optionIndex) => (
-				<Form.Control
+				<InputHelper
 					ref={optionIndex === 0 ? firstOptionRef : undefined}
 					key={option.screeningAnswerOptionId}
 					type="text"
-					placeholder={option.answerOptionText}
 					value={value.find((v) => v.screeningAnswerOptionId === option.screeningAnswerOptionId)?.text}
 					onChange={({ currentTarget }) => {
 						if (currentTarget.value.trim().length < 1) {
@@ -37,6 +37,7 @@ export const ScreeningAnswerFreeformText = ({ options, value, onChange }: Screen
 							},
 						]);
 					}}
+					label={option.answerOptionText ?? ''}
 				/>
 			))}
 		</Form.Group>
