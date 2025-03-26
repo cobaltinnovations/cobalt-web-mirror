@@ -288,7 +288,10 @@ export const Component = () => {
 												courseUnit?.screeningFlowId && (
 													<div className={classes.screeningFlowOuter}>
 														<ScreeningFlow
-															screeningFlowId={courseUnit.screeningFlowId}
+															screeningFlowParams={{
+																courseSessionId: course?.courseId,
+																screeningFlowId: courseUnit.screeningFlowId,
+															}}
 															onScreeningFlowComplete={(screeningSessionDestination) => {
 																window.alert(
 																	'[TODO]: handle screening complete, check console log.'

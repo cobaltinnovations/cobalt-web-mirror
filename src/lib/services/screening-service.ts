@@ -14,12 +14,13 @@ import {
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 
-type ScreeningFlowParams = {
+export type ScreeningFlowParams = {
 	screeningFlowId?: string;
 	targetAccountId?: string | null;
 	screeningFlowVersionId?: string;
 	patientOrderId?: string;
 	groupSessionId?: string;
+	courseSessionId?: string;
 	metadata?: {
 		modifiedAssessment?: boolean;
 	};

@@ -1,21 +1,21 @@
 import React, { useCallback, useState } from 'react';
-import { screeningService } from '@/lib/services';
+import { ScreeningFlowParams, screeningService } from '@/lib/services';
 import { ScreeningQuestionContext } from '@/components/screening-v2';
-import AsyncWrapper from '../async-page';
+import AsyncWrapper from '@/components/async-page';
 import { ScreeningSessionDestination } from '@/lib/models';
 import { useScreeningV2Styles } from './use-screening-v2-styles';
 
 interface ScreeningProps {
-	screeningFlowId: string;
+	screeningFlowParams: ScreeningFlowParams;
 	onScreeningFlowComplete(screeningSessionDestination?: ScreeningSessionDestination): void;
 }
 
-export const ScreeningFlow = ({ screeningFlowId, onScreeningFlowComplete }: ScreeningProps) => {
+export const ScreeningFlow = ({ screeningFlowParams, onScreeningFlowComplete }: ScreeningProps) => {
 	useScreeningV2Styles();
 	const [initialScreeningQuestionContextId, setInitialScreeningQuestionContextId] = useState('');
 
 	const fetchData = useCallback(async () => {
-		const { screeningSession } = await screeningService.createScreeningSession({ screeningFlowId }).fetch();
+		const { screeningSession } = await screeningService.createScreeningSession(screeningFlowParams).fetch();
 		const { nextScreeningQuestionContextId } = screeningSession;
 
 		if (!nextScreeningQuestionContextId) {
@@ -24,7 +24,7 @@ export const ScreeningFlow = ({ screeningFlowId, onScreeningFlowComplete }: Scre
 		}
 
 		setInitialScreeningQuestionContextId(nextScreeningQuestionContextId);
-	}, [onScreeningFlowComplete, screeningFlowId]);
+	}, [onScreeningFlowComplete, screeningFlowParams]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>

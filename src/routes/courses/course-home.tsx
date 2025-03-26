@@ -33,7 +33,7 @@ export const Component = () => {
 						<Row>
 							<Col md={12} lg={{ span: 6, offset: 3 }}>
 								<ScreeningFlow
-									screeningFlowId={institution.onboardingScreeningFlowId}
+									screeningFlowParams={{ screeningFlowId: institution.onboardingScreeningFlowId }}
 									onScreeningFlowComplete={() => {
 										setShowOnboardingModal(false);
 									}}
