@@ -289,7 +289,10 @@ export const Component = () => {
 													<div className={classes.screeningFlowOuter}>
 														<ScreeningFlow
 															screeningFlowParams={{
-																courseSessionId: course?.courseId,
+																...(course?.currentCourseSession?.courseSessionId && {
+																	courseSessionId:
+																		course.currentCourseSession.courseSessionId,
+																}),
 																screeningFlowId: courseUnit.screeningFlowId,
 															}}
 															onScreeningFlowComplete={(screeningSessionDestination) => {
