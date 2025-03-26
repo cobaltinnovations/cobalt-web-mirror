@@ -1,5 +1,7 @@
 import {
 	ScreeningAnswer,
+	ScreeningAnswersMessage,
+	ScreeningAnswersQuestionResult,
 	ScreeningFlow,
 	ScreeningFlowTypeId,
 	ScreeningFlowVersion,
@@ -103,6 +105,8 @@ export const screeningService = {
 	) {
 		return httpSingleton.orchestrateRequest<{
 			screeningAnswers: ScreeningAnswer[];
+			messages?: ScreeningAnswersMessage[];
+			questionResultsByScreeningQuestionId?: Record<string, ScreeningAnswersQuestionResult>;
 			nextScreeningQuestionContextId?: string;
 			screeningSessionDestination?: ScreeningSessionDestination;
 			screeningSession: ScreeningSession;

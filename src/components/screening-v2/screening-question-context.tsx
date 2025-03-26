@@ -3,14 +3,17 @@ import { Button, Form } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import {
 	ScreeningAnswerSelection,
+	ScreeningAnswersMessage,
+	ScreeningAnswersQuestionResult,
 	ScreeningConfirmationPrompt,
 	ScreeningQuestionContextResponse,
 	ScreeningSessionDestination,
 } from '@/lib/models';
+import { CobaltError } from '@/lib/http-client';
 import { screeningService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
-import { CobaltError } from '@/lib/http-client';
+import InlineAlert from '@/components/inline-alert';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
@@ -94,6 +97,11 @@ export const ScreeningQuestionContext = ({
 	});
 	const [selectedAnswers, setSelectedAnswers] = useState<ScreeningAnswerSelection[]>([]);
 	const [isNext, setIsNext] = useState(true);
+	const [answerConfig, setAnswerConfig] = useState<{
+		messages: ScreeningAnswersMessage[];
+		nextScreeningQuestionContextId: string;
+		questionResultsByScreeningQuestionId: Record<string, ScreeningAnswersQuestionResult>;
+	}>();
 
 	const fetchData = useCallback(async () => {
 		setIsLoading(true);
@@ -171,9 +179,21 @@ export const ScreeningQuestionContext = ({
 			setIsLoading(true);
 
 			try {
-				const { nextScreeningQuestionContextId, screeningSessionDestination } = await screeningService
-					.answerQuestion(screeningQuestionContextId, selectedAnswers, force)
-					.fetch();
+				const {
+					messages,
+					nextScreeningQuestionContextId,
+					questionResultsByScreeningQuestionId,
+					screeningSessionDestination,
+				} = await screeningService.answerQuestion(screeningQuestionContextId, selectedAnswers, force).fetch();
+
+				if ((messages ?? []).length > 0 || questionResultsByScreeningQuestionId) {
+					setAnswerConfig({
+						messages: messages ?? [],
+						questionResultsByScreeningQuestionId: questionResultsByScreeningQuestionId ?? {},
+						nextScreeningQuestionContextId: nextScreeningQuestionContextId ?? '',
+					});
+					return;
+				}
 
 				if (nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
@@ -271,6 +291,14 @@ export const ScreeningQuestionContext = ({
 									{screeningQuestionContext.screeningQuestion.footerText && (
 										<p className="mb-6">{screeningQuestionContext.screeningQuestion.footerText}</p>
 									)}
+
+									{answerConfig?.messages.map((message) => (
+										<InlineAlert
+											variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
+											title={'TODO: Message Title'}
+											description={message.message}
+										/>
+									))}
 
 									<div className="d-flex align-items-center justify-content-between">
 										<div>

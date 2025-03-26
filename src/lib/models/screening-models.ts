@@ -221,3 +221,30 @@ export interface ScreeningAnswerResult {
 	text?: string;
 	score?: number;
 }
+
+export interface ScreeningAnswersMessage {
+	displayTypeId: ScreeningAnswersDisplayTypeId;
+	message: string;
+}
+
+export interface ScreeningAnswersQuestionResult {
+	correctnessIndicatorId: ScreeningAnswersCorrectnessIndicatorId;
+	displayTypeId: ScreeningAnswersDisplayTypeId;
+}
+
+export enum ScreeningAnswersCorrectnessIndicatorId {
+	CORRECT = 'CORRECT',
+	INCORRECT = 'INCORRECT',
+}
+
+export enum ScreeningAnswersDisplayTypeId {
+	DEFAULT = 'DEFAULT',
+	PRIMARY = 'PRIMARY',
+	SECONDARY = 'SECONDARY',
+	SUCCESS = 'SUCCESS',
+	DANGER = 'DANGER',
+	WARNING = 'WARNING',
+	INFO = 'INFO',
+	DARK = 'DARK',
+	LIGHT = 'LIGHT',
+}

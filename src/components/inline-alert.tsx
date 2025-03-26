@@ -129,7 +129,7 @@ export const InlineAlert = ({ title, description, action, variant = 'info', clas
 			<div className={classes.iconOuter}>{variant && icon[variant]}</div>
 			<div className={classes.informationOuter}>
 				<p
-					className={classNames('fs-large fw-bold', {
+					className={classNames('fs-large fw-semibold', {
 						'mb-0': !description && !action,
 						'mb-2': description || action,
 					})}
