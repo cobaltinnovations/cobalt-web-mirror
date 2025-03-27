@@ -42,6 +42,8 @@ export const ScreeningAnswerSingleSelect = ({
 							className={classNames({
 								[`screening-v2__answer--${questionResult?.displayTypeId.toLocaleLowerCase()}`]:
 									questionResult?.displayTypeId,
+								[`screening-v2__answer--${questionResult?.correctnessIndicatorId.toLocaleLowerCase()}`]:
+									questionResult?.correctnessIndicatorId,
 							})}
 							type="radio"
 							ref={optionIndex === 0 ? firstOptionRef : undefined}

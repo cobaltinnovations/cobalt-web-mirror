@@ -96,31 +96,35 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			'& input[type=checkbox]:checked + label:before': {
 				maskImage: `url(${checkboxSelected})`,
 			},
+			'&--correct': {
+				'& input[type=radio], & input[type=checkbox]': {
+					'& + label:before': {
+						maskImage: `url(${checkCircleFill}) !important`,
+						backgroundColor: `${theme.colors.s500} !important`,
+					},
+				},
+			},
+			'&--incorrect': {
+				'& input[type=radio], & input[type=checkbox]': {
+					'& + label:before': {
+						maskImage: `url(${cancelFill}) !important`,
+						backgroundColor: `${theme.colors.n500} !important`,
+					},
+				},
+			},
 			'&--success': {
 				'& input[type=radio], & input[type=checkbox]': {
-					'& + label': {
-						'&:before': {
-							maskImage: `url(${checkCircleFill}) !important`,
-							backgroundColor: `${theme.colors.n500} !important`,
-						},
-						'&:after': {
-							borderWidth: '2px !important',
-							borderColor: `${theme.colors.s500} !important`,
-						},
+					'& + label:after': {
+						borderWidth: '2px !important',
+						borderColor: `${theme.colors.s500} !important`,
 					},
 				},
 			},
 			'&--danger': {
 				'& input[type=radio], & input[type=checkbox]': {
-					'& + label': {
-						'&:before': {
-							maskImage: `url(${cancelFill}) !important`,
-							backgroundColor: `${theme.colors.n500} !important`,
-						},
-						'&:after': {
-							borderWidth: '2px !important',
-							borderColor: `${theme.colors.d500} !important`,
-						},
+					'& + label:after': {
+						borderWidth: '2px !important',
+						borderColor: `${theme.colors.d500} !important`,
 					},
 				},
 			},
