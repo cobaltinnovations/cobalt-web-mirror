@@ -51,6 +51,10 @@ export const ScreeningAnswerSingleSelect = ({
 							value={option.screeningAnswerOptionId}
 							checked={isChecked}
 							onChange={({ currentTarget }) => {
+								if (questionResult) {
+									return;
+								}
+
 								onChange([{ screeningAnswerOptionId: currentTarget.value }]);
 							}}
 						/>

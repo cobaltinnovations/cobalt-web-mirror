@@ -118,6 +118,7 @@ export interface ScreeningQuestion {
 	preferAutosubmit: boolean;
 	displayOrder: number;
 	screeningQuestionSubmissionStyleId: ScreeningQuestionSubmissionStyleId;
+	supplementText?: string;
 }
 
 export interface ScreeningAnswerOption {

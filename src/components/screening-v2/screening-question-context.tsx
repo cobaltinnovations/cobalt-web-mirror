@@ -18,6 +18,7 @@ import InlineAlert from '@/components/inline-alert';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import classNames from 'classnames';
 
 const QUESTION_TRANSITION_DURATION_MS = 600;
 
@@ -296,7 +297,20 @@ export const ScreeningQuestionContext = ({
 										<p className="mb-2">{screeningQuestionContext.screeningQuestion.introText}</p>
 									)}
 
-									<h2 className="mb-6">{screeningQuestionContext.screeningQuestion.questionText}</h2>
+									<h2
+										className={classNames({
+											'mb-2': screeningQuestionContext.screeningQuestion.supplementText,
+											'mb-8': !screeningQuestionContext.screeningQuestion.supplementText,
+										})}
+									>
+										{screeningQuestionContext.screeningQuestion.questionText}
+									</h2>
+
+									{screeningQuestionContext.screeningQuestion.supplementText && (
+										<p className="mb-6">
+											{screeningQuestionContext.screeningQuestion.supplementText}
+										</p>
+									)}
 
 									<ScreeningAnswer
 										className="mb-6"
