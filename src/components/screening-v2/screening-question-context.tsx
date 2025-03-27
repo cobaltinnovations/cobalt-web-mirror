@@ -186,7 +186,6 @@ export const ScreeningQuestionContext = ({
 					onScreeningFlowComplete(answerConfig.screeningSessionDestination);
 				}
 
-				setAnswerConfig(undefined);
 				return;
 			}
 
@@ -254,6 +253,10 @@ export const ScreeningQuestionContext = ({
 		}
 	}, [confirmationPrompt.isSubmitConfirmationPrompt, handleQuestionFormSubmit]);
 
+	const showNextAndPreviousButtons =
+		screeningQuestionContext?.screeningQuestion.screeningQuestionSubmissionStyleId ===
+			ScreeningQuestionSubmissionStyleId.NEXT || answerConfig;
+
 	if (!screeningQuestionContext) {
 		return null;
 	}
@@ -315,13 +318,12 @@ export const ScreeningQuestionContext = ({
 											key={messageIndex}
 											className="mb-6"
 											variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
-											title={'TODO: Message Title'}
+											title={message.title}
 											description={message.message}
 										/>
 									))}
 
-									{screeningQuestionContext.screeningQuestion.screeningQuestionSubmissionStyleId ===
-									ScreeningQuestionSubmissionStyleId.NEXT ? (
+									{showNextAndPreviousButtons ? (
 										<div className="d-flex align-items-center justify-content-between">
 											<div>
 												{(screeningQuestionContext.previousScreeningQuestionContextId ||

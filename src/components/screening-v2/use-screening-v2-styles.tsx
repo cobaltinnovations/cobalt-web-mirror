@@ -4,6 +4,8 @@ import radioSelected from '@/assets/icons/screening-v2/radio-selected.svg';
 import radioUnselected from '@/assets/icons/screening-v2/radio-unselected.svg';
 import checkboxSelected from '@/assets/icons/screening-v2/checkbox-selected.svg';
 import checkboxUnselected from '@/assets/icons/screening-v2/checkbox-unselected.svg';
+import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
+import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 
 export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 	'@global': {
@@ -97,6 +99,10 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			'&--success': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label': {
+						'&:before': {
+							maskImage: `url(${checkCircleFill}) !important`,
+							backgroundColor: `${theme.colors.n500} !important`,
+						},
 						'&:after': {
 							borderWidth: '2px !important',
 							borderColor: `${theme.colors.s500} !important`,
@@ -107,19 +113,13 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			'&--danger': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label': {
+						'&:before': {
+							maskImage: `url(${cancelFill}) !important`,
+							backgroundColor: `${theme.colors.n500} !important`,
+						},
 						'&:after': {
 							borderWidth: '2px !important',
 							borderColor: `${theme.colors.d500} !important`,
-						},
-					},
-				},
-			},
-			'&--warning': {
-				'& input[type=radio], & input[type=checkbox]': {
-					'& + label': {
-						'&:after': {
-							borderWidth: '2px !important',
-							borderColor: `${theme.colors.w500} !important`,
 						},
 					},
 				},

@@ -35,8 +35,6 @@ export const ScreeningAnswerMultiSelect = ({
 				const isChecked = !!currentValue;
 				const questionResult = questionResultsByScreeningAnswerOptionId?.[option.screeningAnswerOptionId];
 
-				console.log('questionResult', questionResult);
-
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
 						<Form.Check
@@ -53,6 +51,10 @@ export const ScreeningAnswerMultiSelect = ({
 							value={option.screeningAnswerOptionId}
 							checked={isChecked}
 							onChange={({ currentTarget }) => {
+								if (questionResult) {
+									return;
+								}
+
 								onChange(
 									isChecked
 										? value.filter((v) => v.screeningAnswerOptionId !== currentTarget.value)

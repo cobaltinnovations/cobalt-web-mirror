@@ -226,6 +226,7 @@ export interface ScreeningAnswerResult {
 
 export interface ScreeningAnswersMessage {
 	displayTypeId: ScreeningAnswersDisplayTypeId;
+	title: string;
 	message: string;
 }
 
