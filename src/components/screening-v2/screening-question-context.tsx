@@ -7,6 +7,7 @@ import {
 	ScreeningAnswersQuestionResult,
 	ScreeningConfirmationPrompt,
 	ScreeningQuestionContextResponse,
+	ScreeningQuestionSubmissionStyleId,
 	ScreeningSessionDestination,
 } from '@/lib/models';
 import { CobaltError } from '@/lib/http-client';
@@ -100,7 +101,8 @@ export const ScreeningQuestionContext = ({
 	const [answerConfig, setAnswerConfig] = useState<{
 		messages: ScreeningAnswersMessage[];
 		nextScreeningQuestionContextId: string;
-		questionResultsByScreeningQuestionId: Record<string, ScreeningAnswersQuestionResult>;
+		questionResultsByScreeningAnswerOptionId: Record<string, ScreeningAnswersQuestionResult>;
+		screeningSessionDestination?: ScreeningSessionDestination;
 	}>();
 
 	const fetchData = useCallback(async () => {
@@ -176,21 +178,34 @@ export const ScreeningQuestionContext = ({
 	const handleQuestionFormSubmit = useCallback(
 		async (event?: React.FormEvent<HTMLFormElement>, force?: boolean) => {
 			event?.preventDefault();
+
+			if (answerConfig) {
+				if (answerConfig.nextScreeningQuestionContextId) {
+					setScreeningQuestionContextId(answerConfig.nextScreeningQuestionContextId);
+				} else {
+					onScreeningFlowComplete(answerConfig.screeningSessionDestination);
+				}
+
+				setAnswerConfig(undefined);
+				return;
+			}
+
 			setIsLoading(true);
 
 			try {
 				const {
 					messages,
 					nextScreeningQuestionContextId,
-					questionResultsByScreeningQuestionId,
+					questionResultsByScreeningAnswerOptionId,
 					screeningSessionDestination,
 				} = await screeningService.answerQuestion(screeningQuestionContextId, selectedAnswers, force).fetch();
 
-				if ((messages ?? []).length > 0 || questionResultsByScreeningQuestionId) {
+				if (messages.length > 0 || Object.entries(questionResultsByScreeningAnswerOptionId).length > 0) {
 					setAnswerConfig({
-						messages: messages ?? [],
-						questionResultsByScreeningQuestionId: questionResultsByScreeningQuestionId ?? {},
+						messages,
+						questionResultsByScreeningAnswerOptionId,
 						nextScreeningQuestionContextId: nextScreeningQuestionContextId ?? '',
+						screeningSessionDestination,
 					});
 					return;
 				}
@@ -224,7 +239,7 @@ export const ScreeningQuestionContext = ({
 				setIsLoading(false);
 			}
 		},
-		[handleError, onScreeningFlowComplete, screeningQuestionContextId, selectedAnswers]
+		[answerConfig, handleError, onScreeningFlowComplete, screeningQuestionContextId, selectedAnswers]
 	);
 
 	const handlePromptSubmit = useCallback(() => {
@@ -284,6 +299,9 @@ export const ScreeningQuestionContext = ({
 										className="mb-6"
 										question={screeningQuestionContext.screeningQuestion}
 										answerOptions={screeningQuestionContext.screeningAnswerOptions}
+										questionResultsByScreeningAnswerOptionId={
+											answerConfig?.questionResultsByScreeningAnswerOptionId
+										}
 										value={selectedAnswers}
 										onChange={setSelectedAnswers}
 									/>
@@ -292,59 +310,79 @@ export const ScreeningQuestionContext = ({
 										<p className="mb-6">{screeningQuestionContext.screeningQuestion.footerText}</p>
 									)}
 
-									{answerConfig?.messages.map((message) => (
+									{answerConfig?.messages.map((message, messageIndex) => (
 										<InlineAlert
+											key={messageIndex}
+											className="mb-6"
 											variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
 											title={'TODO: Message Title'}
 											description={message.message}
 										/>
 									))}
 
-									<div className="d-flex align-items-center justify-content-between">
-										<div>
-											{(screeningQuestionContext.previousScreeningQuestionContextId ||
-												screeningQuestionContext.preQuestionScreeningConfirmationPrompt) && (
+									{screeningQuestionContext.screeningQuestion.screeningQuestionSubmissionStyleId ===
+									ScreeningQuestionSubmissionStyleId.NEXT ? (
+										<div className="d-flex align-items-center justify-content-between">
+											<div>
+												{(screeningQuestionContext.previousScreeningQuestionContextId ||
+													screeningQuestionContext.preQuestionScreeningConfirmationPrompt) && (
+													<Button
+														type="button"
+														variant="link"
+														className="d-flex align-items-center text-decoration-none ps-3"
+														onClick={handleQuestionPreviousButtonClick}
+													>
+														<LeftChevron className="me-2" />
+														Back
+													</Button>
+												)}
+											</div>
+											<div>
+												{screeningQuestionContext.screeningQuestion.minimumAnswerCount ===
+													0 && (
+													<Button
+														type="button"
+														variant="outline-primary"
+														className="d-flex align-items-center text-decoration-none pe-3"
+														onClick={() => {
+															setIsNext(true);
+															setSelectedAnswers([]);
+															window.alert('[TODO]: Skip');
+														}}
+													>
+														Skip
+														<RightChevron className="ms-1" />
+													</Button>
+												)}
 												<Button
-													type="button"
-													variant="link"
-													className="d-flex align-items-center text-decoration-none ps-3"
-													onClick={handleQuestionPreviousButtonClick}
-												>
-													<LeftChevron className="me-2" />
-													Back
-												</Button>
-											)}
-										</div>
-										<div>
-											{screeningQuestionContext.screeningQuestion.minimumAnswerCount === 0 && (
-												<Button
-													type="button"
-													variant="outline-primary"
+													type="submit"
+													variant="primary"
 													className="d-flex align-items-center text-decoration-none pe-3"
-													onClick={() => {
-														setIsNext(true);
-														setSelectedAnswers([]);
-														window.alert('[TODO]: Skip');
-													}}
+													disabled={
+														selectedAnswers.length <
+														screeningQuestionContext.screeningQuestion.minimumAnswerCount
+													}
 												>
-													Skip
+													Next
 													<RightChevron className="ms-1" />
 												</Button>
-											)}
+											</div>
+										</div>
+									) : (
+										<div className="d-flex align-items-center justify-content-center">
 											<Button
 												type="submit"
 												variant="primary"
-												className="d-flex align-items-center text-decoration-none pe-3"
+												className="d-flex align-items-center"
 												disabled={
 													selectedAnswers.length <
 													screeningQuestionContext.screeningQuestion.minimumAnswerCount
 												}
 											>
-												Next
-												<RightChevron className="ms-1" />
+												Submit
 											</Button>
 										</div>
-									</div>
+									)}
 								</fieldset>
 							</Form>
 						)}

@@ -115,7 +115,9 @@ export interface ScreeningQuestion {
 	minimumAnswerCountDescription: string;
 	maximumAnswerCount: number;
 	maximumAnswerCountDescription: string;
+	preferAutosubmit: boolean;
 	displayOrder: number;
+	screeningQuestionSubmissionStyleId: ScreeningQuestionSubmissionStyleId;
 }
 
 export interface ScreeningAnswerOption {
@@ -247,4 +249,9 @@ export enum ScreeningAnswersDisplayTypeId {
 	INFO = 'INFO',
 	DARK = 'DARK',
 	LIGHT = 'LIGHT',
+}
+
+export enum ScreeningQuestionSubmissionStyleId {
+	NEXT = 'NEXT',
+	SUBMIT = 'SUBMIT',
 }

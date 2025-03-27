@@ -46,10 +46,12 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 						right: 0,
 						bottom: 0,
 						content: '""',
+						borderWidth: 1,
 						position: 'absolute',
+						borderStyle: 'solid',
 						pointerEvents: 'none',
 						borderRadius: 'inherit',
-						border: `1px solid ${theme.colors.n100}`,
+						borderColor: theme.colors.n100,
 					},
 					'&:hover': {
 						backgroundColor: theme.colors.n50,
@@ -91,6 +93,36 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			},
 			'& input[type=checkbox]:checked + label:before': {
 				maskImage: `url(${checkboxSelected})`,
+			},
+			'&--success': {
+				'& input[type=radio], & input[type=checkbox]': {
+					'& + label': {
+						'&:after': {
+							borderWidth: '2px !important',
+							borderColor: `${theme.colors.s500} !important`,
+						},
+					},
+				},
+			},
+			'&--danger': {
+				'& input[type=radio], & input[type=checkbox]': {
+					'& + label': {
+						'&:after': {
+							borderWidth: '2px !important',
+							borderColor: `${theme.colors.d500} !important`,
+						},
+					},
+				},
+			},
+			'&--warning': {
+				'& input[type=radio], & input[type=checkbox]': {
+					'& + label': {
+						'&:after': {
+							borderWidth: '2px !important',
+							borderColor: `${theme.colors.w500} !important`,
+						},
+					},
+				},
 			},
 		},
 	},

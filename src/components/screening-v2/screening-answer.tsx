@@ -3,6 +3,7 @@ import {
 	ScreeningAnswerFormatId,
 	ScreeningAnswerOption,
 	ScreeningAnswerSelection,
+	ScreeningAnswersQuestionResult,
 	ScreeningQuestion as ScreeningQuestionModel,
 } from '@/lib/models';
 import {
@@ -18,17 +19,35 @@ interface ScreeningAnswerProps {
 	answerOptions: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
 	onChange(value: ScreeningAnswerSelection[]): void;
+	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 	className?: string;
 }
 
-export const ScreeningAnswer = ({ question, answerOptions, value, onChange, className }: ScreeningAnswerProps) => {
+export const ScreeningAnswer = ({
+	question,
+	answerOptions,
+	value,
+	onChange,
+	questionResultsByScreeningAnswerOptionId,
+	className,
+}: ScreeningAnswerProps) => {
 	return (
 		<div className={className}>
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.CARD_SORT && (
-				<ScreeningAnswerCardSort options={answerOptions} value={value} onChange={onChange} />
+				<ScreeningAnswerCardSort
+					options={answerOptions}
+					value={value}
+					onChange={onChange}
+					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
+				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.FREEFORM_TEXT && (
-				<ScreeningAnswerFreeformText options={answerOptions} value={value} onChange={onChange} />
+				<ScreeningAnswerFreeformText
+					options={answerOptions}
+					value={value}
+					onChange={onChange}
+					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
+				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.MULTI_SELECT && (
 				<ScreeningAnswerMultiSelect
@@ -36,10 +55,16 @@ export const ScreeningAnswer = ({ question, answerOptions, value, onChange, clas
 					options={answerOptions}
 					value={value}
 					onChange={onChange}
+					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
 				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.REORDER && (
-				<ScreeningAnswerReorder options={answerOptions} value={value} onChange={onChange} />
+				<ScreeningAnswerReorder
+					options={answerOptions}
+					value={value}
+					onChange={onChange}
+					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
+				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.SINGLE_SELECT && (
 				<ScreeningAnswerSingleSelect
@@ -47,6 +72,7 @@ export const ScreeningAnswer = ({ question, answerOptions, value, onChange, clas
 					options={answerOptions}
 					value={value}
 					onChange={onChange}
+					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
 				/>
 			)}
 		</div>

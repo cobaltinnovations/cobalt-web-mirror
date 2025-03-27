@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Collapse, Form } from 'react-bootstrap';
-import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
+import classNames from 'classnames';
+import { ScreeningAnswerOption, ScreeningAnswerSelection, ScreeningAnswersQuestionResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 
 interface ScreeningAnswerSingleSelectProps {
@@ -8,9 +9,16 @@ interface ScreeningAnswerSingleSelectProps {
 	options: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
 	onChange(value: ScreeningAnswerSelection[]): void;
+	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 }
 
-export const ScreeningAnswerSingleSelect = ({ name, options, value, onChange }: ScreeningAnswerSingleSelectProps) => {
+export const ScreeningAnswerSingleSelect = ({
+	name,
+	options,
+	value,
+	onChange,
+	questionResultsByScreeningAnswerOptionId,
+}: ScreeningAnswerSingleSelectProps) => {
 	const firstOptionRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -25,11 +33,16 @@ export const ScreeningAnswerSingleSelect = ({ name, options, value, onChange }: 
 				);
 				const supplementText = currentValue?.text ?? '';
 				const isChecked = !!currentValue;
+				const questionResult = questionResultsByScreeningAnswerOptionId?.[option.screeningAnswerOptionId];
 
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
 						<Form.Check
 							bsPrefix="screening-v2__answer"
+							className={classNames({
+								[`screening-v2__answer--${questionResult?.displayTypeId.toLocaleLowerCase()}`]:
+									questionResult?.displayTypeId,
+							})}
 							type="radio"
 							ref={optionIndex === 0 ? firstOptionRef : undefined}
 							id={option.screeningAnswerOptionId}

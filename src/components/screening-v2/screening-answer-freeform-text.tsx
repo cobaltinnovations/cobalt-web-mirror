@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
-import { ScreeningAnswerOption, ScreeningAnswerSelection } from '@/lib/models';
+import { ScreeningAnswerOption, ScreeningAnswerSelection, ScreeningAnswersQuestionResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 
 interface ScreeningAnswerFreeformTextProps {
 	options: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
 	onChange(value: ScreeningAnswerSelection[]): void;
+	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 }
 
 export const ScreeningAnswerFreeformText = ({ options, value, onChange }: ScreeningAnswerFreeformTextProps) => {

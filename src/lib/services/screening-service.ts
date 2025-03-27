@@ -106,8 +106,8 @@ export const screeningService = {
 	) {
 		return httpSingleton.orchestrateRequest<{
 			screeningAnswers: ScreeningAnswer[];
-			messages?: ScreeningAnswersMessage[];
-			questionResultsByScreeningQuestionId?: Record<string, ScreeningAnswersQuestionResult>;
+			messages: ScreeningAnswersMessage[];
+			questionResultsByScreeningAnswerOptionId: Record<string, ScreeningAnswersQuestionResult>;
 			nextScreeningQuestionContextId?: string;
 			screeningSessionDestination?: ScreeningSessionDestination;
 			screeningSession: ScreeningSession;
