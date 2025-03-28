@@ -151,6 +151,33 @@ export const Component = () => {
 		};
 	}, [course?.videos, courseUnit?.courseUnitTypeId, courseUnit?.videoId]);
 
+	const handleScreeningFlowComplete = useCallback(async () => {
+		try {
+			if (!courseIdentifier) {
+				throw new Error('courseIdentifier is undefined.');
+			}
+
+			const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
+
+			if (!response.course.currentCourseSession) {
+				return;
+			}
+
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+				response.course.currentCourseSession
+			);
+
+			if (!desiredUnitId) {
+				navigate(`/courses/${response.course.urlName}`);
+				return;
+			}
+
+			navigate(`/courses/${response.course.urlName}/course-units/${desiredUnitId}`);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [courseIdentifier, handleError, navigate]);
+
 	const handleMarkCourseUnitCompleteButtonClick = useCallback(async () => {
 		try {
 			if (!course) {
@@ -295,15 +322,7 @@ export const Component = () => {
 																}),
 																screeningFlowId: courseUnit.screeningFlowId,
 															}}
-															onScreeningFlowComplete={(screeningSessionDestination) => {
-																window.alert(
-																	'[TODO]: handle screening complete, check console log.'
-																);
-																console.log(
-																	'[TODO]: screening flow complete, load next unit',
-																	screeningSessionDestination
-																);
-															}}
+															onScreeningFlowComplete={handleScreeningFlowComplete}
 														/>
 													</div>
 												)}
