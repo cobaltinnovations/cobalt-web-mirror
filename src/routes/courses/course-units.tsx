@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
 	CourseModel,
+	CourseModuleModel,
 	CourseSessionModel,
 	CourseSessionUnitStatusId,
 	CourseUnitDependencyTypeId,
@@ -80,6 +81,8 @@ export const Component = () => {
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
 	const [course, setCourse] = useState<CourseModel>();
+	const [requiredModules, setRequiredModules] = useState<CourseModuleModel[]>([]);
+	const [optionalModules, setOptionalModules] = useState<CourseModuleModel[]>([]);
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
 	const [courseUnitCompleted, setCourseUnitCompleted] = useState(false);
@@ -106,6 +109,17 @@ export const Component = () => {
 			: undefined;
 
 		setCourse(response.course);
+		setRequiredModules(
+			response.course.courseModules.filter(
+				(cm) =>
+					!(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+			)
+		);
+		setOptionalModules(
+			response.course.courseModules.filter((cm) =>
+				(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+			)
+		);
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
 		setCourseUnitCompleted(
@@ -240,7 +254,7 @@ export const Component = () => {
 					</div>
 					<div className={classes.aside}>
 						{course &&
-							(course.courseModules ?? []).map((courseModule) => (
+							requiredModules.map((courseModule) => (
 								<CourseModule
 									compact
 									activeCourseUnitId={unitId}
@@ -261,6 +275,39 @@ export const Component = () => {
 									}}
 								/>
 							))}
+						{optionalModules.length > 0 && (
+							<>
+								<hr className="my-4" />
+								<h6 className="px-4 pt-4 pb-1 small fw-bold text-uppercase text-n500">
+									Optional Modules
+								</h6>
+								{course &&
+									optionalModules.map((courseModule) => (
+										<CourseModule
+											compact
+											activeCourseUnitId={unitId}
+											key={courseModule.courseModuleId}
+											courseModule={courseModule}
+											courseSessionUnitStatusIdsByCourseUnitId={
+												course.currentCourseSession
+													? course.currentCourseSession
+															.courseSessionUnitStatusIdsByCourseUnitId
+													: {}
+											}
+											courseUnitLockStatusesByCourseUnitId={
+												course.currentCourseSession
+													? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
+													: course.defaultCourseUnitLockStatusesByCourseUnitId
+											}
+											onCourseUnitClick={(courseUnit) => {
+												navigate(
+													`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+												);
+											}}
+										/>
+									))}
+							</>
+						)}
 					</div>
 					<div className={classes.previewPane}>
 						<Container>

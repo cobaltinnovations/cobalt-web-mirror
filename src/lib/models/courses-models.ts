@@ -53,6 +53,11 @@ export interface CourseSessionModel {
 	courseSessionStatusId: CourseSessionStatusId;
 	courseSessionUnitStatusIdsByCourseUnitId: CourseSessionUnitStatusIdsByCourseUnitId;
 	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+	optionalCourseModuleIds: string[];
 }
 
 export enum CourseSessionStatusId {

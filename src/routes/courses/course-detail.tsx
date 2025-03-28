@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { CourseModel } from '@/lib/models';
+import { CourseModel, CourseModuleModel } from '@/lib/models';
 import { coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
@@ -29,6 +29,8 @@ export const Component = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [course, setCourse] = useState<CourseModel>();
+	const [requiredModules, setRequiredModules] = useState<CourseModuleModel[]>([]);
+	const [optionalModules, setOptionalModules] = useState<CourseModuleModel[]>([]);
 	const [currentTab, setCurrentTab] = useState(TABS.COURSE_OVERVIEW);
 	const [showRestartCourseModal, setShowRestartCourseModal] = useState(false);
 
@@ -38,7 +40,19 @@ export const Component = () => {
 		}
 
 		const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
+
 		setCourse(response.course);
+		setRequiredModules(
+			response.course.courseModules.filter(
+				(cm) =>
+					!(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+			)
+		);
+		setOptionalModules(
+			response.course.courseModules.filter((cm) =>
+				(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+			)
+		);
 	}, [courseIdentifier]);
 
 	const handleStartCourseButtonClick = useCallback(async () => {
@@ -158,40 +172,77 @@ export const Component = () => {
 													)}
 												</div>
 												{course &&
-													(course.courseModules ?? []).map(
-														(courseModule, courseModuleIndex) => {
-															const isLast =
-																(course?.courseModules ?? []).length - 1 ===
-																courseModuleIndex;
+													requiredModules.map((courseModule, courseModuleIndex) => {
+														const isLast = requiredModules.length - 1 === courseModuleIndex;
 
-															return (
-																<CourseModule
-																	className={classNames({
-																		'mb-4': !isLast,
-																	})}
-																	key={courseModule.courseModuleId}
-																	courseModule={courseModule}
-																	courseSessionUnitStatusIdsByCourseUnitId={
-																		course.currentCourseSession
-																			? course.currentCourseSession
-																					.courseSessionUnitStatusIdsByCourseUnitId
-																			: {}
-																	}
-																	courseUnitLockStatusesByCourseUnitId={
-																		course.currentCourseSession
-																			? course.currentCourseSession
-																					.courseUnitLockStatusesByCourseUnitId
-																			: course.defaultCourseUnitLockStatusesByCourseUnitId
-																	}
-																	onCourseUnitClick={(courseUnit) => {
-																		navigate(
-																			`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
-																		);
-																	}}
-																/>
-															);
-														}
-													)}
+														return (
+															<CourseModule
+																className={classNames({
+																	'mb-4': !isLast,
+																})}
+																key={courseModule.courseModuleId}
+																courseModule={courseModule}
+																courseSessionUnitStatusIdsByCourseUnitId={
+																	course.currentCourseSession
+																		? course.currentCourseSession
+																				.courseSessionUnitStatusIdsByCourseUnitId
+																		: {}
+																}
+																courseUnitLockStatusesByCourseUnitId={
+																	course.currentCourseSession
+																		? course.currentCourseSession
+																				.courseUnitLockStatusesByCourseUnitId
+																		: course.defaultCourseUnitLockStatusesByCourseUnitId
+																}
+																onCourseUnitClick={(courseUnit) => {
+																	navigate(
+																		`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+																	);
+																}}
+															/>
+														);
+													})}
+												{optionalModules.length > 0 && (
+													<>
+														<h2 className="pt-14 mb-2">Optional Modules</h2>
+														<p className="mb-6">
+															These modules do not count towards course completion, but
+															may have useful information.
+														</p>
+														{course &&
+															optionalModules.map((courseModule, courseModuleIndex) => {
+																const isLast =
+																	optionalModules.length - 1 === courseModuleIndex;
+
+																return (
+																	<CourseModule
+																		className={classNames({
+																			'mb-4': !isLast,
+																		})}
+																		key={courseModule.courseModuleId}
+																		courseModule={courseModule}
+																		courseSessionUnitStatusIdsByCourseUnitId={
+																			course.currentCourseSession
+																				? course.currentCourseSession
+																						.courseSessionUnitStatusIdsByCourseUnitId
+																				: {}
+																		}
+																		courseUnitLockStatusesByCourseUnitId={
+																			course.currentCourseSession
+																				? course.currentCourseSession
+																						.courseUnitLockStatusesByCourseUnitId
+																				: course.defaultCourseUnitLockStatusesByCourseUnitId
+																		}
+																		onCourseUnitClick={(courseUnit) => {
+																			navigate(
+																				`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+																			);
+																		}}
+																	/>
+																);
+															})}
+													</>
+												)}
 											</Col>
 											<Col md={12} lg={5}>
 												<h3 className="pt-6 mb-4">Course Focus</h3>
