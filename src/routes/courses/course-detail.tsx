@@ -143,8 +143,8 @@ export const Component = () => {
 									<Tab.Pane eventKey={TABS.COURSE_OVERVIEW} mountOnEnter unmountOnExit>
 										<Row>
 											<Col md={12} lg={7}>
-												<div className="pt-6 mb-11 d-flex align-items-center justify-content-between">
-													<h2 className="mb-0">Course Content</h2>
+												<div className="pt-6 mb-11  d-xl-flex align-items-center justify-content-between">
+													<h2 className="mb-4 mb-xl-0">Course Content</h2>
 													{course?.currentCourseSession ? (
 														<div className="d-flex align-items-center">
 															<Button
