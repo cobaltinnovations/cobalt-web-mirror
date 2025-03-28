@@ -62,6 +62,12 @@ export const Component = () => {
 			}
 
 			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(course.currentCourseSession);
+
+			if (!desiredUnitId) {
+				window.alert('all units done, what to do?');
+				return;
+			}
+
 			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
 		} catch (error) {
 			handleError(error);

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
@@ -9,9 +9,8 @@ import {
 	CourseUnitLockStatus,
 	CourseUnitLockTypeId,
 	CourseUnitModel,
-	CourseUnitTypeId,
 } from '@/lib/models';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { Button, Col, Container, Row } from 'react-bootstrap';
@@ -83,7 +82,7 @@ export const Component = () => {
 	const [course, setCourse] = useState<CourseModel>();
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
-	const [courseUnitCompletionStatusId, setCourseUnitCompletionStatusId] = useState<CourseSessionUnitStatusId>();
+	const [courseUnitCompleted, setCourseUnitCompleted] = useState(false);
 	const [courseUnitByUnitId, setCourseUnitByUnitId] = useState<Record<string, CourseUnitModel>>({});
 
 	const fetchData = useCallback(async () => {
@@ -109,7 +108,10 @@ export const Component = () => {
 		setCourse(response.course);
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
-		setCourseUnitCompletionStatusId(desiredCourseUnitCompletionStatus);
+		setCourseUnitCompleted(
+			desiredCourseUnitCompletionStatus === CourseSessionUnitStatusId.COMPLETED ||
+				desiredCourseUnitCompletionStatus === CourseSessionUnitStatusId.SKIPPED
+		);
 		setCourseUnitByUnitId(
 			courseUnitsFlat.reduce(
 				(accumulator, currentValue) => ({
@@ -120,29 +122,6 @@ export const Component = () => {
 			)
 		);
 	}, [courseIdentifier, unitId]);
-
-	useEffect(() => {
-		if (courseUnit?.courseUnitTypeId !== CourseUnitTypeId.VIDEO) {
-			return;
-		}
-		const video = course?.videos.find((v) => v.videoId === courseUnit.videoId);
-		if (!video) {
-			return;
-		}
-
-		const { script } = getKalturaScriptForVideo({
-			videoPlayerId: 'kaltura_player',
-			courseVideo: video,
-			eventCallback: (eventName, event) => {
-				console.log(`Kaltura player event triggered: ${eventName}, event data: ${JSON.stringify(event)}`);
-			},
-		});
-
-		document.body.appendChild(script);
-		return () => {
-			document.body.removeChild(script);
-		};
-	}, [course?.videos, courseUnit?.courseUnitTypeId, courseUnit?.videoId]);
 
 	const navigateToNextAvailableUnit = useCallback(
 		(course: CourseModel, courseSession: CourseSessionModel) => {
@@ -204,13 +183,6 @@ export const Component = () => {
 
 		navigateToNextAvailableUnit(course, course.currentCourseSession);
 	}, [course, navigateToNextAvailableUnit]);
-
-	const courseUnitIsCompleted = useMemo(
-		() =>
-			courseUnitCompletionStatusId === CourseSessionUnitStatusId.COMPLETED ||
-			courseUnitCompletionStatusId === CourseSessionUnitStatusId.SKIPPED,
-		[courseUnitCompletionStatusId]
-	);
 
 	const courseUnitIsStronglyLocked = useMemo(
 		() => courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.STRONGLY_LOCKED,
@@ -294,13 +266,13 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 2, span: 8 }}>
-									{courseUnitIsCompleted ? (
+									{courseUnitCompleted ? (
 										<>
 											{courseUnit && (
 												<CourseUnitComplete
 													courseUnit={courseUnit}
 													onRestartActivityButtonClick={() => {
-														window.alert('TODO: not sure how this should happen yet.');
+														setCourseUnitCompleted(false);
 													}}
 													onNextButtonClick={handleCompletedUnitNextButtonClick}
 												/>
@@ -326,6 +298,7 @@ export const Component = () => {
 															courseSessionId={
 																course.currentCourseSession?.courseSessionId
 															}
+															courseVideos={course.videos}
 															courseUnit={courseUnit}
 															dependencyCourseUnits={weakCourseUnitDependencies}
 															onActivityComplete={handleActivityComplete}

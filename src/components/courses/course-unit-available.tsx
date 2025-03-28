@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
+import { getKalturaScriptForVideo } from '@/lib/utils';
+import { CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
 import InlineAlert from '@/components/inline-alert';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { ScreeningFlow } from '@/components/screening-v2';
@@ -27,6 +28,7 @@ interface CourseUnitAvailableProps {
 	courseUrlName: string;
 	courseSessionId: string;
 	courseUnit: CourseUnitModel;
+	courseVideos: CourseVideoModel[];
 	dependencyCourseUnits: CourseUnitModel[];
 	onActivityComplete(): void;
 	onSkipActivityButtonClick(): void;
@@ -36,11 +38,35 @@ export const CourseUnitAvailable = ({
 	courseUrlName,
 	courseSessionId,
 	courseUnit,
+	courseVideos,
 	dependencyCourseUnits,
 	onActivityComplete,
 	onSkipActivityButtonClick,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
+
+	useEffect(() => {
+		if (courseUnit.courseUnitTypeId !== CourseUnitTypeId.VIDEO) {
+			return;
+		}
+		const video = courseVideos.find((v) => v.videoId === courseUnit.videoId);
+		if (!video) {
+			return;
+		}
+
+		const { script } = getKalturaScriptForVideo({
+			videoPlayerId: 'kaltura_player',
+			courseVideo: video,
+			eventCallback: (eventName, event) => {
+				console.log(`Kaltura player event triggered: ${eventName}, event data: ${JSON.stringify(event)}`);
+			},
+		});
+
+		document.body.appendChild(script);
+		return () => {
+			document.body.removeChild(script);
+		};
+	}, [courseUnit.courseUnitTypeId, courseUnit.videoId, courseVideos]);
 
 	return (
 		<>
