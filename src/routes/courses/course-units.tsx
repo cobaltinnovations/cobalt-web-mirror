@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
 	CourseModel,
+	CourseSessionModel,
+	CourseSessionUnitStatusId,
 	CourseUnitDependencyTypeId,
 	CourseUnitLockStatus,
 	CourseUnitLockTypeId,
@@ -14,7 +16,7 @@ import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { CourseModule } from '@/components/courses';
+import { CourseModule, CourseUnitComplete, CourseUnitLocked } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
@@ -97,6 +99,7 @@ export const Component = () => {
 	const [course, setCourse] = useState<CourseModel>();
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
+	const [courseUnitCompletionStatusId, setCourseUnitCompletionStatusId] = useState<CourseSessionUnitStatusId>();
 	const [courseUnitByUnitId, setCourseUnitByUnitId] = useState<Record<string, CourseUnitModel>>({});
 
 	const fetchData = useCallback(async () => {
@@ -113,10 +116,16 @@ export const Component = () => {
 		const desiredCourseUnitLockStatus = desiredCourseUnit
 			? lockStatuses[desiredCourseUnit.courseUnitId]
 			: undefined;
+		const desiredCourseUnitCompletionStatus = desiredCourseUnit
+			? response.course.currentCourseSession?.courseSessionUnitStatusIdsByCourseUnitId[
+					desiredCourseUnit.courseUnitId
+			  ]
+			: undefined;
 
 		setCourse(response.course);
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
+		setCourseUnitCompletionStatusId(desiredCourseUnitCompletionStatus);
 		setCourseUnitByUnitId(
 			courseUnitsFlat.reduce(
 				(accumulator, currentValue) => ({
@@ -151,6 +160,20 @@ export const Component = () => {
 		};
 	}, [course?.videos, courseUnit?.courseUnitTypeId, courseUnit?.videoId]);
 
+	const navigateToNextAvailableUnit = useCallback(
+		(course: CourseModel, courseSession: CourseSessionModel) => {
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseSession);
+
+			if (!desiredUnitId) {
+				navigate(`/courses/${course.urlName}`);
+				return;
+			}
+
+			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
+		},
+		[navigate]
+	);
+
 	const handleScreeningFlowComplete = useCallback(async () => {
 		try {
 			if (!courseIdentifier) {
@@ -163,22 +186,13 @@ export const Component = () => {
 				return;
 			}
 
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
-				response.course.currentCourseSession
-			);
-
-			if (!desiredUnitId) {
-				navigate(`/courses/${response.course.urlName}`);
-				return;
-			}
-
-			navigate(`/courses/${response.course.urlName}/course-units/${desiredUnitId}`);
+			navigateToNextAvailableUnit(response.course, response.course.currentCourseSession);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [courseIdentifier, handleError, navigate]);
+	}, [courseIdentifier, handleError, navigateToNextAvailableUnit]);
 
-	const handleMarkCourseUnitCompleteButtonClick = useCallback(async () => {
+	const handleSkipActivityButtonClick = useCallback(async () => {
 		try {
 			if (!course) {
 				throw new Error('course is undefined.');
@@ -189,18 +203,35 @@ export const Component = () => {
 			}
 
 			const { courseSession } = await coursesService.completeCourseUnit(courseUnit.courseUnitId).fetch();
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseSession);
-
-			if (!desiredUnitId) {
-				navigate(`/courses/${course.urlName}`);
-				return;
-			}
-
-			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
+			navigateToNextAvailableUnit(course, courseSession);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course, courseUnit, handleError, navigate]);
+	}, [course, courseUnit, handleError, navigateToNextAvailableUnit]);
+
+	const handleCompletedUnitNextButtonClick = useCallback(() => {
+		if (!course) {
+			throw new Error('course is undefined.');
+		}
+
+		if (!course.currentCourseSession) {
+			throw new Error('currentCourseSession is undefined.');
+		}
+
+		navigateToNextAvailableUnit(course, course.currentCourseSession);
+	}, [course, navigateToNextAvailableUnit]);
+
+	const courseUnitIsCompleted = useMemo(
+		() =>
+			courseUnitCompletionStatusId === CourseSessionUnitStatusId.COMPLETED ||
+			courseUnitCompletionStatusId === CourseSessionUnitStatusId.SKIPPED,
+		[courseUnitCompletionStatusId]
+	);
+
+	const courseUnitIsStronglyLocked = useMemo(
+		() => courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.STRONGLY_LOCKED,
+		[courseUnitLockStatus?.courseUnitLockTypeId]
+	);
 
 	const strongCourseUnitDependencies = useMemo(
 		() =>
@@ -210,6 +241,7 @@ export const Component = () => {
 			).map((dependencyUnitId) => courseUnitByUnitId[dependencyUnitId]),
 		[courseUnitByUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
 	);
+
 	const weakCourseUnitDependencies = useMemo(
 		() =>
 			(
@@ -278,92 +310,105 @@ export const Component = () => {
 						<Container>
 							<Row>
 								<Col md={12} lg={{ offset: 2, span: 8 }}>
-									{courseUnitLockStatus?.courseUnitLockTypeId !==
-									CourseUnitLockTypeId.STRONGLY_LOCKED ? (
+									{courseUnitIsCompleted ? (
 										<>
-											{weakCourseUnitDependencies.length > 0 && (
-												<InlineAlert
-													className="mb-10"
-													variant="warning"
-													title="Recommended learning path"
-													description={
-														<>
-															<p>
-																We recommend completing the following units before
-																continuing:
-															</p>
-															<ul className="p-0 mb-0">
-																{weakCourseUnitDependencies.map(
-																	(dependencyCourseUnit) => (
-																		<Link
-																			to={`/courses/${course?.urlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
-																		>
-																			{dependencyCourseUnit.title}
-																		</Link>
-																	)
-																)}
-															</ul>
-														</>
-													}
+											{courseUnit && (
+												<CourseUnitComplete
+													courseUnit={courseUnit}
+													onRestartActivityButtonClick={() => {
+														window.alert('TODO: not sure how this should happen yet.');
+													}}
+													onNextButtonClick={handleCompletedUnitNextButtonClick}
 												/>
 											)}
-											<h2 className="mb-10">{courseUnit?.title}</h2>
-											{courseUnit?.description && (
-												<WysiwygDisplay className="mb-8" html={courseUnit?.description ?? ''} />
-											)}
-											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
-												courseUnit?.screeningFlowId && (
-													<div className={classes.screeningFlowOuter}>
-														<ScreeningFlow
-															screeningFlowParams={{
-																...(course?.currentCourseSession?.courseSessionId && {
-																	courseSessionId:
-																		course.currentCourseSession.courseSessionId,
-																}),
-																screeningFlowId: courseUnit.screeningFlowId,
-															}}
-															onScreeningFlowComplete={handleScreeningFlowComplete}
-														/>
-													</div>
-												)}
-											{courseUnit?.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
-												<div className={classes.videoPlayerOuter}>
-													<div
-														id="kaltura_player"
-														style={{ width: '100%', height: '100%' }}
-													/>
-												</div>
-											)}
-											<div className="pt-10 d-flex justify-content-end">
-												<Button
-													type="button"
-													variant="light"
-													className="d-flex align-items-center text-decoration-none pe-3"
-													onClick={handleMarkCourseUnitCompleteButtonClick}
-												>
-													Skip Activity
-													<RightChevron className="ms-1" />
-												</Button>
-											</div>
 										</>
 									) : (
 										<>
-											<h2 className="mb-10">{courseUnit?.title}</h2>
-											<h3 className="mb-6">This unit is locked</h3>
-											<p className="fs-large mb-6">
-												Please complete the following modules to unlock this unit:
-											</p>
-											<ul>
-												{strongCourseUnitDependencies.map((dependencyCourseUnit) => (
-													<li key={dependencyCourseUnit.courseUnitId}>
-														<Link
-															to={`/courses/${course?.urlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
+											{courseUnitIsStronglyLocked ? (
+												<>
+													{course && courseUnit && (
+														<CourseUnitLocked
+															courseUrlName={course.urlName}
+															courseUnit={courseUnit}
+															dependencyCourseUnits={strongCourseUnitDependencies}
+														/>
+													)}
+												</>
+											) : (
+												<>
+													{weakCourseUnitDependencies.length > 0 && (
+														<InlineAlert
+															className="mb-10"
+															variant="warning"
+															title="Recommended learning path"
+															description={
+																<>
+																	<p>
+																		We recommend completing the following units
+																		before continuing:
+																	</p>
+																	<ul className="p-0 mb-0">
+																		{weakCourseUnitDependencies.map(
+																			(dependencyCourseUnit) => (
+																				<Link
+																					to={`/courses/${course?.urlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
+																				>
+																					{dependencyCourseUnit.title}
+																				</Link>
+																			)
+																		)}
+																	</ul>
+																</>
+															}
+														/>
+													)}
+													<h2 className="mb-10">{courseUnit?.title}</h2>
+													{courseUnit?.description && (
+														<WysiwygDisplay
+															className="mb-8"
+															html={courseUnit?.description ?? ''}
+														/>
+													)}
+													{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
+														courseUnit?.screeningFlowId && (
+															<div className={classes.screeningFlowOuter}>
+																<ScreeningFlow
+																	screeningFlowParams={{
+																		...(course?.currentCourseSession
+																			?.courseSessionId && {
+																			courseSessionId:
+																				course.currentCourseSession
+																					.courseSessionId,
+																		}),
+																		screeningFlowId: courseUnit.screeningFlowId,
+																	}}
+																	onScreeningFlowComplete={
+																		handleScreeningFlowComplete
+																	}
+																/>
+															</div>
+														)}
+													{courseUnit?.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
+														<div className={classes.videoPlayerOuter}>
+															<div
+																id="kaltura_player"
+																style={{ width: '100%', height: '100%' }}
+															/>
+														</div>
+													)}
+													<div className="pt-10 d-flex justify-content-end">
+														<Button
+															type="button"
+															variant="light"
+															className="d-flex align-items-center text-decoration-none pe-3"
+															onClick={handleSkipActivityButtonClick}
 														>
-															{dependencyCourseUnit.title}
-														</Link>
-													</li>
-												))}
-											</ul>
+															Skip Activity
+															<RightChevron className="ms-1" />
+														</Button>
+													</div>
+												</>
+											)}
 										</>
 									)}
 								</Col>
