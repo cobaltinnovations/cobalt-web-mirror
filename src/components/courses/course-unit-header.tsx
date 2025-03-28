@@ -78,7 +78,7 @@ export const CourseUnitHeader = ({ height, course }: CourseUnitHeaderProps) => {
 						variant="link"
 						className={classes.exitButton}
 						onClick={() => {
-							navigate(-1);
+							navigate(`/courses/${course.urlName}`);
 						}}
 					>
 						<BackArrowIcon className="me-lg-1" />
