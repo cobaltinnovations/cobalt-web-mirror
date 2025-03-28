@@ -1,6 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import classNames from 'classnames';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import {
 	CourseModel,
 	CourseModuleModel,
@@ -11,10 +14,9 @@ import {
 	CourseUnitLockTypeId,
 	CourseUnitModel,
 } from '@/lib/models';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import { coursesService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
-import { Col, Container, Row } from 'react-bootstrap';
 import {
 	CourseModule,
 	CourseUnitAvailable,
@@ -23,7 +25,9 @@ import {
 	CourseUnitLocked,
 } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
-import useHandleError from '@/hooks/use-handle-error';
+import mediaQueries from '@/jss/media-queries';
+import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import { ReactComponent as MenuIcon } from '@/assets/icons/icon-menu.svg';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -37,31 +41,26 @@ const useStyles = createUseThemedStyles((theme) => ({
 		zIndex: 0,
 		position: 'fixed',
 	},
-	header: {
-		top: 0,
-		left: 0,
-		right: 0,
-		height: headerHeight,
-		zIndex: 3,
-		display: 'flex',
-		padding: '0 24px',
-		position: 'absolute',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		backgroundColor: theme.colors.n0,
-		borderBottom: `1px solid ${theme.colors.n100}`,
-	},
 	aside: {
 		top: headerHeight,
 		left: 0,
 		bottom: 0,
-		zIndex: 2,
+		zIndex: 4,
 		width: asideWidth,
 		overflowY: 'auto',
 		padding: '24px 16px',
 		position: 'absolute',
+		transition: '200ms transform',
 		backgroundColor: theme.colors.n0,
 		borderRight: `1px solid ${theme.colors.n100}`,
+		[mediaQueries.lg]: {
+			top: 0,
+			maxWidth: '100%',
+			transform: 'translateX(-100%)',
+			'&.show': {
+				transform: 'translateX(0%)',
+			},
+		},
 	},
 	previewPane: {
 		top: headerHeight,
@@ -72,7 +71,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		overflowY: 'auto',
 		padding: '40px 24px',
 		position: 'absolute',
+		transition: '200ms left',
 		backgroundColor: theme.colors.n75,
+		[mediaQueries.lg]: {
+			left: 0,
+			padding: '24px 20px',
+		},
 	},
 }));
 
@@ -85,6 +89,8 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
+
+	const [showAside, setShowAside] = useState(false);
 	const [course, setCourse] = useState<CourseModel>();
 	const [requiredModules, setRequiredModules] = useState<CourseModuleModel[]>([]);
 	const [optionalModules, setOptionalModules] = useState<CourseModuleModel[]>([]);
@@ -233,7 +239,23 @@ export const Component = () => {
 			<AsyncWrapper fetchData={fetchData}>
 				<div className={classes.wrapper}>
 					{course && <CourseUnitHeader height={headerHeight} course={course} />}
-					<div className={classes.aside}>
+					<div
+						className={classNames(classes.aside, {
+							show: showAside,
+						})}
+					>
+						<div className="d-lg-none mb-4 d-flex justify-content-end">
+							<Button
+								variant="link"
+								className="d-flex align-items-center text-decoration-none"
+								onClick={() => {
+									setShowAside((previousValue) => !previousValue);
+								}}
+							>
+								<CloseIcon width={16} height={16} className="me-1" />
+								Close
+							</Button>
+						</div>
 						{course &&
 							requiredModules.map((courseModule) => (
 								<CourseModule
@@ -292,6 +314,20 @@ export const Component = () => {
 					</div>
 					<div className={classes.previewPane}>
 						<Container>
+							<Row className="d-block d-lg-none mb-6">
+								<Col md={12} lg={{ offset: 2, span: 8 }}>
+									<Button
+										variant="link"
+										className="px-0 d-flex align-items-center text-decoration-none"
+										onClick={() => {
+											setShowAside((previousValue) => !previousValue);
+										}}
+									>
+										<MenuIcon className="me-1" />
+										Course Content
+									</Button>
+								</Col>
+							</Row>
 							<Row>
 								<Col md={12} lg={{ offset: 2, span: 8 }}>
 									{courseUnitCompleted ? (

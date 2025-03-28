@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { getKalturaScriptForVideo } from '@/lib/utils';
@@ -44,6 +44,10 @@ export const CourseUnitAvailable = ({
 	onSkipActivityButtonClick,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
+	const screeningFlowParams = useMemo(
+		() => ({ courseSessionId, screeningFlowId: courseUnit.screeningFlowId }),
+		[courseSessionId, courseUnit.screeningFlowId]
+	);
 
 	useEffect(() => {
 		if (courseUnit.courseUnitTypeId !== CourseUnitTypeId.VIDEO) {
@@ -98,10 +102,7 @@ export const CourseUnitAvailable = ({
 			{courseUnit.courseUnitTypeId === CourseUnitTypeId.QUIZ && courseUnit.screeningFlowId && (
 				<div className={classes.screeningFlowOuter}>
 					<ScreeningFlow
-						screeningFlowParams={{
-							courseSessionId,
-							screeningFlowId: courseUnit.screeningFlowId,
-						}}
+						screeningFlowParams={screeningFlowParams}
 						onScreeningFlowComplete={onActivityComplete}
 					/>
 				</div>
