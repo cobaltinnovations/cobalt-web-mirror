@@ -315,7 +315,7 @@ export const Component = () => {
 					<div className={classes.previewPane}>
 						<Container>
 							<Row className="d-block d-lg-none mb-6">
-								<Col md={12} lg={{ offset: 2, span: 8 }}>
+								<Col lg={12} xl={{ offset: 1, span: 10 }} xxl={{ offset: 2, span: 8 }}>
 									<Button
 										variant="link"
 										className="px-0 d-flex align-items-center text-decoration-none"
@@ -329,7 +329,7 @@ export const Component = () => {
 								</Col>
 							</Row>
 							<Row>
-								<Col md={12} lg={{ offset: 2, span: 8 }}>
+								<Col lg={12} xl={{ offset: 1, span: 10 }} xxl={{ offset: 2, span: 8 }}>
 									{courseUnitCompleted ? (
 										<>
 											{courseUnit && (
