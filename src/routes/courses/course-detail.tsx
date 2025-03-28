@@ -14,6 +14,7 @@ import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
+import ResourceLibraryCard from '@/components/resource-library-card';
 
 export async function loader() {
 	return null;
@@ -143,7 +144,7 @@ export const Component = () => {
 									<Tab.Pane eventKey={TABS.COURSE_OVERVIEW} mountOnEnter unmountOnExit>
 										<Row>
 											<Col md={12} lg={7}>
-												<div className="pt-6 mb-11  d-xl-flex align-items-center justify-content-between">
+												<div className="pt-8 mb-11  d-xl-flex align-items-center justify-content-between">
 													<h2 className="mb-4 mb-xl-0">Course Content</h2>
 													{course?.currentCourseSession ? (
 														<div className="d-flex align-items-center">
@@ -254,7 +255,47 @@ export const Component = () => {
 										</Row>
 									</Tab.Pane>
 									<Tab.Pane eventKey={TABS.ADDITIONAL_RESOURCES} mountOnEnter unmountOnExit>
-										<div className="pt-6">Additonal Resources</div>
+										<Row className="pt-10 mb-10">
+											<Col>
+												<h3 className="mb-1">Additional Resources</h3>
+												<p className="mb-0">
+													The following resources are not used throughout the course but may
+													be helpful once you've finished with the course activities.
+												</p>
+											</Col>
+										</Row>
+										<Row>
+											{(course?.contents ?? []).map((content) => (
+												<Col
+													xs={12}
+													sm={12}
+													md={6}
+													lg={4}
+													key={content.contentId}
+													className="mb-8"
+												>
+													<ResourceLibraryCard
+														key={content.contentId}
+														linkTo={`/resource-library/${content.contentId}`}
+														className="h-100"
+														imageUrl={content.imageUrl}
+														badgeTitle={content.newFlag ? 'New' : ''}
+														title={content.title}
+														author={content.author}
+														description={content.description}
+														tags={[]}
+														contentTypeId={content.contentTypeId}
+														duration={content.durationInMinutesDescription}
+														trackEvent={() => {
+															return;
+														}}
+														trackTagEvent={(_tag) => {
+															return;
+														}}
+													/>
+												</Col>
+											))}
+										</Row>
 									</Tab.Pane>
 								</Tab.Content>
 							</Tab.Container>

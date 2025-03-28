@@ -1,3 +1,5 @@
+import { Content } from '@/lib/models';
+
 export interface CourseModel {
 	courseId: string;
 	title: string;
@@ -9,6 +11,7 @@ export interface CourseModel {
 	videos: CourseVideoModel[];
 	defaultCourseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	currentCourseSession?: CourseSessionModel;
+	contents: Content[];
 }
 
 export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, CourseSessionUnitStatusId>;
