@@ -18,6 +18,7 @@ interface ScreeningAnswerProps {
 	question: ScreeningQuestionModel;
 	answerOptions: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
+	maximumAnswerCount: number;
 	onChange(value: ScreeningAnswerSelection[]): void;
 	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 	className?: string;
@@ -27,6 +28,7 @@ export const ScreeningAnswer = ({
 	question,
 	answerOptions,
 	value,
+	maximumAnswerCount,
 	onChange,
 	questionResultsByScreeningAnswerOptionId,
 	className,
@@ -54,6 +56,7 @@ export const ScreeningAnswer = ({
 					name={question.screeningQuestionId}
 					options={answerOptions}
 					value={value}
+					maximumAnswerCount={maximumAnswerCount}
 					onChange={onChange}
 					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
 				/>

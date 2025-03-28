@@ -319,6 +319,9 @@ export const ScreeningQuestionContext = ({
 										questionResultsByScreeningAnswerOptionId={
 											answerConfig?.questionResultsByScreeningAnswerOptionId
 										}
+										maximumAnswerCount={
+											screeningQuestionContext.screeningQuestion.maximumAnswerCount
+										}
 										value={selectedAnswers}
 										onChange={setSelectedAnswers}
 									/>

@@ -8,6 +8,7 @@ interface ScreeningAnswerMultiSelectProps {
 	name: string;
 	options: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
+	maximumAnswerCount: number;
 	onChange(value: ScreeningAnswerSelection[]): void;
 	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 }
@@ -16,6 +17,7 @@ export const ScreeningAnswerMultiSelect = ({
 	name,
 	options,
 	value,
+	maximumAnswerCount,
 	onChange,
 	questionResultsByScreeningAnswerOptionId,
 }: ScreeningAnswerMultiSelectProps) => {
@@ -63,6 +65,11 @@ export const ScreeningAnswerMultiSelect = ({
 										: [...value, { screeningAnswerOptionId: currentTarget.value }]
 								);
 							}}
+							disabled={
+								value.length >= maximumAnswerCount &&
+								value.filter((v) => v.screeningAnswerOptionId === option.screeningAnswerOptionId)
+									.length === 0
+							}
 						/>
 						{option.freeformSupplement && (
 							<Collapse in={isChecked}>
