@@ -14,11 +14,16 @@ import {
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import { CourseModule, CourseUnitAvailable, CourseUnitComplete, CourseUnitLocked } from '@/components/courses';
+import { Col, Container, Row } from 'react-bootstrap';
+import {
+	CourseModule,
+	CourseUnitAvailable,
+	CourseUnitComplete,
+	CourseUnitHeader,
+	CourseUnitLocked,
+} from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -227,31 +232,7 @@ export const Component = () => {
 			</Helmet>
 			<AsyncWrapper fetchData={fetchData}>
 				<div className={classes.wrapper}>
-					<div className={classes.header}>
-						<div>
-							<Button
-								type="button"
-								className="me-2"
-								onClick={() => {
-									navigate(`/courses/${course?.urlName}`);
-								}}
-							>
-								Go Back
-							</Button>
-							<span className="fs-large fw-bold">{course?.title}</span>
-						</div>
-						<Button
-							type="button"
-							variant="link"
-							className="d-flex align-items-center text-decoration-none"
-							onClick={() => {
-								navigate('/feedback');
-							}}
-						>
-							<QuestionMarkIcon className="me-1" width={20} height={20} />
-							Need Help?
-						</Button>
-					</div>
+					{course && <CourseUnitHeader height={headerHeight} course={course} />}
 					<div className={classes.aside}>
 						{course &&
 							requiredModules.map((courseModule) => (
