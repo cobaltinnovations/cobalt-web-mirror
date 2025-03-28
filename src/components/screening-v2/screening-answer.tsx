@@ -4,7 +4,7 @@ import {
 	ScreeningAnswerOption,
 	ScreeningAnswerSelection,
 	ScreeningAnswersQuestionResult,
-	ScreeningQuestion as ScreeningQuestionModel,
+	ScreeningQuestion,
 } from '@/lib/models';
 import {
 	ScreeningAnswerCardSort,
@@ -15,7 +15,7 @@ import {
 } from '@/components/screening-v2';
 
 interface ScreeningAnswerProps {
-	question: ScreeningQuestionModel;
+	question: ScreeningQuestion;
 	answerOptions: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
 	maximumAnswerCount: number;
@@ -37,6 +37,7 @@ export const ScreeningAnswer = ({
 		<div className={className}>
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.CARD_SORT && (
 				<ScreeningAnswerCardSort
+					question={question}
 					options={answerOptions}
 					value={value}
 					onChange={onChange}
