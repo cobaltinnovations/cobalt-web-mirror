@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
 	CourseModel,
@@ -14,15 +14,11 @@ import {
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getKalturaScriptForVideo } from '@/lib/utils';
 import { coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { ScreeningFlow } from '@/components/screening-v2';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { CourseModule, CourseUnitComplete, CourseUnitLocked } from '@/components/courses';
+import { CourseModule, CourseUnitAvailable, CourseUnitComplete, CourseUnitLocked } from '@/components/courses';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
-import { WysiwygDisplay } from '@/components/wysiwyg-basic';
-import InlineAlert from '@/components/inline-alert';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -72,18 +68,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '40px 24px',
 		position: 'absolute',
 		backgroundColor: theme.colors.n75,
-	},
-	videoPlayerOuter: {
-		width: '100%',
-		aspectRatio: '16/9',
-		borderRadius: 8,
-		overflow: 'hidden',
-	},
-	screeningFlowOuter: {
-		padding: 40,
-		borderRadius: 12,
-		backgroundColor: theme.colors.n0,
-		border: `1px solid ${theme.colors.n100}`,
 	},
 }));
 
@@ -174,7 +158,7 @@ export const Component = () => {
 		[navigate]
 	);
 
-	const handleScreeningFlowComplete = useCallback(async () => {
+	const handleActivityComplete = useCallback(async () => {
 		try {
 			if (!courseIdentifier) {
 				throw new Error('courseIdentifier is undefined.');
@@ -336,77 +320,18 @@ export const Component = () => {
 												</>
 											) : (
 												<>
-													{weakCourseUnitDependencies.length > 0 && (
-														<InlineAlert
-															className="mb-10"
-															variant="warning"
-															title="Recommended learning path"
-															description={
-																<>
-																	<p>
-																		We recommend completing the following units
-																		before continuing:
-																	</p>
-																	<ul className="p-0 mb-0">
-																		{weakCourseUnitDependencies.map(
-																			(dependencyCourseUnit) => (
-																				<Link
-																					to={`/courses/${course?.urlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
-																				>
-																					{dependencyCourseUnit.title}
-																				</Link>
-																			)
-																		)}
-																	</ul>
-																</>
+													{course && course.currentCourseSession && courseUnit && (
+														<CourseUnitAvailable
+															courseUrlName={course.urlName}
+															courseSessionId={
+																course.currentCourseSession?.courseSessionId
 															}
+															courseUnit={courseUnit}
+															dependencyCourseUnits={weakCourseUnitDependencies}
+															onActivityComplete={handleActivityComplete}
+															onSkipActivityButtonClick={handleSkipActivityButtonClick}
 														/>
 													)}
-													<h2 className="mb-10">{courseUnit?.title}</h2>
-													{courseUnit?.description && (
-														<WysiwygDisplay
-															className="mb-8"
-															html={courseUnit?.description ?? ''}
-														/>
-													)}
-													{courseUnit?.courseUnitTypeId === CourseUnitTypeId.QUIZ &&
-														courseUnit?.screeningFlowId && (
-															<div className={classes.screeningFlowOuter}>
-																<ScreeningFlow
-																	screeningFlowParams={{
-																		...(course?.currentCourseSession
-																			?.courseSessionId && {
-																			courseSessionId:
-																				course.currentCourseSession
-																					.courseSessionId,
-																		}),
-																		screeningFlowId: courseUnit.screeningFlowId,
-																	}}
-																	onScreeningFlowComplete={
-																		handleScreeningFlowComplete
-																	}
-																/>
-															</div>
-														)}
-													{courseUnit?.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
-														<div className={classes.videoPlayerOuter}>
-															<div
-																id="kaltura_player"
-																style={{ width: '100%', height: '100%' }}
-															/>
-														</div>
-													)}
-													<div className="pt-10 d-flex justify-content-end">
-														<Button
-															type="button"
-															variant="light"
-															className="d-flex align-items-center text-decoration-none pe-3"
-															onClick={handleSkipActivityButtonClick}
-														>
-															Skip Activity
-															<RightChevron className="ms-1" />
-														</Button>
-													</div>
 												</>
 											)}
 										</>
