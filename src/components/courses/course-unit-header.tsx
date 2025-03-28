@@ -34,7 +34,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		height: '100%',
 		display: 'flex',
 		alignItems: 'center',
-		padding: '8px 0 8px 40px',
+		padding: '8px 0 8px 4px',
 		borderRight: `1px solid ${theme.colors.n100}`,
 		[mediaQueries.lg]: {
 			border: 0,
