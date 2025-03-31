@@ -99,19 +99,27 @@ export const CourseUnitAvailable = ({
 			<h2 className="mb-10">{courseUnit.title}</h2>
 			{courseUnit.description && <WysiwygDisplay className="mb-8" html={courseUnit.description ?? ''} />}
 
-			{courseUnit.courseUnitTypeId === CourseUnitTypeId.QUIZ && courseUnit.screeningFlowId && (
-				<div className={classes.screeningFlowOuter}>
-					<ScreeningFlow
-						screeningFlowParams={screeningFlowParams}
-						onScreeningFlowComplete={onActivityComplete}
-					/>
-				</div>
-			)}
+			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.QUIZ ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.REORDER) &&
+				courseUnit.screeningFlowId && (
+					<div className={classes.screeningFlowOuter}>
+						<ScreeningFlow
+							screeningFlowParams={screeningFlowParams}
+							onScreeningFlowComplete={onActivityComplete}
+						/>
+					</div>
+				)}
 
 			{courseUnit.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
 				<div className={classes.videoPlayerOuter}>
 					<div id="kaltura_player" style={{ width: '100%', height: '100%' }} />
 				</div>
+			)}
+
+			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK) && (
+				<p className="text-danger mb-0">TODO: Infographic and Homework</p>
 			)}
 
 			<div className="pt-10 d-flex justify-content-end">
