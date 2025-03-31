@@ -210,6 +210,7 @@ export const ScreeningQuestionContext = ({
 					return;
 				}
 
+				setSelectedAnswers([]);
 				if (nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
 				} else {
@@ -253,6 +254,22 @@ export const ScreeningQuestionContext = ({
 			});
 		}
 	}, [confirmationPrompt.isSubmitConfirmationPrompt, handleQuestionFormSubmit]);
+
+	useEffect(() => {
+		if (
+			!screeningQuestionContext?.previouslyAnswered &&
+			screeningQuestionContext?.screeningQuestion.preferAutosubmit &&
+			selectedAnswers.length >= screeningQuestionContext?.screeningQuestion.minimumAnswerCount
+		) {
+			handleQuestionFormSubmit();
+		}
+	}, [
+		handleQuestionFormSubmit,
+		screeningQuestionContext?.previouslyAnswered,
+		screeningQuestionContext?.screeningQuestion.minimumAnswerCount,
+		screeningQuestionContext?.screeningQuestion.preferAutosubmit,
+		selectedAnswers.length,
+	]);
 
 	const showNextAndPreviousButtons =
 		screeningQuestionContext?.screeningQuestion.screeningQuestionSubmissionStyleId ===
