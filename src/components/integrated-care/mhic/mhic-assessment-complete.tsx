@@ -36,6 +36,9 @@ import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import InlineAlert from '@/components/inline-alert';
+import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
+import useFlags from '@/hooks/use-flags';
+import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -59,6 +62,8 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	const [isExportingResults, setIsExportingResults] = useState(false);
 	const copyTextToClipboard = useCopyTextToClipboard();
 	const handleError = useHandleError();
+	const [showResetModel, setShowResetModel] = useState(false);
+	const { addFlag } = useFlags();
 
 	const eligilityResults = useMemo(
 		() => patientOrder?.intakeScreeningSessionResult?.screeningSessionScreeningResults ?? [],
@@ -135,6 +140,32 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 		}
 	}, [copyTextToClipboard, handleError, patientOrder]);
 
+	const handleResetPatientOrder = useCallback(async () => {
+		try {
+			if (!patientOrder) {
+				throw new Error('patientOrder is undefined');
+			}
+
+			const response = await integratedCareService.resetPatientOrder(patientOrder.patientOrderId).fetch();
+
+			setShowResetModel(false);
+			addFlag({
+				variant: 'success',
+				title: 'Success',
+				description: 'Patient order was reset.',
+				actions: [],
+			});
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT, {
+				patientOrderId: patientOrder.patientOrderId,
+			});
+
+			navigate(`/ic/mhic/my-patients/all/${response.patientOrder.patientOrderId}`);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, navigate, patientOrder]);
+
 	const canFlagForSafetyPlanning =
 		!!patientOrder &&
 		patientOrder.patientOrderDispositionId === PatientOrderDispositionId.OPEN &&
@@ -148,6 +179,14 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 				<title>Cobalt | Integrated Care - Assessment Results</title>
 			</Helmet>
 
+			<MhicResetAssessmentModel
+				show={showResetModel}
+				onHide={() => {
+					setShowResetModel(false);
+				}}
+				onReset={handleResetPatientOrder}
+			/>
+
 			<Container className="py-10">
 				{patientOrder && (
 					<>
@@ -157,24 +196,18 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 									<h2 className="mb-0">Assessment Review</h2>
 									<div className="d-flex align-items-center">
 										<Button
-											className="me-2"
-											variant="outline-primary"
+											variant="link"
+											className="me-2 text-decoration-none d-flex align-items-center"
 											onClick={() => {
-												analyticsService.persistEvent(
-													AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT,
-													{
-														patientOrderId: patientOrder.patientOrderId,
-													}
-												);
-
-												onStartNewAssessment();
+												setShowResetModel(true);
 											}}
 											disabled={
 												patientOrder.patientOrderDispositionId !==
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											Retake Assessment
+											<ResetIcon className="me-1" />
+											Reset
 										</Button>
 										<Button
 											className="d-flex align-items-center"

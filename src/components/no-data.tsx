@@ -15,6 +15,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 export interface NoDataAction {
 	size?: 'sm' | 'lg';
+	className?: string;
+	icon?: JSX.Element;
 	variant: ButtonVariant;
 	title: string;
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -55,16 +57,17 @@ const NoData = ({ illustration, title, description, actions, className }: NoData
 				</p>
 			)}
 			{actions.length > 0 && (
-				<div className="text-center">
+				<div className="d-flex justify-content-center align-items-center">
 					{actions.map((action, actionIndex) => (
 						<Button
 							key={actionIndex}
 							size={action.size}
 							variant={action.variant}
-							className="mx-1"
+							className={classNames('mx-1 d-flex align-items-center', action.className)}
 							onClick={action.onClick}
 							disabled={action.disabled}
 						>
+							{action.icon}
 							{action.title}
 						</Button>
 					))}
