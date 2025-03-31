@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { CourseModel, CourseModuleModel } from '@/lib/models';
-import { coursesService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, CourseModel, CourseModuleModel } from '@/lib/models';
+import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import PageHeader from '@/components/page-header';
@@ -20,19 +20,20 @@ export async function loader() {
 	return null;
 }
 
-enum TABS {
-	COURSE_OVERVIEW = 'COURSE_OVERVIEW',
+enum MODE {
+	OVERVIEW = 'OVERVIEW',
 	ADDITIONAL_RESOURCES = 'ADDITIONAL_RESOURCES',
 }
 
 export const Component = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const mode = useMemo(() => searchParams.get('mode') ?? MODE.OVERVIEW, [searchParams]);
 	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [course, setCourse] = useState<CourseModel>();
 	const [requiredModules, setRequiredModules] = useState<CourseModuleModel[]>([]);
 	const [optionalModules, setOptionalModules] = useState<CourseModuleModel[]>([]);
-	const [currentTab, setCurrentTab] = useState(TABS.COURSE_OVERVIEW);
 	const [showRestartCourseModal, setShowRestartCourseModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
@@ -55,6 +56,20 @@ export const Component = () => {
 			)
 		);
 	}, [courseIdentifier]);
+
+	useEffect(() => {
+		if (!course) {
+			return;
+		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_DETAIL, {
+			courseId: course.courseId,
+			...(course.currentCourseSession && {
+				courseSessionId: course.currentCourseSession.courseSessionId,
+			}),
+			mode,
+		});
+	}, [course, mode]);
 
 	const handleStartCourseButtonClick = useCallback(async () => {
 		try {
@@ -119,29 +134,26 @@ export const Component = () => {
 				<Container>
 					<Row className="mb-24">
 						<Col>
-							<Tab.Container
-								id="course-tabs"
-								defaultActiveKey={TABS.COURSE_OVERVIEW}
-								activeKey={currentTab}
-							>
+							<Tab.Container id="course-tabs" defaultActiveKey={MODE.OVERVIEW} activeKey={mode}>
 								<TabBar
-									value={currentTab}
+									value={mode}
 									tabs={[
 										{
 											title: 'Course Overview',
-											value: TABS.COURSE_OVERVIEW,
+											value: MODE.OVERVIEW,
 										},
 										{
 											title: 'Additional Resources',
-											value: TABS.ADDITIONAL_RESOURCES,
+											value: MODE.ADDITIONAL_RESOURCES,
 										},
 									]}
 									onTabClick={(tabValue) => {
-										setCurrentTab(tabValue as TABS);
+										searchParams.set('mode', tabValue);
+										setSearchParams(searchParams);
 									}}
 								/>
 								<Tab.Content>
-									<Tab.Pane eventKey={TABS.COURSE_OVERVIEW} mountOnEnter unmountOnExit>
+									<Tab.Pane eventKey={MODE.OVERVIEW} mountOnEnter unmountOnExit>
 										<Row>
 											<Col md={12} lg={7}>
 												<div className="pt-8 mb-11  d-xl-flex align-items-center justify-content-between">
@@ -254,7 +266,7 @@ export const Component = () => {
 											</Col>
 										</Row>
 									</Tab.Pane>
-									<Tab.Pane eventKey={TABS.ADDITIONAL_RESOURCES} mountOnEnter unmountOnExit>
+									<Tab.Pane eventKey={MODE.ADDITIONAL_RESOURCES} mountOnEnter unmountOnExit>
 										<Row className="pt-10 mb-10">
 											<Col>
 												<h3 className="mb-1">Additional Resources</h3>
@@ -287,7 +299,21 @@ export const Component = () => {
 														contentTypeId={content.contentTypeId}
 														duration={content.durationInMinutesDescription}
 														trackEvent={() => {
-															return;
+															if (!course) {
+																return;
+															}
+
+															analyticsService.persistEvent(
+																AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_CONTENT,
+																{
+																	courseId: course.courseId,
+																	...(course.currentCourseSession && {
+																		courseSessionId:
+																			course.currentCourseSession.courseSessionId,
+																	}),
+																	contentId: content.contentId,
+																}
+															);
 														}}
 														trackTagEvent={(_tag) => {
 															return;

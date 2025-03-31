@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { CourseModel } from '@/lib/models';
-import { coursesService } from '@/lib/services';
+import { AnalyticsNativeEventTypeId, CourseModel } from '@/lib/models';
+import { analyticsService, coursesService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import useAccount from '@/hooks/use-account';
 import CallToActionBlock from '@/components/call-to-action-block';
@@ -23,6 +23,8 @@ export const Component = () => {
 	const fetchData = useCallback(async () => {
 		const response = await coursesService.getCourses().fetch();
 		setCourses(response.courses);
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSES);
 	}, []);
 
 	return (

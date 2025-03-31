@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { getKalturaScriptForVideo } from '@/lib/utils';
-import { CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
 import InlineAlert from '@/components/inline-alert';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { analyticsService } from '@/lib/services';
+import { throttle } from 'lodash';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	videoPlayerOuter: {
@@ -49,6 +51,33 @@ export const CourseUnitAvailable = ({
 		[courseSessionId, courseUnit.screeningFlowId]
 	);
 
+	const throttledPlayerEvent = useRef(
+		throttle(
+			({
+				courseUnitId,
+				courseSessionId,
+				videoId,
+				eventName,
+				eventPayload,
+			}: {
+				courseUnitId: string;
+				courseSessionId?: string;
+				videoId: string;
+				eventName: string;
+				eventPayload: unknown;
+			}) =>
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
+					courseUnitId,
+					...(courseSessionId && { courseSessionId }),
+					videoId,
+					eventName,
+					eventPayload,
+				}),
+			5000,
+			{ leading: true, trailing: false }
+		)
+	).current;
+
 	useEffect(() => {
 		if (courseUnit.courseUnitTypeId !== CourseUnitTypeId.VIDEO) {
 			return;
@@ -62,7 +91,23 @@ export const CourseUnitAvailable = ({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
 			eventCallback: (eventName, event) => {
-				console.log(`Kaltura player event triggered: ${eventName}, event data: ${JSON.stringify(event)}`);
+				if (eventName === 'playerUpdatePlayhead') {
+					throttledPlayerEvent({
+						courseUnitId: courseUnit.courseUnitId,
+						...(courseSessionId && { courseSessionId }),
+						videoId: video.videoId,
+						eventName,
+						eventPayload: event,
+					});
+				} else {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
+						courseUnitId: courseUnit.courseUnitId,
+						...(courseSessionId && { courseSessionId }),
+						videoId: video.videoId,
+						eventName,
+						eventPayload: event,
+					});
+				}
 			},
 		});
 
@@ -70,7 +115,14 @@ export const CourseUnitAvailable = ({
 		return () => {
 			document.body.removeChild(script);
 		};
-	}, [courseUnit.courseUnitTypeId, courseUnit.videoId, courseVideos]);
+	}, [
+		courseSessionId,
+		courseUnit.courseUnitId,
+		courseUnit.courseUnitTypeId,
+		courseUnit.videoId,
+		courseVideos,
+		throttledPlayerEvent,
+	]);
 
 	return (
 		<>

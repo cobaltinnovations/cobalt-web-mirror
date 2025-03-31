@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import {
+	AnalyticsNativeEventTypeId,
 	CourseModel,
 	CourseModuleModel,
 	CourseSessionModel,
@@ -14,7 +15,7 @@ import {
 	CourseUnitLockTypeId,
 	CourseUnitModel,
 } from '@/lib/models';
-import { coursesService } from '@/lib/services';
+import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import {
@@ -147,6 +148,19 @@ export const Component = () => {
 			)
 		);
 	}, [courseIdentifier, unitId]);
+
+	useEffect(() => {
+		if (!courseUnit) {
+			return;
+		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_UNIT, {
+			courseUnitId: courseUnit.courseUnitId,
+			...(course?.currentCourseSession?.courseSessionId && {
+				courseSessionId: course.currentCourseSession.courseSessionId,
+			}),
+		});
+	}, [course?.currentCourseSession?.courseSessionId, courseUnit]);
 
 	const navigateToNextAvailableUnit = useCallback(
 		(course: CourseModel, courseSession: CourseSessionModel) => {
