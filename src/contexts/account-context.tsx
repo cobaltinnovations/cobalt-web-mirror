@@ -120,7 +120,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const permittedAccountSourceIds = Cookies.get('permittedAccountSourceIds');
 	const accountSources = useMemo(() => {
 		if (!permittedAccountSourceIds) {
-			return institutionResponse.accountSources;
+			return institutionResponse.accountSources.filter((accountSource) => accountSource.visible);
 		}
 
 		const parsedPermitted = (JSON.parse(permittedAccountSourceIds) as string[]).reduce((acc, cur) => {
@@ -129,7 +129,7 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		}, {} as Record<string, boolean>);
 
 		return institutionResponse.accountSources.filter(
-			(accountSource) => parsedPermitted[accountSource.accountSourceId]
+			(accountSource) => accountSource.visible && parsedPermitted[accountSource.accountSourceId]
 		);
 	}, [institutionResponse.accountSources, permittedAccountSourceIds]);
 

@@ -27,7 +27,7 @@ import { accountService, institutionService, topicCenterService } from '@/lib/se
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { decodeAccessToken, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
-import { AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
+import { AccountSourceId, AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
 import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
@@ -66,6 +66,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			return new Error();
 		}),
 	]);
+
+	const anonymousImplicitAccountSourceSupported =
+		institutionResponse.accountSources.filter(
+			(accountSource) => accountSource.accountSourceId === AccountSourceId.ANONYMOUS_IMPLICIT
+		).length > 0;
+
+	if (anonymousImplicitAccountSourceSupported) {
+		// TODO: create implicit anonymous account here if necessary
+	}
 
 	if (accountResponse instanceof Error) {
 		Cookies.set('authRedirectUrl', url.pathname + url.search);
