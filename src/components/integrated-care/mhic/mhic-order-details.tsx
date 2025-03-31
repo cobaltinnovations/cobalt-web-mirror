@@ -42,6 +42,8 @@ import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
+import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
+import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -72,6 +74,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showScheduleCallEditModal, setShowScheduleCallEditModal] = useState(false);
 	const [showScheduleCallCompleteModal, setShowScheduleCallCompleteModal] = useState(false);
 	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
+	const [showResetModel, setShowResetModel] = useState(false);
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -171,6 +174,27 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		patientOrder.patientOrderScreeningStatusId,
 	]);
 
+	const handleResetPatientOrder = useCallback(async () => {
+		try {
+			await integratedCareService.resetPatientOrder(patientOrder.patientOrderId).fetch();
+
+			revalidator.revalidate();
+			setShowResetModel(false);
+			addFlag({
+				variant: 'success',
+				title: 'Success',
+				description: 'Patient order was reset.',
+				actions: [],
+			});
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_RETAKE_ORDER_ASSESSMENT, {
+				patientOrderId: patientOrder.patientOrderId,
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	}, [addFlag, handleError, patientOrder.patientOrderId, revalidator]);
+
 	if (loadingIntakeScreening || loadingClinicalScreening) {
 		return loadingIntakeScreening || loadingClinicalScreening;
 	}
@@ -262,6 +286,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					revalidator.revalidate();
 					setShowAddVoicemailTaskModal(false);
 				}}
+			/>
+
+			<MhicResetAssessmentModel
+				show={showResetModel}
+				onHide={() => {
+					setShowResetModel(false);
+				}}
+				onReset={handleResetPatientOrder}
 			/>
 
 			<MhicSelectAssessmentTypeModal
@@ -474,22 +506,36 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 								<Col>
 									<div className="d-flex align-items-center justify-content-between">
 										<h4 className="mb-0">Assessment</h4>
-										<Button
-											variant="primary"
-											className="d-flex align-items-center"
-											onClick={() => {
-												analyticsService.persistEvent(
-													AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_ORDER_ASSESSMENT_RESULTS,
-													{
-														patientOrderId: patientOrder.patientOrderId,
-													}
-												);
+										<div className="d-flex align-items-center">
+											<Button
+												variant="link"
+												className="text-decoration-none d-flex align-items-center"
+												onClick={() => {
+													setShowResetModel(true);
+												}}
+											>
+												<ResetIcon className="me-1" />
+												Reset
+											</Button>
+											<Button
+												variant="primary"
+												className="d-flex align-items-center"
+												onClick={() => {
+													analyticsService.persistEvent(
+														AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_ORDER_ASSESSMENT_RESULTS,
+														{
+															patientOrderId: patientOrder.patientOrderId,
+														}
+													);
 
-												navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
-											}}
-										>
-											Review <ExternalIcon className="ms-2" width={20} height={20} />
-										</Button>
+													navigate(
+														`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`
+													);
+												}}
+											>
+												Review <ExternalIcon className="ms-2" width={20} height={20} />
+											</Button>
+										</div>
 									</div>
 									<p className="mb-0">
 										Completed{' '}
@@ -658,10 +704,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													PatientOrderDispositionId.OPEN,
 											},
 											{
-												variant: 'outline-primary',
-												title: 'Retake Assessment',
+												variant: 'link',
+												icon: <ResetIcon className="me-1" />,
+												className: 'text-decoration-none',
+												title: 'Reset',
 												onClick: () => {
-													setShowSelectAssessmentTypeModal(true);
+													setShowResetModel(true);
 												},
 												disabled:
 													patientOrder.patientOrderDispositionId !==

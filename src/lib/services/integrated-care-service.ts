@@ -589,4 +589,10 @@ export const integratedCareService = {
 			data,
 		});
 	},
+	resetPatientOrder(patientOrderId: string) {
+		return httpSingleton.orchestrateRequest<{ patientOrder: PatientOrderModel }>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/reset`,
+		});
+	},
 };
