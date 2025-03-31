@@ -64,6 +64,7 @@ export const ScreeningAnswer = ({
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.REORDER && (
 				<ScreeningAnswerReorder
+					question={question}
 					options={answerOptions}
 					value={value}
 					onChange={onChange}

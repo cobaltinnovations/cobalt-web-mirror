@@ -1,4 +1,5 @@
 export * from './card-draggable';
+export * from './item-draggable';
 export * from './screening-answer-card-sort';
 export * from './screening-answer-freeform-text';
 export * from './screening-answer-multi-select';
