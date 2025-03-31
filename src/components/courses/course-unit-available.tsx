@@ -137,6 +137,7 @@ export const CourseUnitAvailable = ({
 							<ul className="p-0 mb-0">
 								{dependencyCourseUnits.map((dependencyCourseUnit) => (
 									<Link
+										key={dependencyCourseUnit.courseUnitId}
 										to={`/courses/${courseUrlName}/course-units/${dependencyCourseUnit.courseUnitId}`}
 									>
 										{dependencyCourseUnit.title}
