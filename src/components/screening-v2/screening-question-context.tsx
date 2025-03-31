@@ -187,6 +187,7 @@ export const ScreeningQuestionContext = ({
 					onScreeningFlowComplete(answerConfig.screeningSessionDestination);
 				}
 
+				setAnswerConfig(undefined);
 				return;
 			}
 
