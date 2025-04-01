@@ -28,10 +28,12 @@ export const getKalturaScriptForVideo = ({
 	videoPlayerId,
 	courseVideo,
 	eventCallback,
+	errorCallback,
 }: {
 	videoPlayerId: string;
 	courseVideo: CourseVideoModel;
 	eventCallback: (eventName: string, event: string | number | object) => void;
+	errorCallback: (error: unknown) => void;
 }) => {
 	const script = document.createElement('script');
 	script.src = `//cdnapisec.kaltura.com/p/${courseVideo.kalturaPartnerId}/sp/${courseVideo.kalturaPartnerId}00/embedIframeJs/uiconf_id/${courseVideo.kalturaUiconfId}/partner_id/${courseVideo.kalturaPartnerId}`;
@@ -81,6 +83,7 @@ export const getKalturaScriptForVideo = ({
 			},
 		});
 	};
+	script.onerror = errorCallback;
 
 	return {
 		script,

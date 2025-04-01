@@ -1,23 +1,42 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { Button } from 'react-bootstrap';
+import { throttle } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
+import classNames from 'classnames';
+
 import { getKalturaScriptForVideo } from '@/lib/utils';
 import { AnalyticsNativeEventTypeId, CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
 import InlineAlert from '@/components/inline-alert';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { analyticsService } from '@/lib/services';
-import { throttle } from 'lodash';
+import Loader from '../loader';
+import useHandleError from '@/hooks/use-handle-error';
 
 const useStyles = createUseThemedStyles((theme) => ({
+	videoPlayerSupplementsOuter: {
+		position: 'relative',
+	},
+	videoPlayerLoader: {
+		top: '50%',
+		left: '50%',
+	},
 	videoPlayerOuter: {
 		width: '100%',
 		borderRadius: 8,
 		overflow: 'hidden',
 		aspectRatio: '16/9',
-		backgroundColor: theme.colors.n500,
+		backgroundColor: theme.colors.n900,
+		'& #kaltura_player': {
+			opacity: 0,
+		},
+		'&.ready': {
+			'& #kaltura_player': {
+				opacity: 1,
+			},
+		},
 	},
 	screeningFlowOuter: {
 		padding: 40,
@@ -57,6 +76,27 @@ export const CourseUnitAvailable = ({
 		() => ({ courseSessionId, screeningFlowId: courseUnit.screeningFlowId }),
 		[courseSessionId, courseUnit.screeningFlowId]
 	);
+	const handleError = useHandleError();
+
+	const [videoPlayerReady, setVideoPlayerReady] = useState(false);
+	const [videoPlayerTimedOut, setVideoPlayerTimedOut] = useState(false);
+	const videoLoadingTimeoutRef = useRef<NodeJS.Timeout>();
+
+	const stopVideoLoadingTimer = useCallback(() => {
+		if (!videoLoadingTimeoutRef.current) {
+			return;
+		}
+
+		clearTimeout(videoLoadingTimeoutRef.current);
+		videoLoadingTimeoutRef.current = undefined;
+	}, []);
+
+	const startVideoLoadingTimer = useCallback(() => {
+		stopVideoLoadingTimer();
+		videoLoadingTimeoutRef.current = setTimeout(() => {
+			setVideoPlayerTimedOut(true);
+		}, 5000);
+	}, [stopVideoLoadingTimer]);
 
 	const throttledPlayerEvent = useRef(
 		throttle(
@@ -94,10 +134,20 @@ export const CourseUnitAvailable = ({
 			return;
 		}
 
+		setVideoPlayerReady(false);
+		setVideoPlayerTimedOut(false);
+		startVideoLoadingTimer();
+
 		const { script } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
 			eventCallback: (eventName, event) => {
+				if (eventName === 'playerReady') {
+					setVideoPlayerReady(true);
+					setVideoPlayerTimedOut(false);
+					stopVideoLoadingTimer();
+				}
+
 				if (eventName === 'playerUpdatePlayhead') {
 					throttledPlayerEvent({
 						courseUnitId: courseUnit.courseUnitId,
@@ -116,6 +166,12 @@ export const CourseUnitAvailable = ({
 					});
 				}
 			},
+			errorCallback: (error) => {
+				setVideoPlayerReady(false);
+				setVideoPlayerTimedOut(false);
+				stopVideoLoadingTimer();
+				handleError(error);
+			},
 		});
 
 		document.body.appendChild(script);
@@ -128,6 +184,9 @@ export const CourseUnitAvailable = ({
 		courseUnit.courseUnitTypeId,
 		courseUnit.videoId,
 		courseVideos,
+		handleError,
+		startVideoLoadingTimer,
+		stopVideoLoadingTimer,
 		throttledPlayerEvent,
 	]);
 
@@ -172,9 +231,26 @@ export const CourseUnitAvailable = ({
 				)}
 
 			{courseUnit.courseUnitTypeId === CourseUnitTypeId.VIDEO && (
-				<div className={classes.videoPlayerOuter}>
-					<div id="kaltura_player" style={{ width: '100%', height: '100%' }} />
-				</div>
+				<>
+					{videoPlayerTimedOut && (
+						<InlineAlert
+							className="mb-4"
+							variant="warning"
+							title="Video is taking longer than usual to load."
+							description="If the issue persists, try reloading your browser window."
+							action={{
+								title: 'Reload',
+								onClick: () => window.location.reload(),
+							}}
+						/>
+					)}
+					<div className={classes.videoPlayerSupplementsOuter}>
+						{!videoPlayerReady && <Loader className={classes.videoPlayerLoader} />}
+						<div className={classNames(classes.videoPlayerOuter, { ready: videoPlayerReady })}>
+							<div id="kaltura_player" style={{ width: '100%', height: '100%' }} />
+						</div>
+					</div>
+				</>
 			)}
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
