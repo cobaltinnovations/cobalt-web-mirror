@@ -253,83 +253,80 @@ export const Component = () => {
 			<Helmet>
 				<title>Cobalt | Courses - Session</title>
 			</Helmet>
-			<AsyncWrapper fetchData={fetchData}>
-				<div className={classes.wrapper}>
-					{course && <CourseUnitHeader height={headerHeight} course={course} />}
-					<div
-						className={classNames(classes.aside, {
-							show: showAside,
-						})}
-					>
-						<div className="d-lg-none mb-4 d-flex justify-content-end">
-							<Button
-								variant="link"
-								className="d-flex align-items-center text-decoration-none"
-								onClick={() => {
-									setShowAside((previousValue) => !previousValue);
-								}}
-							>
-								<CloseIcon width={16} height={16} className="me-1" />
-								Close
-							</Button>
-						</div>
-						{course &&
-							requiredModules.map((courseModule) => (
-								<CourseModule
-									compact
-									activeCourseUnitId={unitId}
-									key={courseModule.courseModuleId}
-									courseModule={courseModule}
-									courseSessionUnitStatusIdsByCourseUnitId={
-										course.currentCourseSession
-											? course.currentCourseSession.courseSessionUnitStatusIdsByCourseUnitId
-											: {}
-									}
-									courseUnitLockStatusesByCourseUnitId={
-										course.currentCourseSession
-											? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
-											: course.defaultCourseUnitLockStatusesByCourseUnitId
-									}
-									onCourseUnitClick={(courseUnit) => {
-										navigate(`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`);
-									}}
-								/>
-							))}
-						{optionalModules.length > 0 && (
-							<>
-								<hr className="my-4" />
-								<h6 className="px-4 pt-4 pb-1 small fw-bold text-uppercase text-n500">
-									Optional Modules
-								</h6>
-								{course &&
-									optionalModules.map((courseModule) => (
-										<CourseModule
-											compact
-											activeCourseUnitId={unitId}
-											key={courseModule.courseModuleId}
-											courseModule={courseModule}
-											courseSessionUnitStatusIdsByCourseUnitId={
-												course.currentCourseSession
-													? course.currentCourseSession
-															.courseSessionUnitStatusIdsByCourseUnitId
-													: {}
-											}
-											courseUnitLockStatusesByCourseUnitId={
-												course.currentCourseSession
-													? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
-													: course.defaultCourseUnitLockStatusesByCourseUnitId
-											}
-											onCourseUnitClick={(courseUnit) => {
-												navigate(
-													`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
-												);
-											}}
-										/>
-									))}
-							</>
-						)}
+			<div className={classes.wrapper}>
+				{course && <CourseUnitHeader height={headerHeight} course={course} />}
+				<div
+					className={classNames(classes.aside, {
+						show: showAside,
+					})}
+				>
+					<div className="d-lg-none mb-4 d-flex justify-content-end">
+						<Button
+							variant="link"
+							className="d-flex align-items-center text-decoration-none"
+							onClick={() => {
+								setShowAside((previousValue) => !previousValue);
+							}}
+						>
+							<CloseIcon width={16} height={16} className="me-1" />
+							Close
+						</Button>
 					</div>
-					<div className={classes.previewPane}>
+					{course &&
+						requiredModules.map((courseModule) => (
+							<CourseModule
+								compact
+								activeCourseUnitId={unitId}
+								key={courseModule.courseModuleId}
+								courseModule={courseModule}
+								courseSessionUnitStatusIdsByCourseUnitId={
+									course.currentCourseSession
+										? course.currentCourseSession.courseSessionUnitStatusIdsByCourseUnitId
+										: {}
+								}
+								courseUnitLockStatusesByCourseUnitId={
+									course.currentCourseSession
+										? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
+										: course.defaultCourseUnitLockStatusesByCourseUnitId
+								}
+								onCourseUnitClick={(courseUnit) => {
+									navigate(`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`);
+								}}
+							/>
+						))}
+					{optionalModules.length > 0 && (
+						<>
+							<hr className="my-4" />
+							<h6 className="px-4 pt-4 pb-1 small fw-bold text-uppercase text-n500">Optional Modules</h6>
+							{course &&
+								optionalModules.map((courseModule) => (
+									<CourseModule
+										compact
+										activeCourseUnitId={unitId}
+										key={courseModule.courseModuleId}
+										courseModule={courseModule}
+										courseSessionUnitStatusIdsByCourseUnitId={
+											course.currentCourseSession
+												? course.currentCourseSession.courseSessionUnitStatusIdsByCourseUnitId
+												: {}
+										}
+										courseUnitLockStatusesByCourseUnitId={
+											course.currentCourseSession
+												? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
+												: course.defaultCourseUnitLockStatusesByCourseUnitId
+										}
+										onCourseUnitClick={(courseUnit) => {
+											navigate(
+												`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+											);
+										}}
+									/>
+								))}
+						</>
+					)}
+				</div>
+				<div className={classes.previewPane}>
+					<AsyncWrapper fetchData={fetchData}>
 						<Container>
 							<Row className="d-block d-lg-none mb-6">
 								<Col lg={12} xl={{ offset: 1, span: 10 }} xxl={{ offset: 2, span: 8 }}>
@@ -393,9 +390,9 @@ export const Component = () => {
 								</Col>
 							</Row>
 						</Container>
-					</div>
+					</AsyncWrapper>
 				</div>
-			</AsyncWrapper>
+			</div>
 		</>
 	);
 };
