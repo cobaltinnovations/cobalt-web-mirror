@@ -179,16 +179,9 @@ export const CourseUnitAvailable = ({
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK) && (
-				<>
-					<div className={classes.imageOuter}>
-						<img src={courseUnit.imageUrl} alt="" />
-					</div>
-					<object data={courseUnit.imageUrl} type="application/pdf" width="100%" height={400}>
-						<p>
-							<a href={courseUnit.imageUrl}>View PDF</a>
-						</p>
-					</object>
-				</>
+				<div className={classes.imageOuter}>
+					<img src={courseUnit.imageUrl} alt="" />
+				</div>
 			)}
 
 			<div className="pt-10 d-flex justify-content-end">
