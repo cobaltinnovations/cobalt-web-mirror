@@ -20,19 +20,25 @@ interface CardDraggableProps {
 	cardId: string;
 	cardIndex: number;
 	cardText: string;
+	className?: string;
+	disabled?: boolean;
 }
 
-export const CardDraggable = ({ cardId, cardIndex, cardText }: CardDraggableProps) => {
+export const CardDraggable = ({ cardId, cardIndex, cardText, className, disabled }: CardDraggableProps) => {
 	const classes = useStyles();
 	return (
-		<Draggable draggableId={cardId} index={cardIndex}>
+		<Draggable draggableId={cardId} index={cardIndex} isDragDisabled={disabled}>
 			{(draggableProvided, draggableSnapshot) => (
 				<div
 					ref={draggableProvided.innerRef}
 					{...draggableProvided.draggableProps}
-					className={classNames(classes.cardDraggable, {
-						'shadow-lg': draggableSnapshot.isDragging,
-					})}
+					className={classNames(
+						classes.cardDraggable,
+						{
+							'shadow-lg': draggableSnapshot.isDragging,
+						},
+						className
+					)}
 				>
 					<p className="text-center">{cardText}</p>
 					<div className="d-flex align-items-center justify-content-center">

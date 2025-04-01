@@ -112,6 +112,14 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 					},
 				},
 			},
+			'&--default': {
+				'& input[type=radio], & input[type=checkbox]': {
+					'& + label:after': {
+						borderWidth: '2px !important',
+						borderColor: `${theme.colors.n100} !important`,
+					},
+				},
+			},
 			'&--success': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label:after': {

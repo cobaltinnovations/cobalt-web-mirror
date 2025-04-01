@@ -143,6 +143,7 @@ export const ScreeningQuestionContext = ({
 
 		const { preQuestionScreeningConfirmationPrompt, previousScreeningQuestionContextId } = screeningQuestionContext;
 		setIsNext(false);
+		setAnswerConfig(undefined);
 
 		if (preQuestionScreeningConfirmationPrompt) {
 			setConfirmationPrompt({
@@ -161,6 +162,7 @@ export const ScreeningQuestionContext = ({
 
 	const handlePromptPreviousButtonClick = useCallback(() => {
 		setIsNext(false);
+		setAnswerConfig(undefined);
 
 		if (confirmationPrompt.isSubmitConfirmationPrompt) {
 			setConfirmationPrompt({
