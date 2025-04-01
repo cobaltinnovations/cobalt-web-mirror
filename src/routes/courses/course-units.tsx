@@ -164,7 +164,10 @@ export const Component = () => {
 
 	const navigateToNextAvailableUnit = useCallback(
 		(course: CourseModel, courseSession: CourseSessionModel) => {
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseSession);
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+				course.courseModules,
+				courseSession
+			);
 
 			if (!desiredUnitId) {
 				navigate(`/courses/${course.urlName}`);

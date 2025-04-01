@@ -78,12 +78,15 @@ export const Component = () => {
 			}
 
 			const { courseSession } = await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseSession);
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+				course.courseModules,
+				courseSession
+			);
 			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.courseId, course?.urlName, handleError, navigate]);
+	}, [course?.courseId, course?.courseModules, course?.urlName, handleError, navigate]);
 
 	const handleResumeCourseButtonClick = useCallback(() => {
 		try {
@@ -91,7 +94,12 @@ export const Component = () => {
 				throw new Error('course.currentCourseSession is undefined.');
 			}
 
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(course.currentCourseSession);
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+				course.courseModules,
+				course.currentCourseSession
+			);
+
+			console.log('desiredUnitId');
 
 			if (!desiredUnitId) {
 				window.alert('all units done, what to do?');
@@ -102,7 +110,7 @@ export const Component = () => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.currentCourseSession, course?.urlName, handleError, navigate]);
+	}, [course?.courseModules, course?.currentCourseSession, course?.urlName, handleError, navigate]);
 
 	return (
 		<>
