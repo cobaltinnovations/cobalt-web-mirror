@@ -25,7 +25,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'&:before': {
 			top: 16,
 			left: 16,
-			zIndex: 1,
+			zIndex: 2,
 			width: 20,
 			height: 20,
 			content: '""',

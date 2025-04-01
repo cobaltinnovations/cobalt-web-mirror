@@ -6,13 +6,23 @@ import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.s
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
+		zIndex: 1,
 		padding: 16,
 		width: '100%',
 		height: '100%',
 		borderRadius: 4,
+		display: 'flex',
 		position: 'relative',
+		alignItems: 'center',
+		justifyContent: 'center',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
+	},
+	dragHandleOuter: {
+		bottom: 16,
+		left: '50%',
+		position: 'absolute',
+		transform: 'translateX(-50%)',
 	},
 }));
 
@@ -32,6 +42,7 @@ export const CardDraggable = ({ cardId, cardIndex, cardText, className, disabled
 				<div
 					ref={draggableProvided.innerRef}
 					{...draggableProvided.draggableProps}
+					{...draggableProvided.dragHandleProps}
 					className={classNames(
 						classes.cardDraggable,
 						{
@@ -41,10 +52,8 @@ export const CardDraggable = ({ cardId, cardIndex, cardText, className, disabled
 					)}
 				>
 					<p className="text-center">{cardText}</p>
-					<div className="d-flex align-items-center justify-content-center">
-						<div {...draggableProvided.dragHandleProps}>
-							<DragIndicator className="text-gray" />
-						</div>
+					<div className={classes.dragHandleOuter}>
+						<DragIndicator className="text-gray" />
 					</div>
 				</div>
 			)}
