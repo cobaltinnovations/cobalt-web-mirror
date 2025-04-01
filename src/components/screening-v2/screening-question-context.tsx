@@ -24,13 +24,15 @@ const QUESTION_TRANSITION_DURATION_MS = 600;
 
 const useStyles = createUseThemedStyles({
 	'@global': {
-		'.right-to-left-enter, .right-to-left-enter-active, .right-to-left-exit, .right-to-left-exit-active, .left-to-right-enter, .left-to-right-enter-active, .left-to-right-exit, .left-to-right-exit-active':
-			{
-				top: 0,
-				left: 0,
-				right: 0,
-				position: 'absolute',
-			},
+		'.right-to-left-enter, .right-to-left-enter-active, .left-to-right-enter, .left-to-right-enter-active, ': {
+			position: 'static',
+		},
+		'.right-to-left-exit, .right-to-left-exit-active, .left-to-right-exit, .left-to-right-exit-active': {
+			top: 0,
+			left: 0,
+			right: 0,
+			position: 'absolute',
+		},
 		'.right-to-left-enter': {
 			opacity: 0,
 			transform: 'translateX(100%)',

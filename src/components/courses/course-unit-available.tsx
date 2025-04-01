@@ -14,13 +14,15 @@ import { throttle } from 'lodash';
 const useStyles = createUseThemedStyles((theme) => ({
 	videoPlayerOuter: {
 		width: '100%',
-		aspectRatio: '16/9',
 		borderRadius: 8,
 		overflow: 'hidden',
+		aspectRatio: '16/9',
+		backgroundColor: theme.colors.n500,
 	},
 	screeningFlowOuter: {
 		padding: 40,
 		borderRadius: 12,
+		overflow: 'hidden',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
 	},
