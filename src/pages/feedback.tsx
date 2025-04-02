@@ -10,7 +10,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useAnalytics from '@/hooks/use-analytics';
 import useFlags from '@/hooks/use-flags';
-import useAccount from '@/hooks/use-account';
 import InputHelper from '@/components/input-helper';
 import FeedbackSupplement from '@/components/feedback-supplement';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
@@ -19,7 +18,6 @@ import HeroContainer from '@/components/hero-container';
 const Feedback: FC = () => {
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const { institution } = useAccount();
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 	const { addFlag } = useFlags();
@@ -69,12 +67,6 @@ const Feedback: FC = () => {
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<FeedbackSupplement />
 						<h4 className="mb-4">This form is not for clinical concerns.</h4>
-						<p className="mb-0">
-							For mental health support{' '}
-							<a href={`tel:${institution.clinicalSupportPhoneNumber}`} className="fw-normal">
-								call {institution.clinicalSupportPhoneNumberDescription ?? 'N/A'}
-							</a>
-						</p>
 						<p className="mb-8">
 							If you are in immediate crisis,{' '}
 							<span
@@ -129,7 +121,7 @@ const Feedback: FC = () => {
 									</option>
 									<option value="HELP">Help using the platform</option>
 									<option value="FEEDBACK">Feedback or suggestion</option>
-									<option value="OTher">Other</option>
+									<option value="OTHER">Other</option>
 								</InputHelper>
 								<InputHelper
 									className="mb-6"
