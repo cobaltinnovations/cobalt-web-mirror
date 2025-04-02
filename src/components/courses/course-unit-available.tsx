@@ -7,6 +7,7 @@ import InlineAlert from '@/components/inline-alert';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { CourseVideo } from '@/components/courses/course-video';
+import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
@@ -134,6 +135,13 @@ export const CourseUnitAvailable = ({
 					<img src={courseUnit.imageUrl} alt="" />
 				</div>
 			)}
+
+			{(courseUnit.courseUnitDownloadableFiles ?? []).map((courseUnitDownloadableFile) => (
+				<CourseDownloadable
+					key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
+					courseUnitDownloadableFile={courseUnitDownloadableFile}
+				/>
+			))}
 
 			<div className="pt-10 d-flex justify-content-end">
 				<Button

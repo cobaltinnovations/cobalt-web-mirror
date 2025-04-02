@@ -1,3 +1,4 @@
+export * from './course-downloadable';
 export * from './course-module';
 export * from './course-unit-available';
 export * from './course-unit-complete';

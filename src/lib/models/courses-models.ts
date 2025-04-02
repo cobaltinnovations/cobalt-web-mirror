@@ -47,6 +47,7 @@ export interface CourseUnitModel {
 	screeningFlowId?: string;
 	title: string;
 	videoId?: string;
+	courseUnitDownloadableFiles: CourseUnitDownloadableFile[];
 }
 
 export interface CourseSessionModel {
@@ -105,4 +106,8 @@ export interface CourseVideoModel {
 	lastUpdatedDescription: string;
 	videoId: string;
 	videoVendorId: string;
+}
+
+export interface CourseUnitDownloadableFile {
+	courseUnitDownloadableFileId: string;
 }
