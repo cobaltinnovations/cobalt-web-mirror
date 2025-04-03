@@ -99,8 +99,6 @@ export const Component = () => {
 				course.currentCourseSession
 			);
 
-			console.log('desiredUnitId');
-
 			if (!desiredUnitId) {
 				window.alert('all units done, what to do?');
 				return;

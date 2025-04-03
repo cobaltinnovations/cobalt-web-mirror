@@ -4,12 +4,21 @@ export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	courseModules: CourseModuleModel[],
 	courseSession: CourseSessionModel
 ) => {
-	const courseUnitsFlat = courseModules.map((courseModule) => courseModule.courseUnits).flat();
+	const requiredModules = courseModules.filter(
+		(cm) => !(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+	);
+	const optionalModules = courseModules.filter((cm) =>
+		(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+	);
+	const requiredCourseUnits = requiredModules.map((courseModule) => courseModule.courseUnits).flat();
+	const optionalCourseUnits = optionalModules.map((courseModule) => courseModule.courseUnits).flat();
+	const courseUnits = [...requiredCourseUnits, ...optionalCourseUnits];
+
 	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
 		.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
 		.map(([k, _v]) => k);
 	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
-	const unlockedCourseUnits = courseUnitsFlat.filter((courseUnit) =>
+	const unlockedCourseUnits = courseUnits.filter((courseUnit) =>
 		unlockedCourseUnitIds.includes(courseUnit.courseUnitId)
 	);
 	const unlockedAndIncompleteUnits = unlockedCourseUnits.filter(
