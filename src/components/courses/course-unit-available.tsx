@@ -107,6 +107,7 @@ export const CourseUnitAvailable = ({
 				courseUnit.screeningFlowId && (
 					<div className={classes.screeningFlowOuter}>
 						<ScreeningFlow
+							cardSortOnly={courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT}
 							screeningFlowParams={screeningFlowParams}
 							onScreeningFlowComplete={onActivityComplete}
 						/>

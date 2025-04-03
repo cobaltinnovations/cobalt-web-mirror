@@ -27,15 +27,20 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface CardDraggableProps {
-	cardId: string;
+	cardId?: string;
 	cardIndex: number;
-	cardText: string;
+	cardText?: string;
 	className?: string;
 	disabled?: boolean;
 }
 
 export const CardDraggable = ({ cardId, cardIndex, cardText, className, disabled }: CardDraggableProps) => {
 	const classes = useStyles();
+
+	if (!cardId) {
+		return null;
+	}
+
 	return (
 		<Draggable draggableId={cardId} index={cardIndex} isDragDisabled={disabled}>
 			{(draggableProvided, draggableSnapshot) => (
