@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Collapse, Form } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import {
 	ScreeningAnswerSelection,
@@ -352,17 +352,26 @@ export const ScreeningQuestionContext = ({
 										<p className="mb-6">{screeningQuestionContext.screeningQuestion.footerText}</p>
 									)}
 
-									{answerConfig?.messages.map((message, messageIndex) => (
-										<InlineAlert
-											key={messageIndex}
-											className="mb-6"
-											variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
-											title={message.title}
-											description={
-												<div dangerouslySetInnerHTML={{ __html: message.message ?? '' }}></div>
-											}
-										/>
-									))}
+									<Collapse in={(answerConfig?.messages ?? []).length > 0}>
+										<div>
+											<div className="pb-6">
+												{answerConfig?.messages.map((message, messageIndex) => (
+													<InlineAlert
+														key={messageIndex}
+														variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
+														title={message.title}
+														description={
+															<div
+																dangerouslySetInnerHTML={{
+																	__html: message.message ?? '',
+																}}
+															></div>
+														}
+													/>
+												))}
+											</div>
+										</div>
+									</Collapse>
 
 									{showNextAndPreviousButtons ? (
 										<div className="d-flex align-items-center justify-content-between">
