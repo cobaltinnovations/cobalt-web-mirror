@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { AnalyticsNativeEventTypeId, CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
@@ -74,6 +74,19 @@ export const CourseUnitAvailable = ({
 		[courseSessionId, courseUnit.screeningFlowId]
 	);
 
+	const handleVideoPlayerEvent = useCallback(
+		(eventName: string, eventPayload: unknown) => {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
+				courseUnitId: courseUnit.courseUnitId,
+				...(courseSessionId && { courseSessionId }),
+				videoId: courseUnit.videoId,
+				eventName,
+				eventPayload,
+			});
+		},
+		[courseSessionId, courseUnit.courseUnitId, courseUnit.videoId]
+	);
+
 	return (
 		<>
 			{dependencyCourseUnits.length > 0 && (
@@ -123,15 +136,7 @@ export const CourseUnitAvailable = ({
 				<CourseVideo
 					videoId={courseUnit.videoId ?? ''}
 					courseVideos={courseVideos}
-					onVideoPlayerEvent={(eventName, eventPayload) => {
-						analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
-							courseUnitId: courseUnit.courseUnitId,
-							...(courseSessionId && { courseSessionId }),
-							videoId: courseUnit.videoId,
-							eventName,
-							eventPayload,
-						});
-					}}
+					onVideoPlayerEvent={handleVideoPlayerEvent}
 				/>
 			)}
 

@@ -71,8 +71,9 @@ export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent }: Cours
 		stopVideoLoadingTimer();
 		videoLoadingTimeoutRef.current = setTimeout(() => {
 			setVideoPlayerTimedOut(true);
+			onVideoPlayerEvent('INITIALIZATION_ERROR', {});
 		}, 15000);
-	}, [stopVideoLoadingTimer]);
+	}, [onVideoPlayerEvent, stopVideoLoadingTimer]);
 
 	const throttledPlayerEvent = useRef(
 		throttle((eventName: string, eventPayload: unknown) => onVideoPlayerEvent(eventName, eventPayload), 5000, {
