@@ -217,6 +217,20 @@ export const Component = () => {
 																	navigate(
 																		`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
 																	);
+
+																	analyticsService.persistEvent(
+																		AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT,
+																		{
+																			courseId: course.courseId,
+																			...(course.currentCourseSession && {
+																				courseSessionId:
+																					course.currentCourseSession
+																						.courseSessionId,
+																			}),
+																			courseUnitId: courseUnit.courseUnitId,
+																			source: 'COURSE_DETAIL',
+																		}
+																	);
 																}}
 															/>
 														);
@@ -255,6 +269,21 @@ export const Component = () => {
 																		onCourseUnitClick={(courseUnit) => {
 																			navigate(
 																				`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+																			);
+
+																			analyticsService.persistEvent(
+																				AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT,
+																				{
+																					courseId: course.courseId,
+																					...(course.currentCourseSession && {
+																						courseSessionId:
+																							course.currentCourseSession
+																								.courseSessionId,
+																					}),
+																					courseUnitId:
+																						courseUnit.courseUnitId,
+																					source: 'COURSE_DETAIL',
+																				}
 																			);
 																		}}
 																	/>

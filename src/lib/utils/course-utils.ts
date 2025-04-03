@@ -1,4 +1,10 @@
-import { CourseModuleModel, CourseSessionModel, CourseUnitLockTypeId, CourseVideoModel } from '@/lib/models';
+import {
+	CourseModuleModel,
+	CourseSessionModel,
+	CourseUnitLockTypeId,
+	CourseUnitModel,
+	CourseVideoModel,
+} from '@/lib/models';
 
 export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	courseModules: CourseModuleModel[],
@@ -19,6 +25,46 @@ export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 		.map(([k, _v]) => k);
 	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
 	const unlockedCourseUnits = courseUnits.filter((courseUnit) =>
+		unlockedCourseUnitIds.includes(courseUnit.courseUnitId)
+	);
+	const unlockedAndIncompleteUnits = unlockedCourseUnits.filter(
+		(courseUnit) => !completedCourseUnitIds.includes(courseUnit.courseUnitId)
+	);
+	const firstUnlockedAndIncompleteCourseUnit = unlockedAndIncompleteUnits[0];
+
+	if (firstUnlockedAndIncompleteCourseUnit) {
+		return firstUnlockedAndIncompleteCourseUnit.courseUnitId;
+	}
+
+	return undefined;
+};
+
+export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = (
+	courseUnit: CourseUnitModel,
+	courseModules: CourseModuleModel[],
+	courseSession: CourseSessionModel
+) => {
+	const requiredModules = courseModules.filter(
+		(cm) => !(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+	);
+	const optionalModules = courseModules.filter((cm) =>
+		(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
+	);
+	const requiredCourseUnits = requiredModules.map((courseModule) => courseModule.courseUnits).flat();
+	const optionalCourseUnits = optionalModules.map((courseModule) => courseModule.courseUnits).flat();
+	const courseUnits = [...requiredCourseUnits, ...optionalCourseUnits];
+	const currentCourseUnitIndex = courseUnits.findIndex((cu) => cu.courseUnitId === courseUnit.courseUnitId);
+
+	if (currentCourseUnitIndex <= -1) {
+		return undefined;
+	}
+
+	const postCurrentCourseUnits = courseUnits.slice(currentCourseUnitIndex + 1);
+	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
+		.filter(([_k, v]) => v.courseUnitLockTypeId !== CourseUnitLockTypeId.STRONGLY_LOCKED)
+		.map(([k, _v]) => k);
+	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
+	const unlockedCourseUnits = postCurrentCourseUnits.filter((courseUnit) =>
 		unlockedCourseUnitIds.includes(courseUnit.courseUnitId)
 	);
 	const unlockedAndIncompleteUnits = unlockedCourseUnits.filter(

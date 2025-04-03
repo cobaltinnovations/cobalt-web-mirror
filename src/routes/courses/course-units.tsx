@@ -3,7 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import {
+	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
+	getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession,
+} from '@/lib/utils';
 import {
 	AnalyticsNativeEventTypeId,
 	CourseModel,
@@ -207,12 +210,34 @@ export const Component = () => {
 				throw new Error('courseUnit is undefined.');
 			}
 
-			const { courseSession } = await coursesService.completeCourseUnit(courseUnit.courseUnitId).fetch();
-			navigateToNextAvailableUnit(course, courseSession);
+			if (!course.currentCourseSession) {
+				throw new Error('course.currentCourseSession is undefined.');
+			}
+
+			const desiredUnitId = getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession(
+				courseUnit,
+				course.courseModules,
+				course.currentCourseSession
+			);
+
+			if (!desiredUnitId) {
+				navigate(`/courses/${course.urlName}`);
+				return;
+			}
+
+			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_SKIP, {
+				courseId: course.courseId,
+				...(course.currentCourseSession && {
+					courseSessionId: course.currentCourseSession.courseSessionId,
+				}),
+				courseUnitId: courseUnit.courseUnitId,
+			});
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course, courseUnit, handleError, navigateToNextAvailableUnit]);
+	}, [course, courseUnit, handleError, navigate]);
 
 	const handleCompletedUnitNextButtonClick = useCallback(() => {
 		if (!course) {
@@ -289,8 +314,24 @@ export const Component = () => {
 										? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
 										: course.defaultCourseUnitLockStatusesByCourseUnitId
 								}
-								onCourseUnitClick={(courseUnit) => {
-									navigate(`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`);
+								onCourseUnitClick={(desiredCourseUnit) => {
+									navigate(
+										`/courses/${course.urlName}/course-units/${desiredCourseUnit.courseUnitId}`
+									);
+
+									if (!courseUnit) {
+										return;
+									}
+
+									analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT, {
+										courseId: course.courseId,
+										...(course.currentCourseSession && {
+											courseSessionId: course.currentCourseSession.courseSessionId,
+										}),
+										courseUnitId: desiredCourseUnit.courseUnitId,
+										source: 'COURSE_UNIT',
+										sourceCourseUnitId: courseUnit.courseUnitId,
+									});
 								}}
 							/>
 						))}
@@ -315,9 +356,26 @@ export const Component = () => {
 												? course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
 												: course.defaultCourseUnitLockStatusesByCourseUnitId
 										}
-										onCourseUnitClick={(courseUnit) => {
+										onCourseUnitClick={(desiredCourseUnit) => {
 											navigate(
-												`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
+												`/courses/${course.urlName}/course-units/${desiredCourseUnit.courseUnitId}`
+											);
+
+											if (!courseUnit) {
+												return;
+											}
+
+											analyticsService.persistEvent(
+												AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT,
+												{
+													courseId: course.courseId,
+													...(course.currentCourseSession && {
+														courseSessionId: course.currentCourseSession.courseSessionId,
+													}),
+													courseUnitId: desiredCourseUnit.courseUnitId,
+													source: 'COURSE_UNIT',
+													sourceCourseUnitId: courseUnit.courseUnitId,
+												}
 											);
 										}}
 									/>
