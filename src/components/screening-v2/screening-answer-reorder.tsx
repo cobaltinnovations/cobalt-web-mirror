@@ -17,7 +17,13 @@ interface ScreeningAnswerReorderProps {
 	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 }
 
-export const ScreeningAnswerReorder = ({ question, options, value, onChange }: ScreeningAnswerReorderProps) => {
+export const ScreeningAnswerReorder = ({
+	question,
+	options,
+	value,
+	onChange,
+	questionResultsByScreeningAnswerOptionId,
+}: ScreeningAnswerReorderProps) => {
 	const answerStackTextById = useMemo(
 		() =>
 			options.reduce(
@@ -51,15 +57,23 @@ export const ScreeningAnswerReorder = ({ question, options, value, onChange }: S
 			<Droppable droppableId={question.screeningQuestionId}>
 				{(droppableProvided) => (
 					<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-						{value.map((card, cardIndex) => (
-							<ItemDraggable
-								key={card.screeningAnswerOptionId}
-								cardId={card.screeningAnswerOptionId}
-								cardIndex={cardIndex}
-								cardText={answerStackTextById[card.screeningAnswerOptionId]}
-								className="mb-2"
-							/>
-						))}
+						{value.map((card, cardIndex) => {
+							const questionResult =
+								questionResultsByScreeningAnswerOptionId?.[card.screeningAnswerOptionId];
+
+							return (
+								<ItemDraggable
+									key={card.screeningAnswerOptionId}
+									cardId={card.screeningAnswerOptionId}
+									cardIndex={cardIndex}
+									cardText={answerStackTextById[card.screeningAnswerOptionId]}
+									className="mb-2"
+									disabled={!!questionResult}
+									variant={questionResult?.displayTypeId}
+									correctnessIndicatorId={questionResult?.correctnessIndicatorId}
+								/>
+							);
+						})}
 						{droppableProvided.placeholder}
 					</div>
 				)}
