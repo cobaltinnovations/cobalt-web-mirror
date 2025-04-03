@@ -59,12 +59,21 @@ export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = 
 		return undefined;
 	}
 
-	const postCurrentCourseUnits = courseUnits.slice(currentCourseUnitIndex + 1);
+	const preCurrentCourseUnits = [...courseUnits].splice(0, currentCourseUnitIndex);
+	const postCurrentCourseUnits = [...courseUnits].slice(currentCourseUnitIndex + 1);
+	let desiredUnits = [];
+
+	if (postCurrentCourseUnits.length > 0) {
+		desiredUnits = [...postCurrentCourseUnits];
+	} else {
+		desiredUnits = [...preCurrentCourseUnits];
+	}
+
 	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
 		.filter(([_k, v]) => v.courseUnitLockTypeId !== CourseUnitLockTypeId.STRONGLY_LOCKED)
 		.map(([k, _v]) => k);
 	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
-	const unlockedCourseUnits = postCurrentCourseUnits.filter((courseUnit) =>
+	const unlockedCourseUnits = desiredUnits.filter((courseUnit) =>
 		unlockedCourseUnitIds.includes(courseUnit.courseUnitId)
 	);
 	const unlockedAndIncompleteUnits = unlockedCourseUnits.filter(
