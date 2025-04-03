@@ -130,6 +130,7 @@ export interface AccountSource {
 	supplementMessage?: string;
 	supplementMessageStyle?: string;
 	ssoUrl?: string;
+	visible: boolean;
 }
 
 export enum INSTITUTION_BLURB_TYPE_ID {

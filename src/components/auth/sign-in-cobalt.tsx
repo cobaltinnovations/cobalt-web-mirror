@@ -77,38 +77,42 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 							<h2 className="mb-6 text-center">Sign in with</h2>
 
 							<div className="text-center mb-3">
-								{accountSources.map((accountSource, index) => {
-									const isLast = accountSources.length - 1 === index;
-									let variant =
-										accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] || 'primary';
+								{accountSources
+									.filter((accountSource) => accountSource.visible)
+									.map((accountSource, index) => {
+										const isLast = accountSources.length - 1 === index;
+										let variant =
+											accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] ||
+											'primary';
 
-									return (
-										<React.Fragment key={accountSource.accountSourceId}>
-											{accountSource.supplementMessage && (
-												<InlineAlert
-													className="mb-4 text-left"
-													variant={
-														(accountSource.supplementMessageStyle as 'primary') ?? 'info'
-													}
-													title={accountSource.supplementMessage}
-												/>
-											)}
-											<Button
-												key={`account-source-${index}`}
-												className={classNames('d-block w-100', {
-													'mb-4': !isLast,
-												})}
-												variant={variant}
-												data-testid={`signIn-${accountSource.accountSourceId}`}
-												onClick={() => {
-													onAccountSourceClick(accountSource);
-												}}
-											>
-												{accountSource.authenticationDescription}
-											</Button>
-										</React.Fragment>
-									);
-								})}
+										return (
+											<>
+												{accountSource.supplementMessage && (
+													<InlineAlert
+														className="mb-4 text-left"
+														variant={
+															(accountSource.supplementMessageStyle as 'primary') ??
+															'info'
+														}
+														title={accountSource.supplementMessage}
+													/>
+												)}
+												<Button
+													key={`account-source-${index}`}
+													className={classNames('d-block w-100', {
+														'mb-4': !isLast,
+													})}
+													variant={variant}
+													data-testid={`signIn-${accountSource.accountSourceId}`}
+													onClick={() => {
+														onAccountSourceClick(accountSource);
+													}}
+												>
+													{accountSource.authenticationDescription}
+												</Button>
+											</>
+										);
+									})}
 							</div>
 						</div>
 					</Col>
