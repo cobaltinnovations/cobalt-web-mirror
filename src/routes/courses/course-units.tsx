@@ -76,7 +76,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n75,
 		[mediaQueries.lg]: {
 			left: 0,
-			padding: '24px 20px',
+			padding: '24px 4px',
 		},
 	},
 }));

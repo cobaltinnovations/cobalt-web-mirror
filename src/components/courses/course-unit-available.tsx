@@ -10,6 +10,7 @@ import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import classNames from 'classnames';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	videoPlayerSupplementsOuter: {
@@ -105,7 +106,11 @@ export const CourseUnitAvailable = ({
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.REORDER) &&
 				courseUnit.screeningFlowId && (
-					<div className={classes.screeningFlowOuter}>
+					<div
+						className={classNames({
+							[classes.screeningFlowOuter]: courseUnit.courseUnitTypeId !== CourseUnitTypeId.CARD_SORT,
+						})}
+					>
 						<ScreeningFlow
 							cardSortOnly={courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT}
 							screeningFlowParams={screeningFlowParams}

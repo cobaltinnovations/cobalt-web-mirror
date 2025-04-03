@@ -18,9 +18,10 @@ import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
 import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 import { cloneDeep } from 'lodash';
 import { Button, Collapse } from 'react-bootstrap';
+import mediaQueries from '@/jss/media-queries';
 
-const CARD_FLIP_DURATION_MS = 200;
-const CARD_FALL_DURATION_MS = 200;
+const CARD_FLIP_DURATION_MS = 400;
+const CARD_FALL_DURATION_MS = 400;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	questionOuter: {
@@ -74,11 +75,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 				backgroundColor: `${theme.colors.n500} !important`,
 			},
 		},
-		'&--success': {
-			borderColor: theme.colors.s500,
-		},
-		'&--danger': {
-			borderColor: theme.colors.d500,
+		[mediaQueries.md]: {
+			width: 140,
+			height: 160,
 		},
 	},
 	'@global': {
@@ -331,12 +330,8 @@ export const ScreeningQuestionContextCardSort = ({
 										className={classNames(classes.cardDroppable, {
 											[`${
 												classes.cardDroppable
-											}--${questionResult?.displayTypeId.toLocaleLowerCase()}`]:
-												questionResult?.displayTypeId,
-											[`${
-												classes.cardDroppable
 											}--${questionResult?.correctnessIndicatorId.toLocaleLowerCase()}`]:
-												questionResult?.correctnessIndicatorId,
+												questionResult?.correctnessIndicatorId && !!answerStack.card,
 										})}
 										data-answer-text={answerStack.text}
 									>
