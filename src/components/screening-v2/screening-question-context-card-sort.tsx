@@ -368,7 +368,7 @@ export const ScreeningQuestionContextCardSort = ({
 								key={messageIndex}
 								variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
 								title={message.title}
-								description={message.message}
+								description={<div dangerouslySetInnerHTML={{ __html: message.message ?? '' }}></div>}
 							/>
 						))}
 					</div>
