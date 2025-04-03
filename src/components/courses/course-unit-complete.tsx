@@ -4,6 +4,7 @@ import { CourseUnitModel } from '@/lib/models';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import NoData from '@/components/no-data';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
 
 interface CourseUnitCompleteProps {
 	courseUnit: CourseUnitModel;
@@ -26,6 +27,8 @@ export const CourseUnitComplete = ({
 				actions={[
 					{
 						variant: 'light',
+						className: 'ps-3',
+						icon: <BeforeIcon className="me-2" />,
 						title: 'Restart Activity',
 						onClick: onRestartActivityButtonClick,
 					},
