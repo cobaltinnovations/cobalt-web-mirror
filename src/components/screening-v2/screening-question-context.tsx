@@ -187,12 +187,12 @@ export const ScreeningQuestionContext = ({
 			if (answerConfig) {
 				if (answerConfig.nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(answerConfig.nextScreeningQuestionContextId);
+					setAnswerConfig(undefined);
+					return;
 				} else {
 					onScreeningFlowComplete(answerConfig.screeningSessionDestination);
+					return;
 				}
-
-				setAnswerConfig(undefined);
-				return;
 			}
 
 			setIsLoading(true);
@@ -228,6 +228,9 @@ export const ScreeningQuestionContext = ({
 					onScreeningFlowComplete(screeningSessionDestination);
 				}
 			} catch (error) {
+				setIsNext(true);
+				setIsLoading(false);
+
 				if (error instanceof CobaltError) {
 					const confirmationPrompt = error.apiError?.metadata?.screeningConfirmationPrompt as
 						| ScreeningConfirmationPrompt
@@ -245,8 +248,6 @@ export const ScreeningQuestionContext = ({
 					return;
 				}
 
-				setIsNext(true);
-				setIsLoading(false);
 				handleError(error);
 			}
 		},
