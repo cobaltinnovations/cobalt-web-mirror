@@ -41,9 +41,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface CourseDownloadableProps {
 	courseUnitDownloadableFile: CourseUnitDownloadableFile;
+	trackEvent?(): void;
 }
 
-export const CourseDownloadable = ({ courseUnitDownloadableFile }: CourseDownloadableProps) => {
+export const CourseDownloadable = ({ courseUnitDownloadableFile, trackEvent }: CourseDownloadableProps) => {
 	const classes = useStyles();
 
 	return (
@@ -52,6 +53,7 @@ export const CourseDownloadable = ({ courseUnitDownloadableFile }: CourseDownloa
 			href={courseUnitDownloadableFile.url}
 			target="_blank"
 			rel="noreferrer"
+			onClick={trackEvent}
 		>
 			<div className={classes.downloadTypeIconOuter}>
 				<PdfIcon className="text-n500" />

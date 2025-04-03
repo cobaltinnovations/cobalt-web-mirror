@@ -146,6 +146,16 @@ export const CourseUnitAvailable = ({
 				<CourseDownloadable
 					key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
 					courseUnitDownloadableFile={courseUnitDownloadableFile}
+					trackEvent={() => {
+						analyticsService.persistEvent(
+							AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
+							{
+								courseUnitId: courseUnit.courseUnitId,
+								...(courseSessionId && { courseSessionId }),
+								courseUnitDownloadableFileId: courseUnitDownloadableFile.courseUnitDownloadableFileId,
+							}
+						);
+					}}
 				/>
 			))}
 
