@@ -27,10 +27,23 @@ import { accountService, institutionService, topicCenterService } from '@/lib/se
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { decodeAccessToken, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
-import { AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
+import { AccountSourceId, AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
 import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
+
+const isUrlPathAcceptableForAnonymousImplicitAccountCreation = (urlPath = window.location.pathname) => {
+	// Check for /resource-library: match exactly or followed by a slash.
+	if (urlPath === '/resource-library' || urlPath.startsWith('/resource-library/')) {
+		return true;
+	}
+
+	// Define the other prefixes that must be followed by something (i.e., they always end with a slash).
+	const prefixes = ['/pages/', '/community/', '/featured-topics/'];
+
+	// Check if path starts with any of these prefixes.
+	return prefixes.some((prefix) => urlPath.startsWith(prefix));
+};
 
 export function useAppRootLoaderData() {
 	return useRouteLoaderData('root') as AppRootLoaderData;
@@ -71,6 +84,33 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		Cookies.set('authRedirectUrl', url.pathname + url.search);
 
 		return redirect('/sign-in');
+	}
+
+	// If no access token existed at all, then we're OK to create an implicit anonymous account so long as the following hold:
+	// 1. The institution supports these kinds of accounts
+	// 2. The URL path starts with a supported prefix
+	if (!accessToken) {
+		const anonymousImplicitAccountSourceSupported =
+			institutionResponse.accountSources.filter(
+				(accountSource) => accountSource.accountSourceId === AccountSourceId.ANONYMOUS_IMPLICIT
+			).length > 0;
+
+		if (
+			anonymousImplicitAccountSourceSupported &&
+			isUrlPathAcceptableForAnonymousImplicitAccountCreation(window.location.pathname)
+		) {
+			const createAnonymousImplicitAccountRequest = await accountService.createAnonymousAccount({
+				accountSourceId: AccountSourceId.ANONYMOUS_IMPLICIT,
+			});
+
+			const anonymousImplicitAccountAccessToken = (await createAnonymousImplicitAccountRequest.fetch())
+				.accessToken;
+
+			const authRedirectUrl = window.location.pathname + (window.location.search || '');
+			Cookies.set('authRedirectUrl', authRedirectUrl);
+
+			window.location.href = `/auth?accessToken=${encodeURIComponent(anonymousImplicitAccountAccessToken)}`;
+		}
 	}
 
 	if (accessToken && accountResponse) {
