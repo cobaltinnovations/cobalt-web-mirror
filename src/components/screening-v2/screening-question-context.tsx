@@ -212,11 +212,17 @@ export const ScreeningQuestionContext = ({
 						nextScreeningQuestionContextId: nextScreeningQuestionContextId ?? '',
 						screeningSessionDestination,
 					});
+
+					setIsNext(true);
+					setIsLoading(false);
 					return;
 				}
 
 				setSelectedAnswers([]);
+
 				if (nextScreeningQuestionContextId) {
+					setIsNext(true);
+					setIsLoading(false);
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
 				} else {
 					onScreeningFlowComplete(screeningSessionDestination);
@@ -239,10 +245,9 @@ export const ScreeningQuestionContext = ({
 					return;
 				}
 
-				handleError(error);
-			} finally {
 				setIsNext(true);
 				setIsLoading(false);
+				handleError(error);
 			}
 		},
 		[answerConfig, handleError, onScreeningFlowComplete, screeningQuestionContextId, selectedAnswers]
