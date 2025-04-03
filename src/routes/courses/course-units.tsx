@@ -150,20 +150,18 @@ export const Component = () => {
 				{}
 			)
 		);
-	}, [courseIdentifier, unitId]);
 
-	useEffect(() => {
-		if (!courseUnit) {
+		if (!desiredCourseUnit) {
 			return;
 		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_UNIT, {
-			courseUnitId: courseUnit.courseUnitId,
-			...(course?.currentCourseSession?.courseSessionId && {
-				courseSessionId: course.currentCourseSession.courseSessionId,
+			courseUnitId: desiredCourseUnit.courseUnitId,
+			...(response.course.currentCourseSession?.courseSessionId && {
+				courseSessionId: response.course.currentCourseSession.courseSessionId,
 			}),
 		});
-	}, [course?.currentCourseSession?.courseSessionId, courseUnit]);
+	}, [courseIdentifier, unitId]);
 
 	const navigateToNextAvailableUnit = useCallback(
 		(course: CourseModel, courseSession: CourseSessionModel) => {
