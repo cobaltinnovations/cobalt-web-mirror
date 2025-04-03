@@ -32,9 +32,17 @@ interface CardDraggableProps {
 	cardText?: string;
 	className?: string;
 	disabled?: boolean;
+	onMouseDown?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
 }
 
-export const CardDraggable = ({ cardId, cardIndex, cardText, className, disabled }: CardDraggableProps) => {
+export const CardDraggable = ({
+	cardId,
+	cardIndex,
+	cardText,
+	className,
+	disabled,
+	onMouseDown,
+}: CardDraggableProps) => {
 	const classes = useStyles();
 
 	if (!cardId) {
@@ -55,6 +63,7 @@ export const CardDraggable = ({ cardId, cardIndex, cardText, className, disabled
 						},
 						className
 					)}
+					onMouseDown={onMouseDown}
 				>
 					<p className="text-center">{cardText}</p>
 					<div className={classes.dragHandleOuter}>

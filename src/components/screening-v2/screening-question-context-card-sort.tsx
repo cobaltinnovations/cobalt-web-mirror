@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import {
@@ -18,8 +19,8 @@ import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 import { cloneDeep } from 'lodash';
 import { Button, Collapse } from 'react-bootstrap';
 
-const CARD_FLIP_DURATION_MS = 400;
-const CARD_FALL_DURATION_MS = 400;
+const CARD_FLIP_DURATION_MS = 200;
+const CARD_FALL_DURATION_MS = 200;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	questionOuter: {
@@ -55,6 +56,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			zIndex: 0,
 			top: '50%',
 			left: '50%',
+			textAlign: 'center',
 			position: 'absolute',
 			pointerEvents: 'none',
 			transform: 'translate(-50%, -50%)',
@@ -82,12 +84,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 	'@global': {
 		'.card-flip-enter': {
 			opacity: 0,
+			pointerEvents: 'none',
 			transform: 'translateY(-100%) rotate(-90deg)',
 		},
 		'.card-flip-enter-active': {
 			opacity: 1,
 			transform: 'translate(0, 0) rotate(0deg)',
-			transition: `all ${CARD_FALL_DURATION_MS}ms`,
+			transition: `all ${CARD_FLIP_DURATION_MS}ms`,
 		},
 		'.card-fall-exit': {
 			opacity: 1,
@@ -108,7 +111,6 @@ interface ScreeningQuestionContextCardSortProps {
 
 interface CardStack {
 	cardStackId: string;
-	screeningAnswerOptionId: string;
 	text: string | undefined;
 	card: CardStackItem | undefined;
 }
@@ -133,7 +135,7 @@ export const ScreeningQuestionContextCardSort = ({
 		screeningSessionDestination?: ScreeningSessionDestination;
 	}>();
 
-	const isFirstCard = useRef(true);
+	const isFirstQuestion = useRef(true);
 	const [card, setCard] = useState<CardStackItem>();
 	const [questionStack, setQuestionStack] = useState<CardStack>();
 	const [answerStacks, setAnswerStacks] = useState<CardStack[]>([]);
@@ -145,7 +147,7 @@ export const ScreeningQuestionContextCardSort = ({
 		try {
 			const response = await screeningService.getScreeningQuestionContext(screeningQuestionContextId).fetch();
 			const card = {
-				id: response.screeningQuestion.screeningQuestionId,
+				id: uuidv4(),
 				text: response.screeningQuestion.questionText,
 			};
 
@@ -153,22 +155,20 @@ export const ScreeningQuestionContextCardSort = ({
 			setCard(card);
 			setQuestionStack({
 				cardStackId: 'QUESTION_STACK',
-				screeningAnswerOptionId: '',
 				text: '',
 				card: card,
 			});
 
-			if (isFirstCard.current) {
+			if (isFirstQuestion.current) {
 				setAnswerStacks(
-					response.screeningAnswerOptions.map((screeningAnswerOption, screeningAnswerOptionIndex) => ({
-						cardStackId: `ANSWER_STACK_${screeningAnswerOptionIndex}`,
-						screeningAnswerOptionId: screeningAnswerOption.screeningAnswerOptionId,
+					response.screeningAnswerOptions.map((screeningAnswerOption) => ({
+						cardStackId: screeningAnswerOption.screeningAnswerOptionId,
 						text: screeningAnswerOption.answerOptionText,
 						card: undefined,
 					}))
 				);
 
-				isFirstCard.current = false;
+				isFirstQuestion.current = false;
 			}
 		} catch (error) {
 			handleError(error);
@@ -218,21 +218,18 @@ export const ScreeningQuestionContextCardSort = ({
 		[handleError, screeningQuestionContextId]
 	);
 
-	const handleDragStart = useCallback(() => {
+	const handleCardMouseDown = useCallback(() => {
 		if (!screeningQuestionContext) {
 			return;
 		}
 
 		setAnswerConfig(undefined);
 		setAnswerStacks(
-			screeningQuestionContext.screeningAnswerOptions.map(
-				(screeningAnswerOption, screeningAnswerOptionIndex) => ({
-					cardStackId: `ANSWER_STACK_${screeningAnswerOptionIndex}`,
-					screeningAnswerOptionId: screeningAnswerOption.screeningAnswerOptionId,
-					text: screeningAnswerOption.answerOptionText,
-					card: undefined,
-				})
-			)
+			screeningQuestionContext.screeningAnswerOptions.map((screeningAnswerOption) => ({
+				cardStackId: screeningAnswerOption.screeningAnswerOptionId,
+				text: screeningAnswerOption.answerOptionText,
+				card: undefined,
+			}))
 		);
 	}, [screeningQuestionContext]);
 
@@ -267,7 +264,7 @@ export const ScreeningQuestionContextCardSort = ({
 
 			const selectedAnswerStack = answerStacks.find((as) => as.cardStackId === destination.droppableId);
 			if (selectedAnswerStack) {
-				submitScreeningAnswer(selectedAnswerStack.screeningAnswerOptionId);
+				submitScreeningAnswer(selectedAnswerStack.cardStackId);
 			}
 		},
 		[answerStacks, card, questionStack?.cardStackId, submitScreeningAnswer]
@@ -279,7 +276,7 @@ export const ScreeningQuestionContextCardSort = ({
 
 	return (
 		<div className={classes.questionOuter}>
-			<DragDropContext onBeforeDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+			<DragDropContext onDragEnd={handleDragEnd}>
 				<div className="mb-10 d-flex align-items-center justify-content-around">
 					{allCardsSorted ? (
 						<div className={classes.allCardsSorted}>
@@ -306,6 +303,7 @@ export const ScreeningQuestionContextCardSort = ({
 												unmountOnExit
 											>
 												<CardDraggable
+													onMouseDown={handleCardMouseDown}
 													cardId={questionStack.card?.id}
 													cardText={questionStack.card?.text}
 													cardIndex={0}
@@ -320,14 +318,12 @@ export const ScreeningQuestionContextCardSort = ({
 					)}
 				</div>
 				<div className="d-flex align-items-center justify-content-around">
-					{answerStacks.map((answerStack) => {
+					{answerStacks.map((answerStack, answerStackIndex) => {
 						const questionResult =
-							answerConfig?.questionResultsByScreeningAnswerOptionId?.[
-								answerStack.screeningAnswerOptionId
-							];
+							answerConfig?.questionResultsByScreeningAnswerOptionId?.[answerStack.cardStackId];
 
 						return (
-							<Droppable key={answerStack.cardStackId} droppableId={answerStack.cardStackId}>
+							<Droppable key={answerStackIndex} droppableId={answerStack.cardStackId}>
 								{(droppableProvided) => (
 									<div
 										ref={droppableProvided.innerRef}

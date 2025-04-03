@@ -36,6 +36,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			zIndex: 0,
 			top: '50%',
 			left: '50%',
+			textAlign: 'center',
 			position: 'absolute',
 			pointerEvents: 'none',
 			transform: 'translate(-50%, -50%)',
