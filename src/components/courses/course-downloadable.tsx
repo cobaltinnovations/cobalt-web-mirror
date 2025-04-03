@@ -10,8 +10,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		borderRadius: 8,
 		alignItems: 'center',
+		textDecoration: 'none',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
+		'&:hover': {
+			backgroundColor: theme.colors.n50,
+		},
 	},
 	downloadTypeIconOuter: {
 		width: 32,
@@ -43,17 +47,22 @@ export const CourseDownloadable = ({ courseUnitDownloadableFile }: CourseDownloa
 	const classes = useStyles();
 
 	return (
-		<div className={classes.courseDownloadable}>
+		<a
+			className={classes.courseDownloadable}
+			href={courseUnitDownloadableFile.url}
+			target="_blank"
+			rel="noreferrer"
+		>
 			<div className={classes.downloadTypeIconOuter}>
-				<PdfIcon />
+				<PdfIcon className="text-n500" />
 			</div>
 			<div className={classes.downloadInfoOuter}>
-				<p className="m-0">attending-basics.pdf</p>
-				<p className="m-0 text-n500">125 KB</p>
+				<p className="m-0 text-dark">{courseUnitDownloadableFile.filename}</p>
+				<p className="m-0 text-n500">{courseUnitDownloadableFile.filesizeDescription}</p>
 			</div>
 			<div className={classes.downloadIconOuter}>
 				<DownloadIcon className="text-primary" />
 			</div>
-		</div>
+		</a>
 	);
 };

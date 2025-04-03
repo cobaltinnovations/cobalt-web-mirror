@@ -109,5 +109,13 @@ export interface CourseVideoModel {
 }
 
 export interface CourseUnitDownloadableFile {
+	contentType: string;
 	courseUnitDownloadableFileId: string;
+	courseUnitId: string;
+	displayOrder: 1;
+	fileUploadId: string;
+	filename: string;
+	filesize: number;
+	filesizeDescription: string;
+	url: string;
 }
