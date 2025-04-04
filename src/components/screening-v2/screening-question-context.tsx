@@ -280,6 +280,10 @@ export const ScreeningQuestionContext = ({
 		}
 	}, [confirmationPrompt.isSubmitConfirmationPrompt, selectedAnswers, submitAnswers]);
 
+	const handleSkipButtonClick = useCallback(() => {
+		submitAnswers({ selectedScreeningAnswers: [] });
+	}, [submitAnswers]);
+
 	const handleScreeningAnswerChange = useCallback(
 		(selectedScreeningAnswers: ScreeningAnswerSelection[]) => {
 			if (!screeningQuestionContext) {
@@ -388,7 +392,7 @@ export const ScreeningQuestionContext = ({
 																dangerouslySetInnerHTML={{
 																	__html: message.message ?? '',
 																}}
-															></div>
+															/>
 														}
 													/>
 												))}
@@ -419,11 +423,7 @@ export const ScreeningQuestionContext = ({
 														type="button"
 														variant="outline-primary"
 														className="d-flex align-items-center text-decoration-none pe-3"
-														onClick={() => {
-															setIsNext(true);
-															setSelectedAnswers([]);
-															window.alert('[TODO]: Skip');
-														}}
+														onClick={handleSkipButtonClick}
 													>
 														Skip
 														<RightChevron className="ms-1" />
