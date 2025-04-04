@@ -171,18 +171,8 @@ export const Component = () => {
 	);
 
 	const handleActivityComplete = useCallback(async () => {
-		try {
-			if (!courseIdentifier) {
-				throw new Error('courseIdentifier is undefined.');
-			}
-
-			const { course: currentCourse } = await coursesService.getCourseDetail(courseIdentifier).fetch();
-
-			navigateToNextAvailableUnit(currentCourse);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [courseIdentifier, handleError, navigateToNextAvailableUnit]);
+		fetchData();
+	}, [fetchData]);
 
 	const handleSkipActivityButtonClick = useCallback(() => {
 		try {
