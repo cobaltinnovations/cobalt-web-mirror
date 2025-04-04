@@ -110,6 +110,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 						display: 'inline-block',
 						maskPosition: 'center',
 						maskRepeat: 'no-repeat',
+						transition: '200ms all',
 						backgroundColor: theme.colors.n100,
 					},
 					'&:after': {
@@ -123,6 +124,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 						borderStyle: 'solid',
 						pointerEvents: 'none',
 						borderRadius: 'inherit',
+						transition: '100ms all',
 						borderColor: theme.colors.n100,
 					},
 					'&:hover': {
