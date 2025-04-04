@@ -6,11 +6,27 @@ import {
 	CourseVideoModel,
 } from '@/lib/models';
 
-const getOrderedCourseUnits = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
-	const requiredModules = courseModules.filter((cm) => !optionalCourseModuleIds.includes(cm.courseModuleId));
-	const optionalModules = courseModules.filter((cm) => optionalCourseModuleIds.includes(cm.courseModuleId));
-	const requiredCourseUnits = requiredModules.flatMap((cm) => cm.courseUnits);
-	const optionalCourseUnits = optionalModules.flatMap((cm) => cm.courseUnits);
+export const getRequiredCourseModules = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
+	return courseModules.filter((cm) => !optionalCourseModuleIds.includes(cm.courseModuleId));
+};
+
+export const getOptionalCourseModules = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
+	return courseModules.filter((cm) => optionalCourseModuleIds.includes(cm.courseModuleId));
+};
+
+export const getRequiredCourseUnits = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
+	const requiredModules = getRequiredCourseModules(courseModules, optionalCourseModuleIds);
+	return requiredModules.flatMap((cm) => cm.courseUnits);
+};
+
+export const getOptionalCourseUnits = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
+	const optionalModules = getOptionalCourseModules(courseModules, optionalCourseModuleIds);
+	return optionalModules.flatMap((cm) => cm.courseUnits);
+};
+
+export const getOrderedCourseUnits = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
+	const requiredCourseUnits = getRequiredCourseUnits(courseModules, optionalCourseModuleIds);
+	const optionalCourseUnits = getOptionalCourseUnits(courseModules, optionalCourseModuleIds);
 	return [...requiredCourseUnits, ...optionalCourseUnits];
 };
 

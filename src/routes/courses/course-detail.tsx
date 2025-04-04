@@ -11,7 +11,11 @@ import PageHeader from '@/components/page-header';
 import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import {
+	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
+	getOptionalCourseModules,
+	getRequiredCourseModules,
+} from '@/lib/utils';
 import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import ResourceLibraryCard from '@/components/resource-library-card';
@@ -41,20 +45,13 @@ export const Component = () => {
 			throw new Error('courseIdentifier is undefined.');
 		}
 
-		const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
+		const { course: currentCourse } = await coursesService.getCourseDetail(courseIdentifier).fetch();
+		const { courseModules, currentCourseSession } = currentCourse;
+		const optionalCourseModuleIds = currentCourseSession?.optionalCourseModuleIds ?? [];
 
-		setCourse(response.course);
-		setRequiredModules(
-			response.course.courseModules.filter(
-				(cm) =>
-					!(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-			)
-		);
-		setOptionalModules(
-			response.course.courseModules.filter((cm) =>
-				(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-			)
-		);
+		setCourse(currentCourse);
+		setRequiredModules(getRequiredCourseModules(courseModules, optionalCourseModuleIds));
+		setOptionalModules(getOptionalCourseModules(courseModules, optionalCourseModuleIds));
 	}, [courseIdentifier]);
 
 	useEffect(() => {
@@ -62,53 +59,52 @@ export const Component = () => {
 			return;
 		}
 
+		const { courseId, currentCourseSession } = course;
+
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_DETAIL, {
-			courseId: course.courseId,
-			...(course.currentCourseSession && {
-				courseSessionId: course.currentCourseSession.courseSessionId,
-			}),
+			courseId,
+			...(currentCourseSession && { courseSessionId: currentCourseSession.courseSessionId }),
 			mode,
 		});
 	}, [course, mode]);
 
 	const handleStartCourseButtonClick = useCallback(async () => {
 		try {
-			if (!course?.courseId) {
-				throw new Error('course.courseId is undefined.');
+			if (!course) {
+				throw new Error('course is undefined.');
 			}
 
-			const { courseSession } = await coursesService.createCourseSession({ courseId: course.courseId }).fetch();
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
-				course.courseModules,
-				courseSession
-			);
-			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
+			const { courseId, courseModules } = course;
+			const { courseSession } = await coursesService.createCourseSession({ courseId }).fetch();
+			const courseUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseModules, courseSession);
+
+			if (!courseUnitId) {
+				throw new Error('unitId undefined.');
+			}
+
+			navigate(`/courses/${course.urlName}/course-units/${courseUnitId}`);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course?.courseId, course?.courseModules, course?.urlName, handleError, navigate]);
+	}, [course, handleError, navigate]);
 
 	const handleResumeCourseButtonClick = useCallback(() => {
-		try {
-			if (!course?.currentCourseSession) {
-				throw new Error('course.currentCourseSession is undefined.');
-			}
-
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
-				course.courseModules,
-				course.currentCourseSession
-			);
-
-			if (!desiredUnitId) {
-				window.alert('all units done, what to do?');
-				return;
-			}
-
-			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
-		} catch (error) {
-			handleError(error);
+		if (!course || !course.currentCourseSession) {
+			return;
 		}
-	}, [course?.courseModules, course?.currentCourseSession, course?.urlName, handleError, navigate]);
+
+		const { courseModules, currentCourseSession, urlName } = course;
+		const courseUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+			courseModules,
+			currentCourseSession
+		);
+
+		if (!courseUnitId) {
+			return;
+		}
+
+		navigate(`/courses/${urlName}/course-units/${courseUnitId}`);
+	}, [course, navigate]);
 
 	return (
 		<>

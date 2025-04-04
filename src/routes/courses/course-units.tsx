@@ -6,6 +6,8 @@ import classNames from 'classnames';
 import {
 	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
 	getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession,
+	getOptionalCourseModules,
+	getRequiredCourseModules,
 } from '@/lib/utils';
 import {
 	AnalyticsNativeEventTypeId,
@@ -132,12 +134,8 @@ export const Component = () => {
 			completionStatus === CourseSessionUnitStatusId.SKIPPED;
 
 		setCourse(currentCourse);
-		setRequiredModules(
-			courseModules.filter(({ courseModuleId }) => !optionalCourseModuleIds.includes(courseModuleId))
-		);
-		setOptionalModules(
-			courseModules.filter(({ courseModuleId }) => optionalCourseModuleIds.includes(courseModuleId))
-		);
+		setRequiredModules(getRequiredCourseModules(courseModules, optionalCourseModuleIds));
+		setOptionalModules(getOptionalCourseModules(courseModules, optionalCourseModuleIds));
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(courseUnitLockStatusesByCourseUnitId[courseUnitId]);
 		setCourseUnitCompleted(isCompleted);
