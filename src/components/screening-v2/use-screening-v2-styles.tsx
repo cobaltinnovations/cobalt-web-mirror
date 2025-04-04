@@ -6,6 +6,7 @@ import checkboxSelected from '@/assets/icons/screening-v2/checkbox-selected.svg'
 import checkboxUnselected from '@/assets/icons/screening-v2/checkbox-unselected.svg';
 import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
 import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
+import backArrowIcon from '@/assets/icons/icon-back-arrow.svg';
 
 export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 	'@global': {
@@ -21,7 +22,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			...theme.fonts.default,
 			backgroundColor: theme.colors.n0,
 			boxShadow: '0px 1px 0px 0px rgba(26, 26, 26, 0.07), 0px 0px 2px 0px rgba(0, 0, 0, 0.12)',
-			'&:after': {
+			'&:before': {
 				top: 0,
 				left: 0,
 				right: 0,
@@ -32,21 +33,50 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 				borderStyle: 'solid',
 				pointerEvents: 'none',
 				borderRadius: 'inherit',
+				transition: '100ms all',
 				borderColor: theme.colors.n100,
 			},
+			'&:after': {
+				right: 24,
+				width: 24,
+				height: 24,
+				top: '50%',
+				opacity: 0,
+				maskSize: 24,
+				content: '""',
+				position: 'absolute',
+				pointerEvents: 'none',
+				maskPosition: 'center',
+				maskRepeat: 'no-repeat',
+				transition: '200ms all',
+				maskImage: `url(${backArrowIcon})`,
+				backgroundColor: theme.colors.p500,
+				transform: 'translate(-50%, -50%) rotate(180deg)',
+			},
 			'&:hover': {
-				backgroundColor: theme.colors.n50,
+				'&:before': {
+					borderWidth: '2px !important',
+					borderColor: `${theme.colors.p500} !important`,
+				},
 				'&:after': {
-					borderColor: theme.colors.n300,
+					opacity: 1,
+					transform: 'translate(0, -50%) rotate(180deg)',
 				},
 			},
 			'&:focus': {
 				outline: 'none',
 				boxShadow: `0 0 0 4px ${Color(theme.colors.p500).alpha(0.24).string()}`,
 			},
-			'&--checked:after': {
-				borderWidth: '2px !important',
-				borderColor: `${theme.colors.p500} !important`,
+			'&--checked': {
+				color: theme.colors.n0,
+				backgroundColor: theme.colors.p500,
+				'&:before': {
+					borderWidth: '2px !important',
+					borderColor: `${theme.colors.p500} !important`,
+				},
+				'&:after': {
+					backgroundColor: theme.colors.n0,
+				},
 			},
 		},
 		'.screening-v2__answer': {
