@@ -50,6 +50,7 @@ export const ScreeningAnswer = ({
 					value={value}
 					onChange={onChange}
 					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
+					screeningAnswerContentHintId={question.screeningAnswerContentHintId}
 				/>
 			)}
 			{question.screeningAnswerFormatId === ScreeningAnswerFormatId.MULTI_SELECT && (
