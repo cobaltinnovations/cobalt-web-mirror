@@ -78,6 +78,7 @@ export const ScreeningAnswer = ({
 					value={value}
 					onChange={onChange}
 					questionResultsByScreeningAnswerOptionId={questionResultsByScreeningAnswerOptionId}
+					preferAutosubmit={question.preferAutosubmit}
 				/>
 			)}
 		</div>

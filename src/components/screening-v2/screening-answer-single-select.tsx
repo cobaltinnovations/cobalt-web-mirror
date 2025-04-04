@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Collapse, Form } from 'react-bootstrap';
+import { Button, Collapse, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 import { ScreeningAnswerOption, ScreeningAnswerSelection, ScreeningAnswersQuestionResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
@@ -9,6 +9,7 @@ interface ScreeningAnswerSingleSelectProps {
 	options: ScreeningAnswerOption[];
 	value: ScreeningAnswerSelection[];
 	onChange(value: ScreeningAnswerSelection[]): void;
+	preferAutosubmit?: boolean;
 	questionResultsByScreeningAnswerOptionId?: Record<string, ScreeningAnswersQuestionResult>;
 }
 
@@ -17,6 +18,7 @@ export const ScreeningAnswerSingleSelect = ({
 	options,
 	value,
 	onChange,
+	preferAutosubmit,
 	questionResultsByScreeningAnswerOptionId,
 }: ScreeningAnswerSingleSelectProps) => {
 	const firstOptionRef = useRef<HTMLInputElement>(null);
@@ -37,29 +39,49 @@ export const ScreeningAnswerSingleSelect = ({
 
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
-						<Form.Check
-							bsPrefix="screening-v2__answer"
-							className={classNames({
-								[`screening-v2__answer--${questionResult?.displayTypeId.toLocaleLowerCase()}`]:
-									questionResult?.displayTypeId,
-								[`screening-v2__answer--${questionResult?.correctnessIndicatorId.toLocaleLowerCase()}`]:
-									questionResult?.correctnessIndicatorId,
-							})}
-							type="radio"
-							ref={optionIndex === 0 ? firstOptionRef : undefined}
-							id={option.screeningAnswerOptionId}
-							name={name}
-							label={option.answerOptionText}
-							value={option.screeningAnswerOptionId}
-							checked={isChecked}
-							onChange={({ currentTarget }) => {
-								if (questionResult) {
-									return;
-								}
+						{preferAutosubmit ? (
+							<Button
+								bsPrefix="screening-v2__answer"
+								className={classNames({
+									'screening-v2__answer--checked': isChecked,
+									[`screening-v2__answer--${questionResult?.displayTypeId.toLocaleLowerCase()}`]:
+										questionResult?.displayTypeId,
+									[`screening-v2__answer--${questionResult?.correctnessIndicatorId.toLocaleLowerCase()}`]:
+										questionResult?.correctnessIndicatorId,
+								})}
+								type="button"
+								id={option.screeningAnswerOptionId}
+								onClick={() => {
+									onChange([{ screeningAnswerOptionId: option.screeningAnswerOptionId }]);
+								}}
+							>
+								{option.answerOptionText}
+							</Button>
+						) : (
+							<Form.Check
+								bsPrefix="screening-v2__answer"
+								className={classNames({
+									[`screening-v2__answer--${questionResult?.displayTypeId.toLocaleLowerCase()}`]:
+										questionResult?.displayTypeId,
+									[`screening-v2__answer--${questionResult?.correctnessIndicatorId.toLocaleLowerCase()}`]:
+										questionResult?.correctnessIndicatorId,
+								})}
+								type="radio"
+								ref={optionIndex === 0 ? firstOptionRef : undefined}
+								id={option.screeningAnswerOptionId}
+								name={name}
+								label={option.answerOptionText}
+								value={option.screeningAnswerOptionId}
+								checked={isChecked}
+								onChange={({ currentTarget }) => {
+									if (questionResult) {
+										return;
+									}
 
-								onChange([{ screeningAnswerOptionId: currentTarget.value }]);
-							}}
-						/>
+									onChange([{ screeningAnswerOptionId: currentTarget.value }]);
+								}}
+							/>
+						)}
 						{option.freeformSupplement && (
 							<Collapse in={isChecked}>
 								<div>

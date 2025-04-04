@@ -9,6 +9,46 @@ import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 
 export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 	'@global': {
+		'button.screening-v2__answer': {
+			border: 0,
+			width: '100%',
+			display: 'flex',
+			marginBottom: 8,
+			borderRadius: 26,
+			appearance: 'none',
+			padding: '16px 20px',
+			position: 'relative',
+			...theme.fonts.default,
+			backgroundColor: theme.colors.n0,
+			boxShadow: '0px 1px 0px 0px rgba(26, 26, 26, 0.07), 0px 0px 2px 0px rgba(0, 0, 0, 0.12)',
+			'&:after': {
+				top: 0,
+				left: 0,
+				right: 0,
+				bottom: 0,
+				content: '""',
+				borderWidth: 1,
+				position: 'absolute',
+				borderStyle: 'solid',
+				pointerEvents: 'none',
+				borderRadius: 'inherit',
+				borderColor: theme.colors.n100,
+			},
+			'&:hover': {
+				backgroundColor: theme.colors.n50,
+				'&:after': {
+					borderColor: theme.colors.n300,
+				},
+			},
+			'&:focus': {
+				outline: 'none',
+				boxShadow: `0 0 0 4px ${Color(theme.colors.p500).alpha(0.24).string()}`,
+			},
+			'&--checked:after': {
+				borderWidth: '2px !important',
+				borderColor: `${theme.colors.p500} !important`,
+			},
+		},
 		'.screening-v2__answer': {
 			marginBottom: 8,
 			position: 'relative',
