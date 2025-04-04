@@ -180,10 +180,14 @@ export const ScreeningQuestionContext = ({
 		}
 	}, [confirmationPrompt.isSubmitConfirmationPrompt, screeningQuestionContext?.previousScreeningQuestionContextId]);
 
-	const handleQuestionFormSubmit = useCallback(
-		async (event?: React.FormEvent<HTMLFormElement>, force?: boolean) => {
-			event?.preventDefault();
-
+	const submitAnswers = useCallback(
+		async ({
+			selectedScreeningAnswers,
+			force,
+		}: {
+			selectedScreeningAnswers: ScreeningAnswerSelection[];
+			force?: boolean;
+		}) => {
 			if (answerConfig) {
 				if (answerConfig.nextScreeningQuestionContextId) {
 					setScreeningQuestionContextId(answerConfig.nextScreeningQuestionContextId);
@@ -203,7 +207,9 @@ export const ScreeningQuestionContext = ({
 					nextScreeningQuestionContextId,
 					questionResultsByScreeningAnswerOptionId,
 					screeningSessionDestination,
-				} = await screeningService.answerQuestion(screeningQuestionContextId, selectedAnswers, force).fetch();
+				} = await screeningService
+					.answerQuestion(screeningQuestionContextId, selectedScreeningAnswers, force)
+					.fetch();
 
 				if (messages.length > 0 || Object.entries(questionResultsByScreeningAnswerOptionId).length > 0) {
 					setAnswerConfig({
@@ -251,36 +257,47 @@ export const ScreeningQuestionContext = ({
 				handleError(error);
 			}
 		},
-		[answerConfig, handleError, onScreeningFlowComplete, screeningQuestionContextId, selectedAnswers]
+		[answerConfig, handleError, onScreeningFlowComplete, screeningQuestionContextId]
+	);
+
+	const handleQuestionFormSubmit = useCallback(
+		async (event?: React.FormEvent<HTMLFormElement>, force?: boolean) => {
+			event?.preventDefault();
+			submitAnswers({ selectedScreeningAnswers: selectedAnswers, force });
+		},
+		[selectedAnswers, submitAnswers]
 	);
 
 	const handlePromptSubmit = useCallback(() => {
 		setIsNext(true);
 		if (confirmationPrompt.isSubmitConfirmationPrompt) {
-			handleQuestionFormSubmit(undefined, true);
+			submitAnswers({ selectedScreeningAnswers: selectedAnswers, force: true });
 		} else {
 			setConfirmationPrompt({
 				screeningConfirmationPrompt: undefined,
 				isSubmitConfirmationPrompt: false,
 			});
 		}
-	}, [confirmationPrompt.isSubmitConfirmationPrompt, handleQuestionFormSubmit]);
+	}, [confirmationPrompt.isSubmitConfirmationPrompt, selectedAnswers, submitAnswers]);
 
-	useEffect(() => {
-		if (
-			!screeningQuestionContext?.previouslyAnswered &&
-			screeningQuestionContext?.screeningQuestion.preferAutosubmit &&
-			selectedAnswers.length >= screeningQuestionContext?.screeningQuestion.minimumAnswerCount
-		) {
-			handleQuestionFormSubmit();
-		}
-	}, [
-		handleQuestionFormSubmit,
-		screeningQuestionContext?.previouslyAnswered,
-		screeningQuestionContext?.screeningQuestion.minimumAnswerCount,
-		screeningQuestionContext?.screeningQuestion.preferAutosubmit,
-		selectedAnswers.length,
-	]);
+	const handleScreeningAnswerChange = useCallback(
+		(selectedScreeningAnswers: ScreeningAnswerSelection[]) => {
+			if (!screeningQuestionContext) {
+				return;
+			}
+
+			if (
+				screeningQuestionContext.screeningQuestion.preferAutosubmit &&
+				selectedScreeningAnswers.length >= screeningQuestionContext?.screeningQuestion.minimumAnswerCount
+			) {
+				submitAnswers({ selectedScreeningAnswers });
+				return;
+			}
+
+			setSelectedAnswers(selectedScreeningAnswers);
+		},
+		[screeningQuestionContext, submitAnswers]
+	);
 
 	const showNextAndPreviousButtons =
 		screeningQuestionContext?.screeningQuestion.screeningQuestionSubmissionStyleId ===
@@ -351,7 +368,7 @@ export const ScreeningQuestionContext = ({
 											screeningQuestionContext.screeningQuestion.maximumAnswerCount
 										}
 										value={selectedAnswers}
-										onChange={setSelectedAnswers}
+										onChange={handleScreeningAnswerChange}
 									/>
 
 									{screeningQuestionContext.screeningQuestion.footerText && (
