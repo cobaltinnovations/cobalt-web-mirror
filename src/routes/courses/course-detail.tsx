@@ -12,8 +12,10 @@ import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import {
+	getCompletedCourseUnitIds,
 	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
 	getOptionalCourseModules,
+	getOrderedCourseUnits,
 	getRequiredCourseModules,
 } from '@/lib/utils';
 import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
@@ -30,15 +32,17 @@ enum MODE {
 }
 
 export const Component = () => {
+	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const mode = useMemo(() => searchParams.get('mode') ?? MODE.OVERVIEW, [searchParams]);
-	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
+
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const [course, setCourse] = useState<CourseModel>();
 	const [requiredModules, setRequiredModules] = useState<CourseModuleModel[]>([]);
 	const [optionalModules, setOptionalModules] = useState<CourseModuleModel[]>([]);
 	const [showRestartCourseModal, setShowRestartCourseModal] = useState(false);
+	const [showResumeButton, setShowResumeButton] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
@@ -52,6 +56,15 @@ export const Component = () => {
 		setCourse(currentCourse);
 		setRequiredModules(getRequiredCourseModules(courseModules, optionalCourseModuleIds));
 		setOptionalModules(getOptionalCourseModules(courseModules, optionalCourseModuleIds));
+
+		if (!currentCourseSession) {
+			return;
+		}
+
+		const allCourseUnits = getOrderedCourseUnits(courseModules, optionalCourseModuleIds);
+		const completedCourseUnitIds = getCompletedCourseUnitIds(currentCourseSession);
+		const allCourseUnitsComplete = allCourseUnits.every((u) => completedCourseUnitIds.includes(u.courseUnitId));
+		setShowResumeButton(!allCourseUnitsComplete);
 	}, [courseIdentifier]);
 
 	useEffect(() => {
@@ -162,12 +175,14 @@ export const Component = () => {
 													<h2 className="mb-4 mb-xl-0">Course Content</h2>
 													{course?.currentCourseSession ? (
 														<div className="d-flex align-items-center">
-															<Button
-																type="button"
-																onClick={handleResumeCourseButtonClick}
-															>
-																Resume Course
-															</Button>
+															{showResumeButton && (
+																<Button
+																	type="button"
+																	onClick={handleResumeCourseButtonClick}
+																>
+																	Resume Course
+																</Button>
+															)}
 															<Button
 																type="button"
 																variant="link"

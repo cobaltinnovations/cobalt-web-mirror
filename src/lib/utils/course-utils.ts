@@ -1,6 +1,7 @@
 import {
 	CourseModuleModel,
 	CourseSessionModel,
+	CourseSessionUnitStatusId,
 	CourseUnitLockTypeId,
 	CourseUnitModel,
 	CourseVideoModel,
@@ -30,6 +31,12 @@ export const getOrderedCourseUnits = (courseModules: CourseModuleModel[], option
 	return [...requiredCourseUnits, ...optionalCourseUnits];
 };
 
+export const getCompletedCourseUnitIds = (courseSession: CourseSessionModel) => {
+	return Object.entries(courseSession.courseSessionUnitStatusIdsByCourseUnitId)
+		.filter(([, status]) => status === CourseSessionUnitStatusId.COMPLETED)
+		.map(([courseUnitId]) => courseUnitId);
+};
+
 export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	courseModules: CourseModuleModel[],
 	courseSession: CourseSessionModel
@@ -38,7 +45,7 @@ export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
 		.filter(([, { courseUnitLockTypeId }]) => courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
 		.map(([courseUnitId]) => courseUnitId);
-	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
+	const completedCourseUnitIds = getCompletedCourseUnitIds(courseSession);
 	const nextCourseUnit = courseUnitsOrdered.find(
 		(u) => unlockedCourseUnitIds.includes(u.courseUnitId) && !completedCourseUnitIds.includes(u.courseUnitId)
 	);
@@ -62,7 +69,7 @@ export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = 
 	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
 		.filter(([, { courseUnitLockTypeId }]) => courseUnitLockTypeId !== CourseUnitLockTypeId.STRONGLY_LOCKED)
 		.map(([courseUnitId]) => courseUnitId);
-	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
+	const completedCourseUnitIds = getCompletedCourseUnitIds(courseSession);
 
 	const nextCourseUnit = desiredUnits.find(
 		(u) => unlockedCourseUnitIds.includes(u.courseUnitId) && !completedCourseUnitIds.includes(u.courseUnitId)
