@@ -6,37 +6,28 @@ import {
 	CourseVideoModel,
 } from '@/lib/models';
 
+const getOrderedCourseUnits = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
+	const requiredModules = courseModules.filter((cm) => !optionalCourseModuleIds.includes(cm.courseModuleId));
+	const optionalModules = courseModules.filter((cm) => optionalCourseModuleIds.includes(cm.courseModuleId));
+	const requiredCourseUnits = requiredModules.flatMap((cm) => cm.courseUnits);
+	const optionalCourseUnits = optionalModules.flatMap((cm) => cm.courseUnits);
+	return [...requiredCourseUnits, ...optionalCourseUnits];
+};
+
 export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	courseModules: CourseModuleModel[],
 	courseSession: CourseSessionModel
 ) => {
-	const requiredModules = courseModules.filter(
-		(cm) => !(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-	);
-	const optionalModules = courseModules.filter((cm) =>
-		(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-	);
-	const requiredCourseUnits = requiredModules.map((courseModule) => courseModule.courseUnits).flat();
-	const optionalCourseUnits = optionalModules.map((courseModule) => courseModule.courseUnits).flat();
-	const courseUnits = [...requiredCourseUnits, ...optionalCourseUnits];
-
+	const courseUnitsOrdered = getOrderedCourseUnits(courseModules, courseSession.optionalCourseModuleIds);
 	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
-		.filter(([_k, v]) => v.courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
-		.map(([k, _v]) => k);
+		.filter(([, { courseUnitLockTypeId }]) => courseUnitLockTypeId === CourseUnitLockTypeId.UNLOCKED)
+		.map(([courseUnitId]) => courseUnitId);
 	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
-	const unlockedCourseUnits = courseUnits.filter((courseUnit) =>
-		unlockedCourseUnitIds.includes(courseUnit.courseUnitId)
+	const nextCourseUnit = courseUnitsOrdered.find(
+		(u) => unlockedCourseUnitIds.includes(u.courseUnitId) && !completedCourseUnitIds.includes(u.courseUnitId)
 	);
-	const unlockedAndIncompleteUnits = unlockedCourseUnits.filter(
-		(courseUnit) => !completedCourseUnitIds.includes(courseUnit.courseUnitId)
-	);
-	const firstUnlockedAndIncompleteCourseUnit = unlockedAndIncompleteUnits[0];
 
-	if (firstUnlockedAndIncompleteCourseUnit) {
-		return firstUnlockedAndIncompleteCourseUnit.courseUnitId;
-	}
-
-	return undefined;
+	return nextCourseUnit?.courseUnitId;
 };
 
 export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = (
@@ -44,48 +35,24 @@ export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = 
 	courseModules: CourseModuleModel[],
 	courseSession: CourseSessionModel
 ) => {
-	const requiredModules = courseModules.filter(
-		(cm) => !(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-	);
-	const optionalModules = courseModules.filter((cm) =>
-		(courseSession.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-	);
-	const requiredCourseUnits = requiredModules.map((courseModule) => courseModule.courseUnits).flat();
-	const optionalCourseUnits = optionalModules.map((courseModule) => courseModule.courseUnits).flat();
-	const courseUnits = [...requiredCourseUnits, ...optionalCourseUnits];
-	const currentCourseUnitIndex = courseUnits.findIndex((cu) => cu.courseUnitId === courseUnit.courseUnitId);
+	const courseUnitsOrdered = getOrderedCourseUnits(courseModules, courseSession.optionalCourseModuleIds);
+	const currentCourseUnitIndex = courseUnitsOrdered.findIndex((cu) => cu.courseUnitId === courseUnit.courseUnitId);
 
-	if (currentCourseUnitIndex <= -1) {
-		return undefined;
-	}
+	if (currentCourseUnitIndex === -1) return undefined;
 
-	const preCurrentCourseUnits = [...courseUnits].splice(0, currentCourseUnitIndex);
-	const postCurrentCourseUnits = [...courseUnits].slice(currentCourseUnitIndex + 1);
-	let desiredUnits = [];
-
-	if (postCurrentCourseUnits.length > 0) {
-		desiredUnits = [...postCurrentCourseUnits];
-	} else {
-		desiredUnits = [...preCurrentCourseUnits];
-	}
-
+	const preCurrentCourseUnits = courseUnitsOrdered.slice(0, currentCourseUnitIndex);
+	const postCurrentCourseUnits = courseUnitsOrdered.slice(currentCourseUnitIndex + 1);
+	const desiredUnits = postCurrentCourseUnits.length > 0 ? postCurrentCourseUnits : preCurrentCourseUnits;
 	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
-		.filter(([_k, v]) => v.courseUnitLockTypeId !== CourseUnitLockTypeId.STRONGLY_LOCKED)
-		.map(([k, _v]) => k);
+		.filter(([, { courseUnitLockTypeId }]) => courseUnitLockTypeId !== CourseUnitLockTypeId.STRONGLY_LOCKED)
+		.map(([courseUnitId]) => courseUnitId);
 	const completedCourseUnitIds = Object.keys(courseSession.courseSessionUnitStatusIdsByCourseUnitId);
-	const unlockedCourseUnits = desiredUnits.filter((courseUnit) =>
-		unlockedCourseUnitIds.includes(courseUnit.courseUnitId)
-	);
-	const unlockedAndIncompleteUnits = unlockedCourseUnits.filter(
-		(courseUnit) => !completedCourseUnitIds.includes(courseUnit.courseUnitId)
-	);
-	const firstUnlockedAndIncompleteCourseUnit = unlockedAndIncompleteUnits[0];
 
-	if (firstUnlockedAndIncompleteCourseUnit) {
-		return firstUnlockedAndIncompleteCourseUnit.courseUnitId;
-	}
+	const nextCourseUnit = desiredUnits.find(
+		(u) => unlockedCourseUnitIds.includes(u.courseUnitId) && !completedCourseUnitIds.includes(u.courseUnitId)
+	);
 
-	return undefined;
+	return nextCourseUnit?.courseUnitId;
 };
 
 export const getKalturaScriptForVideo = ({
