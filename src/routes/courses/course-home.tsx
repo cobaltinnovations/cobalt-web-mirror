@@ -68,6 +68,7 @@ export const Component = () => {
 						<Col>
 							{courses.map((course) => (
 								<CallToActionBlock
+									key={course.courseId}
 									subheading="Learning Course"
 									heading={course.title}
 									descriptionHtml={course.description}

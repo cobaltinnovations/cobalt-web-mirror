@@ -21,10 +21,12 @@ export const ScreeningAnswerSingleSelect = ({
 	preferAutosubmit,
 	questionResultsByScreeningAnswerOptionId,
 }: ScreeningAnswerSingleSelectProps) => {
-	const firstOptionRef = useRef<HTMLInputElement>(null);
+	const firstOptionInputRef = useRef<HTMLInputElement>(null);
+	const firstOptionButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		firstOptionRef.current?.focus();
+		firstOptionInputRef.current?.focus();
+		firstOptionButtonRef.current?.focus();
 	}, []);
 
 	return (
@@ -50,6 +52,7 @@ export const ScreeningAnswerSingleSelect = ({
 										questionResult?.correctnessIndicatorId,
 								})}
 								type="button"
+								ref={optionIndex === 0 ? firstOptionButtonRef : undefined}
 								id={option.screeningAnswerOptionId}
 								onClick={() => {
 									onChange([{ screeningAnswerOptionId: option.screeningAnswerOptionId }]);
@@ -67,7 +70,7 @@ export const ScreeningAnswerSingleSelect = ({
 										questionResult?.correctnessIndicatorId,
 								})}
 								type="radio"
-								ref={optionIndex === 0 ? firstOptionRef : undefined}
+								ref={optionIndex === 0 ? firstOptionInputRef : undefined}
 								id={option.screeningAnswerOptionId}
 								name={name}
 								label={option.answerOptionText}

@@ -19,28 +19,33 @@ export const ScreeningAnswerFreeformText = ({ options, value, onChange }: Screen
 
 	return (
 		<Form.Group>
-			{options.map((option, optionIndex) => (
-				<InputHelper
-					ref={optionIndex === 0 ? firstOptionRef : undefined}
-					key={option.screeningAnswerOptionId}
-					type="text"
-					value={value.find((v) => v.screeningAnswerOptionId === option.screeningAnswerOptionId)?.text}
-					onChange={({ currentTarget }) => {
-						if (currentTarget.value.trim().length < 1) {
-							onChange([]);
-							return;
-						}
+			{options.map((option, optionIndex) => {
+				const currentValue =
+					value.find((v) => v.screeningAnswerOptionId === option.screeningAnswerOptionId)?.text ?? '';
 
-						onChange([
-							{
-								screeningAnswerOptionId: option.screeningAnswerOptionId,
-								text: currentTarget.value.trim(),
-							},
-						]);
-					}}
-					label={option.answerOptionText ?? ''}
-				/>
-			))}
+				return (
+					<InputHelper
+						ref={optionIndex === 0 ? firstOptionRef : undefined}
+						key={option.screeningAnswerOptionId}
+						type="text"
+						value={currentValue}
+						onChange={({ currentTarget }) => {
+							if (currentTarget.value.trim().length < 1) {
+								onChange([]);
+								return;
+							}
+
+							onChange([
+								{
+									screeningAnswerOptionId: option.screeningAnswerOptionId,
+									text: currentTarget.value.trim(),
+								},
+							]);
+						}}
+						label={option.answerOptionText ?? ''}
+					/>
+				);
+			})}
 		</Form.Group>
 	);
 };
