@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -11,7 +11,6 @@ import {
 	AnalyticsNativeEventTypeId,
 	CourseModel,
 	CourseModuleModel,
-	CourseSessionModel,
 	CourseSessionUnitStatusId,
 	CourseUnitDependencyTypeId,
 	CourseUnitLockStatus,
@@ -101,81 +100,74 @@ export const Component = () => {
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
 	const [courseUnitCompleted, setCourseUnitCompleted] = useState(false);
-	const [courseUnitByUnitId, setCourseUnitByUnitId] = useState<Record<string, CourseUnitModel>>({});
+	const [courseUnitByCourseUnitId, setCourseUnitByCourseUnitId] = useState<Record<string, CourseUnitModel>>({});
 
 	const fetchData = useCallback(async () => {
 		if (!courseIdentifier) {
 			throw new Error('courseIdentifier is undefined.');
 		}
 
-		const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
-		const lockStatuses = response.course.currentCourseSession
-			? response.course.currentCourseSession.courseUnitLockStatusesByCourseUnitId
-			: response.course.defaultCourseUnitLockStatusesByCourseUnitId;
-		const courseUnitsFlat = response.course.courseModules.map((courseModule) => courseModule.courseUnits).flat();
-		const desiredCourseUnit = courseUnitsFlat.find((cu) => cu.courseUnitId === unitId);
-		const desiredCourseUnitLockStatus = desiredCourseUnit
-			? lockStatuses[desiredCourseUnit.courseUnitId]
-			: undefined;
-		const desiredCourseUnitCompletionStatus = desiredCourseUnit
-			? response.course.currentCourseSession?.courseSessionUnitStatusIdsByCourseUnitId[
-					desiredCourseUnit.courseUnitId
-			  ]
-			: undefined;
+		const { course: currentCourse } = await coursesService.getCourseDetail(courseIdentifier).fetch();
+		const { currentCourseSession, courseModules, defaultCourseUnitLockStatusesByCourseUnitId } = currentCourse;
 
-		setCourse(response.course);
-		setRequiredModules(
-			response.course.courseModules.filter(
-				(cm) =>
-					!(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-			)
+		const optionalCourseModuleIds = currentCourseSession?.optionalCourseModuleIds ?? [];
+		const courseUnitLockStatusesByCourseUnitId = currentCourseSession
+			? currentCourseSession.courseUnitLockStatusesByCourseUnitId
+			: defaultCourseUnitLockStatusesByCourseUnitId;
+		const courseUnitsFlat = courseModules.flatMap(({ courseUnits }) => courseUnits);
+		const courseUnitMap: Record<string, CourseUnitModel> = courseUnitsFlat.reduce(
+			(accumulator, courseUnit) => ({ ...accumulator, [courseUnit.courseUnitId]: courseUnit }),
+			{}
 		);
-		setOptionalModules(
-			response.course.courseModules.filter((cm) =>
-				(response.course.currentCourseSession?.optionalCourseModuleIds ?? []).includes(cm.courseModuleId)
-			)
-		);
-		setCourseUnit(desiredCourseUnit);
-		setCourseUnitLockStatus(desiredCourseUnitLockStatus);
-		setCourseUnitCompleted(
-			desiredCourseUnitCompletionStatus === CourseSessionUnitStatusId.COMPLETED ||
-				desiredCourseUnitCompletionStatus === CourseSessionUnitStatusId.SKIPPED
-		);
-		setCourseUnitByUnitId(
-			courseUnitsFlat.reduce(
-				(accumulator, currentValue) => ({
-					...accumulator,
-					[currentValue.courseUnitId]: currentValue,
-				}),
-				{}
-			)
-		);
+		const desiredCourseUnit = unitId ? courseUnitMap[unitId] : undefined;
 
 		if (!desiredCourseUnit) {
 			return;
 		}
 
+		const { courseUnitId } = desiredCourseUnit;
+		const completionStatus = currentCourseSession?.courseSessionUnitStatusIdsByCourseUnitId?.[courseUnitId];
+		const isCompleted =
+			completionStatus === CourseSessionUnitStatusId.COMPLETED ||
+			completionStatus === CourseSessionUnitStatusId.SKIPPED;
+
+		setCourse(currentCourse);
+		setRequiredModules(
+			courseModules.filter(({ courseModuleId }) => !optionalCourseModuleIds.includes(courseModuleId))
+		);
+		setOptionalModules(
+			courseModules.filter(({ courseModuleId }) => optionalCourseModuleIds.includes(courseModuleId))
+		);
+		setCourseUnit(desiredCourseUnit);
+		setCourseUnitLockStatus(courseUnitLockStatusesByCourseUnitId[courseUnitId]);
+		setCourseUnitCompleted(isCompleted);
+		setCourseUnitByCourseUnitId(courseUnitMap);
+
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_UNIT, {
 			courseUnitId: desiredCourseUnit.courseUnitId,
-			...(response.course.currentCourseSession?.courseSessionId && {
-				courseSessionId: response.course.currentCourseSession.courseSessionId,
+			...(currentCourseSession?.courseSessionId && {
+				courseSessionId: currentCourseSession.courseSessionId,
 			}),
 		});
 	}, [courseIdentifier, unitId]);
 
 	const navigateToNextAvailableUnit = useCallback(
-		(course: CourseModel, courseSession: CourseSessionModel) => {
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
-				course.courseModules,
-				courseSession
-			);
-
-			if (!desiredUnitId) {
-				navigate(`/courses/${course.urlName}`);
+		(currentCourse: CourseModel) => {
+			if (!currentCourse.currentCourseSession) {
+				navigate(`/courses/${currentCourse.urlName}`);
 				return;
 			}
 
-			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
+			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+				currentCourse.courseModules,
+				currentCourse.currentCourseSession
+			);
+
+			if (desiredUnitId) {
+				navigate(`/courses/${currentCourse.urlName}/course-units/${desiredUnitId}`);
+			} else {
+				navigate(`/courses/${currentCourse.urlName}`);
+			}
 		},
 		[navigate]
 	);
@@ -186,19 +178,15 @@ export const Component = () => {
 				throw new Error('courseIdentifier is undefined.');
 			}
 
-			const response = await coursesService.getCourseDetail(courseIdentifier).fetch();
+			const { course: currentCourse } = await coursesService.getCourseDetail(courseIdentifier).fetch();
 
-			if (!response.course.currentCourseSession) {
-				return;
-			}
-
-			navigateToNextAvailableUnit(response.course, response.course.currentCourseSession);
+			navigateToNextAvailableUnit(currentCourse);
 		} catch (error) {
 			handleError(error);
 		}
 	}, [courseIdentifier, handleError, navigateToNextAvailableUnit]);
 
-	const handleSkipActivityButtonClick = useCallback(async () => {
+	const handleSkipActivityButtonClick = useCallback(() => {
 		try {
 			if (!course) {
 				throw new Error('course is undefined.');
@@ -212,23 +200,23 @@ export const Component = () => {
 				throw new Error('course.currentCourseSession is undefined.');
 			}
 
+			const { courseModules, currentCourseSession, urlName, courseId } = course;
 			const desiredUnitId = getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession(
 				courseUnit,
-				course.courseModules,
-				course.currentCourseSession
+				courseModules,
+				currentCourseSession
 			);
 
-			if (!desiredUnitId) {
-				navigate(`/courses/${course.urlName}`);
-				return;
+			if (desiredUnitId) {
+				navigate(`/courses/${urlName}/course-units/${desiredUnitId}`);
+			} else {
+				navigate(`/courses/${urlName}`);
 			}
 
-			navigate(`/courses/${course.urlName}/course-units/${desiredUnitId}`);
-
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_SKIP, {
-				courseId: course.courseId,
-				...(course.currentCourseSession && {
-					courseSessionId: course.currentCourseSession.courseSessionId,
+				courseId,
+				...(currentCourseSession && {
+					courseSessionId: currentCourseSession.courseSessionId,
 				}),
 				courseUnitId: courseUnit.courseUnitId,
 			});
@@ -242,11 +230,7 @@ export const Component = () => {
 			throw new Error('course is undefined.');
 		}
 
-		if (!course.currentCourseSession) {
-			throw new Error('currentCourseSession is undefined.');
-		}
-
-		navigateToNextAvailableUnit(course, course.currentCourseSession);
+		navigateToNextAvailableUnit(course);
 	}, [course, navigateToNextAvailableUnit]);
 
 	const courseUnitIsStronglyLocked = useMemo(
@@ -259,16 +243,16 @@ export const Component = () => {
 			(
 				courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds[CourseUnitDependencyTypeId.STRONG] ??
 				[]
-			).map((dependencyUnitId) => courseUnitByUnitId[dependencyUnitId]),
-		[courseUnitByUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
+			).map((dependencyUnitId) => courseUnitByCourseUnitId[dependencyUnitId]),
+		[courseUnitByCourseUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
 	);
 
 	const weakCourseUnitDependencies = useMemo(
 		() =>
 			(
 				courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds[CourseUnitDependencyTypeId.WEAK] ?? []
-			).map((dependencyUnitId) => courseUnitByUnitId[dependencyUnitId]),
-		[courseUnitByUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
+			).map((dependencyUnitId) => courseUnitByCourseUnitId[dependencyUnitId]),
+		[courseUnitByCourseUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
 	);
 
 	return (
