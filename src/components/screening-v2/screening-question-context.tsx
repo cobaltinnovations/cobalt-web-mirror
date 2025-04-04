@@ -261,9 +261,9 @@ export const ScreeningQuestionContext = ({
 	);
 
 	const handleQuestionFormSubmit = useCallback(
-		async (event?: React.FormEvent<HTMLFormElement>, force?: boolean) => {
-			event?.preventDefault();
-			submitAnswers({ selectedScreeningAnswers: selectedAnswers, force });
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+			submitAnswers({ selectedScreeningAnswers: selectedAnswers });
 		},
 		[selectedAnswers, submitAnswers]
 	);
