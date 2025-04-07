@@ -78,6 +78,18 @@ export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = 
 	return nextCourseUnit?.courseUnitId;
 };
 
+export const getCurrentCourseModule = (courseModules: CourseModuleModel[], courseSession?: CourseSessionModel) => {
+	if (!courseSession) {
+		return courseModules[0];
+	}
+
+	const currentCourseUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(courseModules, courseSession);
+
+	return courseModules.find((cm) =>
+		cm.courseUnits.map((u) => u.courseUnitId).find((uid) => uid === currentCourseUnitId)
+	);
+};
+
 export const getKalturaScriptForVideo = ({
 	videoPlayerId,
 	courseVideo,

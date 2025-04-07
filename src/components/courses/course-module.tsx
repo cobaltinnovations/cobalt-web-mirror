@@ -101,6 +101,7 @@ interface CourseModuleProps {
 	onCourseUnitClick(courseUnit: CourseUnitModel): void;
 	compact?: boolean;
 	activeCourseUnitId?: string;
+	initialShow?: boolean;
 	className?: string;
 }
 
@@ -111,10 +112,11 @@ export const CourseModule = ({
 	onCourseUnitClick,
 	compact = false,
 	activeCourseUnitId = '',
+	initialShow,
 	className,
 }: CourseModuleProps) => {
 	const classes = useStyles({ compact });
-	const [show, setShow] = useState(true);
+	const [show, setShow] = useState(typeof initialShow !== 'undefined' ? initialShow : true);
 
 	const completeCourseUnits = courseModule.courseUnits.filter((cu) =>
 		Object.keys(courseSessionUnitStatusIdsByCourseUnitId).includes(cu.courseUnitId)

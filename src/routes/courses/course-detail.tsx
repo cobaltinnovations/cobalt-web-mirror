@@ -13,6 +13,7 @@ import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import {
 	getCompletedCourseUnitIds,
+	getCurrentCourseModule,
 	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
 	getOptionalCourseModules,
 	getOrderedCourseUnits,
@@ -243,6 +244,12 @@ export const Component = () => {
 																		}
 																	);
 																}}
+																initialShow={
+																	getCurrentCourseModule(
+																		requiredModules,
+																		course.currentCourseSession
+																	)?.courseModuleId === courseModule.courseModuleId
+																}
 															/>
 														);
 													})}
@@ -297,6 +304,13 @@ export const Component = () => {
 																				}
 																			);
 																		}}
+																		initialShow={
+																			getCurrentCourseModule(
+																				requiredModules,
+																				course.currentCourseSession
+																			)?.courseModuleId ===
+																			courseModule.courseModuleId
+																		}
 																	/>
 																);
 															})}
