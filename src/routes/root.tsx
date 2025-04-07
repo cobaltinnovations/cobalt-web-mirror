@@ -48,6 +48,11 @@ const isUrlPathAcceptableForAnonymousImplicitAccountCreation = (urlPath = window
 		return true;
 	}
 
+	// Check for /in-crisis: match exactly
+	if (urlPath === '/in-crisis') {
+		return true;
+	}
+
 	// Define the other prefixes that must be followed by something (i.e., they always end with a slash).
 	const prefixes = ['/pages/', '/community/', '/featured-topics/'];
 
