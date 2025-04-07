@@ -18,7 +18,7 @@ import {
 	CourseUnitLockStatus,
 	CourseUnitLockTypeId,
 	CourseUnitModel,
-	CourseUnitTypeId,
+	UnitCompletionTypeId,
 } from '@/lib/models';
 import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -224,9 +224,22 @@ export const Component = () => {
 
 	const handleCourseUnitView = useCallback(
 		async (viewedCourseUnit: CourseUnitModel) => {
-			const autoCompleteCourseUnitTypes = [CourseUnitTypeId.HOMEWORK, CourseUnitTypeId.INFOGRAPHIC];
-			const viewedCourseUnitMatchesType = autoCompleteCourseUnitTypes.includes(viewedCourseUnit.courseUnitTypeId);
-			if (!viewedCourseUnitMatchesType) {
+			if (viewedCourseUnit.unitCompletionTypeId !== UnitCompletionTypeId.IMMEDIATELY) {
+				return;
+			}
+
+			try {
+				await coursesService.completeCourseUnit(viewedCourseUnit.courseUnitId).fetch();
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[handleError]
+	);
+
+	const handleCompletionThresholdPassed = useCallback(
+		async (viewedCourseUnit: CourseUnitModel) => {
+			if (viewedCourseUnit.unitCompletionTypeId !== UnitCompletionTypeId.COMPLETION_THRESHOLD_IN_SECONDS) {
 				return;
 			}
 
@@ -429,6 +442,9 @@ export const Component = () => {
 															onSkipActivityButtonClick={handleSkipActivityButtonClick}
 															onNextButtonClick={handleCompletedUnitNextButtonClick}
 															onView={handleCourseUnitView}
+															onCompletionThresholdPassed={
+																handleCompletionThresholdPassed
+															}
 														/>
 													)}
 												</>

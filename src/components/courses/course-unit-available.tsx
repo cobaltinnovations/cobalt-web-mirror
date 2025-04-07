@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import { AnalyticsNativeEventTypeId, CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
+import {
+	AnalyticsNativeEventTypeId,
+	CourseUnitModel,
+	CourseUnitTypeId,
+	CourseVideoModel,
+	UnitCompletionTypeId,
+} from '@/lib/models';
 import { analyticsService } from '@/lib/services';
 import InlineAlert from '@/components/inline-alert';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
@@ -59,6 +65,7 @@ interface CourseUnitAvailableProps {
 	onSkipActivityButtonClick(): void;
 	onNextButtonClick(): void;
 	onView?(courseUnit: CourseUnitModel): void;
+	onCompletionThresholdPassed(courseUnit: CourseUnitModel): void;
 }
 
 export const CourseUnitAvailable = ({
@@ -71,6 +78,7 @@ export const CourseUnitAvailable = ({
 	onSkipActivityButtonClick,
 	onNextButtonClick,
 	onView,
+	onCompletionThresholdPassed,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
 	const screeningFlowParams = useMemo(
@@ -96,9 +104,8 @@ export const CourseUnitAvailable = ({
 	}, [courseUnit, onView]);
 
 	const showNextButton = useMemo(() => {
-		const autoCompleteCourseUnitTypes = [CourseUnitTypeId.HOMEWORK, CourseUnitTypeId.INFOGRAPHIC];
-		return autoCompleteCourseUnitTypes.includes(courseUnit.courseUnitTypeId);
-	}, [courseUnit.courseUnitTypeId]);
+		return courseUnit.unitCompletionTypeId === UnitCompletionTypeId.IMMEDIATELY;
+	}, [courseUnit.unitCompletionTypeId]);
 
 	return (
 		<>
@@ -153,7 +160,7 @@ export const CourseUnitAvailable = ({
 					onVideoPlayerEnd={onActivityComplete}
 					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
 					onCompletionThresholdPassed={() => {
-						console.log('threshold passed!');
+						onCompletionThresholdPassed(courseUnit);
 					}}
 				/>
 			)}

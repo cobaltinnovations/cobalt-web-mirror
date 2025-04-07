@@ -49,6 +49,7 @@ export interface CourseUnitModel {
 	videoId?: string;
 	completionThresholdInSeconds?: number;
 	courseUnitDownloadableFiles: CourseUnitDownloadableFile[];
+	unitCompletionTypeId: UnitCompletionTypeId;
 }
 
 export interface CourseSessionModel {
@@ -119,4 +120,10 @@ export interface CourseUnitDownloadableFile {
 	filesize: number;
 	filesizeDescription: string;
 	url: string;
+}
+
+export enum UnitCompletionTypeId {
+	IMMEDIATELY = 'IMMEDIATELY',
+	DO_NOT_MARK_COMPLETE = 'DO_NOT_MARK_COMPLETE',
+	COMPLETION_THRESHOLD_IN_SECONDS = 'COMPLETION_THRESHOLD_IN_SECONDS',
 }
