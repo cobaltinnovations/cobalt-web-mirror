@@ -18,6 +18,7 @@ import {
 	CourseUnitLockStatus,
 	CourseUnitLockTypeId,
 	CourseUnitModel,
+	CourseUnitTypeId,
 } from '@/lib/models';
 import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -221,6 +222,23 @@ export const Component = () => {
 		navigateToNextAvailableUnit(course);
 	}, [course, navigateToNextAvailableUnit]);
 
+	const handleCourseUnitView = useCallback(
+		async (viewedCourseUnit: CourseUnitModel) => {
+			const autoCompleteCourseUnitTypes = [CourseUnitTypeId.HOMEWORK, CourseUnitTypeId.INFOGRAPHIC];
+			const viewedCourseUnitMatchesType = autoCompleteCourseUnitTypes.includes(viewedCourseUnit.courseUnitTypeId);
+			if (!viewedCourseUnitMatchesType) {
+				return;
+			}
+
+			try {
+				await coursesService.completeCourseUnit(viewedCourseUnit.courseUnitId).fetch();
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[handleError]
+	);
+
 	const courseUnitIsStronglyLocked = useMemo(
 		() => courseUnitLockStatus?.courseUnitLockTypeId === CourseUnitLockTypeId.STRONGLY_LOCKED,
 		[courseUnitLockStatus?.courseUnitLockTypeId]
@@ -409,6 +427,8 @@ export const Component = () => {
 															dependencyCourseUnits={weakCourseUnitDependencies}
 															onActivityComplete={handleActivityComplete}
 															onSkipActivityButtonClick={handleSkipActivityButtonClick}
+															onNextButtonClick={handleCompletedUnitNextButtonClick}
+															onView={handleCourseUnitView}
 														/>
 													)}
 												</>

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { AnalyticsNativeEventTypeId, CourseUnitModel, CourseUnitTypeId, CourseVideoModel } from '@/lib/models';
@@ -57,6 +57,8 @@ interface CourseUnitAvailableProps {
 	dependencyCourseUnits: CourseUnitModel[];
 	onActivityComplete(): void;
 	onSkipActivityButtonClick(): void;
+	onNextButtonClick(): void;
+	onView?(courseUnit: CourseUnitModel): void;
 }
 
 export const CourseUnitAvailable = ({
@@ -67,6 +69,8 @@ export const CourseUnitAvailable = ({
 	dependencyCourseUnits,
 	onActivityComplete,
 	onSkipActivityButtonClick,
+	onNextButtonClick,
+	onView,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
 	const screeningFlowParams = useMemo(
@@ -86,6 +90,15 @@ export const CourseUnitAvailable = ({
 		},
 		[courseSessionId, courseUnit.courseUnitId, courseUnit.videoId]
 	);
+
+	useEffect(() => {
+		onView?.(courseUnit);
+	}, [courseUnit, onView]);
+
+	const showNextButton = useMemo(() => {
+		const autoCompleteCourseUnitTypes = [CourseUnitTypeId.HOMEWORK, CourseUnitTypeId.INFOGRAPHIC];
+		return autoCompleteCourseUnitTypes.includes(courseUnit.courseUnitTypeId);
+	}, [courseUnit.courseUnitTypeId]);
 
 	return (
 		<>
@@ -165,15 +178,27 @@ export const CourseUnitAvailable = ({
 			))}
 
 			<div className="pt-10 d-flex justify-content-end">
-				<Button
-					type="button"
-					variant="light"
-					className="d-flex align-items-center text-decoration-none pe-3"
-					onClick={onSkipActivityButtonClick}
-				>
-					Skip Activity
-					<RightChevron className="ms-1" />
-				</Button>
+				{showNextButton ? (
+					<Button
+						type="button"
+						variant="primary"
+						className="d-flex align-items-center text-decoration-none pe-3"
+						onClick={onNextButtonClick}
+					>
+						Next
+						<RightChevron className="ms-1" />
+					</Button>
+				) : (
+					<Button
+						type="button"
+						variant="light"
+						className="d-flex align-items-center text-decoration-none pe-3"
+						onClick={onSkipActivityButtonClick}
+					>
+						Skip Activity
+						<RightChevron className="ms-1" />
+					</Button>
+				)}
 			</div>
 		</>
 	);
