@@ -137,13 +137,13 @@ export const CourseModule = ({
 					</span>
 					{!compact && (
 						<span className="d-block fs-default">
-							{completeCourseUnits}/{totalCourseUnits} units &bull;{' '}
+							{completeCourseUnits}/{totalCourseUnits} unit{totalCourseUnits === 1 ? '' : 's'} &bull;{' '}
 							{courseModule.estimatedCompletionTimeInMinutesDescription}
 						</span>
 					)}
 				</div>
 				<DownChevron
-					className="d-flex text-n500"
+					className="d-flex text-n500 flex-shrink-0"
 					style={{ transform: `rotate(${show ? '180deg' : '0deg'})` }}
 				/>
 			</Button>
