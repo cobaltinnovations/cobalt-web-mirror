@@ -151,6 +151,10 @@ export const CourseUnitAvailable = ({
 					courseVideos={courseVideos}
 					onVideoPlayerEvent={handleVideoPlayerEvent}
 					onVideoPlayerEnd={onActivityComplete}
+					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
+					onCompletionThresholdPassed={() => {
+						console.log('threshold passed!');
+					}}
 				/>
 			)}
 

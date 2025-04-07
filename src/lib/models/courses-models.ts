@@ -47,6 +47,7 @@ export interface CourseUnitModel {
 	screeningFlowId?: string;
 	title: string;
 	videoId?: string;
+	completionThresholdInSeconds?: number;
 	courseUnitDownloadableFiles: CourseUnitDownloadableFile[];
 }
 

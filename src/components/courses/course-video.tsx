@@ -49,15 +49,25 @@ interface CourseVideoProps {
 	videoId: string;
 	courseVideos: CourseVideoModel[];
 	onVideoPlayerEvent(eventName: string, eventPayload: unknown): void;
+	completionThresholdInSeconds: number;
+	onCompletionThresholdPassed(): void;
 	onVideoPlayerEnd(): void;
 }
 
-export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent, onVideoPlayerEnd }: CourseVideoProps) => {
+export const CourseVideo = ({
+	videoId,
+	courseVideos,
+	onVideoPlayerEvent,
+	completionThresholdInSeconds,
+	onCompletionThresholdPassed,
+	onVideoPlayerEnd,
+}: CourseVideoProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [videoPlayerReady, setVideoPlayerReady] = useState(false);
 	const [videoPlayerTimedOut, setVideoPlayerTimedOut] = useState(false);
 	const videoLoadingTimeoutRef = useRef<NodeJS.Timeout>();
+	const completionThresholdPassedRef = useRef(false);
 
 	const stopVideoLoadingTimer = useCallback(() => {
 		if (!videoLoadingTimeoutRef.current) {
@@ -103,6 +113,15 @@ export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent, onVideo
 					stopVideoLoadingTimer();
 				}
 
+				if (
+					!completionThresholdPassedRef.current &&
+					eventName === 'playerUpdatePlayhead' &&
+					(eventPayload as number) > completionThresholdInSeconds
+				) {
+					completionThresholdPassedRef.current = true;
+					onCompletionThresholdPassed();
+				}
+
 				if (eventName === 'playerPlayEnd') {
 					onVideoPlayerEnd();
 				}
@@ -110,8 +129,6 @@ export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent, onVideo
 				if (eventName === 'playerUpdatePlayhead') {
 					throttledPlayerEvent(eventName, eventPayload);
 				} else {
-					console.log('eventName', eventName);
-					console.log('eventPayload', eventPayload);
 					onVideoPlayerEvent(eventName, eventPayload);
 				}
 			},
@@ -128,8 +145,10 @@ export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent, onVideo
 			document.body.removeChild(script);
 		};
 	}, [
+		completionThresholdInSeconds,
 		courseVideos,
 		handleError,
+		onCompletionThresholdPassed,
 		onVideoPlayerEnd,
 		onVideoPlayerEvent,
 		startVideoLoadingTimer,
