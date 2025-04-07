@@ -150,6 +150,7 @@ export const CourseUnitAvailable = ({
 					videoId={courseUnit.videoId ?? ''}
 					courseVideos={courseVideos}
 					onVideoPlayerEvent={handleVideoPlayerEvent}
+					onVideoPlayerEnd={onActivityComplete}
 				/>
 			)}
 

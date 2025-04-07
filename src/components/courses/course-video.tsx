@@ -49,9 +49,10 @@ interface CourseVideoProps {
 	videoId: string;
 	courseVideos: CourseVideoModel[];
 	onVideoPlayerEvent(eventName: string, eventPayload: unknown): void;
+	onVideoPlayerEnd(): void;
 }
 
-export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent }: CourseVideoProps) => {
+export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent, onVideoPlayerEnd }: CourseVideoProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [videoPlayerReady, setVideoPlayerReady] = useState(false);
@@ -102,9 +103,15 @@ export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent }: Cours
 					stopVideoLoadingTimer();
 				}
 
+				if (eventName === 'playerPlayEnd') {
+					onVideoPlayerEnd();
+				}
+
 				if (eventName === 'playerUpdatePlayhead') {
 					throttledPlayerEvent(eventName, eventPayload);
 				} else {
+					console.log('eventName', eventName);
+					console.log('eventPayload', eventPayload);
 					onVideoPlayerEvent(eventName, eventPayload);
 				}
 			},
@@ -123,6 +130,7 @@ export const CourseVideo = ({ videoId, courseVideos, onVideoPlayerEvent }: Cours
 	}, [
 		courseVideos,
 		handleError,
+		onVideoPlayerEnd,
 		onVideoPlayerEvent,
 		startVideoLoadingTimer,
 		stopVideoLoadingTimer,
