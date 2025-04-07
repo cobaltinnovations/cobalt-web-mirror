@@ -38,6 +38,16 @@ const isUrlPathAcceptableForAnonymousImplicitAccountCreation = (urlPath = window
 		return true;
 	}
 
+	// Check for /group-sessions: match exactly or followed by a slash.
+	if (urlPath === '/group-sessions' || urlPath.startsWith('/group-sessions/')) {
+		return true;
+	}
+
+	// Check for /connect-with-support: match exactly or followed by a slash.
+	if (urlPath === '/connect-with-support' || urlPath.startsWith('/connect-with-support/')) {
+		return true;
+	}
+
 	// Define the other prefixes that must be followed by something (i.e., they always end with a slash).
 	const prefixes = ['/pages/', '/community/', '/featured-topics/'];
 
