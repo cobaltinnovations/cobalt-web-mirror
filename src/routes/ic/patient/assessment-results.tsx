@@ -199,26 +199,44 @@ export const PatientAssessmentResults = () => {
 										</p>
 									)}
 
-									{patientOrder.patientOrderReferralSourceId ===
-										PatientOrderReferralSourceId.SELF && (
-										<p className="mb-6 fs-large">
-											Based on the symptoms reported, we recommend that you meet with a{' '}
-											<strong>Mental Health Provider</strong>.
-										</p>
-									)}
+									{patientOrder.patientOrderReferralSourceId === PatientOrderReferralSourceId.SELF &&
+										!institution.integratedCareMhpTriageOverviewOverride && (
+											<p className="mb-6 fs-large">
+												Based on your responses,{' '}
+												<strong>
+													you are eligible to self-schedule an an appointment with a Mental
+													Health Provider
+												</strong>
+												.
+											</p>
+										)}
+
+									{patientOrder.patientOrderReferralSourceId === PatientOrderReferralSourceId.SELF &&
+										institution.integratedCareMhpTriageOverviewOverride && (
+											<p
+												className="mb-6 fs-large"
+												dangerouslySetInnerHTML={{
+													__html: institution.integratedCareMhpTriageOverviewOverride,
+												}}
+											/>
+										)}
 
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.SELF && (
 										<p className="mb-6 fs-large">
-											You can <strong>schedule an initial in-person appointment</strong> with a
-											Mental Health Provider by browsing the list of providers and choosing an
-											available appointment time. If you have any questions, please call us at{' '}
+											Please browse the list of available times and choose the appointment that is
+											most convenient for you. If you have any questions, please call{' '}
+											{institution.integratedCareCallCenterName
+												? `the ${institution.integratedCareCallCenterName}`
+												: 'us'}{' '}
+											at{' '}
 											<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
 												{institution?.integratedCarePhoneNumberDescription}
 											</a>{' '}
 											{institution.integratedCareAvailabilityDescription}.
 										</p>
 									)}
+
 									<div className="mb-4 text-center">
 										<Button
 											size="lg"
