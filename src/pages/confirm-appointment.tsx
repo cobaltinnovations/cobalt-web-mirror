@@ -273,8 +273,11 @@ const ConfirmAppointment = () => {
 							<p className="mb-6">
 								Your appointment will be scheduled for {formattedTime} on {formattedDate}. If this is
 								OK, press the Book Appointment button below. If you have any trouble booking your
-								appointment, please call the {institution.integratedCareProgramName} Resource Center at{' '}
-								{institution.integratedCarePhoneNumberDescription}{' '}
+								appointment, please call the{' '}
+								{institution.integratedCareCallCenterName
+									? `${institution.integratedCareCallCenterName}`
+									: `${institution.integratedCareProgramName} Resource Center}`}{' '}
+								at {institution.integratedCarePhoneNumberDescription}{' '}
 								{institution.integratedCareAvailabilityDescription}.
 							</p>
 							<div className="text-right">

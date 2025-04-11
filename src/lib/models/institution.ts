@@ -83,6 +83,10 @@ export interface Institution {
 	resourcePacketsEnabled?: boolean;
 	integratedCarePatientDemographicsRequired: boolean;
 	integratedCarePatientCarePreferenceVisible: boolean;
+	integratedCareCallCenterName?: string;
+	integratedCareMhpTriageOverviewOverride?: string;
+	integratedCareBookingInsuranceRequirements?: string;
+	landingPageTaglineOverride?: string;
 }
 
 export interface InstitutionFeature {
