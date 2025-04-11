@@ -217,7 +217,7 @@ export const Component = () => {
 			/* ------------------------------------------------------------------ */
 			if (response.patientOrder.patientOrderReferralSourceId === PatientOrderReferralSourceId.SELF) {
 				setIntroductionText(
-					`Thank you for contacting the <strong>${institution.name}</strong> program for further assessment. Follow the steps below to connect to mental health services.`
+					`Thank you for participating in this pilot. Follow the steps below to determine eligibility to self-schedule with ${institution.name}.`
 				);
 			} else {
 				setIntroductionText(
