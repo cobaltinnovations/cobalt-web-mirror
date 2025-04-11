@@ -73,10 +73,15 @@ export const SignInPatient = ({ onAccountSourceClick }: SignInCobaltProps) => {
 									<Logo className="text-primary" width={151.11} height={20} />
 								</div>
 								<h1 className="mb-6">Welcome to {institution?.name}</h1>
-								<h4 className="mb-6">
-									The {institution?.integratedCareProgramName} program connects you to the correct
-									level of mental healthcare
-								</h4>
+								{!institution.landingPageTaglineOverride && (
+									<h4 className="mb-6">
+										The {institution?.integratedCareProgramName} program connects you to the correct
+										level of mental healthcare
+									</h4>
+								)}
+								{institution.landingPageTaglineOverride && (
+									<h4 className="mb-6">{institution.landingPageTaglineOverride}</h4>
+								)}
 								<hr className="mb-6" />
 								<h3 className="mb-4">Sign in</h3>
 								<p className="mb-6">
