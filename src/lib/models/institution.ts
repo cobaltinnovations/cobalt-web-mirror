@@ -85,6 +85,7 @@ export interface Institution {
 	integratedCarePatientCarePreferenceVisible: boolean;
 	integratedCareCallCenterName?: string;
 	integratedCareMhpTriageOverviewOverride?: string;
+	integratedCareBookingInsuranceRequirements?: string;
 }
 
 export interface InstitutionFeature {

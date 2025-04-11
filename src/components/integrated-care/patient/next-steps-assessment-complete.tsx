@@ -65,6 +65,7 @@ export const NextStepsAssessmentComplete = ({
 		<>
 			<PatientInsuranceStatementModal
 				show={showInsuranceStatementModal}
+				content={institution.integratedCareBookingInsuranceRequirements!}
 				onHide={() => {
 					setShowInsuranceStatementModal(false);
 				}}

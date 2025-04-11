@@ -114,6 +114,7 @@ export const PatientAssessmentResults = () => {
 			<AsyncWrapper fetchData={fetchData}>
 				<PatientInsuranceStatementModal
 					show={showInsuranceStatementModal}
+					content={institution.integratedCareBookingInsuranceRequirements!}
 					onHide={() => {
 						setShowInsuranceStatementModal(false);
 					}}
