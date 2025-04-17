@@ -11,6 +11,7 @@ import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	headerAlert: {
+		minHeight: 60,
 		display: 'flex',
 		alignItems: 'center',
 		padding: '10px 40px',
@@ -24,8 +25,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: theme.colors.s500,
 		},
 		'&--warning': {
-			color: theme.colors.n900,
-			backgroundColor: theme.colors.w500,
+			color: theme.colors.w900,
+			backgroundColor: theme.colors.w300,
 		},
 		'&--danger': {
 			color: theme.colors.n0,
@@ -54,7 +55,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface HeaderAlertProps {
 	title: string;
-	message: string;
+	message?: string;
 	variant?: 'primary' | 'success' | 'warning' | 'danger';
 	dismissable?: boolean;
 	onDismiss?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -95,7 +96,7 @@ const HeaderAlert = ({
 			<div className={classes.iconOuter}>{variant && icon[variant]}</div>
 			<div className={classes.messageOuter}>
 				<div className="fw-bold" dangerouslySetInnerHTML={{ __html: title }} />
-				<div dangerouslySetInnerHTML={{ __html: message }} />
+				{message && <div dangerouslySetInnerHTML={{ __html: message ?? '' }} />}
 			</div>
 			{dismissable && (
 				<div className={classes.buttonOuter}>
