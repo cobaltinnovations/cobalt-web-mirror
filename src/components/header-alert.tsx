@@ -25,7 +25,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: theme.colors.s500,
 		},
 		'&--warning': {
-			color: theme.colors.w900,
+			color: theme.colors.n900,
 			backgroundColor: theme.colors.w300,
 		},
 		'&--danger': {
