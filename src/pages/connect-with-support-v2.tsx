@@ -285,11 +285,16 @@ const ConnectWithSupportV2 = () => {
 						return (
 							<Form.Check
 								key={l.institutionLocationId}
-								className="mb-1"
+								className="mb-1 align-items-start"
 								type="radio"
 								name="employer"
 								id={`employer--${l.institutionLocationId}`}
-								label={l.name}
+								label={
+									<>
+										<span className="d-block fw-semibold">{l.shortName ?? l.name}</span>
+										{l.shortName && <span className="d-block text-n500">{l.name}</span>}
+									</>
+								}
 								value={l.institutionLocationId}
 								checked={selectedEmployerId === l.institutionLocationId}
 								onChange={({ currentTarget }) => {
@@ -302,7 +307,7 @@ const ConnectWithSupportV2 = () => {
 						type="radio"
 						name="employer"
 						id="employer--NA"
-						label="I'm not sure / I'd rather not say"
+						label={<span className="fw-semibold">I'm not sure / I'd rather not say</span>}
 						value="NA"
 						checked={selectedEmployerId === 'NA'}
 						onChange={({ currentTarget }) => {
