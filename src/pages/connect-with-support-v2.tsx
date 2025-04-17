@@ -36,6 +36,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
 import CallToActionBlock from '@/components/call-to-action-block';
+import HeaderAlert from '@/components/header-alert';
 
 import scheduleApptWoman from '@/assets/images/img-ill-schedule-appt-woman.png';
 
@@ -324,6 +325,16 @@ const ConnectWithSupportV2 = () => {
 
 			<BookingModals ref={bookingRef} />
 			<IneligibleBookingModal show={!isEligible} onHide={() => setIsEligible(true)} />
+
+			{featureDetails?.bannerMessage && (
+				<HeaderAlert
+					variant={
+						(featureDetails.bannerMessageDisplayTypeId?.toLocaleLowerCase() as unknown as 'primary') ??
+						'primary'
+					}
+					title={featureDetails.bannerMessage}
+				/>
+			)}
 
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
