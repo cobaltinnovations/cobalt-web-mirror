@@ -1,9 +1,9 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import mediaQueries from '@/jss/media-queries';
+import mediaQueries, { screenWidths } from '@/jss/media-queries';
 
 import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
@@ -179,6 +179,11 @@ interface CourseUnitLayoutProps {
 	onShowMenuToggle(showMenu: boolean): void;
 }
 
+enum SIZES {
+	MOBILE = 'MOBILE',
+	DESKTOP = 'DESKTOP',
+}
+
 export const CourseUnitLayout = ({
 	title,
 	onExitButtonClick,
@@ -189,6 +194,25 @@ export const CourseUnitLayout = ({
 	children,
 }: PropsWithChildren<CourseUnitLayoutProps>) => {
 	const classes = useStyles();
+	const size = useRef<SIZES>();
+
+	useEffect(() => {
+		const handleWindowResize = () => {
+			if (window.outerWidth <= screenWidths.lg && size.current !== SIZES.MOBILE) {
+				size.current = SIZES.MOBILE;
+				onShowMenuToggle(false);
+			} else if (window.outerWidth > screenWidths.lg && size.current !== SIZES.DESKTOP) {
+				size.current = SIZES.DESKTOP;
+				onShowMenuToggle(true);
+			}
+		};
+
+		handleWindowResize();
+		window.addEventListener('resize', handleWindowResize);
+		return () => {
+			window.removeEventListener('resize', handleWindowResize);
+		};
+	}, [onShowMenuToggle]);
 
 	return (
 		<>
