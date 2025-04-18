@@ -36,6 +36,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
 import CallToActionBlock from '@/components/call-to-action-block';
+import HeaderAlert from '@/components/header-alert';
 
 import scheduleApptWoman from '@/assets/images/img-ill-schedule-appt-woman.png';
 
@@ -285,11 +286,16 @@ const ConnectWithSupportV2 = () => {
 						return (
 							<Form.Check
 								key={l.institutionLocationId}
-								className="mb-1"
+								className="mb-1 align-items-start"
 								type="radio"
 								name="employer"
 								id={`employer--${l.institutionLocationId}`}
-								label={l.name}
+								label={
+									<>
+										<span className="d-block fw-semibold">{l.shortName ?? l.name}</span>
+										{l.shortName && <span className="d-block text-n500">{l.name}</span>}
+									</>
+								}
 								value={l.institutionLocationId}
 								checked={selectedEmployerId === l.institutionLocationId}
 								onChange={({ currentTarget }) => {
@@ -302,7 +308,7 @@ const ConnectWithSupportV2 = () => {
 						type="radio"
 						name="employer"
 						id="employer--NA"
-						label="I'm not sure / I'd rather not say"
+						label={<span className="fw-semibold">I'm not sure / I'd rather not say</span>}
 						value="NA"
 						checked={selectedEmployerId === 'NA'}
 						onChange={({ currentTarget }) => {
@@ -319,6 +325,16 @@ const ConnectWithSupportV2 = () => {
 
 			<BookingModals ref={bookingRef} />
 			<IneligibleBookingModal show={!isEligible} onHide={() => setIsEligible(true)} />
+
+			{featureDetails?.bannerMessage && (
+				<HeaderAlert
+					variant={
+						(featureDetails.bannerMessageDisplayTypeId?.toLocaleLowerCase() as unknown as 'primary') ??
+						'primary'
+					}
+					title={featureDetails.bannerMessage}
+				/>
+			)}
 
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
@@ -500,13 +516,24 @@ const ConnectWithSupportV2 = () => {
 																	return (
 																		<Form.Check
 																			key={l.institutionLocationId}
-																			className={classNames({
+																			className={classNames('align-items-start', {
 																				'mb-1': !isLast,
 																			})}
 																			type="radio"
 																			name="location"
 																			id={`location--${l.institutionLocationId}`}
-																			label={l.name}
+																			label={
+																				<>
+																					<span className="d-block fw-semibold">
+																						{l.shortName ?? l.name}
+																					</span>
+																					{l.shortName && (
+																						<span className="d-block text-n500">
+																							{l.name}
+																						</span>
+																					)}
+																				</>
+																			}
 																			value={l.institutionLocationId}
 																			checked={
 																				selectedInstitutionLocationId ===

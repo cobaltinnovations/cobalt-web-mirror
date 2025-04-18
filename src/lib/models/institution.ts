@@ -84,6 +84,10 @@ export interface Institution {
 	resourcePacketsEnabled?: boolean;
 	integratedCarePatientDemographicsRequired: boolean;
 	integratedCarePatientCarePreferenceVisible: boolean;
+	integratedCareCallCenterName?: string;
+	integratedCareMhpTriageOverviewOverride?: string;
+	integratedCareBookingInsuranceRequirements?: string;
+	landingPageTaglineOverride?: string;
 	onboardingScreeningFlowId?: string;
 }
 
@@ -101,6 +105,19 @@ export interface InstitutionFeature {
 	locationPromptRequired: boolean;
 	treatmentDescription?: string;
 	subtitle?: string;
+	bannerMessage?: string;
+	bannerMessageDisplayTypeId?: DisplayTypeId;
+}
+
+export enum DisplayTypeId {
+	PRIMARY = 'PRIMARY',
+	SECONDARY = 'SECONDARY',
+	SUCCESS = 'SUCCESS',
+	DANGER = 'DANGER',
+	WARNING = 'WARNING',
+	INFO = 'INFO',
+	DARK = 'DARK',
+	LIGHT = 'LIGHT',
 }
 
 export interface AdditionalNavigationItem {
@@ -162,6 +179,7 @@ export interface InstitutionLocation {
 	institutionId: string;
 	institutionLocationId: string;
 	name: string;
+	shortName?: string;
 }
 
 export enum AlertTypeId {
