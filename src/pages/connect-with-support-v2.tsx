@@ -516,13 +516,24 @@ const ConnectWithSupportV2 = () => {
 																	return (
 																		<Form.Check
 																			key={l.institutionLocationId}
-																			className={classNames({
+																			className={classNames('align-items-start', {
 																				'mb-1': !isLast,
 																			})}
 																			type="radio"
 																			name="location"
 																			id={`location--${l.institutionLocationId}`}
-																			label={l.name}
+																			label={
+																				<>
+																					<span className="d-block fw-semibold">
+																						{l.shortName ?? l.name}
+																					</span>
+																					{l.shortName && (
+																						<span className="d-block text-n500">
+																							{l.name}
+																						</span>
+																					)}
+																				</>
+																			}
 																			value={l.institutionLocationId}
 																			checked={
 																				selectedInstitutionLocationId ===
