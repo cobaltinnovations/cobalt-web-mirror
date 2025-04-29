@@ -175,12 +175,19 @@ export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnIma
 	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
 };
 
+export enum SITE_LOCATION_ID {
+	COMMUNITY = 'COMMUNITY',
+	FEATURED_TOPIC = 'FEATURED_TOPIC',
+}
+
 export interface PageSiteLocationModel {
 	pageId: string;
+	siteLocationId: SITE_LOCATION_ID;
 	relativeUrl: string;
 	headline: string;
 	description: string;
-	imageAltText: string;
+	shortDescription?: string;
+	imageAltText?: string;
 	imageUrl: string;
 	callToAction: string;
 }
