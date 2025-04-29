@@ -13,6 +13,7 @@ import {
 	PageSiteLocationModel,
 	PresignedUploadResponse,
 	ResourcesRowModel,
+	SITE_LOCATION_ID,
 	TagGroupRowModel,
 	TagRowModel,
 	ThreeColumnImageRowModel,
@@ -403,10 +404,16 @@ export const pagesService = {
 			url: `/pages/published/${pageIdentifier}`,
 		});
 	},
-	getPageSiteLocations(siteLocationId: string) {
-		return httpSingleton.orchestrateRequest<{ pageSiteLocations: PageSiteLocationModel }>({
+	getPageSiteLocations() {
+		return httpSingleton.orchestrateRequest<{ pageSiteLocations: PageSiteLocationModel[] }>({
 			method: 'GET',
-			url: `/pages/site-location/${siteLocationId}`,
+			url: '/page-site-locations',
+		});
+	},
+	getPageSiteLocationsBySiteLocationId(siteLocationId: SITE_LOCATION_ID) {
+		return httpSingleton.orchestrateRequest<{ pageSiteLocations: PageSiteLocationModel[] }>({
+			method: 'GET',
+			url: `/page-site-locations/${siteLocationId}`,
 		});
 	},
 };

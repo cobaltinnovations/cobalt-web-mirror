@@ -321,7 +321,7 @@ const MobileAccordianItem = ({
 };
 
 const HeaderV2 = () => {
-	const { featuredTopicCenter } = useAppRootLoaderData();
+	const { featuredTopicCenter, legacyFeaturedTopicCenter } = useAppRootLoaderData();
 	const { pathname } = useLocation();
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
@@ -519,7 +519,7 @@ const HeaderV2 = () => {
 								matchPath(url + '/*', pathname)
 							),
 							items: (institution?.additionalNavigationItems ?? []).map(
-								({ iconName, imageUrl, name, url, topicCenterId }, index) => ({
+								({ iconName, imageUrl, name, url, topicCenterId, pageId }, index) => ({
 									testId: `menuLink-additionalItem${index}`,
 									icon: (
 										<AdditionalNavigationItemIconOrImage
@@ -533,13 +533,22 @@ const HeaderV2 = () => {
 									description: '',
 									to: url,
 									onClick: () => {
-										analyticsService.persistEvent(
-											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
-											{
-												topicCenterId: topicCenterId,
-												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
-											}
-										);
+										if (institution.preferLegacyTopicCenters) {
+											analyticsService.persistEvent(
+												AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+												{
+													topicCenterId,
+													source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+												}
+											);
+
+											return;
+										}
+
+										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
+											pageId,
+											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+										});
 									},
 								})
 							),
@@ -548,10 +557,11 @@ const HeaderV2 = () => {
 				: []),
 		];
 	}, [
-		pathname,
+		institution?.additionalNavigationItems,
 		institution?.featuresEnabled,
 		institution?.features,
-		institution?.additionalNavigationItems,
+		institution.preferLegacyTopicCenters,
+		pathname,
 		account?.institutionLocationId,
 	]);
 
@@ -625,15 +635,37 @@ const HeaderV2 = () => {
 		[handleError, revalidator]
 	);
 
-	const featuredTopicCenterItem: NavFeaturedItem | undefined = featuredTopicCenter && {
-		subtitle: 'Featured Topic',
-		name: featuredTopicCenter.featuredTitle!,
-		imageAlt: featuredTopicCenter.name!,
-		imageUrl: featuredTopicCenter.imageUrl!,
-		descriptionHtml: featuredTopicCenter.navDescription!,
-		linkTo: `/featured-topics/${featuredTopicCenter.urlName}`,
-		topicCenterId: featuredTopicCenter.topicCenterId,
-	};
+	const featuredTopicCenterItem: NavFeaturedItem | undefined = useMemo(() => {
+		if (institution.preferLegacyTopicCenters) {
+			return legacyFeaturedTopicCenter
+				? {
+						isLegacy: true,
+						subtitle: 'Featured Topic',
+						name: legacyFeaturedTopicCenter.featuredTitle!,
+						imageAlt: legacyFeaturedTopicCenter.name!,
+						imageUrl: legacyFeaturedTopicCenter.imageUrl!,
+						descriptionHtml: legacyFeaturedTopicCenter.navDescription!,
+						linkTo: `/featured-topics/${legacyFeaturedTopicCenter.urlName}`,
+						topicCenterId: legacyFeaturedTopicCenter.topicCenterId,
+						pageId: '',
+				  }
+				: undefined;
+		}
+
+		return featuredTopicCenter
+			? {
+					isLegacy: false,
+					subtitle: 'Featured Topic',
+					name: featuredTopicCenter.headline,
+					imageAlt: featuredTopicCenter.imageAltText ?? '',
+					imageUrl: featuredTopicCenter.imageUrl,
+					descriptionHtml: featuredTopicCenter.shortDescription ?? '',
+					linkTo: featuredTopicCenter.relativeUrl,
+					topicCenterId: '',
+					pageId: featuredTopicCenter.pageId,
+			  }
+			: undefined;
+	}, [featuredTopicCenter, institution.preferLegacyTopicCenters, legacyFeaturedTopicCenter]);
 
 	const routeMatches = useMatches();
 	const hideHeader = useMemo(
@@ -696,13 +728,22 @@ const HeaderV2 = () => {
 													className="bg-n50 mt-6 px-4 py-6"
 													featuredItem={featuredTopicCenterItem}
 													onImageClick={() => {
-														analyticsService.persistEvent(
-															AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
-															{
-																topicCenterId: featuredTopicCenterItem.topicCenterId,
-																source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
-															}
-														);
+														featuredTopicCenterItem.isLegacy
+															? analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+																	{
+																		topicCenterId:
+																			featuredTopicCenterItem.topicCenterId,
+																		source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+																	}
+															  )
+															: analyticsService.persistEvent(
+																	AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
+																	{
+																		pageId: featuredTopicCenterItem.pageId,
+																		source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+																	}
+															  );
 													}}
 												/>
 											)}

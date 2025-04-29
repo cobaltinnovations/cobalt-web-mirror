@@ -70,7 +70,8 @@ const resourceLibraryCarouselConfig = {
 };
 
 const Index: FC = () => {
-	const { featuredTopicCenter, secondaryFeaturedTopicCenter } = useAppRootLoaderData();
+	const { featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
+		useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
@@ -241,64 +242,97 @@ const Index: FC = () => {
 				)}
 			</AsyncPage>
 
-			{featuredTopicCenter && (
-				<Container className="pt-4 pt-lg-8">
-					<CallToActionBlock
-						subheading="Featured Topic"
-						heading={featuredTopicCenter.featuredTitle!}
-						descriptionHtml={featuredTopicCenter.featuredDescription!}
-						imageUrl={featuredTopicCenter.imageUrl!}
-						primaryActionText={featuredTopicCenter.featuredCallToAction!}
-						onPrimaryActionClick={() => {
-							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
-								topicCenterId: featuredTopicCenter.topicCenterId,
-								source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-							});
+			{institution.preferLegacyTopicCenters ? (
+				<>
+					{legacyFeaturedTopicCenter && (
+						<Container className="pt-4 pt-lg-8">
+							<CallToActionBlock
+								subheading="Featured Topic"
+								heading={legacyFeaturedTopicCenter.featuredTitle!}
+								descriptionHtml={legacyFeaturedTopicCenter.featuredDescription!}
+								imageUrl={legacyFeaturedTopicCenter.imageUrl!}
+								primaryActionText={legacyFeaturedTopicCenter.featuredCallToAction!}
+								onPrimaryActionClick={() => {
+									analyticsService.persistEvent(
+										AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+										{
+											topicCenterId: legacyFeaturedTopicCenter.topicCenterId,
+											source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+										}
+									);
 
-							if (featuredTopicCenter.urlOverride) {
-								window.location.href = featuredTopicCenter.urlOverride;
-							} else {
-								navigate('/featured-topics/' + featuredTopicCenter.urlName);
-							}
-						}}
-						className="mb-4"
-					/>
-				</Container>
-			)}
-
-			{secondaryFeaturedTopicCenter && (
-				<Container className="pt-4 pt-lg-8">
-					<CallToActionBlock
-						variant="light"
-						heading={secondaryFeaturedTopicCenter.featuredTitle ?? ''}
-						descriptionHtml={secondaryFeaturedTopicCenter.featuredDescription ?? ''}
-						imageUrl={secondaryFeaturedTopicCenter.imageUrl ?? ''}
-						primaryActionText={secondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
-						onPrimaryActionClick={() => {
-							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
-								topicCenterId: secondaryFeaturedTopicCenter.topicCenterId,
-								source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_SECONDARY_FEATURE,
-							});
-
-							if (secondaryFeaturedTopicCenter.urlOverride) {
-								try {
-									const url = new URL(secondaryFeaturedTopicCenter.urlOverride);
-									const isExternal = url.origin !== window.location.origin;
-									if (isExternal) {
-										window.location.href = secondaryFeaturedTopicCenter.urlOverride;
+									if (legacyFeaturedTopicCenter.urlOverride) {
+										window.location.href = legacyFeaturedTopicCenter.urlOverride;
 									} else {
-										navigate(secondaryFeaturedTopicCenter.urlOverride);
+										navigate('/featured-topics/' + legacyFeaturedTopicCenter.urlName);
 									}
-								} catch (error) {
-									navigate(secondaryFeaturedTopicCenter.urlOverride);
-								}
-							} else {
-								navigate('/featured-topics/' + secondaryFeaturedTopicCenter.urlName);
-							}
-						}}
-						className="mb-4"
-					/>
-				</Container>
+								}}
+								className="mb-4"
+							/>
+						</Container>
+					)}
+					{legacySecondaryFeaturedTopicCenter && (
+						<Container className="pt-4 pt-lg-8">
+							<CallToActionBlock
+								variant="light"
+								heading={legacySecondaryFeaturedTopicCenter.featuredTitle ?? ''}
+								descriptionHtml={legacySecondaryFeaturedTopicCenter.featuredDescription ?? ''}
+								imageUrl={legacySecondaryFeaturedTopicCenter.imageUrl ?? ''}
+								primaryActionText={legacySecondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
+								onPrimaryActionClick={() => {
+									analyticsService.persistEvent(
+										AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+										{
+											topicCenterId: legacySecondaryFeaturedTopicCenter.topicCenterId,
+											source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_SECONDARY_FEATURE,
+										}
+									);
+
+									if (legacySecondaryFeaturedTopicCenter.urlOverride) {
+										try {
+											const url = new URL(legacySecondaryFeaturedTopicCenter.urlOverride);
+											const isExternal = url.origin !== window.location.origin;
+											if (isExternal) {
+												window.location.href = legacySecondaryFeaturedTopicCenter.urlOverride;
+											} else {
+												navigate(legacySecondaryFeaturedTopicCenter.urlOverride);
+											}
+										} catch (error) {
+											navigate(legacySecondaryFeaturedTopicCenter.urlOverride);
+										}
+									} else {
+										navigate('/featured-topics/' + legacySecondaryFeaturedTopicCenter.urlName);
+									}
+								}}
+								className="mb-4"
+							/>
+						</Container>
+					)}
+				</>
+			) : (
+				<>
+					{featuredTopicCenters.length > 0 && (
+						<Container className="pt-4 pt-lg-8">
+							{featuredTopicCenters.map((topicCenter) => (
+								<CallToActionBlock
+									heading={topicCenter.headline}
+									descriptionHtml={topicCenter.description}
+									imageUrl={topicCenter.imageUrl}
+									primaryActionText={topicCenter.callToAction}
+									onPrimaryActionClick={() => {
+										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
+											pageId: topicCenter.pageId,
+											source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+										});
+
+										navigate(topicCenter.relativeUrl);
+									}}
+									className="mb-4"
+								/>
+							))}
+						</Container>
+					)}
+				</>
 			)}
 
 			<AsyncPage

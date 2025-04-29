@@ -23,11 +23,17 @@ import { AnalyticsProvider } from '@/contexts/analytics-context';
 import { BookingProvider } from '@/contexts/booking-context';
 import useConsentState from '@/hooks/use-consent-state';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
-import { accountService, institutionService, topicCenterService } from '@/lib/services';
+import { accountService, institutionService, pagesService, topicCenterService } from '@/lib/services';
 import { getCookieOrParamAsBoolean, getSubdomain } from '@/lib/utils';
 import { decodeAccessToken, updateTokenCookies } from '@/routes/auth';
 import Loader from '@/components/loader';
-import { AccountSourceId, AnonymousAccountExpirationStrategyId, TopicCenterModel } from '@/lib/models';
+import {
+	AccountSourceId,
+	AnonymousAccountExpirationStrategyId,
+	PageSiteLocationModel,
+	SITE_LOCATION_ID,
+	TopicCenterModel,
+} from '@/lib/models';
 import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
@@ -136,22 +142,46 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		);
 	}
 
-	let featuredTopicCenter: TopicCenterModel | undefined;
-	if (accessToken && institutionResponse.institution.featuredTopicCenterId) {
-		const response = await topicCenterService
-			.getTopicCenterById(institutionResponse.institution.featuredTopicCenterId)
-			.fetch();
+	/* ----------------------------------------------------------------- */
+	/* Featured Topic Center For Navigation */
+	/* ----------------------------------------------------------------- */
+	let featuredTopicCenters: PageSiteLocationModel[] = [];
+	let featuredTopicCenter: PageSiteLocationModel | undefined;
+	let legacyFeaturedTopicCenter: TopicCenterModel | undefined;
+	let legacySecondaryFeaturedTopicCenter: TopicCenterModel | undefined;
 
-		featuredTopicCenter = response.topicCenter;
-	}
+	if (institutionResponse.institution.preferLegacyTopicCenters) {
+		const [primaryLegacyFeaturedTopicCenterResponse, secondaryLegacyFeaturedTopicCenterResponse] =
+			await Promise.all([
+				...(accessToken && institutionResponse.institution.featuredTopicCenterId
+					? [
+							topicCenterService
+								.getTopicCenterById(institutionResponse.institution.featuredTopicCenterId)
+								.fetch(),
+					  ]
+					: []),
+				...(accessToken && institutionResponse.institution.featuredSecondaryTopicCenterId
+					? [
+							topicCenterService
+								.getTopicCenterById(institutionResponse.institution.featuredSecondaryTopicCenterId)
+								.fetch(),
+					  ]
+					: []),
+			]);
 
-	let secondaryFeaturedTopicCenter: TopicCenterModel | undefined;
-	if (accessToken && institutionResponse.institution.featuredSecondaryTopicCenterId) {
-		const response = await topicCenterService
-			.getTopicCenterById(institutionResponse.institution.featuredSecondaryTopicCenterId)
-			.fetch();
+		if (primaryLegacyFeaturedTopicCenterResponse) {
+			legacyFeaturedTopicCenter = primaryLegacyFeaturedTopicCenterResponse.topicCenter;
+		}
+		if (secondaryLegacyFeaturedTopicCenterResponse) {
+			legacySecondaryFeaturedTopicCenter = secondaryLegacyFeaturedTopicCenterResponse.topicCenter;
+		}
+	} else {
+		const response = accessToken
+			? await pagesService.getPageSiteLocationsBySiteLocationId(SITE_LOCATION_ID.FEATURED_TOPIC).fetch()
+			: undefined;
 
-		secondaryFeaturedTopicCenter = response.topicCenter;
+		featuredTopicCenters = response?.pageSiteLocations ?? [];
+		featuredTopicCenter = featuredTopicCenters[0];
 	}
 
 	return {
@@ -161,8 +191,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		accountId,
 		institutionResponse,
 		accountResponse,
+		featuredTopicCenters,
 		featuredTopicCenter,
-		secondaryFeaturedTopicCenter,
+		legacyFeaturedTopicCenter,
+		legacySecondaryFeaturedTopicCenter,
 	};
 }
 

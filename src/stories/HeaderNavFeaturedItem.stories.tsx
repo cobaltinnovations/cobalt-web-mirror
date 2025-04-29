@@ -18,6 +18,7 @@ export const Default: Story = {
 	},
 	args: {
 		featuredItem: {
+			isLegacy: false,
 			subtitle: 'Subtitle',
 			imageUrl: 'https://via.placeholder.com/150x150',
 			imageAlt: 'Image Alt',
@@ -28,6 +29,7 @@ export const Default: Story = {
 				hash: '#',
 			},
 			topicCenterId: '',
+			pageId: '',
 		},
 		mobileNav: false,
 		onImageClick: () => {
