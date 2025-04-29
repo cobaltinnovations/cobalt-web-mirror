@@ -4,6 +4,7 @@ import React from 'react';
 import { Link, To } from 'react-router-dom';
 
 export interface NavFeaturedItem {
+	isLegacy: boolean;
 	subtitle: string;
 	imageUrl?: string;
 	imageAlt?: string;
@@ -11,6 +12,7 @@ export interface NavFeaturedItem {
 	descriptionHtml: string;
 	linkTo: To;
 	topicCenterId: string;
+	pageId: string;
 }
 
 interface HeaderNavFeaturedItemProps {

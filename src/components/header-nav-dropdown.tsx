@@ -99,10 +99,18 @@ const HeaderNavDropdown = ({
 							featuredItem={featuredItem}
 							onImageClick={() => {
 								setShow(false);
-								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER, {
-									topicCenterId: featuredItem.topicCenterId,
-									source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
-								});
+								featuredItem.isLegacy
+									? analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+											{
+												topicCenterId: featuredItem.topicCenterId,
+												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+											}
+									  )
+									: analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
+											pageId: featuredItem.pageId,
+											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+									  });
 							}}
 						/>
 					)}

@@ -87,6 +87,7 @@ export interface Institution {
 	integratedCareMhpTriageOverviewOverride?: string;
 	integratedCareBookingInsuranceRequirements?: string;
 	landingPageTaglineOverride?: string;
+	preferLegacyTopicCenters?: boolean;
 }
 
 export interface InstitutionFeature {
@@ -119,11 +120,13 @@ export enum DisplayTypeId {
 }
 
 export interface AdditionalNavigationItem {
-	url: string;
-	name: string;
 	iconName?: string;
 	imageUrl?: string;
+	name: string;
+	pageId?: string;
+	pageUrlName?: string;
 	topicCenterId?: string;
+	url: string;
 }
 
 export enum AccountSourceDisplayStyleId {

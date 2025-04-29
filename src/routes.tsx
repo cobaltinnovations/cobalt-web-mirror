@@ -16,8 +16,8 @@ import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams 
 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
-import { FeatureId, ROLE_ID, TopicCenterModel } from './lib/models';
-import { topicCenterService } from './lib/services';
+import { FeatureId, ROLE_ID, SITE_LOCATION_ID } from './lib/models';
+import { pagesService, topicCenterService } from './lib/services';
 import useAccount from './hooks/use-account';
 
 import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
@@ -215,24 +215,65 @@ const RedirectToCommunityPage = () => {
 
 const RedirectToCurrentFeaturedTopic = () => {
 	const { institution } = useAccount();
-	const [featuredTopicCenter, setFeaturedTopicCenter] = useState<TopicCenterModel>();
+	const [url, setUrl] = useState<string>();
 
 	const fetchTopicCenter = useCallback(async () => {
-		if (!institution.featuredTopicCenterId) {
-			throw new Error('institution.featuredTopicCenterId is undefined.');
+		if (institution.preferLegacyTopicCenters) {
+			if (!institution.featuredTopicCenterId) {
+				return;
+			}
+
+			const { topicCenter } = await topicCenterService
+				.getTopicCenterById(institution.featuredTopicCenterId)
+				.fetch();
+
+			setUrl(`/featured-topics/${topicCenter.urlName}`);
+			return;
 		}
 
-		const { topicCenter } = await topicCenterService.getTopicCenterById(institution.featuredTopicCenterId).fetch();
+		const { pageSiteLocations } = await pagesService
+			.getPageSiteLocationsBySiteLocationId(SITE_LOCATION_ID.FEATURED_TOPIC)
+			.fetch();
 
-		setFeaturedTopicCenter(topicCenter);
-	}, [institution.featuredTopicCenterId]);
+		const firstFeaturedTopicCenter = pageSiteLocations[0];
 
-	if (institution.featuredTopicCenterId) {
-		return (
-			<AsyncWrapper fetchData={fetchTopicCenter}>
-				<Navigate to={`/featured-topics/${featuredTopicCenter?.urlName}`} replace />
-			</AsyncWrapper>
-		);
+		if (firstFeaturedTopicCenter) {
+			setUrl(firstFeaturedTopicCenter.relativeUrl);
+		}
+	}, [institution.featuredTopicCenterId, institution.preferLegacyTopicCenters]);
+
+	return (
+		<AsyncWrapper fetchData={fetchTopicCenter}>
+			{url ? <Navigate to={url} replace /> : <Navigate to="/" replace />}
+		</AsyncWrapper>
+	);
+};
+
+const RedirectLegacyFeaturedTopicCenterToPage = () => {
+	const { institution } = useAccount();
+	const { topicCenterId } = useParams<{ topicCenterId: string }>();
+
+	if (institution.preferLegacyTopicCenters) {
+		return <FeaturedTopic />;
+	}
+
+	if (topicCenterId) {
+		<Navigate to={`/pages/${topicCenterId}`} replace />;
+	}
+
+	return <Navigate to="/" replace />;
+};
+
+const RedirectLegacyCommunityToPage = () => {
+	const { institution } = useAccount();
+	const { topicCenterId } = useParams<{ topicCenterId: string }>();
+
+	if (institution.preferLegacyTopicCenters) {
+		return <CommunityPage />;
+	}
+
+	if (topicCenterId) {
+		<Navigate to={`/pages/${topicCenterId}`} replace />;
 	}
 
 	return <Navigate to="/" replace />;
@@ -705,11 +746,11 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'featured-topics/:topicCenterId',
-						element: <FeaturedTopic />,
+						element: <RedirectLegacyFeaturedTopicCenterToPage />,
 					},
 					{
 						path: 'community/:topicCenterId',
-						element: <CommunityPage />,
+						element: <RedirectLegacyCommunityToPage />,
 					},
 					{
 						path: 'user-settings',
