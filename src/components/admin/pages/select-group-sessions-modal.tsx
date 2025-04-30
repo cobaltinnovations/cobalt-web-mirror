@@ -178,9 +178,14 @@ export const SelectGroupSessionsModal = ({ groupSessionIds, onAdd, ...props }: S
 										className={classes.imagePreview}
 										style={{ backgroundImage: `url(${gs.imageUrl})` }}
 									/>
-									<div className="overflow-hidden">
-										<span className="d-block text-truncate">{gs.title}</span>
-										<span className="d-block text-truncate">{gs.facilitatorName}</span>
+									<div className="w-100 overflow-hidden">
+										<div className="d-flex align-items-center justify-content-between">
+											<span className="d-block text-truncate">{gs.title}</span>
+											<span className="d-block text-nowrap text-gray">
+												{gs.startDateDescription}
+											</span>
+										</div>
+										<span className="d-block text-truncate text-gray">{gs.facilitatorName}</span>
 									</div>
 								</li>
 							))}
