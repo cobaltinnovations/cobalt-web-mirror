@@ -1,4 +1,4 @@
-import { AdminContent, COLOR_IDS, Content, GroupSessionModel, Tag, TagGroup } from '@/lib/models';
+import { AdminContent, COLOR_IDS, GroupSessionModel, Tag, TagGroup } from '@/lib/models';
 
 export enum PAGE_STATUS_ID {
 	LIVE = 'LIVE',
