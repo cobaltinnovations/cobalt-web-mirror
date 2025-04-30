@@ -27,6 +27,21 @@ const useStyles = createUseThemedStyles((theme) => ({
 			boxShadow: theme.elevation.e400,
 		},
 	},
+	expired: {
+		width: '100%',
+		borderRadius: 5,
+		position: 'relative',
+		paddingBottom: '56.25%',
+		backgroundColor: theme.colors.d500,
+	},
+	expiredInner: {
+		top: '50%',
+		left: '50%',
+		width: '100%',
+		padding: '0 16px',
+		position: 'absolute',
+		transform: 'translate(-50%, -50%)',
+	},
 	imageOuter: {
 		position: 'relative',
 		paddingBottom: '56.25%',
@@ -120,6 +135,7 @@ export interface ResourceLibraryCardProps {
 	imageUrl?: string;
 	duration?: string;
 	className?: string;
+	expired?: boolean;
 	trackEvent?(): void;
 	trackTagEvent?(tag: Tag): void;
 }
@@ -138,6 +154,7 @@ const ResourceLibraryCard = ({
 	imageUrl,
 	duration,
 	className,
+	expired,
 	trackEvent,
 	trackTagEvent,
 }: ResourceLibraryCardProps) => {
@@ -233,13 +250,27 @@ const ResourceLibraryCard = ({
 	return (
 		<div className={classNames(classes.resourceLibraryCard, className)}>
 			<Link to={linkTo} {...linkToOptions} className="text-decoration-none" onClick={trackEvent}>
-				<div className={classes.imageOuter} style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}>
-					{badgeTitle && (
-						<Badge as="div" bg="light" pill>
-							{badgeTitle}
-						</Badge>
-					)}
-				</div>
+				{expired ? (
+					<div className={classes.expired}>
+						<div className={classes.expiredInner}>
+							<h6 className="mb-2 text-center text-white">Resource Expired</h6>
+							<p className="mb-0 text-center text-white">
+								This resource will not be visible when the page is published
+							</p>
+						</div>
+					</div>
+				) : (
+					<div
+						className={classes.imageOuter}
+						style={{ backgroundImage: `url(${imageUrl ?? placeholderImage})` }}
+					>
+						{badgeTitle && (
+							<Badge as="div" bg="light" pill>
+								{badgeTitle}
+							</Badge>
+						)}
+					</div>
+				)}
 				<div ref={informationRef} className={classes.informationOuter}>
 					<div className="mb-4 d-flex align-items-center">
 						<Badge bg="outline-dark" pill className="me-2 d-flex align-items-center flex-shrink-0">
