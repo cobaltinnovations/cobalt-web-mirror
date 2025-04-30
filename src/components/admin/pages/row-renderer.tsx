@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
@@ -30,6 +30,7 @@ import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
+import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageId: string;
@@ -96,28 +97,78 @@ const GroupSessionsRowRenderer = ({
 	className,
 	enableAnalytics,
 }: RowRendererProps<GroupSessionsRowModel>) => {
+	const navigate = useNavigate();
+
 	return (
 		<Row className={className}>
-			{pageRow.groupSessions.map((groupSession) => (
-				<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
-					<Link
-						className="d-block text-decoration-none h-100"
-						to={`/group-sessions/${groupSession.urlName}`}
-						onClick={() => {
-							if (!enableAnalytics) {
-								return;
-							}
+			{pageRow.groupSessions.length < 3 ? (
+				<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
+					{pageRow.groupSessions.map((groupSession, groupSessionIndex) => {
+						const isLast = pageRow.groupSessions.length - 1 === groupSessionIndex;
 
-							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_GROUP_SESSION, {
-								pageId,
-								groupSessionId: groupSession.groupSessionId,
-							});
-						}}
-					>
-						<StudioEvent className="h-100" studioEvent={groupSession} />
-					</Link>
+						return (
+							<TopicCenterGroupSession
+								key={groupSession.groupSessionId}
+								className={classNames({
+									'mb-8': !isLast,
+								})}
+								title={groupSession.title}
+								titleSecondary={groupSession.appointmentTimeDescription}
+								titleTertiary={`with ${groupSession.facilitatorName}`}
+								description={groupSession.description}
+								badgeTitle={
+									groupSession.seatsAvailable && groupSession.seatsAvailable <= 20
+										? groupSession.seatsAvailableDescription
+										: ''
+								}
+								buttonTitle="Learn More"
+								onClick={() => {
+									navigate(`/group-sessions/${groupSession.urlName}`);
+
+									if (!enableAnalytics) {
+										return;
+									}
+
+									analyticsService.persistEvent(
+										AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_GROUP_SESSION,
+										{
+											pageId,
+											groupSessionId: groupSession.groupSessionId,
+										}
+									);
+								}}
+								imageUrl={groupSession.imageUrl}
+							/>
+						);
+					})}
 				</Col>
-			))}
+			) : (
+				<>
+					{pageRow.groupSessions.map((groupSession) => (
+						<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
+							<Link
+								className="d-block text-decoration-none h-100"
+								to={`/group-sessions/${groupSession.urlName}`}
+								onClick={() => {
+									if (!enableAnalytics) {
+										return;
+									}
+
+									analyticsService.persistEvent(
+										AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_GROUP_SESSION,
+										{
+											pageId,
+											groupSessionId: groupSession.groupSessionId,
+										}
+									);
+								}}
+							>
+								<StudioEvent className="h-100" studioEvent={groupSession} />
+							</Link>
+						</Col>
+					))}
+				</>
+			)}
 		</Row>
 	);
 };

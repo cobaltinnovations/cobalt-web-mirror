@@ -1,8 +1,6 @@
 import { debounce } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button } from 'react-bootstrap';
-import HTMLEllipsis from 'react-lines-ellipsis/lib/html';
-import responsiveHOC from 'react-lines-ellipsis/lib/responsiveHOC';
 import classNames from 'classnames';
 
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
@@ -16,12 +14,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		borderRadius: 8,
 		overflow: 'hidden',
+
 		backgroundColor: theme.colors.n0,
-		boxShadow: '0px 10px 18px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
+		border: `1px solid ${theme.colors.n100}`,
+		transition: 'box-shadow 0.2s, transform 0.2s',
 		[mediaQueries.lg]: {
 			padding: 0,
 			cursor: 'pointer',
 			flexDirection: 'column',
+		},
+		'&:hover': {
+			transform: 'translateY(-16px)',
+			boxShadow: '0px 10px 18px rgba(41, 40, 39, 0.15), 0px 0px 1px rgba(41, 40, 39, 0.31)',
 		},
 	},
 	imageOuter: {
@@ -74,8 +78,6 @@ interface Props {
 	className?: string;
 }
 
-const ResponsiveEllipsis = responsiveHOC()(HTMLEllipsis);
-
 export const TopicCenterGroupSession = ({
 	title,
 	titleSecondary,
@@ -116,7 +118,7 @@ export const TopicCenterGroupSession = ({
 		>
 			<div className={classes.imageOuter}>
 				{badgeTitle && (
-					<Badge className="d-lg-none" as="div" bg="outline-secondary" pill>
+					<Badge as="div" bg="outline-secondary" pill>
 						{badgeTitle}
 					</Badge>
 				)}
@@ -130,7 +132,7 @@ export const TopicCenterGroupSession = ({
 					<div className="mb-lg-4">
 						<h4 className="mb-1">{title}</h4>
 						<p
-							className={classNames('text-muted text-uppercase fw-bold', {
+							className={classNames('fw-bold', {
 								'mb-1': titleTertiary,
 								'mb-0': !titleTertiary,
 							})}
@@ -139,20 +141,8 @@ export const TopicCenterGroupSession = ({
 						</p>
 						{titleTertiary && <p className="mb-0 text-muted">{titleTertiary}</p>}
 					</div>
-					<ResponsiveEllipsis
-						className="d-none d-lg-block mb-4"
-						unsafeHTML={description}
-						maxLine={titleTertiary ? '2' : '3'}
-					/>
 				</div>
-				<div className="d-none d-lg-flex justify-content-between align-items-end">
-					<div>
-						{badgeTitle && (
-							<Badge as="div" bg="outline-secondary" pill>
-								{badgeTitle}
-							</Badge>
-						)}
-					</div>
+				<div className="d-none d-lg-flex justify-content-start align-items-end">
 					<Button size="sm" onClick={onClick}>
 						{buttonTitle}
 					</Button>
