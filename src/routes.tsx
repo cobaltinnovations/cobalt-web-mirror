@@ -258,7 +258,7 @@ const RedirectLegacyFeaturedTopicCenterToPage = () => {
 	}
 
 	if (topicCenterId) {
-		<Navigate to={`/pages/${topicCenterId}`} replace />;
+		return <Navigate to={`/pages/${topicCenterId}`} replace />;
 	}
 
 	return <Navigate to="/" replace />;
@@ -273,7 +273,7 @@ const RedirectLegacyCommunityToPage = () => {
 	}
 
 	if (topicCenterId) {
-		<Navigate to={`/pages/${topicCenterId}`} replace />;
+		return <Navigate to={`/pages/${topicCenterId}`} replace />;
 	}
 
 	return <Navigate to="/" replace />;
