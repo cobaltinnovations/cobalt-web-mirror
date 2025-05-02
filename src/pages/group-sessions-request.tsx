@@ -160,16 +160,17 @@ const GroupSessionsRequest = () => {
 						<Col lg={{ span: 8, offset: 2 }}>
 							<h1 className="mb-6">Request a Group Session</h1>
 							<p className="mb-4">
-								Please use this form to request a wellness-focused group session for your team (minimum
-								of 5 people). Also please request your session at least two weeks in advance of the
-								desired date. Upon submission, please allow 1-2 business days to hear back from the
-								session coordinator. Sessions are held virtually.
+								Please use this form to submit a request for a wellness-focused group session for your
+								team (minimum of five employees). We ask that you submit your request at least two weeks
+								in advance and please allow 1-2 business days for a response. All sessions are virtual.
 							</p>
 							<p className="mb-4">
-								Selecting multiple topics of interest will increase the likelihood of booking a session
-								on the desired date, however this form is intended to schedule a single session for your
-								team. Please submit a separate form for an additional session, or add a note in the
-								comments section.
+								Selecting multiple topics may improve the likelihood of scheduling a session on your
+								preferred date.
+							</p>
+							<p className="mb-4">
+								Please note that this form is for single session requests to address annual or timely
+								needs. These sessions are not designed for emergency response or ongoing team support.
 							</p>
 							<p className="mb-0 text-danger">Required *</p>
 						</Col>
