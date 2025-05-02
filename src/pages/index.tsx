@@ -3,6 +3,7 @@ import React, { FC, useState, useCallback } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
 
@@ -271,42 +272,6 @@ const Index: FC = () => {
 							/>
 						</Container>
 					)}
-					{legacySecondaryFeaturedTopicCenter && (
-						<Container className="pt-4 pt-lg-8">
-							<CallToActionBlock
-								variant="light"
-								heading={legacySecondaryFeaturedTopicCenter.featuredTitle ?? ''}
-								descriptionHtml={legacySecondaryFeaturedTopicCenter.featuredDescription ?? ''}
-								imageUrl={legacySecondaryFeaturedTopicCenter.imageUrl ?? ''}
-								primaryActionText={legacySecondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
-								onPrimaryActionClick={() => {
-									analyticsService.persistEvent(
-										AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
-										{
-											topicCenterId: legacySecondaryFeaturedTopicCenter.topicCenterId,
-											source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_SECONDARY_FEATURE,
-										}
-									);
-
-									if (legacySecondaryFeaturedTopicCenter.urlOverride) {
-										try {
-											const url = new URL(legacySecondaryFeaturedTopicCenter.urlOverride);
-											const isExternal = url.origin !== window.location.origin;
-											if (isExternal) {
-												window.location.href = legacySecondaryFeaturedTopicCenter.urlOverride;
-											} else {
-												navigate(legacySecondaryFeaturedTopicCenter.urlOverride);
-											}
-										} catch (error) {
-											navigate(legacySecondaryFeaturedTopicCenter.urlOverride);
-										}
-									} else {
-										navigate('/featured-topics/' + legacySecondaryFeaturedTopicCenter.urlName);
-									}
-								}}
-							/>
-						</Container>
-					)}
 				</>
 			) : (
 				<>
@@ -417,31 +382,75 @@ const Index: FC = () => {
 					</>
 				)}
 
-				{!institution.preferLegacyTopicCenters && (
+				{institution.preferLegacyTopicCenters ? (
+					<>
+						{legacySecondaryFeaturedTopicCenter && (
+							<Container className="pt-4 pt-lg-8">
+								<CallToActionBlock
+									variant="light"
+									heading={legacySecondaryFeaturedTopicCenter.featuredTitle ?? ''}
+									descriptionHtml={legacySecondaryFeaturedTopicCenter.featuredDescription ?? ''}
+									imageUrl={legacySecondaryFeaturedTopicCenter.imageUrl ?? ''}
+									primaryActionText={legacySecondaryFeaturedTopicCenter.featuredCallToAction ?? ''}
+									onPrimaryActionClick={() => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
+											{
+												topicCenterId: legacySecondaryFeaturedTopicCenter.topicCenterId,
+												source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_SECONDARY_FEATURE,
+											}
+										);
+
+										if (legacySecondaryFeaturedTopicCenter.urlOverride) {
+											try {
+												const url = new URL(legacySecondaryFeaturedTopicCenter.urlOverride);
+												const isExternal = url.origin !== window.location.origin;
+												if (isExternal) {
+													window.location.href =
+														legacySecondaryFeaturedTopicCenter.urlOverride;
+												} else {
+													navigate(legacySecondaryFeaturedTopicCenter.urlOverride);
+												}
+											} catch (error) {
+												navigate(legacySecondaryFeaturedTopicCenter.urlOverride);
+											}
+										} else {
+											navigate('/featured-topics/' + legacySecondaryFeaturedTopicCenter.urlName);
+										}
+									}}
+								/>
+							</Container>
+						)}
+					</>
+				) : (
 					<>
 						{featuredTopicCenters.slice(1).length > 0 && (
 							<Container className="pt-4 pt-lg-8">
-								{featuredTopicCenters.slice(1).map((ftc) => (
-									<CallToActionBlock
-										className="mb-4"
-										variant="light"
-										heading={ftc.headline}
-										descriptionHtml={ftc.description}
-										imageUrl={ftc.imageUrl}
-										primaryActionText={ftc.callToAction}
-										onPrimaryActionClick={() => {
-											analyticsService.persistEvent(
-												AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
-												{
-													pageId: ftc.pageId,
-													source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-												}
-											);
+								{featuredTopicCenters.slice(1).map((ftc, ftcIndex) => {
+									const isLast = featuredTopicCenters.slice(1).length - 1 === ftcIndex;
 
-											navigate(ftc.relativeUrl);
-										}}
-									/>
-								))}
+									return (
+										<CallToActionBlock
+											className={classNames({ 'mb-4': !isLast })}
+											variant="light"
+											heading={ftc.headline}
+											descriptionHtml={ftc.description}
+											imageUrl={ftc.imageUrl}
+											primaryActionText={ftc.callToAction}
+											onPrimaryActionClick={() => {
+												analyticsService.persistEvent(
+													AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
+													{
+														pageId: ftc.pageId,
+														source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+													}
+												);
+
+												navigate(ftc.relativeUrl);
+											}}
+										/>
+									);
+								})}
 							</Container>
 						)}
 					</>
