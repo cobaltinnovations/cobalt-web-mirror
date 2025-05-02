@@ -33,6 +33,21 @@ const useStudioEventStyles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		paddingBottom: '56.25%',
 	},
+	expired: {
+		width: '100%',
+		borderRadius: 5,
+		position: 'relative',
+		paddingBottom: '56.25%',
+		backgroundColor: theme.colors.d500,
+	},
+	expiredInner: {
+		top: '50%',
+		left: '50%',
+		width: '100%',
+		padding: '0 16px',
+		position: 'absolute',
+		transform: 'translate(-50%, -50%)',
+	},
 	imageContent: {
 		right: 0,
 		bottom: 0,
@@ -51,10 +66,11 @@ export type StudioEventViewModel = GroupSessionModel | GroupSessionRequestModel;
 
 interface StudioEventProps {
 	studioEvent: StudioEventViewModel;
+	expired?: boolean;
 	className?: string;
 }
 
-const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
+const StudioEvent: FC<StudioEventProps> = ({ studioEvent, expired, className }) => {
 	const classes = useStudioEventStyles();
 	const placeholderImage = useRandomPlaceholderImage();
 
@@ -67,22 +83,33 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 	if (groupSessionsService.isGroupSession(studioEvent)) {
 		return (
 			<div className={classNames(classes.studioEvent, className)}>
-				<BackgroundImageContainer
-					className={classes.imageContainer}
-					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
-				>
-					{showSeatAlert && (
-						<div className={classes.imageContent}>
-							<Badge as="div" bg="outline-secondary" pill>
-								{studioEvent.seatsAvailableDescription}
-							</Badge>
+				{expired ? (
+					<div className={classes.expired}>
+						<div className={classes.expiredInner}>
+							<h6 className="mb-2 text-center text-white">Session Expired</h6>
+							<p className="mb-0 text-center text-white">
+								This session will not be visible when the page is published
+							</p>
 						</div>
-					)}
-				</BackgroundImageContainer>
+					</div>
+				) : (
+					<BackgroundImageContainer
+						className={classes.imageContainer}
+						imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
+					>
+						{showSeatAlert && (
+							<div className={classes.imageContent}>
+								<Badge as="div" bg="outline-secondary" pill>
+									{studioEvent.seatsAvailableDescription}
+								</Badge>
+							</div>
+						)}
+					</BackgroundImageContainer>
+				)}
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{studioEvent.title}</h4>
 
-					<p className="mb-0 text-muted fw-bold text-uppercase">{studioEvent.appointmentTimeDescription}</p>
+					<p className="mb-0 text-muted fw-bold">{studioEvent.appointmentTimeDescription}</p>
 
 					{studioEvent.facilitatorName && (
 						<p className="mb-0 text-muted">
@@ -95,10 +122,22 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 	} else if (groupSessionsService.isGroupSessionByRequest(studioEvent)) {
 		return (
 			<div className={classNames(classes.studioEvent, className)}>
-				<BackgroundImageContainer
-					className={classes.imageContainer}
-					imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
-				/>
+				{expired ? (
+					<div className={classes.expired}>
+						<div className={classes.expiredInner}>
+							<h6 className="mb-2 text-center text-white">Session Expired</h6>
+							<p className="mb-0 text-center text-white">
+								This session will not be visible when the page is published
+							</p>
+						</div>
+					</div>
+				) : (
+					<BackgroundImageContainer
+						className={classes.imageContainer}
+						imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
+					/>
+				)}
+
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{studioEvent.title}</h4>
 					{studioEvent.facilitatorName && (
