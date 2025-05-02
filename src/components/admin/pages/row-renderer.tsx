@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
 	Content,
+	ContentStatusId,
+	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
 	isGroupSessionsRow,
 	isOneColumnImageRow,
@@ -50,43 +52,48 @@ const ResourcesRowRenderer = ({
 }: RowRendererProps<ResourcesRowModel>) => {
 	return (
 		<Row className={className}>
-			{pageRow.contents.map((content) => (
-				<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
-					<ResourceLibraryCard
-						key={content.contentId}
-						linkTo={`/resource-library/${content.contentId}`}
-						className="h-100"
-						imageUrl={content.imageUrl}
-						badgeTitle={content.newFlag ? 'New' : ''}
-						title={content.title}
-						author={content.author}
-						description={content.description}
-						tags={content.tagIds.map((tagId) => tagsByTagId?.[tagId] ?? null).filter(Boolean)}
-						contentTypeId={content.contentTypeId}
-						duration={content.durationInMinutesDescription}
-						trackEvent={() => {
-							if (!enableAnalytics) {
-								return;
-							}
+			{pageRow.contents.map((content) => {
+				const expired = content.contentStatusId !== ContentStatusId.LIVE;
 
-							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CONTENT, {
-								pageId,
-								contentId: content.contentId,
-							});
-						}}
-						trackTagEvent={(tag) => {
-							if (!enableAnalytics) {
-								return;
-							}
+				return (
+					<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+						<ResourceLibraryCard
+							key={content.contentId}
+							expired={expired}
+							linkTo={`/resource-library/${content.contentId}`}
+							className="h-100"
+							imageUrl={content.imageUrl}
+							badgeTitle={content.newFlag ? 'New' : ''}
+							title={content.title}
+							author={content.author}
+							description={content.description}
+							tags={content.tagIds.map((tagId) => tagsByTagId?.[tagId] ?? null).filter(Boolean)}
+							contentTypeId={content.contentTypeId}
+							duration={content.durationInMinutesDescription}
+							trackEvent={() => {
+								if (!enableAnalytics) {
+									return;
+								}
 
-							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
-								pageId,
-								tagId: tag.tagId,
-							});
-						}}
-					/>
-				</Col>
-			))}
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CONTENT, {
+									pageId,
+									contentId: content.contentId,
+								});
+							}}
+							trackTagEvent={(tag) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
+									pageId,
+									tagId: tag.tagId,
+								});
+							}}
+						/>
+					</Col>
+				);
+			})}
 		</Row>
 	);
 };
@@ -105,10 +112,12 @@ const GroupSessionsRowRenderer = ({
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
 					{pageRow.groupSessions.map((groupSession, groupSessionIndex) => {
 						const isLast = pageRow.groupSessions.length - 1 === groupSessionIndex;
+						const expired = groupSession.groupSessionStatusId !== GROUP_SESSION_STATUS_ID.ADDED;
 
 						return (
 							<TopicCenterGroupSession
 								key={groupSession.groupSessionId}
+								expired={expired}
 								className={classNames({
 									'mb-8': !isLast,
 								})}
@@ -144,29 +153,33 @@ const GroupSessionsRowRenderer = ({
 				</Col>
 			) : (
 				<>
-					{pageRow.groupSessions.map((groupSession) => (
-						<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
-							<Link
-								className="d-block text-decoration-none h-100"
-								to={`/group-sessions/${groupSession.urlName}`}
-								onClick={() => {
-									if (!enableAnalytics) {
-										return;
-									}
+					{pageRow.groupSessions.map((groupSession) => {
+						const expired = groupSession.groupSessionStatusId !== GROUP_SESSION_STATUS_ID.ADDED;
 
-									analyticsService.persistEvent(
-										AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_GROUP_SESSION,
-										{
-											pageId,
-											groupSessionId: groupSession.groupSessionId,
+						return (
+							<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
+								<Link
+									className="d-block text-decoration-none h-100"
+									to={`/group-sessions/${groupSession.urlName}`}
+									onClick={() => {
+										if (!enableAnalytics) {
+											return;
 										}
-									);
-								}}
-							>
-								<StudioEvent className="h-100" studioEvent={groupSession} />
-							</Link>
-						</Col>
-					))}
+
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_GROUP_SESSION,
+											{
+												pageId,
+												groupSessionId: groupSession.groupSessionId,
+											}
+										);
+									}}
+								>
+									<StudioEvent className="h-100" expired={expired} studioEvent={groupSession} />
+								</Link>
+							</Col>
+						);
+					})}
 				</>
 			)}
 		</Row>

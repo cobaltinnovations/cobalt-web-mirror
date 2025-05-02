@@ -54,6 +54,21 @@ const useStyles = createUseThemedStyles((theme) => ({
 			borderRadius: 0,
 		},
 	},
+	expired: {
+		width: '100%',
+		borderRadius: 5,
+		position: 'relative',
+		paddingBottom: '56.25%',
+		backgroundColor: theme.colors.d500,
+	},
+	expiredInner: {
+		top: '50%',
+		left: '50%',
+		width: '100%',
+		padding: '0 16px',
+		position: 'absolute',
+		transform: 'translate(-50%, -50%)',
+	},
 	informationOuter: {
 		flex: 1,
 		display: 'flex',
@@ -76,6 +91,7 @@ interface Props {
 	onClick(event: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>): void;
 	imageUrl?: string;
 	className?: string;
+	expired?: boolean;
 }
 
 export const TopicCenterGroupSession = ({
@@ -88,6 +104,7 @@ export const TopicCenterGroupSession = ({
 	onClick,
 	imageUrl,
 	className,
+	expired,
 }: Props) => {
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
@@ -122,10 +139,21 @@ export const TopicCenterGroupSession = ({
 						{badgeTitle}
 					</Badge>
 				)}
-				<div
-					className={classes.image}
-					style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
-				/>
+				{expired ? (
+					<div className={classes.expired}>
+						<div className={classes.expiredInner}>
+							<h6 className="mb-2 text-center text-white">Session Expired</h6>
+							<p className="mb-0 text-center text-white">
+								This session will not be visible when the page is published
+							</p>
+						</div>
+					</div>
+				) : (
+					<div
+						className={classes.image}
+						style={{ backgroundImage: `url(${imageUrl ? imageUrl : placeholderImage})` }}
+					/>
+				)}
 			</div>
 			<div className={classes.informationOuter}>
 				<div>
