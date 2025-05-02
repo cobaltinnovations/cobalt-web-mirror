@@ -82,7 +82,7 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, className }) => {
 				<div className={classes.informationContainer}>
 					<h4 className="mb-0">{studioEvent.title}</h4>
 
-					<p className="mb-0 text-muted fw-bold text-uppercase">{studioEvent.appointmentTimeDescription}</p>
+					<p className="mb-0 text-muted fw-bold">{studioEvent.appointmentTimeDescription}</p>
 
 					{studioEvent.facilitatorName && (
 						<p className="mb-0 text-muted">
