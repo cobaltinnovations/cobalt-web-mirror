@@ -70,7 +70,7 @@ const resourceLibraryCarouselConfig = {
 };
 
 const Index: FC = () => {
-	const { featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
+	const { featuredTopicCenter, featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
 		useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
@@ -304,32 +304,28 @@ const Index: FC = () => {
 										navigate('/featured-topics/' + legacySecondaryFeaturedTopicCenter.urlName);
 									}
 								}}
-								className="mb-4"
 							/>
 						</Container>
 					)}
 				</>
 			) : (
 				<>
-					{featuredTopicCenters.length > 0 && (
+					{featuredTopicCenter && (
 						<Container className="pt-4 pt-lg-8">
-							{featuredTopicCenters.map((topicCenter) => (
-								<CallToActionBlock
-									heading={topicCenter.headline}
-									descriptionHtml={topicCenter.description}
-									imageUrl={topicCenter.imageUrl}
-									primaryActionText={topicCenter.callToAction}
-									onPrimaryActionClick={() => {
-										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
-											pageId: topicCenter.pageId,
-											source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-										});
+							<CallToActionBlock
+								heading={featuredTopicCenter.headline}
+								descriptionHtml={featuredTopicCenter.description}
+								imageUrl={featuredTopicCenter.imageUrl}
+								primaryActionText={featuredTopicCenter.callToAction}
+								onPrimaryActionClick={() => {
+									analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
+										pageId: featuredTopicCenter.pageId,
+										source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+									});
 
-										navigate(topicCenter.relativeUrl);
-									}}
-									className="mb-4"
-								/>
-							))}
+									navigate(featuredTopicCenter.relativeUrl);
+								}}
+							/>
 						</Container>
 					)}
 				</>
@@ -375,7 +371,6 @@ const Index: FC = () => {
 				{inTheStudioEvents.length > 0 && (
 					<>
 						<IneligibleBookingModal uiType="group-session" />
-
 						<Container className="pt-20">
 							<Row>
 								<Col>
@@ -422,52 +417,81 @@ const Index: FC = () => {
 					</>
 				)}
 
-				{content.length > 0 && (
+				{!institution.preferLegacyTopicCenters && (
 					<>
-						<Container className="py-20 pb-20">
-							<Row>
-								<Col>
-									<Carousel
-										responsive={resourceLibraryCarouselConfig}
-										description="Resource Library"
-										calloutTitle="Explore all"
-										calloutOnClick={() => {
-											navigate('/resource-library');
-										}}
-									>
-										{content.map((content) => {
-											return (
-												<ResourceLibraryCard
-													key={content.contentId}
-													linkTo={`/resource-library/${content.contentId}`}
-													className="h-100"
-													imageUrl={content.imageUrl}
-													badgeTitle={content.newFlag ? 'New' : ''}
-													title={content.title}
-													author={content.author}
-													description={content.description}
-													tags={
-														tagsByTagId
-															? content.tagIds.map((tagId) => {
-																	return tagsByTagId[tagId];
-															  })
-															: []
-													}
-													contentTypeId={content.contentTypeId}
-													duration={content.durationInMinutesDescription}
-												/>
+						{featuredTopicCenters.slice(1).length > 0 && (
+							<Container className="pt-4 pt-lg-8">
+								{featuredTopicCenters.slice(1).map((ftc) => (
+									<CallToActionBlock
+										className="mb-4"
+										variant="light"
+										heading={ftc.headline}
+										descriptionHtml={ftc.description}
+										imageUrl={ftc.imageUrl}
+										primaryActionText={ftc.callToAction}
+										onPrimaryActionClick={() => {
+											analyticsService.persistEvent(
+												AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
+												{
+													pageId: ftc.pageId,
+													source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+												}
 											);
-										})}
-									</Carousel>
-								</Col>
-							</Row>
-						</Container>
+
+											navigate(ftc.relativeUrl);
+										}}
+									/>
+								))}
+							</Container>
+						)}
 					</>
+				)}
+
+				{content.length > 0 && (
+					<Container className="py-20 pb-20">
+						<Row>
+							<Col>
+								<Carousel
+									responsive={resourceLibraryCarouselConfig}
+									description="Resource Library"
+									calloutTitle="Explore all"
+									calloutOnClick={() => {
+										navigate('/resource-library');
+									}}
+								>
+									{content.map((content) => {
+										return (
+											<ResourceLibraryCard
+												key={content.contentId}
+												linkTo={`/resource-library/${content.contentId}`}
+												className="h-100"
+												imageUrl={content.imageUrl}
+												badgeTitle={content.newFlag ? 'New' : ''}
+												title={content.title}
+												author={content.author}
+												description={content.description}
+												tags={
+													tagsByTagId
+														? content.tagIds.map((tagId) => {
+																return tagsByTagId[tagId];
+														  })
+														: []
+												}
+												contentTypeId={content.contentTypeId}
+												duration={content.durationInMinutesDescription}
+											/>
+										);
+									})}
+								</Carousel>
+							</Col>
+						</Row>
+					</Container>
 				)}
 
 				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.TEAM] && (
 					<Team teamMembers={institutionBlurbs[INSTITUTION_BLURB_TYPE_ID.TEAM].institutionTeamMembers} />
 				)}
+
 				{institutionBlurbs?.[INSTITUTION_BLURB_TYPE_ID.ABOUT] && (
 					<>
 						<Container>
