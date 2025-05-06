@@ -82,23 +82,51 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 									<p className="mb-6 fs-large text-gray">Completed {completedAtDescription}</p>
 									<hr className="mb-4" />
 
-									<InlineAlert
-										variant="info"
-										title={`${recommendedFeature.treatmentDescription} Recommended`}
-										description={
-											<>
-												Based on the symptoms reported we recommend{' '}
-												<strong>{recommendedFeature.treatmentDescription}</strong>. You can
-												schedule a telehealth appointment with one of the providers listed.
-											</>
-										}
-										action={{
-											title: `Schedule with ${recommendedFeature.name}`,
-											onClick: () => {
-												navigate(recommendedFeature.urlName);
-											},
-										}}
-									/>
+									{(() => {
+										// Title override or default
+										const alertTitle =
+											recommendedFeature.recommendationTitleOverride ||
+											`${recommendedFeature.treatmentDescription} Recommended`;
+
+										// Description override or default
+										const alertDescription =
+											recommendedFeature.recommendationDescriptionOverride ? (
+												<div
+													dangerouslySetInnerHTML={{
+														__html: recommendedFeature.recommendationDescriptionOverride,
+													}}
+												/>
+											) : (
+												<>
+													<p>
+														Based on the symptoms reported we recommend{' '}
+														<strong>{recommendedFeature.treatmentDescription}</strong>. You
+														can schedule a telehealth appointment with one of the providers
+														listed.
+													</p>
+													<p>
+														<strong>
+															(Services billed to insurance. The patient is responsible
+															for any co-pays or remaining balance.)
+														</strong>
+													</p>
+												</>
+											);
+
+										return (
+											<InlineAlert
+												variant="info"
+												title={alertTitle}
+												description={alertDescription}
+												action={{
+													title: `Schedule with ${recommendedFeature.name}`,
+													onClick: () => {
+														navigate(recommendedFeature.urlName);
+													},
+												}}
+											/>
+										);
+									})()}
 
 									{showPsychiatristRecommendation && (
 										<PsychiatristRecommendation
