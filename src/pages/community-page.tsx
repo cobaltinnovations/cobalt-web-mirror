@@ -134,12 +134,6 @@ const CommunityPage = () => {
 				{topicCenter?.topicCenterRows.map((topicCenterRow, topicCenterRowIndex) => {
 					const backgroundColorClass = topicCenterRowIndex % 2 === 0 ? 'bg-n50' : 'bg-n75';
 					const containerClassNames = 'pt-10 pt-lg-16 pb-12 pb-lg-24';
-
-					// const showScheduledGroupSessionSection = topicCenterRow.groupSessions.length > 0;
-					// const showByRequestGroupSessionSection = topicCenterRow.groupSessionRequests.length > 0;
-					// const showGroupSessionSection =
-					// 	showScheduledGroupSessionSection || showByRequestGroupSessionSection;
-
 					const topicCenterRowHeader = (
 						<Row className="mb-6 mb-lg-12">
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
@@ -153,152 +147,10 @@ const CommunityPage = () => {
 
 					return (
 						<React.Fragment key={topicCenterRow.topicCenterRowId}>
-							{/* Group Sessions as 'One Section' with Carousels */}
-							{/* {showGroupSessionSection && (
-								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
+							<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
+								{topicCenterRow.groupSessions.length > 0 && (
 									<Container className={containerClassNames}>
 										{topicCenterRowHeader}
-
-										{showScheduledGroupSessionSection && (
-											<Row>
-												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-													<ResourceLibrarySubtopicCard
-														className="h-100"
-														title={topicCenterRow.groupSessionsTitle!}
-														description={topicCenterRow.groupSessionsDescription!}
-													/>
-												</Col>
-
-												<Col lg={9}>
-													<Carousel
-														responsive={resourceLibraryCarouselConfig}
-														trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-														floatingButtonGroup
-													>
-														{topicCenterRow.groupSessions.map((groupSession) => {
-															return (
-																<ResourceLibraryCard
-																	key={groupSession.groupSessionId}
-																	linkTo={`/group-sessions/${groupSession.urlName}`}
-																	linkToOptions={{
-																		state: {
-																			navigationSource:
-																				GroupSessionDetailNavigationSource.TOPIC_CENTER,
-																			topicCenterPath: location.pathname,
-																		},
-																	}}
-																	className="h-100"
-																	imageUrl={groupSession.imageUrl}
-																	title={groupSession.title}
-																	subtitle={groupSession.startDateTimeDescription}
-																	authorPrefix="Hosted by"
-																	author={groupSession.facilitatorName}
-																	tags={[]}
-																	trackEvent={() => {
-																		trackEvent(
-																			TopicCenterAnalyticsEvent.clickGroupSession(
-																				topicCenter.name,
-																				topicCenterRow.title
-																			)
-																		);
-
-																		mixpanel.track(
-																			'Topic Center Group Session Click',
-																			{
-																				'Topic Center ID':
-																					topicCenter.topicCenterId,
-																				'Topic Center Title': topicCenter.name,
-																				'Section Title': topicCenterRow.title,
-																				'Group Session ID':
-																					groupSession.groupSessionId,
-																				'Group Session Title':
-																					groupSession.title,
-																				'Group Session Start Time':
-																					groupSession.startDateTime,
-																			}
-																		);
-																	}}
-																/>
-															);
-														})}
-													</Carousel>
-												</Col>
-											</Row>
-										)}
-
-										{showByRequestGroupSessionSection && (
-											<Row className={classNames({ 'mt-8': showScheduledGroupSessionSection })}>
-												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
-													<ResourceLibrarySubtopicCard
-														className="h-100"
-														title={topicCenterRow.groupSessionRequestsTitle!}
-														description={topicCenterRow.groupSessionRequestsDescription!}
-													/>
-												</Col>
-
-												<Col lg={9}>
-													<Carousel
-														responsive={resourceLibraryCarouselConfig}
-														trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-														floatingButtonGroup
-													>
-														{topicCenterRow.groupSessionRequests.map(
-															(groupSessionRequest) => {
-																return (
-																	<ResourceLibraryCard
-																		key={groupSessionRequest.groupSessionRequestId}
-																		linkTo={`/in-the-studio/group-session-by-request/${groupSessionRequest.groupSessionRequestId}`}
-																		className="h-100"
-																		imageUrl={groupSessionRequest.imageUrl}
-																		title={groupSessionRequest.title}
-																		authorPrefix="BY REQUEST"
-																		author={''}
-																		tags={[]}
-																		trackEvent={() => {
-																			trackEvent(
-																				TopicCenterAnalyticsEvent.clickGroupSessionByRequest(
-																					topicCenter.name,
-																					topicCenterRow.title
-																				)
-																			);
-
-																			mixpanel.track(
-																				'Topic Center Group Session By Request Click',
-																				{
-																					'Topic Center ID':
-																						topicCenter.topicCenterId,
-																					'Topic Center Title':
-																						topicCenter.name,
-																					'Section Title':
-																						topicCenterRow.title,
-																					'Group Session By Request ID':
-																						groupSessionRequest.groupSessionRequestId,
-																					'Group Session By Request Title':
-																						groupSessionRequest.title,
-																				}
-																			);
-																		}}
-																	/>
-																);
-															}
-														)}
-													</Carousel>
-												</Col>
-											</Row>
-										)}
-									</Container>
-								</Container>
-							)} */}
-
-							{topicCenterRow.groupSessions.length > 0 && (
-								<Container
-									fluid
-									className={backgroundColorClass}
-									key={'groupSessions-' + topicCenterRow.topicCenterRowId}
-								>
-									<Container className={containerClassNames}>
-										{topicCenterRowHeader}
-
 										<Row>
 											<Col
 												md={{ span: 10, offset: 1 }}
@@ -367,18 +219,11 @@ const CommunityPage = () => {
 											</Col>
 										</Row>
 									</Container>
-								</Container>
-							)}
+								)}
 
-							{topicCenterRow.groupSessionRequests.length > 0 && (
-								<Container
-									fluid
-									className={backgroundColorClass}
-									key={'groupSessionRequests-' + topicCenterRow.topicCenterRowId}
-								>
+								{topicCenterRow.groupSessionRequests.length > 0 && (
 									<Container className={containerClassNames}>
 										{topicCenterRowHeader}
-
 										<Row>
 											<Col
 												md={{ span: 10, offset: 1 }}
@@ -435,15 +280,12 @@ const CommunityPage = () => {
 											</Col>
 										</Row>
 									</Container>
-								</Container>
-							)}
+								)}
 
-							{(topicCenterRow.topicCenterRowTags ?? []).map((topicCenterRowTag, index) => {
-								return (
-									<Container fluid className={backgroundColorClass} key={'rt' + index}>
+								{(topicCenterRow.topicCenterRowTags ?? []).map((topicCenterRowTag) => {
+									return (
 										<Container className={containerClassNames}>
 											{topicCenterRowHeader}
-
 											<Row>
 												<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
 													<ResourceLibrarySubtopicCard
@@ -521,15 +363,12 @@ const CommunityPage = () => {
 												</Col>
 											</Row>
 										</Container>
-									</Container>
-								);
-							})}
+									);
+								})}
 
-							{topicCenterRow.pinboardNotes.length > 0 && (
-								<Container fluid className="bg-n50" key={topicCenterRow.topicCenterRowId}>
+								{topicCenterRow.pinboardNotes.length > 0 && (
 									<Container className={containerClassNames}>
 										{topicCenterRowHeader}
-
 										<Row>
 											<Col>
 												<Masonry>
@@ -559,14 +398,11 @@ const CommunityPage = () => {
 											</Col>
 										</Row>
 									</Container>
-								</Container>
-							)}
+								)}
 
-							{topicCenterRow.contents.length > 0 && (
-								<Container fluid className={backgroundColorClass} key={topicCenterRow.topicCenterRowId}>
+								{topicCenterRow.contents.length > 0 && (
 									<Container className={containerClassNames}>
 										{topicCenterRowHeader}
-
 										<Row>
 											{topicCenterRow.contents.map((content) => {
 												return (
@@ -622,8 +458,8 @@ const CommunityPage = () => {
 											})}
 										</Row>
 									</Container>
-								</Container>
-							)}
+								)}
+							</Container>
 						</React.Fragment>
 					);
 				})}
