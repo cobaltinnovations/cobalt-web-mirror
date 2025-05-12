@@ -17,10 +17,7 @@ import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 const useResourceDisplayStyles = createUseThemedStyles((theme) => ({
 	mediaContainer: {
-		height: 350,
-		[mediaQueries.lg]: {
-			height: 210,
-		},
+		paddingBottom: '56.25%',
 	},
 	informationContainer: {
 		padding: '10px 20px',
