@@ -74,7 +74,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
-	const [crop, setCrop] = useState({
+	const [crop, setCrop] = useState<ReactCrop.Crop>({
 		width: 90,
 		aspect: 16 / 9,
 		unit: '%' as '%',
@@ -85,7 +85,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 		imageRef.current = htmlImageElement;
 	}, []);
 
-	function handleCropChange(newCrop: any) {
+	function handleCropChange(newCrop: ReactCrop.Crop) {
 		setCrop(newCrop);
 	}
 
