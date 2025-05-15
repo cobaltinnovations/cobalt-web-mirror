@@ -92,6 +92,11 @@ export enum AnalyticsNativeEventClickthroughFeatureSource {
 	NAV = 'NAV',
 }
 
+export enum AnalyticsNativeEventClickthroughSiteLocationId {
+	COMMUNITY = 'COMMUNITY',
+	FEATURED = 'FEATURED',
+}
+
 export enum AnalyticsNativeEventMhicPriorityGroupId {
 	OUTREACH_REVIEW = 'OUTREACH_REVIEW',
 	VOICEMAIL_TASK = 'VOICEMAIL_TASK',

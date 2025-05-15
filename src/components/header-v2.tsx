@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import {
 	AlertTypeId,
 	AnalyticsNativeEventClickthroughFeatureSource,
+	AnalyticsNativeEventClickthroughSiteLocationId,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
@@ -547,6 +548,7 @@ const HeaderV2 = () => {
 										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
 											pageId,
 											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+											siteLocationId: AnalyticsNativeEventClickthroughSiteLocationId.COMMUNITY,
 										});
 									},
 								})
@@ -732,6 +734,8 @@ const HeaderV2 = () => {
 																	{
 																		pageId: featuredTopicCenterItem.pageId,
 																		source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+																		siteLocationId:
+																			AnalyticsNativeEventClickthroughSiteLocationId.FEATURED,
 																	}
 															  );
 													}}
