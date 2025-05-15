@@ -169,17 +169,47 @@ export const SupportMentalHealthProvidersShell = ({
 											);
 										}
 
+										const alertTitle =
+											featureDetails?.recommendationTitleOverride ||
+											`${featureDetails?.treatmentDescription} Recommended`;
+
+										const alertDescription = featureDetails?.recommendationDescriptionOverride ? (
+											<div
+												dangerouslySetInnerHTML={{
+													__html: featureDetails?.recommendationDescriptionOverride,
+												}}
+											/>
+										) : (
+											<>
+												<p>
+													Based on the symptoms reported we recommend{' '}
+													<strong>{featureDetails?.treatmentDescription}</strong>. You can
+													schedule a telehealth appointment with one of the providers listed.
+												</p>
+												<p>
+													<strong>
+														(Services billed to insurance. The patient is responsible for
+														any co-pays or remaining balance.)
+													</strong>
+												</p>
+											</>
+										);
+
+										const bookingTitle =
+											featureDetails?.recommendationBookingTitleOverride ??
+											`Schedule with ${featureDetails?.name}`;
+										const bookingUrl =
+											featureDetails?.recommendationBookingUrlOverride ?? featureDetails?.urlName;
+
 										return (
 											<InlineAlert
 												className="mb-4"
 												variant="info"
-												title={`${featureDetails?.treatmentDescription} Recommended`}
-												description={`Based on the symptoms reported, we recommend ${featureDetails?.treatmentDescription}. You can schedule a telehealth appointment with one of the providers listed.`}
+												title={alertTitle}
+												description={alertDescription}
 												action={{
-													title: 'Schedule with ' + featureDetails?.name,
-													onClick: () => {
-														navigate(featureDetails?.urlName ?? '');
-													},
+													title: bookingTitle,
+													onClick: () => navigate(bookingUrl!),
 												}}
 											/>
 										);
