@@ -9,9 +9,9 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { HeaderNavFeaturedItem, NavFeaturedItem } from './header-nav-featured-item';
 import { analyticsService } from '@/lib/services';
 import {
-	AnalyticsNativeEventClickthroughSiteLocationId,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
+	SITE_LOCATION_ID,
 } from '@/lib/models';
 
 interface UseStylesProps {
@@ -114,7 +114,7 @@ const HeaderNavDropdown = ({
 									: analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
 											pageId: featuredItem.pageId,
 											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
-											siteLocationId: AnalyticsNativeEventClickthroughSiteLocationId.FEATURED,
+											siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
 									  });
 							}}
 						/>

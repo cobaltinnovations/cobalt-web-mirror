@@ -33,7 +33,7 @@ import {
 	Tag,
 	AnalyticsNativeEventTypeId,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
-	AnalyticsNativeEventClickthroughSiteLocationId,
+	SITE_LOCATION_ID,
 } from '@/lib/models';
 
 import PathwaysSection from '@/components/pathways-section';
@@ -287,7 +287,7 @@ const Index: FC = () => {
 									analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
 										pageId: featuredTopicCenter.pageId,
 										source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-										siteLocationId: AnalyticsNativeEventClickthroughSiteLocationId.FEATURED,
+										siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
 									});
 
 									navigate(featuredTopicCenter.relativeUrl);
@@ -445,8 +445,7 @@ const Index: FC = () => {
 													{
 														pageId: ftc.pageId,
 														source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-														siteLocationId:
-															AnalyticsNativeEventClickthroughSiteLocationId.FEATURED,
+														siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
 													}
 												);
 
