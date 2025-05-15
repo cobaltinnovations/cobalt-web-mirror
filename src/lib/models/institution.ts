@@ -108,6 +108,8 @@ export interface InstitutionFeature {
 	bannerMessageDisplayTypeId?: DisplayTypeId;
 	recommendationTitleOverride?: string;
 	recommendationDescriptionOverride?: string;
+	recommendationBookingTitleOverride?: string;
+	recommendationBookingUrlOverride?: string;
 }
 
 export enum DisplayTypeId {
