@@ -113,16 +113,21 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 												</>
 											);
 
+										const bookingTitle =
+											recommendedFeature.recommendationBookingTitleOverride ??
+											`Schedule with ${recommendedFeature.name}`;
+										const bookingUrl =
+											recommendedFeature.recommendationBookingUrlOverride ??
+											recommendedFeature.urlName;
+
 										return (
 											<InlineAlert
 												variant="info"
 												title={alertTitle}
 												description={alertDescription}
 												action={{
-													title: `Schedule with ${recommendedFeature.name}`,
-													onClick: () => {
-														navigate(recommendedFeature.urlName);
-													},
+													title: bookingTitle,
+													onClick: () => navigate(bookingUrl),
 												}}
 											/>
 										);

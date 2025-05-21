@@ -1,5 +1,22 @@
 import { AdminContent, COLOR_IDS, GroupSessionModel, Tag, TagGroup } from '@/lib/models';
 
+export enum SITE_LOCATION_ID {
+	COMMUNITY = 'COMMUNITY',
+	FEATURED_TOPIC = 'FEATURED_TOPIC',
+}
+
+export interface PageSiteLocationModel {
+	pageId: string;
+	siteLocationId: SITE_LOCATION_ID;
+	relativeUrl: string;
+	headline: string;
+	description: string;
+	shortDescription?: string;
+	imageAltText?: string;
+	imageUrl: string;
+	callToAction: string;
+}
+
 export enum PAGE_STATUS_ID {
 	LIVE = 'LIVE',
 	DRAFT = 'DRAFT',
@@ -54,6 +71,7 @@ export interface PageDetailModel {
 	pageSections: PageSectionDetailModel[];
 	relativeUrl: string;
 	editingLivePage: boolean;
+	livePageSiteLocations: PageSiteLocationModel[];
 }
 
 export interface PageSectionDetailModel {
@@ -174,20 +192,3 @@ export const isTwoColumnImageRow = (x: PageRowUnionModel): x is TwoColumnImageRo
 export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnImageRowModel => {
 	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
 };
-
-export enum SITE_LOCATION_ID {
-	COMMUNITY = 'COMMUNITY',
-	FEATURED_TOPIC = 'FEATURED_TOPIC',
-}
-
-export interface PageSiteLocationModel {
-	pageId: string;
-	siteLocationId: SITE_LOCATION_ID;
-	relativeUrl: string;
-	headline: string;
-	description: string;
-	shortDescription?: string;
-	imageAltText?: string;
-	imageUrl: string;
-	callToAction: string;
-}

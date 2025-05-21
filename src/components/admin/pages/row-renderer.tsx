@@ -17,6 +17,7 @@ import {
 	isTwoColumnImageRow,
 	OneColumnImageRowModel,
 	PageRowUnionModel,
+	PageSiteLocationModel,
 	ResourcesRowModel,
 	Tag,
 	TagGroupRowModel,
@@ -40,6 +41,7 @@ interface RowRendererProps<T = PageRowUnionModel> {
 	contentsByTagGroupId: Record<string, Content[]>;
 	tagsByTagId: Record<string, Tag>;
 	enableAnalytics: boolean;
+	livePageSiteLocations: PageSiteLocationModel[];
 	className?: string;
 }
 
@@ -49,6 +51,7 @@ const ResourcesRowRenderer = ({
 	className,
 	tagsByTagId,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<ResourcesRowModel>) => {
 	return (
 		<Row className={className}>
@@ -78,6 +81,7 @@ const ResourcesRowRenderer = ({
 								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CONTENT, {
 									pageId,
 									contentId: content.contentId,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 								});
 							}}
 							trackTagEvent={(tag) => {
@@ -88,6 +92,7 @@ const ResourcesRowRenderer = ({
 								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 									pageId,
 									tagId: tag.tagId,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 								});
 							}}
 						/>
@@ -103,6 +108,7 @@ const GroupSessionsRowRenderer = ({
 	pageRow,
 	className,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<GroupSessionsRowModel>) => {
 	const navigate = useNavigate();
 
@@ -143,6 +149,7 @@ const GroupSessionsRowRenderer = ({
 										{
 											pageId,
 											groupSessionId: groupSession.groupSessionId,
+											siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 										}
 									);
 								}}
@@ -171,6 +178,7 @@ const GroupSessionsRowRenderer = ({
 											{
 												pageId,
 												groupSessionId: groupSession.groupSessionId,
+												siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 											}
 										);
 									}}
@@ -193,6 +201,7 @@ const TagGroupRowRenderer = ({
 	contentsByTagGroupId,
 	tagsByTagId,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<TagGroupRowModel>) => {
 	return (
 		<Row className={className}>
@@ -211,6 +220,7 @@ const TagGroupRowRenderer = ({
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG_GROUP, {
 							pageId,
 							tagId: pageRow.tagGroup.tagGroupId,
+							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
@@ -245,6 +255,7 @@ const TagGroupRowRenderer = ({
 										{
 											pageId,
 											contentId: content.contentId,
+											siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 										}
 									);
 								}}
@@ -256,6 +267,7 @@ const TagGroupRowRenderer = ({
 									analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 										pageId,
 										tagId: tag.tagId,
+										siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 									});
 								}}
 							/>
@@ -273,6 +285,7 @@ const TagRowRenderer = ({
 	className,
 	tagsByTagId,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<TagRowModel>) => {
 	const [content, setContent] = useState<Content[]>([]);
 
@@ -309,6 +322,7 @@ const TagRowRenderer = ({
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 								pageId,
 								tagId: pageRow.tag.tagId,
+								siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 							});
 						}}
 					/>
@@ -343,6 +357,7 @@ const TagRowRenderer = ({
 											{
 												pageId,
 												contentId: content.contentId,
+												siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 											}
 										);
 									}}
@@ -356,6 +371,7 @@ const TagRowRenderer = ({
 											{
 												pageId,
 												tagId: tag.tagId,
+												siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 											}
 										);
 									}}
@@ -374,6 +390,7 @@ const OneColRowRenderer = ({
 	pageRow,
 	className,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<OneColumnImageRowModel>) => {
 	return (
 		<Row className={classNames('align-items-center', className)}>
@@ -404,6 +421,7 @@ const OneColRowRenderer = ({
 								pageId,
 								linkUrl,
 								linkText,
+								siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 							});
 						}}
 					/>
@@ -418,6 +436,7 @@ const TwoColRowRenderer = ({
 	pageRow,
 	className,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<TwoColumnImageRowModel>) => {
 	return (
 		<Row className={className}>
@@ -439,6 +458,7 @@ const TwoColRowRenderer = ({
 							pageId,
 							linkUrl,
 							linkText,
+							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
@@ -461,6 +481,7 @@ const TwoColRowRenderer = ({
 							pageId,
 							linkUrl,
 							linkText,
+							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
@@ -474,6 +495,7 @@ const ThreeColRowRenderer = ({
 	pageRow,
 	className,
 	enableAnalytics,
+	livePageSiteLocations,
 }: RowRendererProps<ThreeColumnImageRowModel>) => {
 	return (
 		<Row className={className}>
@@ -495,6 +517,7 @@ const ThreeColRowRenderer = ({
 							pageId,
 							linkUrl,
 							linkText,
+							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
@@ -517,6 +540,7 @@ const ThreeColRowRenderer = ({
 							pageId,
 							linkUrl,
 							linkText,
+							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
@@ -539,6 +563,7 @@ const ThreeColRowRenderer = ({
 							pageId,
 							linkUrl,
 							linkText,
+							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
@@ -554,6 +579,7 @@ export const getRendererForPageRow = ({
 	tagsByTagId,
 	isLast,
 	enableAnalytics,
+	livePageSiteLocations,
 }: {
 	pageId: string;
 	pageRow: PageRowUnionModel;
@@ -561,6 +587,7 @@ export const getRendererForPageRow = ({
 	tagsByTagId: Record<string, Tag>;
 	isLast: boolean;
 	enableAnalytics: boolean;
+	livePageSiteLocations: PageSiteLocationModel[];
 }) => {
 	const rowTypeMap = [
 		{
@@ -572,6 +599,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
@@ -585,6 +613,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
@@ -598,6 +627,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
@@ -611,6 +641,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
@@ -624,6 +655,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
@@ -637,6 +669,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
@@ -650,6 +683,7 @@ export const getRendererForPageRow = ({
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
 					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),

@@ -37,9 +37,12 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 		);
 
 		if (enableAnalytics) {
-			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PAGE, { pageId: page.pageId });
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PAGE, {
+				pageId: page.pageId,
+				siteLocationIds: page.livePageSiteLocations.map((i) => i.siteLocationId),
+			});
 		}
-	}, [enableAnalytics, page.pageId]);
+	}, [enableAnalytics, page.livePageSiteLocations, page.pageId]);
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -89,6 +92,7 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 										tagsByTagId: tagsByTagId ?? {},
 										isLast,
 										enableAnalytics,
+										livePageSiteLocations: page.livePageSiteLocations,
 									})}
 								</React.Fragment>
 							);

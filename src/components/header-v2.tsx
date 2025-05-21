@@ -10,6 +10,7 @@ import {
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
+	SITE_LOCATION_ID,
 } from '@/lib/models';
 import { analyticsService, institutionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
@@ -548,6 +549,7 @@ const HeaderV2 = () => {
 										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
 											pageId,
 											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+											siteLocationId: SITE_LOCATION_ID.COMMUNITY,
 										});
 									},
 								})
@@ -742,6 +744,7 @@ const HeaderV2 = () => {
 																	{
 																		pageId: featuredTopicCenterItem.pageId,
 																		source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+																		siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
 																	}
 															  );
 													}}

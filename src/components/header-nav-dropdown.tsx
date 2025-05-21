@@ -8,7 +8,11 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import { HeaderNavFeaturedItem, NavFeaturedItem } from './header-nav-featured-item';
 import { analyticsService } from '@/lib/services';
-import { AnalyticsNativeEventClickthroughTopicCenterSource, AnalyticsNativeEventTypeId } from '@/lib/models';
+import {
+	AnalyticsNativeEventClickthroughTopicCenterSource,
+	AnalyticsNativeEventTypeId,
+	SITE_LOCATION_ID,
+} from '@/lib/models';
 
 interface UseStylesProps {
 	hasFeaturedItem: boolean;
@@ -110,6 +114,7 @@ const HeaderNavDropdown = ({
 									: analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
 											pageId: featuredItem.pageId,
 											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
+											siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
 									  });
 							}}
 						/>
