@@ -442,6 +442,8 @@ const ScreeningQuestionsPage = () => {
 		return isSubmitting || (!confirmationPrompt && answerCountMismatch);
 	}, [answerText, confirmationPrompt, isSubmitting, screeningQuestionContextResponse, selectedAnswers.length]);
 
+	const showPromptPrevious = isSubmitPrompt || screeningQuestionContextResponse?.previousScreeningQuestionContextId;
+
 	return (
 		<>
 			<Helmet>
@@ -488,18 +490,21 @@ const ScreeningQuestionsPage = () => {
 									)}
 
 									<div
-										className="my-6 wysiwyg-display"
+										className="my-6 wysiwyg-display text-center"
 										dangerouslySetInnerHTML={{
 											__html: confirmationPrompt.text,
 										}}
 									/>
 
-									<div className="d-flex">
-										{(isSubmitPrompt ||
-											screeningQuestionContextResponse?.previousScreeningQuestionContextId) && (
+									<div
+										className={classNames('d-flex align-items-center', {
+											'justify-content-between': showPromptPrevious,
+											'justify-content-center': !showPromptPrevious,
+										})}
+									>
+										{showPromptPrevious && (
 											<Button
 												disabled={isSubmitting}
-												className="me-2"
 												type="button"
 												onClick={() => {
 													if (isSubmitPrompt) {
@@ -519,7 +524,6 @@ const ScreeningQuestionsPage = () => {
 
 										<Button
 											disabled={disableNextBtn}
-											className="ms-auto"
 											onClick={async () => {
 												if (isSubmitPrompt) {
 													submitAnswers({
