@@ -135,9 +135,10 @@ export const PatientAssessmentResults = () => {
 
 							<hr className="mb-8" />
 
-							{/* This is when the patient is ineligible per the intake assessment */}
+							{/* This is when the patient is ineligible per the intake assessment (provider-referred) */}
 							{patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied &&
-								!patientOrder.mostRecentScreeningSessionId && (
+								!patientOrder.mostRecentScreeningSessionId &&
+								patientOrder.patientOrderReferralSourceId === PatientOrderReferralSourceId.PROVIDER && (
 									<>
 										<p className="mb-6 fs-large">
 											Based on your responses, you are not currently eligible for this program.
@@ -152,6 +153,41 @@ export const PatientAssessmentResults = () => {
 											</strong>{' '}
 											{institution.integratedCareAvailabilityDescription} if you have any
 											questions or would like to speak with us about your options.
+										</p>
+
+										<div className="text-center">
+											<Button
+												variant="outline-primary"
+												size="lg"
+												onClick={() => {
+													navigate('/ic/patient');
+												}}
+											>
+												Return to Home
+											</Button>
+										</div>
+									</>
+								)}
+
+							{/* This is when the patient is ineligible per the intake assessment (self-referred) */}
+							{patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied &&
+								!patientOrder.mostRecentScreeningSessionId &&
+								patientOrder.patientOrderReferralSourceId === PatientOrderReferralSourceId.SELF && (
+									<>
+										<p className="mb-6 fs-large">
+											We understand you were looking to book an appointment online. Based on your
+											responses, a conversation will be needed to determine the most appropriate
+											resources.
+										</p>
+
+										<p className="mb-6 fs-large">
+											Please call ${institution?.integratedCarePrimaryCareName} at{' '}
+											<strong>
+												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
+													{institution?.integratedCarePhoneNumberDescription}
+												</a>
+											</strong>{' '}
+											{institution.integratedCareAvailabilityDescription} to discuss your needs.
 										</p>
 
 										<div className="text-center">
@@ -289,21 +325,22 @@ export const PatientAssessmentResults = () => {
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.SELF && (
 										<p className="mb-6 fs-large">
-											Based on the symptoms reported, a followup conversation is needed.
+											We understand you were looking to book an appointment online. Based on your
+											responses, a conversation will be needed to determine the most appropriate
+											resources.
 										</p>
 									)}
 
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.SELF && (
 										<p className="mb-6 fs-large">
-											Please call us at{' '}
+											Please call ${institution?.integratedCarePrimaryCareName} at{' '}
 											<strong>
 												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
 													{institution?.integratedCarePhoneNumberDescription}
 												</a>
 											</strong>{' '}
-											{institution.integratedCareAvailabilityDescription} to discuss your options
-											for care.
+											{institution.integratedCareAvailabilityDescription} to discuss your needs.
 										</p>
 									)}
 

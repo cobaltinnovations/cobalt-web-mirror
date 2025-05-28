@@ -87,6 +87,7 @@ export interface Institution {
 	integratedCareMhpTriageOverviewOverride?: string;
 	integratedCareBookingInsuranceRequirements?: string;
 	integratedCarePatientIntroOverride?: string;
+	integratedCarePrimaryCareName?: string;
 	landingPageTaglineOverride?: string;
 	preferLegacyTopicCenters?: boolean;
 }
