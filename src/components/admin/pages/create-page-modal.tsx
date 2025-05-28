@@ -154,7 +154,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 								setUrlNameSetByUser(true);
 								setFormValues((previousValue) => ({
 									...previousValue,
-									friendlyUrl: currentTarget.value,
+									friendlyUrl: currentTarget.value.toLowerCase(),
 								}));
 							}}
 							onBlur={() => {

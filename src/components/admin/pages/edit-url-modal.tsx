@@ -124,7 +124,7 @@ export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
 							onChange={({ currentTarget }) => {
 								setFormValues((previousValue) => ({
 									...previousValue,
-									friendlyUrl: currentTarget.value,
+									friendlyUrl: currentTarget.value.toLowerCase(),
 								}));
 							}}
 							required
