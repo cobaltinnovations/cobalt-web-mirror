@@ -50,7 +50,10 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 		}
 
 		pagesService
-			.validatePageUrl({ searchQuery: debouncedPageNameQuery })
+			.validatePageUrl({
+				searchQuery: debouncedPageNameQuery,
+				...(page && { pageId: page.pageId }),
+			})
 			.fetch()
 			.then((response) => {
 				setFormValues((previousValues) => ({
@@ -58,7 +61,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 					friendlyUrl: response.pageUrlNameValidationResult.recommendation,
 				}));
 			});
-	}, [debouncedPageNameQuery, urlNameSetByUser]);
+	}, [debouncedPageNameQuery, page, urlNameSetByUser]);
 
 	useEffect(() => {
 		if (!debouncedFriendlyUrlQuery) {
@@ -66,12 +69,15 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 		}
 
 		pagesService
-			.validatePageUrl({ searchQuery: debouncedFriendlyUrlQuery })
+			.validatePageUrl({
+				searchQuery: debouncedFriendlyUrlQuery,
+				...(page && { pageId: page.pageId }),
+			})
 			.fetch()
 			.then((response) => {
 				setUrlNameValidation(response.pageUrlNameValidationResult);
 			});
-	}, [debouncedFriendlyUrlQuery]);
+	}, [debouncedFriendlyUrlQuery, page]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -154,7 +160,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 								setUrlNameSetByUser(true);
 								setFormValues((previousValue) => ({
 									...previousValue,
-									friendlyUrl: currentTarget.value,
+									friendlyUrl: currentTarget.value.toLowerCase(),
 								}));
 							}}
 							onBlur={() => {
