@@ -48,12 +48,15 @@ export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
 		}
 
 		pagesService
-			.validatePageUrl({ searchQuery: debouncedFriendlyUrlQuery })
+			.validatePageUrl({
+				searchQuery: debouncedFriendlyUrlQuery,
+				...(page && { pageId: page.pageId }),
+			})
 			.fetch()
 			.then((response) => {
 				setUrlNameValidation(response.pageUrlNameValidationResult);
 			});
-	}, [debouncedFriendlyUrlQuery]);
+	}, [debouncedFriendlyUrlQuery, page]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
