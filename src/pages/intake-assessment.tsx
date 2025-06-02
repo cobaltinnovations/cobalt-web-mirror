@@ -9,7 +9,6 @@ import SurveyQuestion from '@/components/survey-question';
 import { assessmentService } from '@/lib/services';
 import { Assessment, QUESTION_TYPE, SelectedQuestionAnswer } from '@/lib/models';
 import ProgressBar from '@/components/progress-bar';
-import Breadcrumb from '@/components/breadcrumb';
 import { BookingContext } from '@/contexts/booking-context';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
@@ -120,7 +119,7 @@ const IntakeAssessment: FC = () => {
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>
-				<Breadcrumb
+				{/* <Breadcrumb
 					breadcrumbs={[
 						{
 							to: '/',
@@ -135,7 +134,7 @@ const IntakeAssessment: FC = () => {
 							title: 'Appointment',
 						},
 					]}
-				/>
+				/> */}
 
 				<ProgressBar
 					current={assessment?.assessmentProgress || 0}
