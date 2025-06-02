@@ -617,7 +617,6 @@ const ResourceLibrary = () => {
 												<Carousel
 													responsive={resourceLibraryCarouselConfig}
 													trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-													floatingButtonGroup
 												>
 													{(contentsByTagGroupId?.[tagGroup.tagGroupId] ?? []).map(
 														(content) => {

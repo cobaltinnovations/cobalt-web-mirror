@@ -42,12 +42,6 @@ export const GroupSession: Story = {
 	},
 	args: {
 		responsive: responsiveDefaults,
-		description: 'Carousel Description',
-		calloutTitle: 'Callout',
-		calloutOnClick: () => {
-			alert('Callout Clicked');
-		},
-		floatingButtonGroup: false,
 		className: '',
 	},
 };
@@ -72,9 +66,5 @@ export const ResourceLibrary: Story = {
 	},
 	args: {
 		responsive: resourceLibraryCarouselConfig,
-		calloutOnClick: () => {
-			alert('Callout Clicked');
-		},
-		floatingButtonGroup: true,
 	},
 };
