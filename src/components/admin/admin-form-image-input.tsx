@@ -41,7 +41,6 @@ export const AdminFormImageInput = ({
 		<>
 			<SessionCropModal
 				imageSource={sessionCropModalImageConfig.source}
-				imageType={sessionCropModalImageConfig.type}
 				show={isCropModalOpen}
 				onHide={() => {
 					setIsCropModalOpen(false);
