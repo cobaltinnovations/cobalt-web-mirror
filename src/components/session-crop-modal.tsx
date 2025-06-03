@@ -140,8 +140,6 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, imageName, o
 				return;
 			}
 
-			console.log('imageName', imageName);
-
 			onSave(cropResult.blob, `${stripExtension(imageName ?? uuidv4())}.${cropResult.extension}`);
 		} catch (error) {
 			addFlag({

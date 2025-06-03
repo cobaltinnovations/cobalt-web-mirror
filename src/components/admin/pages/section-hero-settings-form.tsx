@@ -103,9 +103,6 @@ export const SectionHeroSettingsForm = () => {
 
 	const handleImageChange = useCallback(
 		async (nextId: string, nextSrc: string) => {
-			console.log('nextId', nextId);
-			console.log('nextSrc', nextSrc);
-
 			setFormValues((previousValue) => ({
 				...previousValue,
 				imageFileUploadId: nextId,
