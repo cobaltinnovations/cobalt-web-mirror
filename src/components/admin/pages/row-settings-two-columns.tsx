@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { TwoColumnImageRowModel } from '@/lib/models';
@@ -189,7 +188,7 @@ export const RowSettingsTwoColumns = () => {
 						presignedUploadGetter={(blob, name) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
-								filename: name ?? `${uuidv4()}.jpg`,
+								filename: name,
 							}).fetch;
 						}}
 					/>
@@ -240,7 +239,7 @@ export const RowSettingsTwoColumns = () => {
 						presignedUploadGetter={(blob, name) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
-								filename: name ?? `${uuidv4()}.jpg`,
+								filename: name,
 							}).fetch;
 						}}
 					/>

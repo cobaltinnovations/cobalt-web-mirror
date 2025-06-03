@@ -8,7 +8,7 @@ import { PresignedUploadResponse } from '@/lib/models';
 export interface AdminFormImageInputProps {
 	imageSrc: string;
 	onSrcChange: (newId: string, newSrc: string) => void;
-	presignedUploadGetter: (blob: Blob, name?: string) => () => Promise<PresignedUploadResponse>;
+	presignedUploadGetter: (blob: Blob, name: string) => () => Promise<PresignedUploadResponse>;
 	className?: string;
 	onUploadComplete?(fileUploadId: string): void;
 }
@@ -40,17 +40,18 @@ export const AdminFormImageInput = ({
 	return (
 		<>
 			<SessionCropModal
+				imageName={sessionCropModalImageConfig.name}
 				imageSource={sessionCropModalImageConfig.source}
 				show={isCropModalOpen}
 				onHide={() => {
 					setIsCropModalOpen(false);
 				}}
-				onSave={async (blob) => {
+				onSave={async (blob, fileName) => {
 					setIsCropModalOpen(false);
 
 					let fileUploadId = '';
 
-					imageUploader(blob, presignedUploadGetter(blob, sessionCropModalImageConfig.name))
+					imageUploader(blob, presignedUploadGetter(blob, fileName))
 						.onBeforeUpload((previewImageUrl) => {
 							setImagePreviewSrc(previewImageUrl);
 						})

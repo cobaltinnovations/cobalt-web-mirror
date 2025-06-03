@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import DatePicker from '@/components/date-picker';
@@ -970,7 +969,7 @@ export const Component = () => {
 					presignedUploadGetter={(blob, name) => {
 						return groupSessionsService.getPresignedUploadUrl({
 							contentType: blob.type,
-							filename: name ?? `${uuidv4()}.jpg`,
+							filename: name,
 						}).fetch;
 					}}
 				/>

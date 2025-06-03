@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -146,7 +145,7 @@ export const SectionHeroSettingsForm = () => {
 				presignedUploadGetter={(blob, name) => {
 					return pagesService.createPresignedFileUpload({
 						contentType: blob.type,
-						filename: name ?? `${uuidv4()}.jpg`,
+						filename: name,
 					}).fetch;
 				}}
 			/>

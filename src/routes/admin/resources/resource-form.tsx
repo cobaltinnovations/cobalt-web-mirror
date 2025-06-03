@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -821,7 +820,7 @@ export const Component = () => {
 							presignedUploadGetter={(blob, name) => {
 								return adminService.getPresignedUploadUrl({
 									contentType: blob.type,
-									filename: name ?? `${uuidv4()}.jpg`,
+									filename: name,
 									filesize: blob.size,
 								}).fetch;
 							}}

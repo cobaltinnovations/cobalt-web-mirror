@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
@@ -8,7 +9,10 @@ import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 import useFlags from '@/hooks/use-flags';
 
-function getCroppedImageAsBlob(image: HTMLImageElement, crop: ReactCrop.Crop): Promise<Blob> | undefined {
+function getCroppedImageAsBlob(
+	image: HTMLImageElement,
+	crop: ReactCrop.Crop
+): Promise<{ blob: Blob; extension: string }> | undefined {
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
 
@@ -56,6 +60,7 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: ReactCrop.Crop): P
 		}
 
 		const mimeType = hasTransparency ? 'image/png' : 'image/jpeg';
+		const extension = hasTransparency ? 'png' : 'jpg';
 		const quality = hasTransparency ? 1.0 : 0.9;
 
 		canvas.toBlob(
@@ -67,12 +72,22 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: ReactCrop.Crop): P
 					});
 				}
 
-				resolve(blob);
+				resolve({ blob, extension });
 			},
 			mimeType,
 			quality
 		);
 	});
+}
+
+function stripExtension(filename: string): string {
+	const lastDotIndex = filename.lastIndexOf('.');
+
+	if (lastDotIndex <= 0) {
+		return filename;
+	}
+
+	return filename.slice(0, lastDotIndex);
 }
 
 const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
@@ -89,10 +104,11 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
-	onSave(blob: Blob): void;
+	imageName?: string;
+	onSave(blob: Blob, fileName: string): void;
 }
 
-const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHide, ...props }) => {
+const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, imageName, onSave, onHide, ...props }) => {
 	useTrackModalView('SessionCropModal', props.show);
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
@@ -118,13 +134,15 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 		}
 
 		try {
-			const blob = await getCroppedImageAsBlob(imageRef.current, crop);
+			const cropResult = await getCroppedImageAsBlob(imageRef.current, crop);
 
-			if (!blob) {
+			if (!cropResult) {
 				return;
 			}
 
-			onSave(blob);
+			console.log('imageName', imageName);
+
+			onSave(cropResult.blob, `${stripExtension(imageName ?? uuidv4())}.${cropResult.extension}`);
 		} catch (error) {
 			addFlag({
 				variant: 'danger',
