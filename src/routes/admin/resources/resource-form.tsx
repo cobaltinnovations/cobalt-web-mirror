@@ -818,10 +818,10 @@ export const Component = () => {
 								updateFormValue('imageFileId', nextId);
 								updateFormValue('imageUrl', nextSrc);
 							}}
-							presignedUploadGetter={(blob) => {
+							presignedUploadGetter={(blob, name) => {
 								return adminService.getPresignedUploadUrl({
 									contentType: blob.type,
-									filename: `${uuidv4()}.jpg`,
+									filename: name ?? `${uuidv4()}.jpg`,
 									filesize: blob.size,
 								}).fetch;
 							}}

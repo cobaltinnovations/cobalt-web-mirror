@@ -177,10 +177,10 @@ export const RowSettingsOneColumn = () => {
 						onUploadComplete={(fileUploadId) => {
 							handleUploadComplete('columnOne', fileUploadId);
 						}}
-						presignedUploadGetter={(blob) => {
+						presignedUploadGetter={(blob, name) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
-								filename: `${uuidv4()}.jpg`,
+								filename: name ?? `${uuidv4()}.jpg`,
 							}).fetch;
 						}}
 					/>

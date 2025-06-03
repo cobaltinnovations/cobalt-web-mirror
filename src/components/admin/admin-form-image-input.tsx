@@ -8,7 +8,7 @@ import { PresignedUploadResponse } from '@/lib/models';
 export interface AdminFormImageInputProps {
 	imageSrc: string;
 	onSrcChange: (newId: string, newSrc: string) => void;
-	presignedUploadGetter: (blob: Blob) => () => Promise<PresignedUploadResponse>;
+	presignedUploadGetter: (blob: Blob, name?: string) => () => Promise<PresignedUploadResponse>;
 	className?: string;
 	onUploadComplete?(fileUploadId: string): void;
 }
@@ -22,7 +22,7 @@ export const AdminFormImageInput = ({
 }: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-	const [cropModalImageSrc, setCropModalImageSrc] = useState(imageSrc);
+	const [sessionCropModalImageConfig, setSessionCropModalImageConfig] = useState({ name: '', source: '', type: '' });
 	const [imagePreviewSrc, setImagePreviewSrc] = useState('');
 	const [isUploading, setIsUploading] = useState(false);
 	const [progress, setProgress] = useState(0);
@@ -40,7 +40,8 @@ export const AdminFormImageInput = ({
 	return (
 		<>
 			<SessionCropModal
-				imageSource={cropModalImageSrc}
+				imageSource={sessionCropModalImageConfig.source}
+				imageType={sessionCropModalImageConfig.type}
 				show={isCropModalOpen}
 				onHide={() => {
 					setIsCropModalOpen(false);
@@ -50,7 +51,7 @@ export const AdminFormImageInput = ({
 
 					let fileUploadId = '';
 
-					imageUploader(blob, presignedUploadGetter(blob))
+					imageUploader(blob, presignedUploadGetter(blob, sessionCropModalImageConfig.name))
 						.onBeforeUpload((previewImageUrl) => {
 							setImagePreviewSrc(previewImageUrl);
 						})
@@ -83,9 +84,11 @@ export const AdminFormImageInput = ({
 				isUploading={isUploading}
 				progress={progress}
 				onChange={(file) => {
-					const sourceUrl = URL.createObjectURL(file);
-
-					setCropModalImageSrc(sourceUrl);
+					setSessionCropModalImageConfig({
+						name: file.name,
+						source: URL.createObjectURL(file),
+						type: file.type,
+					});
 					setIsCropModalOpen(true);
 				}}
 				onRemove={() => {

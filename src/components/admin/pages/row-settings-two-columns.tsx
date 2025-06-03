@@ -186,10 +186,10 @@ export const RowSettingsTwoColumns = () => {
 						onUploadComplete={(fileUploadId) => {
 							handleUploadComplete('columnOne', fileUploadId);
 						}}
-						presignedUploadGetter={(blob) => {
+						presignedUploadGetter={(blob, name) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
-								filename: `${uuidv4()}.jpg`,
+								filename: name ?? `${uuidv4()}.jpg`,
 							}).fetch;
 						}}
 					/>
@@ -237,10 +237,10 @@ export const RowSettingsTwoColumns = () => {
 						onUploadComplete={(fileUploadId) => {
 							handleUploadComplete('columnTwo', fileUploadId);
 						}}
-						presignedUploadGetter={(blob) => {
+						presignedUploadGetter={(blob, name) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
-								filename: `${uuidv4()}.jpg`,
+								filename: name ?? `${uuidv4()}.jpg`,
 							}).fetch;
 						}}
 					/>

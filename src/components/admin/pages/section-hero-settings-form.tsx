@@ -143,10 +143,10 @@ export const SectionHeroSettingsForm = () => {
 				imageSrc={formValues.imageUrl}
 				onSrcChange={handleImageChange}
 				onUploadComplete={handleUploadComplete}
-				presignedUploadGetter={(blob) => {
+				presignedUploadGetter={(blob, name) => {
 					return pagesService.createPresignedFileUpload({
 						contentType: blob.type,
-						filename: `${uuidv4()}.jpg`,
+						filename: name ?? `${uuidv4()}.jpg`,
 					}).fetch;
 				}}
 			/>

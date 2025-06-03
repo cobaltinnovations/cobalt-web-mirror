@@ -8,7 +8,11 @@ import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 import useFlags from '@/hooks/use-flags';
 
-function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
+function getCroppedImageAsBlob(image: HTMLImageElement, type: string, crop: ReactCrop.Crop): Promise<Blob> | undefined {
+	if (!crop) {
+		return;
+	}
+
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
 
@@ -19,19 +23,19 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 	const scaleX = image.naturalWidth / image.width;
 	const scaleY = image.naturalHeight / image.height;
 
-	canvas.width = crop.width * scaleX;
-	canvas.height = crop.height * scaleY;
+	canvas.width = (crop.width ?? 0) * scaleX;
+	canvas.height = (crop.height ?? 0) * scaleY;
 
 	ctx.drawImage(
 		image,
-		crop.x * scaleX,
-		crop.y * scaleY,
-		crop.width * scaleX,
-		crop.height * scaleY,
+		(crop.x ?? 0) * scaleX,
+		(crop.y ?? 0) * scaleY,
+		(crop.width ?? 0) * scaleX,
+		(crop.height ?? 0) * scaleY,
 		0,
 		0,
-		crop.width * scaleX,
-		crop.height * scaleY
+		(crop.width ?? 0) * scaleX,
+		(crop.height ?? 0) * scaleY
 	);
 
 	return new Promise((resolve, reject) => {
@@ -46,7 +50,7 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 
 				resolve(blob);
 			},
-			'image/jpeg',
+			type,
 			0.9
 		);
 	});
@@ -66,10 +70,11 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
+	imageType?: string;
 	onSave(blob: Blob): void;
 }
 
-const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHide, ...props }) => {
+const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, imageType, onSave, onHide, ...props }) => {
 	useTrackModalView('SessionCropModal', props.show);
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
@@ -95,7 +100,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 		}
 
 		try {
-			const blob = await getCroppedImageAsBlob(imageRef.current, crop);
+			const blob = await getCroppedImageAsBlob(imageRef.current, imageType ?? 'image/jpeg', crop);
 
 			if (!blob) {
 				return;

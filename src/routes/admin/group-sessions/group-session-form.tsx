@@ -967,10 +967,10 @@ export const Component = () => {
 						updateFormValue('imageFileUploadId', nextId);
 						updateFormValue('imageUrl', nextSrc);
 					}}
-					presignedUploadGetter={(blob) => {
+					presignedUploadGetter={(blob, name) => {
 						return groupSessionsService.getPresignedUploadUrl({
 							contentType: blob.type,
-							filename: `${uuidv4()}.jpg`,
+							filename: name ?? `${uuidv4()}.jpg`,
 						}).fetch;
 					}}
 				/>
