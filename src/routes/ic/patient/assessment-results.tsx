@@ -181,7 +181,7 @@ export const PatientAssessmentResults = () => {
 										</p>
 
 										<p className="mb-6 fs-large">
-											Please call ${institution?.integratedCarePrimaryCareName} at{' '}
+											Please call {institution?.integratedCarePrimaryCareName} at{' '}
 											<strong>
 												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
 													{institution?.integratedCarePhoneNumberDescription}
@@ -334,7 +334,7 @@ export const PatientAssessmentResults = () => {
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.SELF && (
 										<p className="mb-6 fs-large">
-											Please call ${institution?.integratedCarePrimaryCareName} at{' '}
+											Please call {institution?.integratedCarePrimaryCareName} at{' '}
 											<strong>
 												<a href={`tel:${institution?.integratedCarePhoneNumber}`}>
 													{institution?.integratedCarePhoneNumberDescription}
