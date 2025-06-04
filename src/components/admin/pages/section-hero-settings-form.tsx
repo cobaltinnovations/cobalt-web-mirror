@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -104,9 +103,6 @@ export const SectionHeroSettingsForm = () => {
 
 	const handleImageChange = useCallback(
 		async (nextId: string, nextSrc: string) => {
-			console.log('nextId', nextId);
-			console.log('nextSrc', nextSrc);
-
 			setFormValues((previousValue) => ({
 				...previousValue,
 				imageFileUploadId: nextId,
@@ -143,10 +139,10 @@ export const SectionHeroSettingsForm = () => {
 				imageSrc={formValues.imageUrl}
 				onSrcChange={handleImageChange}
 				onUploadComplete={handleUploadComplete}
-				presignedUploadGetter={(blob) => {
+				presignedUploadGetter={(blob, name) => {
 					return pagesService.createPresignedFileUpload({
 						contentType: blob.type,
-						filename: `${uuidv4()}.jpg`,
+						filename: name,
 					}).fetch;
 				}}
 			/>

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
@@ -8,7 +9,10 @@ import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 import useFlags from '@/hooks/use-flags';
 
-function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob> | undefined {
+function getCroppedImageAsBlob(
+	image: HTMLImageElement,
+	crop: ReactCrop.Crop
+): Promise<{ blob: Blob; extension: string }> | undefined {
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
 
@@ -16,25 +20,49 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 		return;
 	}
 
+	const cropX = crop.x ?? 0;
+	const cropY = crop.y ?? 0;
+	const cropWidth = crop.width ?? 0;
+	const cropHeight = crop.height ?? 0;
 	const scaleX = image.naturalWidth / image.width;
 	const scaleY = image.naturalHeight / image.height;
 
-	canvas.width = crop.width * scaleX;
-	canvas.height = crop.height * scaleY;
+	canvas.width = cropWidth * scaleX;
+	canvas.height = cropHeight * scaleY;
 
 	ctx.drawImage(
 		image,
-		crop.x * scaleX,
-		crop.y * scaleY,
-		crop.width * scaleX,
-		crop.height * scaleY,
+		cropX * scaleX,
+		cropY * scaleY,
+		cropWidth * scaleX,
+		cropHeight * scaleY,
 		0,
 		0,
-		crop.width * scaleX,
-		crop.height * scaleY
+		cropWidth * scaleX,
+		cropHeight * scaleY
 	);
 
 	return new Promise((resolve, reject) => {
+		let hasTransparency = false;
+
+		try {
+			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			const data = imageData.data;
+
+			for (let i = 3; i < data.length; i += 4) {
+				if (data[i] < 255) {
+					hasTransparency = true;
+					break;
+				}
+			}
+		} catch (err) {
+			hasTransparency = false;
+		}
+
+		const mimeType = hasTransparency ? 'image/png' : 'image/jpeg';
+		const extension = hasTransparency ? 'png' : 'jpg';
+		const quality = hasTransparency ? 1.0 : 0.9;
+
 		canvas.toBlob(
 			(blob) => {
 				if (!blob) {
@@ -44,12 +72,22 @@ function getCroppedImageAsBlob(image: HTMLImageElement, crop: any): Promise<Blob
 					});
 				}
 
-				resolve(blob);
+				resolve({ blob, extension });
 			},
-			'image/jpeg',
-			0.9
+			mimeType,
+			quality
 		);
 	});
+}
+
+function stripExtension(filename: string): string {
+	const lastDotIndex = filename.lastIndexOf('.');
+
+	if (lastDotIndex <= 0) {
+		return filename;
+	}
+
+	return filename.slice(0, lastDotIndex);
 }
 
 const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
@@ -66,10 +104,11 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
-	onSave(blob: Blob): void;
+	imageName?: string;
+	onSave(blob: Blob, fileName: string): void;
 }
 
-const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHide, ...props }) => {
+const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, imageName, onSave, onHide, ...props }) => {
 	useTrackModalView('SessionCropModal', props.show);
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
@@ -95,13 +134,13 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, onSave, onHi
 		}
 
 		try {
-			const blob = await getCroppedImageAsBlob(imageRef.current, crop);
+			const cropResult = await getCroppedImageAsBlob(imageRef.current, crop);
 
-			if (!blob) {
+			if (!cropResult) {
 				return;
 			}
 
-			onSave(blob);
+			onSave(cropResult.blob, `${stripExtension(imageName ?? uuidv4())}.${cropResult.extension}`);
 		} catch (error) {
 			addFlag({
 				variant: 'danger',
