@@ -96,6 +96,7 @@ export const PatientAssessmentResults = () => {
 							patientOrderClosureReasonId: PatientOrderClosureReasonId.DECLINED_CARE,
 						})
 						.fetch();
+					navigate('/ic/patient');
 				}
 			} catch (error) {
 				setIsSaving(false);
