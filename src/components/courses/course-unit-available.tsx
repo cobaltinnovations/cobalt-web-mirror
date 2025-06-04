@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
+import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
 	CourseUnitModel,
@@ -16,7 +17,6 @@ import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import classNames from 'classnames';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	videoPlayerSupplementsOuter: {
@@ -172,22 +172,33 @@ export const CourseUnitAvailable = ({
 				</div>
 			)}
 
-			{(courseUnit.courseUnitDownloadableFiles ?? []).map((courseUnitDownloadableFile) => (
-				<CourseDownloadable
-					key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
-					courseUnitDownloadableFile={courseUnitDownloadableFile}
-					trackEvent={() => {
-						analyticsService.persistEvent(
-							AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
-							{
-								courseUnitId: courseUnit.courseUnitId,
-								...(courseSessionId && { courseSessionId }),
-								courseUnitDownloadableFileId: courseUnitDownloadableFile.courseUnitDownloadableFileId,
-							}
-						);
-					}}
-				/>
-			))}
+			{(courseUnit.courseUnitDownloadableFiles ?? []).map(
+				(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
+					const isLast =
+						(courseUnit.courseUnitDownloadableFiles ?? []).length - 1 === courseUnitDownloadableFileIndex;
+
+					return (
+						<CourseDownloadable
+							className={classNames({
+								'mb-2': !isLast,
+							})}
+							key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
+							courseUnitDownloadableFile={courseUnitDownloadableFile}
+							trackEvent={() => {
+								analyticsService.persistEvent(
+									AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
+									{
+										courseUnitId: courseUnit.courseUnitId,
+										...(courseSessionId && { courseSessionId }),
+										courseUnitDownloadableFileId:
+											courseUnitDownloadableFile.courseUnitDownloadableFileId,
+									}
+								);
+							}}
+						/>
+					);
+				}
+			)}
 
 			<div className="pt-10 d-flex justify-content-end">
 				{showNextButton ? (

@@ -1,8 +1,10 @@
 import React from 'react';
+import classNames from 'classnames';
+import { CourseUnitDownloadableFile } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
+import { ReactComponent as DocIcon } from '@/assets/icons/filetype-doc.svg';
 import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import { ReactComponent as PdfIcon } from '@/assets/icons/filetype-pdf.svg';
-import { CourseUnitDownloadableFile } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	courseDownloadable: {
@@ -39,25 +41,29 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const iconMap: Record<string, JSX.Element> = {
+	'application/pdf': <PdfIcon className="text-n500" />,
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': <DocIcon className="text-n500" />,
+};
+
 interface CourseDownloadableProps {
 	courseUnitDownloadableFile: CourseUnitDownloadableFile;
+	className?: string;
 	trackEvent?(): void;
 }
 
-export const CourseDownloadable = ({ courseUnitDownloadableFile, trackEvent }: CourseDownloadableProps) => {
+export const CourseDownloadable = ({ courseUnitDownloadableFile, className, trackEvent }: CourseDownloadableProps) => {
 	const classes = useStyles();
 
 	return (
 		<a
-			className={classes.courseDownloadable}
+			className={classNames(classes.courseDownloadable, className)}
 			href={courseUnitDownloadableFile.url}
 			target="_blank"
 			rel="noreferrer"
 			onClick={trackEvent}
 		>
-			<div className={classes.downloadTypeIconOuter}>
-				<PdfIcon className="text-n500" />
-			</div>
+			<div className={classes.downloadTypeIconOuter}>{iconMap[courseUnitDownloadableFile.contentType]}</div>
 			<div className={classes.downloadInfoOuter}>
 				<p className="m-0 text-dark">{courseUnitDownloadableFile.filename}</p>
 				<p className="m-0 text-n500">{courseUnitDownloadableFile.filesizeDescription}</p>
