@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { accountService, analyticsService } from '@/lib/services';
@@ -9,7 +9,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import useTrackModalView from '@/hooks/use-track-modal-view';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
 const useSignInStyles = createUseThemedStyles((theme) => ({
@@ -43,10 +42,6 @@ const SignInEmail = () => {
 		emailAddress: '',
 		password: '',
 	});
-
-	// Forgot Password
-	const [forgotPasswordModalIsOpen, setForgotPasswordModalIsOpen] = useState(false);
-	const [forgotPasswordEmailAddress, setForgotPasswordEmailAddress] = useState('');
 
 	useEffect(() => {
 		if (autofocusCheckComplete.current) {
@@ -89,59 +84,11 @@ const SignInEmail = () => {
 		}
 	}
 
-	async function handleForgotPasswordFormSubmit(event: React.FormEvent<HTMLFormElement>) {
-		event.preventDefault();
-
-		try {
-			await accountService.sendForgotPasswordEmail(forgotPasswordEmailAddress).fetch();
-
-			setForgotPasswordModalIsOpen(false);
-			window.alert('Email sent!');
-		} catch (error) {
-			handleError(error);
-		}
-	}
-
-	useTrackModalView('ForgotPasswordModal', forgotPasswordModalIsOpen);
-
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Sign In</title>
 			</Helmet>
-
-			<Modal
-				show={forgotPasswordModalIsOpen}
-				onHide={() => {
-					setForgotPasswordModalIsOpen(false);
-				}}
-				centered
-			>
-				<Modal.Header closeButton>
-					<Modal.Title>Password Reset</Modal.Title>
-				</Modal.Header>
-				<Form onSubmit={handleForgotPasswordFormSubmit}>
-					<Modal.Body>
-						<p className="mb-4">We will send you an email to reset your password.</p>
-						<InputHelper
-							label="Email address"
-							type="email"
-							value={forgotPasswordEmailAddress}
-							onChange={({ currentTarget }) => {
-								setForgotPasswordEmailAddress(currentTarget.value);
-							}}
-							required
-						/>
-					</Modal.Body>
-					<Modal.Footer>
-						<div className="text-right">
-							<Button variant="primary" type="submit">
-								Send Email
-							</Button>
-						</div>
-					</Modal.Footer>
-				</Form>
-			</Modal>
 
 			<Container fluid className={classes.signInOuter}>
 				<Container className={classes.signIn}>
@@ -187,7 +134,7 @@ const SignInEmail = () => {
 											className="p-0"
 											variant="link"
 											onClick={() => {
-												setForgotPasswordModalIsOpen(true);
+												navigate('/forgot-password');
 											}}
 										>
 											Forgot Password?

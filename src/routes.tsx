@@ -88,7 +88,7 @@ export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-you
 // export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
 export const SignUpClaim = lazyLoadWithRefresh(() => import('@/pages/sign-up-claim'));
-export const ForgotPassword = lazyLoadWithRefresh(() => import('@/pages/forgot-password'));
+export const PasswordForgot = lazyLoadWithRefresh(() => import('@/pages/password-forgot'));
 export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-reset'));
 export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
@@ -358,7 +358,11 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'forgot-password',
-						element: <ForgotPassword />,
+						element: <PasswordForgot />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'accounts/reset-password/:passwordResetToken',
