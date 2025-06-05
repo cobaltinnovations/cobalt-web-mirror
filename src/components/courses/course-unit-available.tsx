@@ -19,28 +19,6 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
-	videoPlayerSupplementsOuter: {
-		position: 'relative',
-	},
-	videoPlayerLoader: {
-		top: '50%',
-		left: '50%',
-	},
-	videoPlayerOuter: {
-		width: '100%',
-		borderRadius: 8,
-		overflow: 'hidden',
-		aspectRatio: '16/9',
-		backgroundColor: theme.colors.n900,
-		'& #kaltura_player': {
-			opacity: 0,
-		},
-		'&.ready': {
-			'& #kaltura_player': {
-				opacity: 1,
-			},
-		},
-	},
 	screeningFlowOuter: {
 		padding: 40,
 		borderRadius: 12,
