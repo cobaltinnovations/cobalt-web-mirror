@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { AnalyticsNativeEventTypeId, CourseModel, CourseModuleModel } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, CourseModel, CourseModuleModel, CourseUnitModel } from '@/lib/models';
 import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
@@ -119,6 +119,30 @@ export const Component = () => {
 
 		navigate(`/courses/${urlName}/course-units/${courseUnitId}`);
 	}, [course, navigate]);
+
+	const handleCourseUnitClick = useCallback(
+		async (courseUnit: CourseUnitModel) => {
+			if (!course) {
+				return;
+			}
+
+			if (course.currentCourseSession) {
+				navigate(`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`);
+			} else {
+				handleStartCourseButtonClick();
+			}
+
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT, {
+				courseId: course.courseId,
+				...(course.currentCourseSession && {
+					courseSessionId: course.currentCourseSession.courseSessionId,
+				}),
+				courseUnitId: courseUnit.courseUnitId,
+				source: 'COURSE_DETAIL',
+			});
+		},
+		[course, handleStartCourseButtonClick, navigate]
+	);
 
 	return (
 		<>
@@ -284,26 +308,7 @@ export const Component = () => {
 																						.courseUnitLockStatusesByCourseUnitId
 																				: course.defaultCourseUnitLockStatusesByCourseUnitId
 																		}
-																		onCourseUnitClick={(courseUnit) => {
-																			navigate(
-																				`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
-																			);
-
-																			analyticsService.persistEvent(
-																				AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT,
-																				{
-																					courseId: course.courseId,
-																					...(course.currentCourseSession && {
-																						courseSessionId:
-																							course.currentCourseSession
-																								.courseSessionId,
-																					}),
-																					courseUnitId:
-																						courseUnit.courseUnitId,
-																					source: 'COURSE_DETAIL',
-																				}
-																			);
-																		}}
+																		onCourseUnitClick={handleCourseUnitClick}
 																		initialShow={
 																			getCurrentCourseModule(
 																				requiredModules,
