@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -26,7 +26,6 @@ import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detai
 
 const GroupSessions = () => {
 	const handleError = useHandleError();
-	const navigate = useNavigate();
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const groupSessionUrlName = searchParams.get('class') ?? '';
@@ -269,18 +268,19 @@ const GroupSessions = () => {
 													})}
 												>
 													<Col>
+														<div className="d-flex align-items-center justify-content-between">
+															<h3 className="mb-0">{collection.title}</h3>
+															<Link
+																to={`/group-sessions/collection/${collection.urlName}`}
+															>
+																See all
+															</Link>
+														</div>
 														<Carousel
 															className={classNames({
 																'mb-8 mb-lg-12': !isLastCollection,
 															})}
 															responsive={responsiveDefaults}
-															description={collection.title}
-															calloutTitle="See All"
-															calloutOnClick={() => {
-																navigate(
-																	`/group-sessions/collection/${collection.urlName}`
-																);
-															}}
 														>
 															{collection.groupSessions.map((groupSession) => {
 																return (

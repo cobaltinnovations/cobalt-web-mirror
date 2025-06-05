@@ -48,29 +48,6 @@ import CallToActionBlock from '@/components/call-to-action-block';
 import { useAppRootLoaderData } from '@/routes/root';
 import FeatureScreeningCta from '@/components/feature-screening-cta';
 
-const resourceLibraryCarouselConfig = {
-	externalMonitor: {
-		...responsiveDefaults.externalMonitor,
-		items: 4,
-	},
-	desktopExtraLarge: {
-		...responsiveDefaults.desktopExtraLarge,
-		items: 4,
-	},
-	desktop: {
-		...responsiveDefaults.desktop,
-		items: 3,
-	},
-	tablet: {
-		...responsiveDefaults.tablet,
-		items: 2,
-	},
-	mobile: {
-		...responsiveDefaults.mobile,
-		items: 1,
-	},
-};
-
 const Index: FC = () => {
 	const { featuredTopicCenter, featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
 		useAppRootLoaderData();
@@ -341,14 +318,11 @@ const Index: FC = () => {
 						<Container className="pt-20">
 							<Row>
 								<Col>
-									<Carousel
-										responsive={responsiveDefaults}
-										description="Group Sessions"
-										calloutTitle="Explore all"
-										calloutOnClick={() => {
-											navigate('/group-sessions');
-										}}
-									>
+									<div className="d-flex align-items-center justify-content-between">
+										<h3 className="mb-0">Group Sessions</h3>
+										<Link to="/group-sessions">See all</Link>
+									</div>
+									<Carousel responsive={responsiveDefaults}>
 										{inTheStudioEvents.map((groupSession) => {
 											let renderKey = '';
 											let detailUrl = '';
@@ -463,14 +437,11 @@ const Index: FC = () => {
 					<Container className="py-20 pb-20">
 						<Row>
 							<Col>
-								<Carousel
-									responsive={resourceLibraryCarouselConfig}
-									description="Resource Library"
-									calloutTitle="Explore all"
-									calloutOnClick={() => {
-										navigate('/resource-library');
-									}}
-								>
+								<div className="d-flex align-items-center justify-content-between">
+									<h3 className="mb-0">Resource Library</h3>
+									<Link to="/resource-library">See all</Link>
+								</div>
+								<Carousel responsive={responsiveDefaults}>
 									{content.map((content) => {
 										return (
 											<ResourceLibraryCard

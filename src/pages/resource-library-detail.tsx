@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
 import AsyncPage from '@/components/async-page';
-import Breadcrumb from '@/components/breadcrumb';
 
 import { analyticsService, contentService } from '@/lib/services';
 import { AnalyticsNativeEventTypeId, Content } from '@/lib/models';
@@ -36,7 +35,7 @@ const ResourceLibraryDetail: FC = () => {
 				<title>Cobalt | Resource Library</title>
 			</Helmet>
 
-			<Breadcrumb
+			{/* <Breadcrumb
 				breadcrumbs={[
 					{
 						to: '/',
@@ -51,7 +50,7 @@ const ResourceLibraryDetail: FC = () => {
 						title: item?.title ?? 'Content',
 					},
 				]}
-			/>
+			/> */}
 
 			<AsyncPage fetchData={fetchData} loadingComponent={<ResourceDisplaySkeleton />}>
 				<ResourceDisplay trackView content={item} />

@@ -3,7 +3,6 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 
 import useFlags from '@/hooks/use-flags';
 import SentryDebugButtons from '@/components/sentry-debug-buttons';
-import Breadcrumb from '@/components/breadcrumb';
 
 export async function loader() {
 	return null;
@@ -14,7 +13,7 @@ export const Component = () => {
 
 	return (
 		<>
-			<Breadcrumb
+			{/* <Breadcrumb
 				breadcrumbs={[
 					{
 						to: '/',
@@ -33,7 +32,7 @@ export const Component = () => {
 						title: 'UI',
 					},
 				]}
-			/>
+			/> */}
 
 			<Container className="py-10">
 				<Row>
