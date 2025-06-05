@@ -367,6 +367,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'accounts/reset-password/:passwordResetToken',
 						element: <PasswordReset />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 				],
 			},
