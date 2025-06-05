@@ -31,18 +31,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 	},
-	screeningFlowOuter: {
-		padding: 40,
-		borderRadius: 12,
-		overflow: 'hidden',
-		backgroundColor: theme.colors.n0,
-		border: `1px solid ${theme.colors.n100}`,
-	},
-	imageOuter: {
-		'& img': {
-			maxWidth: '100%',
-		},
-	},
 }));
 
 interface CourseVideoProps {
