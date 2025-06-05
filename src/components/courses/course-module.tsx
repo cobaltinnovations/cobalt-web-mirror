@@ -199,8 +199,14 @@ export const CourseModule = ({
 														'fs-small': compact,
 													})}
 												>
-													{courseUnit.courseUnitTypeIdDescription} &bull;{' '}
-													{courseUnit.estimatedCompletionTimeInMinutesDescription}
+													{courseUnit.courseUnitTypeIdDescription}
+													{courseUnit.estimatedCompletionTimeInMinutesDescription && (
+														<>
+															{' '}
+															&bull;{' '}
+															{courseUnit.estimatedCompletionTimeInMinutesDescription}
+														</>
+													)}{' '}
 												</span>
 											</div>
 										</Button>

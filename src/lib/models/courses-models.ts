@@ -40,7 +40,7 @@ export interface CourseUnitModel {
 	createdDescription: string;
 	description?: string;
 	estimatedCompletionTimeInMinutes: number;
-	estimatedCompletionTimeInMinutesDescription: string;
+	estimatedCompletionTimeInMinutesDescription?: string;
 	imageUrl?: string;
 	lastUpdated: string;
 	lastUpdatedDescription: string;
