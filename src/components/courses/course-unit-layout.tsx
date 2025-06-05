@@ -215,72 +215,63 @@ export const CourseUnitLayout = ({
 	}, [onShowMenuToggle]);
 
 	return (
-		<>
-			<div className={classes.wrapper}>
-				<div className={classes.header}>
-					<div className={classes.headerLeft}>
-						<div className={classes.exitButtonOuter}>
-							<Button
-								type="button"
-								variant="link"
-								className={classes.exitButton}
-								onClick={onExitButtonClick}
-							>
-								<BackArrowIcon className="me-lg-1" />
-								<span className="d-none d-lg-inline">Exit</span>
-							</Button>
-						</div>
-						<span className="ps-lg-6 text-n700 fs-large fw-semibold text-nowrap text-truncate">
-							{title}
-						</span>
+		<div className={classes.wrapper}>
+			<div className={classes.header}>
+				<div className={classes.headerLeft}>
+					<div className={classes.exitButtonOuter}>
+						<Button type="button" variant="link" className={classes.exitButton} onClick={onExitButtonClick}>
+							<BackArrowIcon className="me-lg-1" />
+							<span className="d-none d-lg-inline">Exit</span>
+						</Button>
 					</div>
+					<span className="ps-lg-6 text-n700 fs-large fw-semibold text-nowrap text-truncate">{title}</span>
+				</div>
+				<Button
+					type="button"
+					variant="link"
+					className="d-none d-lg-inline d-flex align-items-center text-decoration-none text-nowrap"
+					onClick={onNeedHelpButtonClick}
+				>
+					<QuestionMarkIcon className="flex-shrink-0 me-1" width={20} height={20} />
+					Need Help?
+				</Button>
+			</div>
+			<div
+				className={classNames(classes.aside, {
+					show: showMenu,
+				})}
+			>
+				<div className="aside-header">
 					<Button
-						type="button"
 						variant="link"
-						className="d-none d-lg-inline d-flex align-items-center text-decoration-none text-nowrap"
-						onClick={onNeedHelpButtonClick}
+						className="hide-menu-button"
+						onClick={() => {
+							onShowMenuToggle(!showMenu);
+						}}
 					>
-						<QuestionMarkIcon className="flex-shrink-0 me-1" width={20} height={20} />
-						Need Help?
+						<MenuIcon width={16} height={16} className="me-1 flex-shrink-0" />
+						<span className="hide-menu-button__text">Hide Menu</span>
+					</Button>
+					<Button
+						variant="link"
+						className="close-menu-button"
+						onClick={() => {
+							onShowMenuToggle(false);
+						}}
+					>
+						<CloseIcon width={16} height={16} className="me-1 flex-shrink-0" />
+						Close
 					</Button>
 				</div>
-				<div
-					className={classNames(classes.aside, {
-						show: showMenu,
-					})}
-				>
-					<div className="aside-header">
-						<Button
-							variant="link"
-							className="hide-menu-button"
-							onClick={() => {
-								onShowMenuToggle(!showMenu);
-							}}
-						>
-							<MenuIcon width={16} height={16} className="me-1 flex-shrink-0" />
-							<span className="hide-menu-button__text">Hide Menu</span>
-						</Button>
-						<Button
-							variant="link"
-							className="close-menu-button"
-							onClick={() => {
-								onShowMenuToggle(false);
-							}}
-						>
-							<CloseIcon width={16} height={16} className="me-1 flex-shrink-0" />
-							Close
-						</Button>
-					</div>
-					<div className="aside-scroller">{menuElement}</div>
-				</div>
-				<div
-					className={classNames(classes.previewPane, {
-						show: showMenu,
-					})}
-				>
-					{children}
-				</div>
+				<div className="aside-scroller">{menuElement}</div>
 			</div>
-		</>
+			<div
+				className={classNames(classes.previewPane, {
+					show: showMenu,
+				})}
+			>
+				{children}
+			</div>
+		</div>
 	);
 };
