@@ -1,7 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	halfLayout: {
@@ -21,9 +24,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flex: 1,
 		flexShrink: 0,
 		display: 'flex',
+		position: 'relative',
 		alignItems: 'center',
 		flexDirection: 'column',
 		justifyContent: 'center',
+		[mediaQueries.lg]: {
+			position: 'static',
+			padding: '56px 0',
+		},
 	},
 	rightCol: {
 		flex: 1,
@@ -35,6 +43,19 @@ const useStyles = createUseThemedStyles((theme) => ({
 		background: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
 		[mediaQueries.lg]: {
 			display: 'none',
+		},
+	},
+	logoOuter: {
+		top: 96,
+		left: '50%',
+		position: 'absolute',
+		transform: 'translateX(-50%)',
+		[mediaQueries.lg]: {
+			top: 'auto',
+			left: 'auto',
+			marginBottom: 32,
+			position: 'relative',
+			transform: 'translateX(0)',
 		},
 	},
 	form: {
@@ -60,6 +81,9 @@ const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
 	return (
 		<div className={classes.halfLayout}>
 			<div className={classes.col}>
+				<Link className={classes.logoOuter} to="/">
+					<Logo />
+				</Link>
 				<div className="w-100">{leftColChildren(classes.form)}</div>
 			</div>
 			<div className={classNames(classes.col, classes.rightCol)}>
