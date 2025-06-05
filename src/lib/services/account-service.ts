@@ -214,7 +214,7 @@ export const accountService = {
 	},
 	resetPassword(data: ResetPasswordRequestBody) {
 		return httpSingleton.orchestrateRequest({
-			method: 'post',
+			method: 'put',
 			url: '/accounts/reset-password',
 			data,
 		});
