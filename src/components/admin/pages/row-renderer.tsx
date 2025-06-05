@@ -226,11 +226,7 @@ const TagGroupRowRenderer = ({
 				/>
 			</Col>
 			<Col lg={9}>
-				<Carousel
-					responsive={resourceLibraryCarouselConfig}
-					trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-					floatingButtonGroup
-				>
+				<Carousel responsive={resourceLibraryCarouselConfig} trackStyles={{ paddingTop: 16, paddingBottom: 8 }}>
 					{(contentsByTagGroupId?.[pageRow.tagGroup.tagGroupId] ?? []).map((content) => {
 						return (
 							<ResourceLibraryCard
@@ -331,7 +327,6 @@ const TagRowRenderer = ({
 					<Carousel
 						responsive={resourceLibraryCarouselConfig}
 						trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-						floatingButtonGroup
 					>
 						{content.map((content) => {
 							return (

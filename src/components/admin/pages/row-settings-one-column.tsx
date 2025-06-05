@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { OneColumnImageRowModel } from '@/lib/models';
@@ -177,10 +176,10 @@ export const RowSettingsOneColumn = () => {
 						onUploadComplete={(fileUploadId) => {
 							handleUploadComplete('columnOne', fileUploadId);
 						}}
-						presignedUploadGetter={(blob) => {
+						presignedUploadGetter={(blob, name) => {
 							return pagesService.createPresignedFileUpload({
 								contentType: blob.type,
-								filename: `${uuidv4()}.jpg`,
+								filename: name,
 							}).fetch;
 						}}
 					/>

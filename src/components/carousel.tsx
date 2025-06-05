@@ -1,14 +1,13 @@
-import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import React, { PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 import MultiCarousel, { CarouselProps as MultiCarouselProps, ButtonGroupProps } from 'react-multi-carousel';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import mediaQueries from '@/jss/media-queries';
-
 import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+import { createUseThemedStyles } from '@/jss/theme';
 
 const gutterWidth = 30;
 
@@ -43,92 +42,28 @@ export const responsiveDefaults = {
 /* -------------------------------------------------------------------- */
 /* Button Group */
 /* -------------------------------------------------------------------- */
-interface UseCustomButtonGroupStylesProps {
-	floatingButtonGroup?: boolean;
-}
-
-const useCustomButtonGroupStyles = createUseStyles({
-	customButtonGroupOuter: {
-		top: 0,
-		left: 0,
-		right: 0,
-		position: 'absolute',
-		paddingLeft: gutterWidth / 2,
-		paddingRight: gutterWidth / 2,
-		transform: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) =>
-			floatingButtonGroup ? 'translateY(calc(-50% + 16px))' : undefined,
-	},
-	customButtonGroup: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		[mediaQueries.lg]: {
-			display: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) =>
-				floatingButtonGroup ? 'flex' : 'block',
-		},
-	},
-	descriptionText: {
-		marginBottom: 0,
-		[mediaQueries.lg]: {
-			marginBottom: 16,
-		},
-	},
-	carouselButtons: {
+const useCustomButtonGroupStyles = createUseThemedStyles((theme) => ({
+	carouselButton: {
+		top: '50%',
+		width: 48,
+		height: 48,
 		padding: 0,
-		width: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => (floatingButtonGroup ? 48 : 32),
-		height: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) => (floatingButtonGroup ? 48 : 32),
-		boxShadow: ({ floatingButtonGroup }: UseCustomButtonGroupStylesProps) =>
-			floatingButtonGroup ? '0px 3px 5px rgba(41, 40, 39, 0.2), 0px 0px 1px rgba(41, 40, 39, 0.31)' : undefined,
+		position: 'absolute',
+		transform: 'translateY(-50%)',
+		boxShadow: theme.elevation.e200,
 	},
-});
+	carouselButtonPrevious: {
+		left: gutterWidth / 2,
+		transform: 'translate(-50%, -50%)',
+	},
+	carouselButtonNext: {
+		right: gutterWidth / 2,
+		transform: 'translate(50%, -50%)',
+	},
+}));
 
-interface CustomButtonGroupProps extends ButtonGroupProps {
-	description?: string;
-	calloutTitle?: string;
-	calloutOnClick?(): void;
-	onElementHeightChange(height: number): void;
-	floatingButtonGroup?: boolean;
-}
-
-const CustomButtonGroup = ({
-	next,
-	previous,
-	carouselState,
-	description,
-	calloutTitle,
-	calloutOnClick,
-	onElementHeightChange,
-	floatingButtonGroup,
-}: CustomButtonGroupProps) => {
-	const classes = useCustomButtonGroupStyles({
-		floatingButtonGroup,
-	});
-	const customButtonGroupRef = useRef<HTMLDivElement>(null);
-
-	const getElementHeight = useCallback(() => {
-		if (!customButtonGroupRef.current) {
-			onElementHeightChange(0);
-			return;
-		}
-
-		onElementHeightChange(customButtonGroupRef.current.clientHeight);
-	}, [onElementHeightChange]);
-
-	const handleWindowResize = useCallback(() => {
-		getElementHeight();
-	}, [getElementHeight]);
-
-	useEffect(() => {
-		window.addEventListener('resize', handleWindowResize);
-
-		return () => {
-			window.removeEventListener('resize', handleWindowResize);
-		};
-	}, [handleWindowResize]);
-
-	useEffect(() => {
-		getElementHeight();
-	}, [getElementHeight]);
+const CustomButtonGroup = ({ next, previous, carouselState }: ButtonGroupProps) => {
+	const classes = useCustomButtonGroupStyles();
 
 	let noMorePreviousSlides = true;
 	let noMoreNextSlides = true;
@@ -144,43 +79,24 @@ const CustomButtonGroup = ({
 	}
 
 	return (
-		<div ref={customButtonGroupRef} className={classes.customButtonGroupOuter}>
-			<div className={classes.customButtonGroup}>
-				<div>{description && <h3 className={classes.descriptionText}>{description}</h3>}</div>
-				<div className="d-flex align-items-center justify-content-between">
-					<div className="d-flex align-items-center">
-						<Button
-							className={classNames(classes.carouselButtons, 'me-4')}
-							variant="light"
-							size="sm"
-							disabled={noMorePreviousSlides}
-							onClick={previous}
-						>
-							<LeftChevron />
-						</Button>
-						<Button
-							className={classes.carouselButtons}
-							variant="light"
-							size="sm"
-							disabled={noMoreNextSlides}
-							onClick={next}
-						>
-							<RightChevron />
-						</Button>
-					</div>
-					{calloutTitle && (
-						<Button
-							className="ms-6 d-flex align-items-center"
-							variant="light"
-							size="sm"
-							onClick={calloutOnClick}
-						>
-							{calloutTitle} <RightChevron />
-						</Button>
-					)}
-				</div>
-			</div>
-		</div>
+		<>
+			<Button
+				className={classNames(classes.carouselButton, classes.carouselButtonPrevious)}
+				variant="light"
+				disabled={noMorePreviousSlides}
+				onClick={previous}
+			>
+				<LeftChevron />
+			</Button>
+			<Button
+				className={classNames(classes.carouselButton, classes.carouselButtonNext)}
+				variant="light"
+				disabled={noMoreNextSlides}
+				onClick={next}
+			>
+				<RightChevron />
+			</Button>
+		</>
 	);
 };
 
@@ -188,14 +104,11 @@ const CustomButtonGroup = ({
 /* Carousel */
 /* -------------------------------------------------------------------- */
 interface UseCarouselStylesProps {
-	customButtonGroupHeight: number;
 	trackStyles?: React.CSSProperties;
-	floatingButtonGroup?: boolean;
 }
 
 const useCarouselStyles = createUseStyles({
-	carouselOuter: ({ customButtonGroupHeight, floatingButtonGroup, trackStyles }: UseCarouselStylesProps) => ({
-		paddingTop: floatingButtonGroup ? 0 : customButtonGroupHeight,
+	carouselOuter: ({ trackStyles }: UseCarouselStylesProps) => ({
 		position: 'relative',
 		marginLeft: -gutterWidth / 2,
 		marginRight: -gutterWidth / 2,
@@ -212,48 +125,18 @@ const useCarouselStyles = createUseStyles({
 			: {}),
 	}),
 	carouselItem: {
-		maxWidth: 430,
 		paddingLeft: gutterWidth / 2,
 		paddingRight: gutterWidth / 2,
-		[mediaQueries.xxl]: {
-			maxWidth: 364,
-		},
-		[mediaQueries.xl]: {
-			maxWidth: 316,
-		},
-		[mediaQueries.lg]: {
-			maxWidth: 355,
-		},
-		[mediaQueries.md]: {
-			maxWidth: 265,
-		},
 	},
 });
 
 interface CarouselProps extends MultiCarouselProps {
-	description?: string;
-	calloutTitle?: string;
-	calloutOnClick?(): void;
 	trackStyles?: React.CSSProperties;
-	floatingButtonGroup?: boolean;
 }
 
-const Carousel = ({
-	description,
-	children,
-	calloutTitle,
-	calloutOnClick,
-	trackStyles,
-	floatingButtonGroup,
-	...rest
-}: PropsWithChildren<CarouselProps>) => {
+const Carousel = ({ children, trackStyles, ...rest }: PropsWithChildren<CarouselProps>) => {
 	const { hasTouchScreen } = useTouchScreenCheck();
-	const [customButtonGroupHeight, setCustomButtonGroupHeight] = useState(0);
-	const classes = useCarouselStyles({
-		customButtonGroupHeight,
-		trackStyles,
-		floatingButtonGroup,
-	});
+	const classes = useCarouselStyles({ trackStyles });
 
 	return (
 		<div className={classes.carouselOuter}>
@@ -263,15 +146,7 @@ const Carousel = ({
 				swipeable={!hasTouchScreen}
 				draggable={false}
 				arrows={false}
-				customButtonGroup={
-					<CustomButtonGroup
-						description={description}
-						calloutTitle={calloutTitle}
-						calloutOnClick={calloutOnClick}
-						onElementHeightChange={setCustomButtonGroupHeight}
-						floatingButtonGroup={floatingButtonGroup}
-					/>
-				}
+				customButtonGroup={<CustomButtonGroup />}
 				renderButtonGroupOutside={true}
 				itemClass={classes.carouselItem}
 				{...rest}

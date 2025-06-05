@@ -103,7 +103,7 @@ export const AddPageSectionModal: FC<AddPageSectionModalProps> = ({ onPageSectio
 							Cancel
 						</Button>
 						<Button type="submit" className="ms-2" variant="primary">
-							Add
+							{currentPageSection ? 'Save' : 'Add'}
 						</Button>
 					</div>
 				</Modal.Footer>

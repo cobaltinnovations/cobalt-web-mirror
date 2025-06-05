@@ -37,7 +37,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface ImageUploadCardProps {
 	imagePreview?: string;
 	isUploading: boolean;
-	onChange(file: any): void;
+	onChange(file: File): void;
 	onRemove(): void;
 	progress?: number;
 	className?: string;

@@ -333,7 +333,6 @@ const FeaturedTopic = () => {
 													<Carousel
 														responsive={resourceLibraryCarouselConfig}
 														trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
-														floatingButtonGroup
 													>
 														{topicCenterRowTag.contents.map((content) => {
 															return (
