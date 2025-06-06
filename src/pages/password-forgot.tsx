@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -18,6 +18,11 @@ const PasswordForgot: FC = () => {
 	const navigate = useNavigate();
 	const [formSubmitted, setFormSubmitted] = useState(false);
 	const [formValues, setFormValues] = useState({ emailAddress: '' });
+	const emailAddressInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		emailAddressInputRef.current?.focus();
+	}, []);
 
 	const sendEmail = async () => {
 		try {
@@ -92,6 +97,7 @@ const PasswordForgot: FC = () => {
 								</p>
 								<Form onSubmit={handleFormSubmit}>
 									<InputHelper
+										ref={emailAddressInputRef}
 										className="mb-6"
 										name="emailAddress"
 										type="email"

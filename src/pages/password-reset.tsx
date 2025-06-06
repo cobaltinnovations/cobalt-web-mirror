@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -16,6 +16,11 @@ const PasswordReset: FC = () => {
 	const handleError = useHandleError();
 	const navigate = useNavigate();
 	const [formValues, setFormValues] = useState({ password: '', confirmPassword: '' });
+	const passwordInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		passwordInputRef.current?.focus();
+	}, []);
 
 	async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -59,6 +64,7 @@ const PasswordReset: FC = () => {
 						<p className="mb-8 text-center">Enter a new password below.</p>
 						<Form onSubmit={handleFormSubmit}>
 							<InputHelper
+								ref={passwordInputRef}
 								className="mb-4"
 								name="password"
 								type="password"
