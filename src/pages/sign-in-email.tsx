@@ -1,36 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
 import { accountService, analyticsService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
+import HalfLayout from '@/components/half-layout';
 import InputHelper from '@/components/input-helper';
-import { createUseThemedStyles } from '@/jss/theme';
-import mediaQueries from '@/jss/media-queries';
-import { AnalyticsNativeEventTypeId } from '@/lib/models';
-
-const useSignInStyles = createUseThemedStyles((theme) => ({
-	signInOuter: {
-		background: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
-	},
-	signIn: {
-		paddingTop: 96,
-		[mediaQueries.lg]: {
-			paddingTop: 32,
-		},
-	},
-	signInInner: {
-		maxWidth: 408,
-		margin: '0 auto',
-	},
-}));
+import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 const SignInEmail = () => {
 	const handleError = useHandleError();
 	const { institution } = useAccount();
-	const classes = useSignInStyles();
 	const navigate = useNavigate();
 
 	const autofocusCheckComplete = useRef(false);
@@ -90,76 +73,65 @@ const SignInEmail = () => {
 				<title>Cobalt | Sign In</title>
 			</Helmet>
 
-			<Container fluid className={classes.signInOuter}>
-				<Container className={classes.signIn}>
-					<Row>
-						<Col>
-							<div className={classes.signInInner}>
-								<h1 className="mb-10 text-center">Sign in with Email</h1>
-
-								<Form className="mb-6" onSubmit={handleSignInFormSubmit}>
-									<InputHelper
-										ref={emailAddressInputRef}
-										data-testid="signInEmailAddressInput"
-										className="mb-2"
-										label="Email address"
-										type="email"
-										value={signInForm.emailAddress}
-										onChange={({ currentTarget }) => {
-											setSignInForm((previousValues) => ({
-												...previousValues,
-												emailAddress: currentTarget.value,
-											}));
-										}}
-										required
-									/>
-									<InputHelper
-										ref={passwordInputRef}
-										data-testid="signInPasswordInput"
-										className="mb-4"
-										label="Password"
-										type="password"
-										value={signInForm.password}
-										onChange={({ currentTarget }) => {
-											setSignInForm((previousValues) => ({
-												...previousValues,
-												password: currentTarget.value,
-											}));
-										}}
-										required
-									/>
-									<div className="mb-6 text-right">
-										<Button
-											data-testid="signInForgotPasswordButton"
-											className="p-0"
-											variant="link"
-											onClick={() => {
-												navigate('/forgot-password');
-											}}
-										>
-											Forgot Password?
-										</Button>
-									</div>
-									<Button
-										data-testid="signInSubmitButton"
-										type="submit"
-										className="w-100 d-block"
-										variant="primary"
-									>
-										Sign In
-									</Button>
-								</Form>
-
-								{institution?.emailSignupEnabled && (
-									<p className="text-center">
-										Don't have an account? <Link to="/sign-up">Create account</Link>
-									</p>
-								)}
+			<HalfLayout
+				leftColChildren={(className) => (
+					<div className={className}>
+						<h1 className="mb-8 text-center">Sign in with email</h1>
+						<Form onSubmit={handleSignInFormSubmit}>
+							<InputHelper
+								ref={emailAddressInputRef}
+								className="mb-4"
+								name="emailAddress"
+								label="Email address"
+								type="email"
+								value={signInForm.emailAddress}
+								onChange={({ currentTarget }) => {
+									setSignInForm((previousValues) => ({
+										...previousValues,
+										emailAddress: currentTarget.value,
+									}));
+								}}
+								required
+							/>
+							<InputHelper
+								ref={passwordInputRef}
+								className="mb-4"
+								name="password"
+								label="Password"
+								type="password"
+								value={signInForm.password}
+								onChange={({ currentTarget }) => {
+									setSignInForm((previousValues) => ({
+										...previousValues,
+										password: currentTarget.value,
+									}));
+								}}
+								required
+							/>
+							<div className="mb-6 text-right">
+								<Button
+									className="p-0 text-decoration-none fw-normal"
+									variant="link"
+									onClick={() => {
+										navigate('/forgot-password');
+									}}
+								>
+									Forgot Password?
+								</Button>
 							</div>
-						</Col>
-					</Row>
-				</Container>
-			</Container>
+							<Button size="lg" type="submit" className="d-block w-100">
+								Sign in
+							</Button>
+						</Form>
+						{institution?.emailSignupEnabled && (
+							<p className="text-center">
+								Don't have an account? <Link to="/sign-up">Create account</Link>
+							</p>
+						)}
+					</div>
+				)}
+				rightColChildren={(className: string) => <Illustration className={className} />}
+			/>
 		</>
 	);
 };

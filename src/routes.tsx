@@ -333,6 +333,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'sign-in/email',
 						element: <SignInEmail />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'onboarding',
