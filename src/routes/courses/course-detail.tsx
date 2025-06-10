@@ -249,25 +249,7 @@ export const Component = () => {
 																				.courseUnitLockStatusesByCourseUnitId
 																		: course.defaultCourseUnitLockStatusesByCourseUnitId
 																}
-																onCourseUnitClick={(courseUnit) => {
-																	navigate(
-																		`/courses/${course.urlName}/course-units/${courseUnit.courseUnitId}`
-																	);
-
-																	analyticsService.persistEvent(
-																		AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT,
-																		{
-																			courseId: course.courseId,
-																			...(course.currentCourseSession && {
-																				courseSessionId:
-																					course.currentCourseSession
-																						.courseSessionId,
-																			}),
-																			courseUnitId: courseUnit.courseUnitId,
-																			source: 'COURSE_DETAIL',
-																		}
-																	);
-																}}
+																onCourseUnitClick={handleCourseUnitClick}
 																initialShow={
 																	getCurrentCourseModule(
 																		requiredModules,
