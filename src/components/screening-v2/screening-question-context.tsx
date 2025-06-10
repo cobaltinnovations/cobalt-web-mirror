@@ -416,13 +416,13 @@ export const ScreeningQuestionContext = ({
 													</Button>
 												)}
 											</div>
-											<div>
+											<div className="d-flex align-items-center">
 												{screeningQuestionContext.screeningQuestion.minimumAnswerCount ===
 													0 && (
 													<Button
 														type="button"
 														variant="outline-primary"
-														className="d-flex align-items-center text-decoration-none pe-3"
+														className="me-1 d-flex align-items-center text-decoration-none pe-3"
 														onClick={handleSkipButtonClick}
 													>
 														Skip
