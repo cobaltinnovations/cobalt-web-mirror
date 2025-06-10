@@ -50,6 +50,7 @@ export interface CourseUnitModel {
 	completionThresholdInSeconds?: number;
 	courseUnitDownloadableFiles: CourseUnitDownloadableFile[];
 	unitCompletionTypeId: UnitCompletionTypeId;
+	showRestartActivityWhenComplete: boolean;
 }
 
 export interface CourseSessionModel {

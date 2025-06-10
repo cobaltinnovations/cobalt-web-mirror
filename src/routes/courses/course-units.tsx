@@ -347,54 +347,52 @@ export const Component = () => {
 								</Button>
 							</Col>
 						</Row>
-						<Row>
-							<Col lg={12} xl={{ offset: 1, span: 10 }} xxl={{ offset: 2, span: 8 }}>
-								{courseUnitCompleted ? (
-									<>
-										{courseUnit && (
-											<CourseUnitComplete
-												courseUnit={courseUnit}
-												onRestartActivityButtonClick={() => {
-													setCourseUnitCompleted(false);
-												}}
-												onNextButtonClick={handleCompletedUnitNextButtonClick}
-											/>
-										)}
-									</>
-								) : (
-									<>
-										{courseUnitIsStronglyLocked ? (
-											<>
-												{course && courseUnit && (
-													<CourseUnitLocked
-														courseUrlName={course.urlName}
-														courseUnit={courseUnit}
-														dependencyCourseUnits={strongCourseUnitDependencies}
-													/>
-												)}
-											</>
-										) : (
-											<>
-												{course && course.currentCourseSession && courseUnit && (
-													<CourseUnitAvailable
-														courseUrlName={course.urlName}
-														courseSessionId={course.currentCourseSession?.courseSessionId}
-														courseVideos={course.videos}
-														courseUnit={courseUnit}
-														dependencyCourseUnits={weakCourseUnitDependencies}
-														onActivityComplete={handleActivityComplete}
-														onSkipActivityButtonClick={handleSkipActivityButtonClick}
-														onNextButtonClick={handleCompletedUnitNextButtonClick}
-														onView={handleCourseUnitView}
-														onCompletionThresholdPassed={handleCompletionThresholdPassed}
-													/>
-												)}
-											</>
-										)}
-									</>
-								)}
-							</Col>
-						</Row>
+						{course && courseUnit && (
+							<Row>
+								<Col lg={12} xl={{ offset: 1, span: 10 }} xxl={{ offset: 2, span: 8 }}>
+									{courseUnitCompleted && courseUnit.showRestartActivityWhenComplete ? (
+										<CourseUnitComplete
+											courseUnit={courseUnit}
+											onRestartActivityButtonClick={() => {
+												setCourseUnitCompleted(false);
+											}}
+											onNextButtonClick={handleCompletedUnitNextButtonClick}
+										/>
+									) : (
+										<>
+											{courseUnitIsStronglyLocked ? (
+												<CourseUnitLocked
+													courseUrlName={course.urlName}
+													courseUnit={courseUnit}
+													dependencyCourseUnits={strongCourseUnitDependencies}
+												/>
+											) : (
+												<>
+													{course.currentCourseSession && (
+														<CourseUnitAvailable
+															courseUrlName={course.urlName}
+															courseSessionId={
+																course.currentCourseSession?.courseSessionId
+															}
+															courseVideos={course.videos}
+															courseUnit={courseUnit}
+															dependencyCourseUnits={weakCourseUnitDependencies}
+															onActivityComplete={handleActivityComplete}
+															onSkipActivityButtonClick={handleSkipActivityButtonClick}
+															onNextButtonClick={handleCompletedUnitNextButtonClick}
+															onView={handleCourseUnitView}
+															onCompletionThresholdPassed={
+																handleCompletionThresholdPassed
+															}
+														/>
+													)}
+												</>
+											)}
+										</>
+									)}
+								</Col>
+							</Row>
+						)}
 					</Container>
 				</AsyncWrapper>
 			</CourseUnitLayout>
