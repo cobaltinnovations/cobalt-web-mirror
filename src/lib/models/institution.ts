@@ -24,6 +24,7 @@ export enum FeatureId {
 	PSYCHOTHERAPIST = 'PSYCHOTHERAPIST',
 	RESOURCE_NAVIGATOR = 'RESOURCE_NAVIGATOR',
 	COUNSELING_SERVICES = 'COUNSELING_SERVICES',
+	COURSE = 'COURSE',
 }
 
 export interface Institution {
@@ -88,6 +89,7 @@ export interface Institution {
 	integratedCareBookingInsuranceRequirements?: string;
 	integratedCarePatientIntroOverride?: string;
 	landingPageTaglineOverride?: string;
+	onboardingScreeningFlowId?: string;
 	preferLegacyTopicCenters?: boolean;
 }
 

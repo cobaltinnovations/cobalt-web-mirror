@@ -7,16 +7,13 @@ import mediaQueries from '@/jss/media-queries';
 const useStyles = createUseThemedStyles((theme) => ({
 	blurb: {
 		display: 'flex',
-		paddingBottom: 68,
 		alignItems: 'flex-end',
 		justifyContent: 'flex-end',
-		[mediaQueries.md]: {
-			paddingBottom: 24,
+		[mediaQueries.lg]: {
 			flexDirection: 'column',
 		},
 	},
 	speechBubble: {
-		width: 194,
 		padding: '24px 16px',
 		marginRight: 16,
 		borderTopLeftRadius: 8,
@@ -24,7 +21,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderBottomLeftRadius: 8,
 		boxShadow: theme.elevation.e400,
 		backgroundColor: theme.colors.n0,
-		[mediaQueries.md]: {
+		[mediaQueries.lg]: {
 			width: '100%',
 			marginRight: 0,
 			marginBottom: 8,
@@ -33,6 +30,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	headshot: {
 		width: 88,
 		height: 88,
+		flexShrink: 0,
 		display: 'flex',
 		borderRadius: '50%',
 		border: `4px solid ${theme.colors.n0}`,
@@ -42,8 +40,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundRepeat: 'no-repeat',
 		boxShadow: theme.elevation.e400,
 		backgroundColor: theme.colors.n0,
-
-		[mediaQueries.md]: {
+		[mediaQueries.lg]: {
 			alignSelf: 'flex-end',
 			transform: 'translateY(0%)',
 		},

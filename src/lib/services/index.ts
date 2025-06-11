@@ -8,6 +8,7 @@ export * from './calendar-events-service';
 export * from './call-to-action-service';
 export * from './care-resource-service';
 export * from './content-service';
+export * from './courses-service';
 export * from './faqs-service';
 export * from './feedback-service';
 export * from './group-sessions-service';

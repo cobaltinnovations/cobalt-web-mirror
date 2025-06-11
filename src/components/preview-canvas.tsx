@@ -52,15 +52,17 @@ export const PreviewCanvas: FC<Props> = ({ title, children, ...props }) => {
 		>
 			<Offcanvas.Header>
 				<Offcanvas.Title>{title}</Offcanvas.Title>
-				<Button
-					variant="link"
-					className="text-decoration-none"
-					onClick={() => {
-						props.onHide?.();
-					}}
-				>
-					Close
-				</Button>
+				{props.onHide && (
+					<Button
+						variant="link"
+						className="text-decoration-none"
+						onClick={() => {
+							props.onHide();
+						}}
+					>
+						Close
+					</Button>
+				)}
 			</Offcanvas.Header>
 			<Offcanvas.Body>{children}</Offcanvas.Body>
 		</Offcanvas>

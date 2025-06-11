@@ -41,6 +41,7 @@ import PatientCheckIn from './routes/ic/patient/patient-check-in';
 import AsyncWrapper from './components/async-page';
 
 export interface RouteHandle {
+	hideHeader?: boolean;
 	hideFooter?: boolean;
 	hideFooterContactUs?: boolean;
 }
@@ -87,7 +88,7 @@ export const OnYourTimeThanks = lazyLoadWithRefresh(() => import('@/pages/on-you
 // export const InTheStudioThanks = lazyLoadWithRefresh(() => import('@/pages/in-the-studio-thanks'));
 export const NoMatch = lazyLoadWithRefresh(() => import('@/pages/no-match'));
 export const SignUpClaim = lazyLoadWithRefresh(() => import('@/pages/sign-up-claim'));
-export const ForgotPassword = lazyLoadWithRefresh(() => import('@/pages/forgot-password'));
+export const PasswordForgot = lazyLoadWithRefresh(() => import('@/pages/password-forgot'));
 export const PasswordReset = lazyLoadWithRefresh(() => import('@/pages/password-reset'));
 export const Reports = lazyLoadWithRefresh(() => import('@/pages/admin-cms/reports'));
 export const MySchedule = lazyLoadWithRefresh(() => import('@/pages/scheduling/my-schedule'));
@@ -328,10 +329,18 @@ export const routes: RouteObject[] = [
 					{
 						path: 'sign-in',
 						element: <SignIn />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'sign-in/email',
 						element: <SignInEmail />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'onboarding',
@@ -357,11 +366,19 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'forgot-password',
-						element: <ForgotPassword />,
+						element: <PasswordForgot />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'accounts/reset-password/:passwordResetToken',
 						element: <PasswordReset />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 				],
 			},
@@ -545,7 +562,6 @@ export const routes: RouteObject[] = [
 							},
 						],
 					},
-
 					{
 						element: (
 							<ToggledOutlet
@@ -814,6 +830,32 @@ export const routes: RouteObject[] = [
 						id: 'page-detail',
 						path: 'pages/:urlName',
 						lazy: () => import('@/routes/page-detail'),
+					},
+					{
+						id: 'courses',
+						path: 'courses',
+						element: <Outlet />,
+						children: [
+							{
+								id: 'courses-home',
+								index: true,
+								lazy: () => import('@/routes/courses/course-home'),
+							},
+							{
+								id: 'courses-detail',
+								path: ':courseIdentifier',
+								lazy: () => import('@/routes/courses/course-detail'),
+							},
+							{
+								id: 'courses-session',
+								path: ':courseIdentifier/course-units/:unitId',
+								lazy: () => import('@/routes/courses/course-units'),
+								handle: {
+									hideHeader: true,
+									hideFooter: true,
+								} as RouteHandle,
+							},
+						],
 					},
 					{
 						path: '*',

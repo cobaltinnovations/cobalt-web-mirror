@@ -591,7 +591,8 @@ const ScreeningQuestionsPage = () => {
 													type="button"
 													onClick={() => {
 														navigateToQuestion(
-															screeningQuestionContextResponse.previousScreeningQuestionContextId
+															screeningQuestionContextResponse.previousScreeningQuestionContextId ??
+																''
 														);
 													}}
 												>

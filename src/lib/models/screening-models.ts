@@ -52,6 +52,8 @@ export enum ScreeningFlowTypeId {
 	INTEGRATED_CARE_INTAKE = 'INTEGRATED_CARE_INTAKE',
 	FEATURE = 'FEATURE',
 	GROUP_SESSION_INTAKE = 'GROUP_SESSION_INTAKE',
+	ONBOARDING = 'ONBOARDING',
+	COURSE_UNIT = 'COURSE_UNIT',
 }
 
 export enum ScreeningSessionDestinationResultId {
@@ -73,6 +75,7 @@ export enum ScreeningSessionDestinationId {
 	IC_MHIC_CLINICAL_SCREENING = 'IC_MHIC_CLINICAL_SCREENING',
 	INSTITUTION_REFERRAL = 'INSTITUTION_REFERRAL',
 	INSTITUTION_REFERRER_DETAIL = 'INSTITUTION_REFERRER_DETAIL',
+	NONE = 'NONE',
 }
 
 export interface ScreeningSessionDestination {
@@ -85,6 +88,8 @@ export enum ScreeningAnswerFormatId {
 	SINGLE_SELECT = 'SINGLE_SELECT',
 	MULTI_SELECT = 'MULTI_SELECT',
 	FREEFORM_TEXT = 'FREEFORM_TEXT',
+	CARD_SORT = 'CARD_SORT',
+	REORDER = 'REORDER',
 }
 
 export enum ScreeningAnswerContentHintId {
@@ -94,6 +99,8 @@ export enum ScreeningAnswerContentHintId {
 	FULL_NAME = 'FULL_NAME',
 	PHONE_NUMBER = 'PHONE_NUMBER',
 	EMAIL_ADDRESS = 'EMAIL_ADDRESS',
+	INTEGER = 'INTEGER',
+	FREEFORM_TEXT = 'FREEFORM_TEXT',
 }
 
 export interface ScreeningQuestion {
@@ -108,7 +115,10 @@ export interface ScreeningQuestion {
 	minimumAnswerCountDescription: string;
 	maximumAnswerCount: number;
 	maximumAnswerCountDescription: string;
+	preferAutosubmit: boolean;
 	displayOrder: number;
+	screeningQuestionSubmissionStyleId: ScreeningQuestionSubmissionStyleId;
+	supplementText?: string;
 }
 
 export interface ScreeningAnswerOption {
@@ -151,11 +161,12 @@ export interface ScreeningConfirmationPrompt {
 	screeningConfirmationPromptId: string;
 	screeningImageId?: ScreeningImageId;
 	text: string;
+	titleText?: string;
 	actionText: string;
 }
 
 export interface ScreeningQuestionContextResponse {
-	previousScreeningQuestionContextId: string;
+	previousScreeningQuestionContextId?: string;
 	screening: {
 		screeningId: string;
 		name: string;
@@ -212,4 +223,37 @@ export interface ScreeningAnswerResult {
 	answerOptionText?: string;
 	text?: string;
 	score?: number;
+}
+
+export interface ScreeningAnswersMessage {
+	displayTypeId: ScreeningAnswersDisplayTypeId;
+	title: string;
+	message: string;
+}
+
+export interface ScreeningAnswersQuestionResult {
+	correctnessIndicatorId: ScreeningAnswersCorrectnessIndicatorId;
+	displayTypeId: ScreeningAnswersDisplayTypeId;
+}
+
+export enum ScreeningAnswersCorrectnessIndicatorId {
+	CORRECT = 'CORRECT',
+	INCORRECT = 'INCORRECT',
+}
+
+export enum ScreeningAnswersDisplayTypeId {
+	DEFAULT = 'DEFAULT',
+	PRIMARY = 'PRIMARY',
+	SECONDARY = 'SECONDARY',
+	SUCCESS = 'SUCCESS',
+	DANGER = 'DANGER',
+	WARNING = 'WARNING',
+	INFO = 'INFO',
+	DARK = 'DARK',
+	LIGHT = 'LIGHT',
+}
+
+export enum ScreeningQuestionSubmissionStyleId {
+	NEXT = 'NEXT',
+	SUBMIT = 'SUBMIT',
 }

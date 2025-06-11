@@ -1,48 +1,50 @@
-import * as yup from 'yup';
-
-import React, { FC } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Formik } from 'formik';
+import { Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import HeroContainer from '@/components/hero-container';
-import InputHelper from '@/components/input-helper';
-
-import { getRequiredYupFields } from '@/lib/utils';
 import { accountService } from '@/lib/services';
+import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
-
-const passwordResetSchema = yup
-	.object()
-	.required()
-	.shape({
-		password: yup.string().required().default(''),
-		confirmPassword: yup.string().required().default(''),
-	});
-type PasswordResetFormData = yup.InferType<typeof passwordResetSchema>;
-const requiredFields = getRequiredYupFields<PasswordResetFormData>(passwordResetSchema);
+import HalfLayout from '@/components/half-layout';
+import InputHelper from '@/components/input-helper';
+import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 const PasswordReset: FC = () => {
-	const navigate = useNavigate();
+	const { addFlag } = useFlags();
 	const { passwordResetToken } = useParams<{ passwordResetToken?: string }>();
 	const handleError = useHandleError();
+	const navigate = useNavigate();
+	const [formValues, setFormValues] = useState({ password: '', confirmPassword: '' });
+	const passwordInputRef = useRef<HTMLInputElement>(null);
 
-	async function handleFormSubmit(values: PasswordResetFormData) {
+	useEffect(() => {
+		passwordInputRef.current?.focus();
+	}, []);
+
+	async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+
 		try {
 			if (!passwordResetToken) {
-				throw new Error('passwordResetToken is missing.');
+				throw new Error('passwordResetToken is undefined.');
 			}
 
 			await accountService
 				.resetPassword({
 					passwordResetToken,
-					password: values.password,
-					confirmPassword: values.confirmPassword,
+					password: formValues.password,
+					confirmPassword: formValues.confirmPassword,
 				})
 				.fetch();
 
-			window.alert('Your password has been reset.');
+			addFlag({
+				variant: 'success',
+				title: 'Success',
+				description: 'Your password has been reset.',
+				actions: [],
+			});
+
 			navigate('/sign-in');
 		} catch (error) {
 			handleError(error);
@@ -52,70 +54,53 @@ const PasswordReset: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Password Reset</title>
+				<title>Cobalt | Reset Password</title>
 			</Helmet>
 
-			<HeroContainer>
-				<h2 className="mb-0 text-center">We'll get you back in.</h2>
-			</HeroContainer>
-			<Container className="pt-4 pb-4">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Formik<PasswordResetFormData>
-							enableReinitialize
-							validationSchema={passwordResetSchema}
-							initialValues={passwordResetSchema.cast(undefined)}
-							onSubmit={handleFormSubmit}
-						>
-							{(formikBag) => {
-								const { values, handleChange, handleSubmit, touched, errors } = formikBag;
-								return (
-									<Form onSubmit={handleSubmit}>
-										<InputHelper
-											className="mb-1"
-											name="password"
-											type="password"
-											label="Create new password"
-											value={values.password}
-											onChange={handleChange}
-											required={requiredFields.password}
-											error={touched.password && errors.password ? errors.password : ''}
-										/>
-										<InputHelper
-											className="mb-7"
-											name="confirmPassword"
-											type="password"
-											label="Confirm new password"
-											helperText="8+ characters, including a number"
-											value={values.confirmPassword}
-											onChange={handleChange}
-											required={requiredFields.confirmPassword}
-											error={
-												touched.confirmPassword && errors.confirmPassword
-													? errors.confirmPassword
-													: ''
-											}
-										/>
-										<div className="mb-3 d-flex flex-row justify-content-between">
-											<Button
-												variant="outline-primary"
-												onClick={() => {
-													navigate(-1);
-												}}
-											>
-												Back
-											</Button>
-											<Button variant="primary" type="submit">
-												Next
-											</Button>
-										</div>
-									</Form>
-								);
-							}}
-						</Formik>
-					</Col>
-				</Row>
-			</Container>
+			<HalfLayout
+				leftColChildren={(className: string) => (
+					<div className={className}>
+						<h1 className="mb-6 text-center">Reset your password</h1>
+						<p className="mb-8 text-center">Enter a new password below.</p>
+						<Form onSubmit={handleFormSubmit}>
+							<InputHelper
+								ref={passwordInputRef}
+								className="mb-4"
+								name="password"
+								type="password"
+								label="New password"
+								helperText="Use at least 8 characters and one number"
+								value={formValues.password}
+								onChange={({ currentTarget }) => {
+									setFormValues((pv) => ({
+										...pv,
+										password: currentTarget.value,
+									}));
+								}}
+								required
+							/>
+							<InputHelper
+								className="mb-6"
+								name="confirmPassword"
+								type="password"
+								label="Confirm new password"
+								value={formValues.confirmPassword}
+								onChange={({ currentTarget }) => {
+									setFormValues((pv) => ({
+										...pv,
+										confirmPassword: currentTarget.value,
+									}));
+								}}
+								required
+							/>
+							<Button size="lg" type="submit" className="d-block w-100">
+								Reset Password
+							</Button>
+						</Form>
+					</div>
+				)}
+				rightColChildren={(className) => <Illustration className={className} />}
+			/>
 		</>
 	);
 };

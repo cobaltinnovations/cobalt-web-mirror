@@ -1,9 +1,11 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
+import { AnalyticsNativeEventOverlayViewInCrisisSource, AnalyticsNativeEventTypeId } from '@/lib/models';
 import { feedbackService } from '@/lib/services/feedback-service';
+import { analyticsService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import useAnalytics from '@/hooks/use-analytics';
@@ -11,38 +13,44 @@ import useFlags from '@/hooks/use-flags';
 import InputHelper from '@/components/input-helper';
 import FeedbackSupplement from '@/components/feedback-supplement';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
-import { analyticsService } from '@/lib/services';
-import { AnalyticsNativeEventOverlayViewInCrisisSource, AnalyticsNativeEventTypeId } from '@/lib/models';
+import HeroContainer from '@/components/hero-container';
 
 const Feedback: FC = () => {
+	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 	const { addFlag } = useFlags();
-	const navigate = useNavigate();
-
-	const [feedbackEmailValue, setFeedbackEmailValue] = useState('');
-	const [feedbackTextareaValue, setFeedbackTextareaValue] = useState<string>('');
+	const [formValues, setFormValues] = useState({ emailAddress: '', feedbackTypeId: '', feedback: '' });
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	useEffect(() => {
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_CONTACT_US);
 	}, []);
 
-	async function handleSubmitFeedbackButtonClick() {
-		try {
-			await feedbackService.submitFeedback(feedbackEmailValue, feedbackTextareaValue).fetch();
-			setFeedbackEmailValue('');
-			setFeedbackTextareaValue('');
-			addFlag({
-				variant: 'success',
-				title: 'Your message has been sent',
-				description: '',
-				actions: [{ title: 'Back to Home', onClick: () => navigate('/') }],
-			});
-		} catch (error) {
-			handleError(error);
-		}
-	}
+	const handleFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+			setIsSubmitting(true);
+
+			try {
+				await feedbackService.submitFeedback(formValues).fetch();
+
+				setFormValues({ emailAddress: '', feedbackTypeId: '', feedback: '' });
+				addFlag({
+					variant: 'success',
+					title: 'Your message has been sent',
+					description: '',
+					actions: [{ title: 'Back to Home', onClick: () => navigate('/') }],
+				});
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSubmitting(false);
+			}
+		},
+		[addFlag, formValues, handleError, navigate]
+	);
 
 	return (
 		<>
@@ -50,11 +58,16 @@ const Feedback: FC = () => {
 				<title>Cobalt | Feedback</title>
 			</Helmet>
 
-			<Container className="pt-4">
+			<HeroContainer>
+				<h1 className="mb-0 text-center">Contact Us</h1>
+			</HeroContainer>
+
+			<Container className="py-10">
 				<Row className="mb-4">
 					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
 						<FeedbackSupplement />
-						<p className="mb-4">
+						<h4 className="mb-4">This form is not for clinical concerns.</h4>
+						<p className="mb-8">
 							If you are in immediate crisis,{' '}
 							<span
 								className="text-primary text-decoration-underline cursor-pointer"
@@ -69,37 +82,67 @@ const Feedback: FC = () => {
 									openInCrisisModal();
 								}}
 							>
-								please contact these resources.
+								contact these resources.
 							</span>
 						</p>
-						<InputHelper
-							className="mb-1"
-							type="email"
-							value={feedbackEmailValue}
-							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-								setFeedbackEmailValue(event.currentTarget.value);
-							}}
-							label="Your email address"
-						/>
-						<small className="d-block ps-2 pe-2 mb-5">
-							Enter your email address if you would like our team to follow up in the next two business
-							days
-						</small>
-						<InputHelper
-							as="textarea"
-							label="Your technical issue or feedback"
-							value={feedbackTextareaValue}
-							onChange={(event) => {
-								setFeedbackTextareaValue(event.currentTarget.value);
-							}}
-						/>
-					</Col>
-				</Row>
-				<Row className="text-center">
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<Button variant="primary" onClick={handleSubmitFeedbackButtonClick}>
-							Submit
-						</Button>
+						<hr className="mb-6" />
+						<Form onSubmit={handleFormSubmit}>
+							<fieldset disabled={isSubmitting}>
+								<Form.Label className="mb-6">Contact us</Form.Label>
+								<InputHelper
+									className="mb-6"
+									type="email"
+									value={formValues.emailAddress}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											emailAddress: currentTarget.value,
+										}));
+									}}
+									label="Your email address"
+									helperText="Enter your email address if you would like our team to follow up (Avg response time is two
+							business days)."
+								/>
+								<InputHelper
+									className="mb-6"
+									as="select"
+									label="Reason for contacting"
+									value={formValues.feedbackTypeId}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											feedbackTypeId: currentTarget.value,
+										}));
+									}}
+									required
+								>
+									<option value="" disabled>
+										Select reason...
+									</option>
+									<option value="HELP">Help using the platform</option>
+									<option value="FEEDBACK">Feedback or suggestion</option>
+									<option value="OTHER">Other</option>
+								</InputHelper>
+								<InputHelper
+									className="mb-6"
+									as="textarea"
+									label="Describe your technical issue or feedback"
+									value={formValues.feedback}
+									onChange={({ currentTarget }) => {
+										setFormValues((previousValue) => ({
+											...previousValue,
+											feedback: currentTarget.value,
+										}));
+									}}
+									required
+								/>
+								<div className="text-right">
+									<Button type="submit" variant="primary">
+										Submit
+									</Button>
+								</div>
+							</fieldset>
+						</Form>
 					</Col>
 				</Row>
 			</Container>

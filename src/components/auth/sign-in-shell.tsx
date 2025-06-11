@@ -9,15 +9,12 @@ import useHandleError from '@/hooks/use-handle-error';
 import { config } from '@/config';
 import { AccountSource, AccountSourceId, AnalyticsNativeEventTypeId } from '@/lib/models';
 import { accountService, analyticsService } from '@/lib/services';
-import { useAppRootLoaderData } from '@/routes/root';
 
 interface SignInShellProps {
 	defaultView(signInProps: SignInCobaltProps): ReactNode;
 }
 
 export const SignInShell = ({ defaultView }: SignInShellProps) => {
-	const { subdomain } = useAppRootLoaderData();
-
 	const handleError = useHandleError();
 	const { institution, isIntegratedCarePatient, isIntegratedCareStaff } = useAccount();
 	const navigate = useNavigate();

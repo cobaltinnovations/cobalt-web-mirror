@@ -1,12 +1,13 @@
-import React, { useRef, useEffect, useCallback } from 'react';
-import { Link, useMatch, useNavigate } from 'react-router-dom';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import { Link, useMatch, useMatches, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
+import { RouteHandle } from '@/routes';
+import InCrisisHeaderButton from '@/components/in-crisis-header-button';
+import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import InCrisisHeaderButton from './in-crisis-header-button';
-import useAccount from '@/hooks/use-account';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -64,6 +65,15 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 			document.body.style.paddingTop = '0px';
 		};
 	}, [handleWindowResize]);
+
+	const routeMatches = useMatches();
+	const hideHeader = useMemo(
+		() => routeMatches.some((match) => (match.handle as RouteHandle | undefined)?.hideHeader),
+		[routeMatches]
+	);
+	if (hideHeader) {
+		return null;
+	}
 
 	return (
 		<header ref={header} className={classes.header}>
