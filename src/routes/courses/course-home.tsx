@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { AnalyticsNativeEventTypeId, CourseModel } from '@/lib/models';
@@ -9,6 +9,7 @@ import useAccount from '@/hooks/use-account';
 import CallToActionBlock from '@/components/call-to-action-block';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import { ScreeningFlow } from '@/components/screening-v2';
+import { CourseContinue } from '@/components/courses';
 
 export async function loader() {
 	return null;
@@ -64,22 +65,73 @@ export const Component = () => {
 					</Col>
 				</Row>
 				<AsyncWrapper fetchData={fetchData}>
-					<Row>
+					<Row className="py-16">
 						<Col>
+							<div className="mb-8 d-flex align-items-center justify-content-between">
+								<h3 className="mb-0">Continue Learning</h3>
+								<Link to="/group-sessions">View learning history</Link>
+							</div>
+							{courses.map((course) => (
+								<CourseContinue key={course.courseId} course={course} />
+							))}
+						</Col>
+					</Row>
+					<Row className="py-16">
+						<Col>
+							<div className="mb-8">
+								<h3 className="mb-0">Other Courses</h3>
+							</div>
 							{courses.map((course) => (
 								<CallToActionBlock
 									key={course.courseId}
-									subheading="Learning Course"
 									heading={course.title}
 									descriptionHtml={course.description}
 									imageUrl={course.imageUrl}
 									primaryActionText="Start Course"
 									onPrimaryActionClick={() => {
-										navigate(`./${course.urlName}`);
+										navigate(`/courses/${course.urlName}`);
 									}}
-									secondaryActionText="Learn More"
-									onSecondaryActionClick={() => {
-										window.alert('todo');
+								/>
+							))}
+						</Col>
+					</Row>
+					<Row className="py-16">
+						<Col>
+							<div className="mb-8">
+								<h3 className="mb-0">Coming Soon</h3>
+							</div>
+							{courses.map((course) => (
+								<CallToActionBlock
+									key={course.courseId}
+									variant="light"
+									subheading="Coming soon"
+									heading={course.title}
+									descriptionHtml={course.description}
+									imageUrl={course.imageUrl}
+									primaryActionText="Start Course"
+									onPrimaryActionClick={() => {
+										navigate(`/courses/${course.urlName}`);
+									}}
+								/>
+							))}
+						</Col>
+					</Row>
+					<Row className="py-16">
+						<Col>
+							<div className="mb-8">
+								<h3 className="mb-0">Completed</h3>
+							</div>
+							{courses.map((course) => (
+								<CallToActionBlock
+									key={course.courseId}
+									variant="light"
+									subheading="Completed"
+									heading={course.title}
+									descriptionHtml={course.description}
+									imageUrl={course.imageUrl}
+									primaryActionText="View Course"
+									onPrimaryActionClick={() => {
+										navigate(`/courses/${course.urlName}`);
 									}}
 								/>
 							))}
