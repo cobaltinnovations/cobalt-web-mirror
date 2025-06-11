@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import {
-	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
 	getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession,
 	getOptionalCourseModules,
 	getRequiredCourseModules,
@@ -101,7 +100,12 @@ export const Component = () => {
 				return;
 			}
 
-			const desiredUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+			if (!courseUnit) {
+				throw new Error('courseUnit is undefined.');
+			}
+
+			const desiredUnitId = getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession(
+				courseUnit,
 				currentCourse.courseModules,
 				currentCourse.currentCourseSession
 			);
@@ -112,7 +116,7 @@ export const Component = () => {
 				navigate(`/courses/${currentCourse.urlName}`);
 			}
 		},
-		[navigate]
+		[courseUnit, navigate]
 	);
 
 	const handleActivityComplete = useCallback(async () => {
