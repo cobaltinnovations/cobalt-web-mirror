@@ -12,6 +12,7 @@ export interface CourseModel {
 	defaultCourseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	currentCourseSession?: CourseSessionModel;
 	contents: Content[];
+	completionPercentage: number;
 }
 
 export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, CourseSessionUnitStatusId>;

@@ -18,12 +18,18 @@ export async function loader() {
 export const Component = () => {
 	const navigate = useNavigate();
 	const { institution } = useAccount();
-	const [courses, setCourses] = useState<CourseModel[]>([]);
+	const [currentCourses, setCurrentCourses] = useState<CourseModel[]>([]);
+	const [comingSoonCourses, setComingSoonCourses] = useState<CourseModel[]>([]);
+	const [inProgressCourses, setInProgressCourses] = useState<CourseModel[]>([]);
+	const [completedCourses, setCompletedCourses] = useState<CourseModel[]>([]);
 	const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
-		const response = await coursesService.getCourses().fetch();
-		setCourses(response.courses);
+		const { current, comingSoon, inProgress, completed } = await coursesService.getCourses().fetch();
+		setCurrentCourses(current);
+		setComingSoonCourses(comingSoon);
+		setInProgressCourses(inProgress);
+		setCompletedCourses(completed);
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSES);
 	}, []);
@@ -71,7 +77,7 @@ export const Component = () => {
 								<h3 className="mb-0">Continue Learning</h3>
 								<Link to="/group-sessions">View learning history</Link>
 							</div>
-							{courses.map((course) => (
+							{currentCourses.map((course) => (
 								<CourseContinue key={course.courseId} course={course} />
 							))}
 						</Col>
@@ -81,7 +87,7 @@ export const Component = () => {
 							<div className="mb-8">
 								<h3 className="mb-0">Other Courses</h3>
 							</div>
-							{courses.map((course) => (
+							{inProgressCourses.map((course) => (
 								<CallToActionBlock
 									key={course.courseId}
 									heading={course.title}
@@ -100,7 +106,7 @@ export const Component = () => {
 							<div className="mb-8">
 								<h3 className="mb-0">Coming Soon</h3>
 							</div>
-							{courses.map((course) => (
+							{comingSoonCourses.map((course) => (
 								<CallToActionBlock
 									key={course.courseId}
 									variant="light"
@@ -117,7 +123,7 @@ export const Component = () => {
 							<div className="mb-8">
 								<h3 className="mb-0">Completed</h3>
 							</div>
-							{courses.map((course) => (
+							{completedCourses.map((course) => (
 								<CallToActionBlock
 									key={course.courseId}
 									variant="light"
