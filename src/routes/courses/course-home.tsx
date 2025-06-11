@@ -18,15 +18,15 @@ export async function loader() {
 export const Component = () => {
 	const navigate = useNavigate();
 	const { institution } = useAccount();
-	const [currentCourses, setCurrentCourses] = useState<CourseModel[]>([]);
+	const [availableCourses, setAvailableCourses] = useState<CourseModel[]>([]);
 	const [comingSoonCourses, setComingSoonCourses] = useState<CourseModel[]>([]);
 	const [inProgressCourses, setInProgressCourses] = useState<CourseModel[]>([]);
 	const [completedCourses, setCompletedCourses] = useState<CourseModel[]>([]);
 	const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
-		const { current, comingSoon, inProgress, completed } = await coursesService.getCourses().fetch();
-		setCurrentCourses(current);
+		const { available, comingSoon, inProgress, completed } = await coursesService.getCourses().fetch();
+		setAvailableCourses(available);
 		setComingSoonCourses(comingSoon);
 		setInProgressCourses(inProgress);
 		setCompletedCourses(completed);
@@ -77,7 +77,7 @@ export const Component = () => {
 								<h3 className="mb-0">Continue Learning</h3>
 								<Link to="/group-sessions">View learning history</Link>
 							</div>
-							{currentCourses.map((course) => (
+							{inProgressCourses.map((course) => (
 								<CourseContinue key={course.courseId} course={course} />
 							))}
 						</Col>
@@ -87,7 +87,7 @@ export const Component = () => {
 							<div className="mb-8">
 								<h3 className="mb-0">Other Courses</h3>
 							</div>
-							{inProgressCourses.map((course) => (
+							{availableCourses.map((course) => (
 								<CallToActionBlock
 									key={course.courseId}
 									heading={course.title}

@@ -4,7 +4,7 @@ import { CourseModel, CourseSessionModel } from '@/lib/models';
 export const coursesService = {
 	getCourses() {
 		return httpSingleton.orchestrateRequest<{
-			current: CourseModel[];
+			available: CourseModel[];
 			comingSoon: CourseModel[];
 			inProgress: CourseModel[];
 			completed: CourseModel[];
