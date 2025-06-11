@@ -61,8 +61,8 @@ interface CallToActionBlockProps {
 	heading: string;
 	descriptionHtml: string;
 	imageUrl: string;
-	primaryActionText: string;
-	onPrimaryActionClick: () => void;
+	primaryActionText?: string;
+	onPrimaryActionClick?: () => void;
 	subheading?: string;
 	secondaryActionText?: string;
 	onSecondaryActionClick?: () => void;
@@ -95,31 +95,36 @@ const CallToActionBlock = ({
 					<h1 className="my-4">{heading}</h1>
 
 					<div
-						className={classNames(classes.htmlContent, 'mb-10')}
+						className={classNames(classes.htmlContent, {
+							'mb-10': primaryActionText || secondaryActionText,
+						})}
 						dangerouslySetInnerHTML={{
 							__html: descriptionHtml,
 						}}
 					/>
 
-					<div className="d-flex flex-column d-lg-block mt-auto">
-						<Button
-							className="align-self-lg-start"
-							variant={variant === 'light' ? 'primary' : 'light'}
-							onClick={onPrimaryActionClick}
-						>
-							{primaryActionText}
-						</Button>
-
-						{secondaryActionText && (
-							<Button
-								className="mt-4 mt-lg-0 ms-lg-2 align-self-lg-start"
-								variant={variant === 'light' ? 'outline-primary' : 'primary'}
-								onClick={onSecondaryActionClick}
-							>
-								{secondaryActionText}
-							</Button>
-						)}
-					</div>
+					{(primaryActionText || secondaryActionText) && (
+						<div className="d-flex flex-column d-lg-block mt-auto">
+							{primaryActionText && (
+								<Button
+									className="align-self-lg-start"
+									variant={variant === 'light' ? 'primary' : 'light'}
+									onClick={onPrimaryActionClick}
+								>
+									{primaryActionText}
+								</Button>
+							)}
+							{secondaryActionText && (
+								<Button
+									className="mt-4 mt-lg-0 ms-lg-2 align-self-lg-start"
+									variant={variant === 'light' ? 'outline-primary' : 'primary'}
+									onClick={onSecondaryActionClick}
+								>
+									{secondaryActionText}
+								</Button>
+							)}
+						</div>
+					)}
 				</Col>
 
 				{imageUrl && (

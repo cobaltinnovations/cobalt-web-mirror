@@ -108,10 +108,6 @@ export const Component = () => {
 									heading={course.title}
 									descriptionHtml={course.description}
 									imageUrl={course.imageUrl}
-									primaryActionText="Start Course"
-									onPrimaryActionClick={() => {
-										navigate(`/courses/${course.urlName}`);
-									}}
 								/>
 							))}
 						</Col>
