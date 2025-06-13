@@ -94,7 +94,12 @@ export const CourseContinue = ({ course, className }: CourseContinueProps) => {
 				<div>
 					<h4 className="mb-2">{course.title}</h4>
 					<p className="mb-0">
-						<span className="text-muted">Course</span> &bull; <span className="text-muted">0%</span>
+						<span className="text-muted">Course</span> &bull;{' '}
+						<span className="text-muted">
+							{(course.currentCourseSession?.courseSessionCompletionPercentage.completionPercentage ??
+								0) * 100}
+							%
+						</span>
 					</p>
 				</div>
 			</div>
