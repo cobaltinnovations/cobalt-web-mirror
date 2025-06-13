@@ -49,7 +49,7 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 	const classes = useStyles({ compact });
 
 	return (
-		<>
+		<div className="d-flex align-items-center">
 			<div className={classNames(classes.iconOuter, { complete: isComplete })}>
 				{isLocked ? (
 					<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
@@ -80,6 +80,6 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 					)}
 				</span>
 			</div>
-		</>
+		</div>
 	);
 };
