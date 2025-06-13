@@ -66,6 +66,12 @@ export interface CourseSessionModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	optionalCourseModuleIds: string[];
+	courseSessionCompletionPercentage: {
+		completionPercentage: number;
+		courseSessionId: string;
+		minutesCompleted: number;
+		totalMinutes: number;
+	};
 }
 
 export enum CourseSessionStatusId {

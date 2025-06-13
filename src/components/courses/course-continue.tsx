@@ -97,7 +97,13 @@ export const CourseContinue = ({ course, className }: CourseContinueProps) => {
 					</p>
 				</div>
 			</div>
-			<ProgressBar className="mb-4" size="lg" current={course.completionPercentage} max={100} pill />
+			<ProgressBar
+				className="mb-4"
+				size="lg"
+				current={course.currentCourseSession?.courseSessionCompletionPercentage.completionPercentage ?? 0}
+				max={1}
+				pill
+			/>
 			<div className={classes.courseUnitOuter}>
 				<div>
 					{courseUnit && (
