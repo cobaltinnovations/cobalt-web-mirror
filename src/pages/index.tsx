@@ -523,7 +523,8 @@ const Index: FC = () => {
 								<Col>
 									<div className="mb-8 d-flex align-items-center justify-content-between">
 										<h3 className="mb-0">Continue Learning</h3>
-										<Link to="/#">View learning history</Link>
+										{/* course history template */}
+										{/* <Link to="/#">View learning history</Link> */}
 									</div>
 									{inProgressCourses.map((course, courseIndex) => {
 										const isLast = inProgressCourses.length - 1 === courseIndex;
