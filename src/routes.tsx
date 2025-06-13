@@ -837,11 +837,6 @@ export const routes: RouteObject[] = [
 						element: <Outlet />,
 						children: [
 							{
-								id: 'courses-home',
-								index: true,
-								lazy: () => import('@/routes/courses/course-home'),
-							},
-							{
 								id: 'courses-detail',
 								path: ':courseIdentifier',
 								lazy: () => import('@/routes/courses/course-detail'),
