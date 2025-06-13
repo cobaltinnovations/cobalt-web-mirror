@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
 import { CourseModel } from '@/lib/models';
-import ProgressBar from '@/components/progress-bar';
-import { CourseUnitListDisplay } from '@/components/courses';
-import { createUseThemedStyles } from '@/jss/theme';
-import { useNavigate } from 'react-router-dom';
 import useHandleError from '@/hooks/use-handle-error';
+import { CourseUnitListDisplay } from '@/components/courses';
+import ProgressBar from '@/components/progress-bar';
+import { createUseThemedStyles } from '@/jss/theme';
+import colors from '@/jss/theme/colors.json';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	courseContiner: {
@@ -100,6 +101,7 @@ export const CourseContinue = ({ course, className }: CourseContinueProps) => {
 			<ProgressBar
 				className="mb-4"
 				size="lg"
+				barColor={colors.p500}
 				current={course.currentCourseSession?.courseSessionCompletionPercentage.completionPercentage ?? 0}
 				max={1}
 				pill

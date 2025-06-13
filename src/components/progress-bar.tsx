@@ -5,6 +5,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 interface useProgressBarStylesProps {
 	current: number;
 	max: number;
+	barColor?: string;
 	pill?: boolean;
 	size?: 'sm' | 'lg';
 }
@@ -22,7 +23,7 @@ const useProgressBarStyles = createUseThemedStyles((theme) => ({
 		left: 0,
 		bottom: 0,
 		position: 'absolute',
-		backgroundColor: theme.colors.s300,
+		backgroundColor: ({ barColor }: useProgressBarStylesProps) => barColor ?? theme.colors.s300,
 		borderRadius: ({ pill }: useProgressBarStylesProps) => (pill ? 500 : 0),
 		width: ({ current, max }: useProgressBarStylesProps) => `${(current / max) * 100}%`,
 	},
@@ -31,13 +32,14 @@ const useProgressBarStyles = createUseThemedStyles((theme) => ({
 interface ProgressBarProps {
 	current: number;
 	max: number;
+	barColor?: string;
 	className?: string;
 	pill?: boolean;
 	size?: 'sm' | 'lg';
 }
 
-const ProgressBar: FC<ProgressBarProps> = ({ current, max, size, pill, className }) => {
-	const classes = useProgressBarStyles({ current, max, size, pill });
+const ProgressBar: FC<ProgressBarProps> = ({ current, max, barColor, size, pill, className }) => {
+	const classes = useProgressBarStyles({ current, max, barColor, size, pill });
 
 	return (
 		<div className={classNames(classes.progressBarContainer, className)}>
