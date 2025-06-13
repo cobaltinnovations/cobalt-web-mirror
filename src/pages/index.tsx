@@ -519,7 +519,7 @@ const Index: FC = () => {
 					completedCourses.length > 0) && (
 					<Container>
 						{inProgressCourses.length > 0 && (
-							<Row className="py-16">
+							<Row className="pb-16 pb-lg-32">
 								<Col>
 									<div className="mb-8 d-flex align-items-center justify-content-between">
 										<h3 className="mb-0">Continue Learning</h3>
@@ -540,7 +540,7 @@ const Index: FC = () => {
 							</Row>
 						)}
 						{availableCourses.length > 0 && (
-							<Row className="py-16">
+							<Row className="pb-16 pb-lg-32">
 								<Col>
 									<div className="mb-8">
 										<h3 className="mb-0">Other Courses</h3>
@@ -566,7 +566,7 @@ const Index: FC = () => {
 							</Row>
 						)}
 						{comingSoonCourses.length > 0 && (
-							<Row className="py-16">
+							<Row className="pb-16 pb-lg-32">
 								<Col>
 									<div className="mb-8">
 										<h3 className="mb-0">Coming Soon</h3>
@@ -590,7 +590,7 @@ const Index: FC = () => {
 							</Row>
 						)}
 						{completedCourses.length > 0 && (
-							<Row className="py-16">
+							<Row className="pb-16 pb-lg-32">
 								<Col>
 									<div className="mb-8">
 										<h3 className="mb-0">Completed</h3>
