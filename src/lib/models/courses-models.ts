@@ -66,6 +66,7 @@ export interface CourseSessionModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	optionalCourseModuleIds: string[];
+	completionPercentageForDisplay: string;
 	courseSessionCompletionPercentage: {
 		completionPercentage: number;
 		courseSessionId: string;

@@ -96,11 +96,7 @@ export const CourseContinue = ({ course, className }: CourseContinueProps) => {
 					<p className="mb-0">
 						<span className="text-muted">Course</span> &bull;{' '}
 						<span className="text-muted">
-							{(
-								(course.currentCourseSession?.courseSessionCompletionPercentage.completionPercentage ??
-									0) * 100
-							).toFixed(0)}
-							%
+							{course.currentCourseSession?.completionPercentageForDisplay}
 						</span>
 					</p>
 				</div>
