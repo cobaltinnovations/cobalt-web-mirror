@@ -525,9 +525,17 @@ const Index: FC = () => {
 										<h3 className="mb-0">Continue Learning</h3>
 										<Link to="/#">View learning history</Link>
 									</div>
-									{inProgressCourses.map((course) => (
-										<CourseContinue key={course.courseId} course={course} />
-									))}
+									{inProgressCourses.map((course, courseIndex) => {
+										const isLast = inProgressCourses.length - 1 === courseIndex;
+
+										return (
+											<CourseContinue
+												className={classNames({ 'mb-8': !isLast })}
+												key={course.courseId}
+												course={course}
+											/>
+										);
+									})}
 								</Col>
 							</Row>
 						)}
@@ -537,18 +545,23 @@ const Index: FC = () => {
 									<div className="mb-8">
 										<h3 className="mb-0">Other Courses</h3>
 									</div>
-									{availableCourses.map((course) => (
-										<CallToActionBlock
-											key={course.courseId}
-											heading={course.title}
-											descriptionHtml={course.description}
-											imageUrl={course.imageUrl}
-											primaryActionText="Start Course"
-											onPrimaryActionClick={() => {
-												navigate(`/courses/${course.urlName}`);
-											}}
-										/>
-									))}
+									{availableCourses.map((course, courseIndex) => {
+										const isLast = availableCourses.length - 1 === courseIndex;
+
+										return (
+											<CallToActionBlock
+												className={classNames({ 'mb-8': !isLast })}
+												key={course.courseId}
+												heading={course.title}
+												descriptionHtml={course.description}
+												imageUrl={course.imageUrl}
+												primaryActionText="Start Course"
+												onPrimaryActionClick={() => {
+													navigate(`/courses/${course.urlName}`);
+												}}
+											/>
+										);
+									})}
 								</Col>
 							</Row>
 						)}
@@ -558,16 +571,21 @@ const Index: FC = () => {
 									<div className="mb-8">
 										<h3 className="mb-0">Coming Soon</h3>
 									</div>
-									{comingSoonCourses.map((course) => (
-										<CallToActionBlock
-											key={course.courseId}
-											variant="light"
-											subheading="Coming soon"
-											heading={course.title}
-											descriptionHtml={course.description}
-											imageUrl={course.imageUrl}
-										/>
-									))}
+									{comingSoonCourses.map((course, courseIndex) => {
+										const isLast = comingSoonCourses.length - 1 === courseIndex;
+
+										return (
+											<CallToActionBlock
+												className={classNames({ 'mb-8': !isLast })}
+												key={course.courseId}
+												variant="light"
+												subheading="Coming soon"
+												heading={course.title}
+												descriptionHtml={course.description}
+												imageUrl={course.imageUrl}
+											/>
+										);
+									})}
 								</Col>
 							</Row>
 						)}
@@ -577,20 +595,25 @@ const Index: FC = () => {
 									<div className="mb-8">
 										<h3 className="mb-0">Completed</h3>
 									</div>
-									{completedCourses.map((course) => (
-										<CallToActionBlock
-											key={course.courseId}
-											variant="light"
-											subheading="Completed"
-											heading={course.title}
-											descriptionHtml={course.description}
-											imageUrl={course.imageUrl}
-											primaryActionText="View Course"
-											onPrimaryActionClick={() => {
-												navigate(`/courses/${course.urlName}`);
-											}}
-										/>
-									))}
+									{completedCourses.map((course, courseIndex) => {
+										const isLast = completedCourses.length - 1 === courseIndex;
+
+										return (
+											<CallToActionBlock
+												className={classNames({ 'mb-8': !isLast })}
+												key={course.courseId}
+												variant="light"
+												subheading="Completed"
+												heading={course.title}
+												descriptionHtml={course.description}
+												imageUrl={course.imageUrl}
+												primaryActionText="View Course"
+												onPrimaryActionClick={() => {
+													navigate(`/courses/${course.urlName}`);
+												}}
+											/>
+										);
+									})}
 								</Col>
 							</Row>
 						)}
