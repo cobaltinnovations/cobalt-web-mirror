@@ -832,7 +832,11 @@ const HeaderV2 = () => {
 				<header className={classes.header}>
 					<div className="h-100 d-flex align-items-center justify-content-between">
 						<Link to="/" className="d-block me-10">
-							<LogoSmallText className="text-primary" />
+							{institution.headerLogoUrl ? (
+								<img src={institution.headerLogoUrl} alt={institution.name} />
+							) : (
+								<LogoSmallText className="text-primary" />
+							)}
 						</Link>
 						<nav className={classes.desktopNav}>
 							<ul>
