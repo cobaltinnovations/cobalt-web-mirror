@@ -82,8 +82,11 @@ export const CourseUnitAvailable = ({
 	}, [courseUnit, onView]);
 
 	const showNextButton = useMemo(() => {
-		return courseUnit.unitCompletionTypeId === UnitCompletionTypeId.IMMEDIATELY;
-	}, [courseUnit.unitCompletionTypeId]);
+		return (
+			courseUnit.unitCompletionTypeId === UnitCompletionTypeId.IMMEDIATELY ||
+			courseUnit.courseUnitTypeId === CourseUnitTypeId.VIDEO
+		);
+	}, [courseUnit.courseUnitTypeId, courseUnit.unitCompletionTypeId]);
 
 	return (
 		<>
