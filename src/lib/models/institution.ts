@@ -91,6 +91,33 @@ export interface Institution {
 	landingPageTaglineOverride?: string;
 	onboardingScreeningFlowId?: string;
 	preferLegacyTopicCenters?: boolean;
+
+	headerLogoUrl?: string;
+	footerLogoUrl?: string;
+
+	heroTitle?: string;
+	heroDescription?: string;
+	heroImageUrl?: string;
+
+	signInLogoUrl?: string;
+	signInLargeLogoUrl?: string;
+	signInLargeLogoBackgroundUrl?: string;
+	signInBrandingLogoUrl?: string;
+	signInTitle?: string;
+	signInDescription?: string;
+	signInDirection?: string;
+	signInCrisisButtonVisible?: boolean;
+	signInCrisisSectionVisible?: boolean;
+	signInVideoId?: string;
+	signInVideoCta?: string;
+
+	signInPrivacyOverview?: string;
+	signInPrivacyDetail?: string;
+
+	signInQuoteVisible?: boolean;
+	signInQuoteTitle?: string;
+	signInQuoteBlurb?: string;
+	signInQuoteDetail?: string;
 }
 
 export interface InstitutionFeature {

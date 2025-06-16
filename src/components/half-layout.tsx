@@ -5,6 +5,13 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import useAccount from '@/hooks/use-account';
+import { Button } from 'react-bootstrap';
+import useInCrisisModal from '@/hooks/use-in-crisis-modal';
+
+interface UseStylesProps {
+	backgroundImage?: string;
+}
 
 const useStyles = createUseThemedStyles((theme) => ({
 	halfLayout: {
@@ -37,6 +44,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		width: '100%',
 		overflowY: 'auto',
 		padding: '64px 0',
+		position: 'relative',
 		[mediaQueries.lg]: {
 			padding: 0,
 			overflowY: 'visible',
@@ -49,7 +57,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		flexDirection: 'column',
 		justifyContent: 'center',
-		background: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
+		background: ({ backgroundImage }: UseStylesProps) =>
+			backgroundImage
+				? `url(${backgroundImage}) center / cover no-repeat`
+				: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
 		[mediaQueries.lg]: {
 			display: 'none',
 		},
@@ -58,15 +69,26 @@ const useStyles = createUseThemedStyles((theme) => ({
 		marginBottom: 46,
 		textAlign: 'center',
 	},
+	brandingLogo: {
+		width: '100%',
+		maxWidth: 140,
+		marginTop: 30,
+	},
 	form: {
 		width: '80%',
 		maxWidth: 380,
 		margin: '0 auto',
 	},
 	illustration: {
-		maxWidth: '80%',
+		width: '80%',
+		maxWidth: 548,
 		margin: '0 auto',
 		display: 'block',
+	},
+	inCrisisButtonOuter: {
+		top: 40,
+		right: 40,
+		position: 'absolute',
 	},
 }));
 
@@ -76,21 +98,39 @@ interface HalfLayoutProps {
 }
 
 const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
-	const classes = useStyles();
+	const { institution } = useAccount();
+	const { openInCrisisModal } = useInCrisisModal();
+	const classes = useStyles({
+		backgroundImage: institution.signInLargeLogoBackgroundUrl ?? '',
+	});
 
 	return (
 		<div className={classes.halfLayout}>
 			<div className={classes.col}>
 				<div className={classes.leftColInner}>
 					<div className={classes.logoOuter}>
-						<Link to="/">
-							<Logo />
+						<Link to="/" className="d-flex align-items-center flex-column">
+							{institution.signInLogoUrl ? (
+								<img src={institution.signInLogoUrl} alt={institution.name} />
+							) : (
+								<Logo />
+							)}
+							{institution.signInBrandingLogoUrl && (
+								<img src={institution.signInBrandingLogoUrl} className={classes.brandingLogo} alt="" />
+							)}
 						</Link>
 					</div>
 					{leftColChildren(classes.form)}
 				</div>
 			</div>
 			<div className={classNames(classes.col, classes.rightCol)}>
+				{institution.signInCrisisButtonVisible && (
+					<div className={classes.inCrisisButtonOuter}>
+						<Button variant="light" onClick={() => openInCrisisModal()}>
+							Crisis support
+						</Button>
+					</div>
+				)}
 				<div className="w-100">{rightColChildren(classes.illustration)}</div>
 			</div>
 		</div>
