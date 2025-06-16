@@ -63,7 +63,7 @@ export const ScreeningAnswerFreeformText = ({
 							onChange([
 								{
 									screeningAnswerOptionId: option.screeningAnswerOptionId,
-									text: currentTarget.value.trim(),
+									text: currentTarget.value,
 								},
 							]);
 						}}
