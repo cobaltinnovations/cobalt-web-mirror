@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
-
+import useAccount from '@/hooks/use-account';
+import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import useAccount from '@/hooks/use-account';
-import { Button } from 'react-bootstrap';
-import useInCrisisModal from '@/hooks/use-in-crisis-modal';
+import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 interface UseStylesProps {
@@ -38,7 +38,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		justifyContent: 'center',
 		[mediaQueries.lg]: {
 			position: 'static',
-			padding: '56px 0',
 		},
 	},
 	leftColInner: {
@@ -67,13 +66,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	logoOuter: {
-		marginBottom: 46,
+		marginBottom: 30,
 		textAlign: 'center',
+		[mediaQueries.lg]: {
+			display: 'none',
+		},
 	},
-	brandingLogo: {
-		width: '100%',
+	brandingOuter: {
 		maxWidth: 140,
-		marginTop: 30,
+		margin: '0 auto 30px auto',
+		'& img': {
+			width: '100%',
+		},
 	},
 	form: {
 		width: '80%',
@@ -91,14 +95,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 		right: 40,
 		position: 'absolute',
 	},
+	mobileHeader: {
+		top: 0,
+		display: 'none',
+		position: 'sticky',
+		alignItems: 'center',
+		padding: '8px 24px',
+		backgroundColor: theme.colors.n50,
+		[mediaQueries.lg]: {
+			display: 'flex',
+		},
+	},
 }));
 
 interface HalfLayoutProps {
 	leftColChildren(className: string): JSX.Element;
-	rightColChildren?(className: string): JSX.Element;
 }
 
-const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
+const HalfLayout = ({ leftColChildren }: HalfLayoutProps) => {
 	const { institution } = useAccount();
 	const { openInCrisisModal } = useInCrisisModal();
 	const classes = useStyles({
@@ -109,25 +123,58 @@ const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
 		<div className={classes.halfLayout}>
 			<div className={classes.col}>
 				<div className={classes.leftColInner}>
-					<div className={classes.logoOuter}>
-						<Link to="/" className="d-flex align-items-center flex-column">
+					<div
+						className={classNames(classes.mobileHeader, 'mb-6', {
+							'justify-content-between': institution.signInCrisisButtonVisible,
+							'justify-content-center': !institution.signInCrisisButtonVisible,
+						})}
+					>
+						<Link to="/">
 							{institution.signInLogoUrl ? (
 								<img src={institution.signInLogoUrl} alt={institution.name} />
 							) : (
 								<Logo />
 							)}
-							{institution.signInBrandingLogoUrl && (
-								<img src={institution.signInBrandingLogoUrl} className={classes.brandingLogo} alt="" />
+						</Link>
+						{institution.signInCrisisButtonVisible && (
+							<Button
+								variant="light"
+								className="d-flex align-items-center"
+								onClick={() => openInCrisisModal()}
+							>
+								<PhoneIcon className="me-2" />
+								Crisis support
+							</Button>
+						)}
+					</div>
+					<div className={classes.logoOuter}>
+						<Link to="/">
+							{institution.signInLogoUrl ? (
+								<img src={institution.signInLogoUrl} alt={institution.name} />
+							) : (
+								<Logo />
 							)}
 						</Link>
 					</div>
+					{institution.signInBrandingLogoUrl && (
+						<div className={classes.brandingOuter}>
+							<Link to="/">
+								<img src={institution.signInBrandingLogoUrl} alt="" />
+							</Link>
+						</div>
+					)}
 					{leftColChildren(classes.form)}
 				</div>
 			</div>
 			<div className={classNames(classes.col, classes.rightCol)}>
 				{institution.signInCrisisButtonVisible && (
 					<div className={classes.inCrisisButtonOuter}>
-						<Button variant="light" onClick={() => openInCrisisModal()}>
+						<Button
+							variant="light"
+							className="d-flex align-items-center"
+							onClick={() => openInCrisisModal()}
+						>
+							<PhoneIcon className="me-2" />
 							Crisis support
 						</Button>
 					</div>
@@ -138,7 +185,6 @@ const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
 					) : (
 						<Illustration className={classes.illustration} />
 					)}
-					{rightColChildren?.(classes.illustration)}
 				</div>
 			</div>
 		</div>
