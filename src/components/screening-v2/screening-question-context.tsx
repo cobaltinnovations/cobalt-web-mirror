@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Collapse, Form } from 'react-bootstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import {
@@ -307,6 +307,17 @@ export const ScreeningQuestionContext = ({
 		screeningQuestionContext?.screeningQuestion.screeningQuestionSubmissionStyleId ===
 			ScreeningQuestionSubmissionStyleId.NEXT || answerConfig;
 
+	const showNextButton = useMemo(() => {
+		const preferAutosubmit = screeningQuestionContext?.screeningQuestion.preferAutosubmit;
+		const previouslyAnswered = selectedAnswers.length > 0;
+
+		if (!previouslyAnswered && preferAutosubmit) {
+			return false;
+		}
+
+		return true;
+	}, [screeningQuestionContext?.screeningQuestion.preferAutosubmit, selectedAnswers.length]);
+
 	if (!screeningQuestionContext) {
 		return null;
 	}
@@ -429,18 +440,21 @@ export const ScreeningQuestionContext = ({
 														<RightChevron className="ms-1" />
 													</Button>
 												)}
-												<Button
-													type="submit"
-													variant="primary"
-													className="d-flex align-items-center text-decoration-none pe-3"
-													disabled={
-														selectedAnswers.length <
-														screeningQuestionContext.screeningQuestion.minimumAnswerCount
-													}
-												>
-													Next
-													<RightChevron className="ms-1" />
-												</Button>
+												{showNextButton && (
+													<Button
+														type="submit"
+														variant="primary"
+														className="d-flex align-items-center text-decoration-none pe-3"
+														disabled={
+															selectedAnswers.length <
+															screeningQuestionContext.screeningQuestion
+																.minimumAnswerCount
+														}
+													>
+														Next
+														<RightChevron className="ms-1" />
+													</Button>
+												)}
 											</div>
 										</div>
 									) : (
