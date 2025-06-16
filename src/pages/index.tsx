@@ -38,16 +38,18 @@ import {
 	CourseModel,
 } from '@/lib/models';
 
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import { useAppRootLoaderData } from '@/routes/root';
+import { useScreeningFlow } from './screening/screening.hooks';
+import useAnalytics from '@/hooks/use-analytics';
+import useHandleError from '@/hooks/use-handle-error';
 import PathwaysSection from '@/components/pathways-section';
 import ResourceLibraryCard, { SkeletonResourceLibraryCard } from '@/components/resource-library-card';
 import ScreeningFlowCta from '@/components/screening-flow-cta';
 import Team from '@/components/team';
-import { useScreeningFlow } from './screening/screening.hooks';
-import useAnalytics from '@/hooks/use-analytics';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import CallToActionBlock from '@/components/call-to-action-block';
-import { useAppRootLoaderData } from '@/routes/root';
 import FeatureScreeningCta from '@/components/feature-screening-cta';
 import { CourseContinue } from '@/components/courses';
 import { PreviewCanvas } from '@/components/preview-canvas';
@@ -59,6 +61,7 @@ const Index: FC = () => {
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { trackEvent } = useAnalytics();
+	const handleError = useHandleError();
 
 	const [showScreeningFlowCta, setShowScreeningFlowCta] = useState(false);
 	const [callsToAction, setCallsToAction] = useState<CallToActionModel[]>([]);
@@ -150,6 +153,28 @@ const Index: FC = () => {
 
 		setCallsToAction(response.callsToAction);
 	}, []);
+
+	const handleStartCourseButtonClick = useCallback(
+		async (courseId: string) => {
+			try {
+				const { courseSession } = await coursesService.createCourseSession({ courseId }).fetch();
+				const { course } = await coursesService.getCourseDetail(courseSession.courseId).fetch();
+				const courseUnitId = getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession(
+					course.courseModules,
+					courseSession
+				);
+
+				if (!courseUnitId) {
+					throw new Error('courseUnitId undefined.');
+				}
+
+				navigate(`/courses/${course.urlName}/course-units/${courseUnitId}`);
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[handleError, navigate]
+	);
 
 	if (institution?.integratedCareEnabled) {
 		return <Navigate to="/ic" />;
@@ -558,6 +583,10 @@ const Index: FC = () => {
 												imageUrl={course.imageUrl}
 												primaryActionText="Start Course"
 												onPrimaryActionClick={() => {
+													handleStartCourseButtonClick(course.courseId);
+												}}
+												secondaryActionText="Learn More"
+												onSecondaryActionClick={() => {
 													navigate(`/courses/${course.urlName}`);
 												}}
 											/>
