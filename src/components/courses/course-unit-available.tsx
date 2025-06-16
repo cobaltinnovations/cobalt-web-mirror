@@ -153,32 +153,37 @@ export const CourseUnitAvailable = ({
 				</div>
 			)}
 
-			{(courseUnit.courseUnitDownloadableFiles ?? []).map(
-				(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
-					const isLast =
-						(courseUnit.courseUnitDownloadableFiles ?? []).length - 1 === courseUnitDownloadableFileIndex;
+			{(courseUnit.courseUnitDownloadableFiles ?? []).length > 0 && (
+				<div className="pt-8">
+					{(courseUnit.courseUnitDownloadableFiles ?? []).map(
+						(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
+							const isLast =
+								(courseUnit.courseUnitDownloadableFiles ?? []).length - 1 ===
+								courseUnitDownloadableFileIndex;
 
-					return (
-						<CourseDownloadable
-							className={classNames({
-								'mb-2': !isLast,
-							})}
-							key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
-							courseUnitDownloadableFile={courseUnitDownloadableFile}
-							trackEvent={() => {
-								analyticsService.persistEvent(
-									AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
-									{
-										courseUnitId: courseUnit.courseUnitId,
-										...(courseSessionId && { courseSessionId }),
-										courseUnitDownloadableFileId:
-											courseUnitDownloadableFile.courseUnitDownloadableFileId,
-									}
-								);
-							}}
-						/>
-					);
-				}
+							return (
+								<CourseDownloadable
+									className={classNames({
+										'mb-2': !isLast,
+									})}
+									key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
+									courseUnitDownloadableFile={courseUnitDownloadableFile}
+									trackEvent={() => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
+											{
+												courseUnitId: courseUnit.courseUnitId,
+												...(courseSessionId && { courseSessionId }),
+												courseUnitDownloadableFileId:
+													courseUnitDownloadableFile.courseUnitDownloadableFileId,
+											}
+										);
+									}}
+								/>
+							);
+						}
+					)}
+				</div>
 			)}
 
 			<div className="pt-10 d-flex justify-content-end">
