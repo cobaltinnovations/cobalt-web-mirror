@@ -306,6 +306,7 @@ export const ScreeningQuestionContextCardSort = ({
 													cardId={questionStack.card?.id}
 													cardText={questionStack.card?.text}
 													cardIndex={0}
+													disabled={isLoading}
 												/>
 											</CSSTransition>
 											{droppableProvided.placeholder}
