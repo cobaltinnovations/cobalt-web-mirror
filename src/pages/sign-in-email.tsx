@@ -9,7 +9,6 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import HalfLayout from '@/components/half-layout';
 import InputHelper from '@/components/input-helper';
-import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 const SignInEmail = () => {
 	const handleError = useHandleError();
@@ -130,7 +129,6 @@ const SignInEmail = () => {
 						)}
 					</div>
 				)}
-				rightColChildren={(className: string) => <Illustration className={className} />}
 			/>
 		</>
 	);

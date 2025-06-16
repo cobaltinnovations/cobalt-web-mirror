@@ -9,7 +9,6 @@ import AsyncWrapper from '@/components/async-page';
 import Blurb from '@/components/blurb';
 import HalfLayout from '@/components/half-layout';
 import InlineAlert from '@/components/inline-alert';
-import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 export interface SignInCobaltProps {
 	onAccountSourceClick: (accountSource: AccountSource) => Promise<void>;
@@ -158,13 +157,6 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 						)}
 					</div>
 				)}
-				rightColChildren={(className) =>
-					institution.signInLargeLogoUrl ? (
-						<img src={institution.signInLargeLogoUrl} alt="" className={className} />
-					) : (
-						<Illustration className={className} />
-					)
-				}
 			/>
 		</>
 	);

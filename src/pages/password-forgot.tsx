@@ -9,7 +9,6 @@ import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import HalfLayout from '@/components/half-layout';
 import InputHelper from '@/components/input-helper';
-import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 const PasswordForgot: FC = () => {
 	const { addFlag } = useFlags();
@@ -119,7 +118,6 @@ const PasswordForgot: FC = () => {
 						)}
 					</div>
 				)}
-				rightColChildren={(className) => <Illustration className={className} />}
 			/>
 		</>
 	);

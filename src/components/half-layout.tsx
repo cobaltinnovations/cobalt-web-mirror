@@ -8,6 +8,7 @@ import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.sv
 import useAccount from '@/hooks/use-account';
 import { Button } from 'react-bootstrap';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
+import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
 
 interface UseStylesProps {
 	backgroundImage?: string;
@@ -94,7 +95,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface HalfLayoutProps {
 	leftColChildren(className: string): JSX.Element;
-	rightColChildren(className: string): JSX.Element;
+	rightColChildren?(className: string): JSX.Element;
 }
 
 const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
@@ -131,7 +132,14 @@ const HalfLayout = ({ leftColChildren, rightColChildren }: HalfLayoutProps) => {
 						</Button>
 					</div>
 				)}
-				<div className="w-100">{rightColChildren(classes.illustration)}</div>
+				<div className="w-100">
+					{institution.signInLargeLogoUrl ? (
+						<img src={institution.signInLargeLogoUrl} alt="" className={classes.illustration} />
+					) : (
+						<Illustration className={classes.illustration} />
+					)}
+					{rightColChildren?.(classes.illustration)}
+				</div>
 			</div>
 		</div>
 	);
