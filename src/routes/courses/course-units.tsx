@@ -16,6 +16,7 @@ import {
 	CourseUnitLockStatus,
 	CourseUnitLockTypeId,
 	CourseUnitModel,
+	CourseUnitTypeId,
 	UnitCompletionTypeId,
 } from '@/lib/models';
 import { analyticsService, coursesService } from '@/lib/services';
@@ -120,8 +121,15 @@ export const Component = () => {
 	);
 
 	const handleActivityComplete = useCallback(async () => {
+		// Do not automatically refresh the view when a user completes a card sort
+		// Refreshing the data causes the "activity complete" state to appear
+		// Users need time to review their feedback
+		if (courseUnit?.courseUnitTypeId === CourseUnitTypeId.CARD_SORT) {
+			return;
+		}
+
 		fetchData();
-	}, [fetchData]);
+	}, [courseUnit?.courseUnitTypeId, fetchData]);
 
 	const handleSkipActivityButtonClick = useCallback(() => {
 		try {

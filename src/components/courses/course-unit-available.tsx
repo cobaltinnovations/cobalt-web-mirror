@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -63,6 +63,7 @@ export const CourseUnitAvailable = ({
 		() => ({ courseSessionId, screeningFlowId: courseUnit.screeningFlowId }),
 		[courseSessionId, courseUnit.screeningFlowId]
 	);
+	const [isComplete, setIsComplete] = useState(false);
 
 	const handleVideoPlayerEvent = useCallback(
 		(eventName: string, eventPayload: unknown) => {
@@ -81,12 +82,18 @@ export const CourseUnitAvailable = ({
 		onView?.(courseUnit);
 	}, [courseUnit, onView]);
 
+	const handleUnitComplete = useCallback(() => {
+		setIsComplete(true);
+		onActivityComplete();
+	}, [onActivityComplete]);
+
 	const showNextButton = useMemo(() => {
 		return (
 			courseUnit.unitCompletionTypeId === UnitCompletionTypeId.IMMEDIATELY ||
-			courseUnit.courseUnitTypeId === CourseUnitTypeId.VIDEO
+			courseUnit.courseUnitTypeId === CourseUnitTypeId.VIDEO ||
+			isComplete
 		);
-	}, [courseUnit.courseUnitTypeId, courseUnit.unitCompletionTypeId]);
+	}, [courseUnit.courseUnitTypeId, courseUnit.unitCompletionTypeId, isComplete]);
 
 	return (
 		<>
@@ -128,7 +135,7 @@ export const CourseUnitAvailable = ({
 						<ScreeningFlow
 							cardSortOnly={courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT}
 							screeningFlowParams={screeningFlowParams}
-							onScreeningFlowComplete={onActivityComplete}
+							onScreeningFlowComplete={handleUnitComplete}
 						/>
 					</div>
 				)}
@@ -138,7 +145,7 @@ export const CourseUnitAvailable = ({
 					videoId={courseUnit.videoId ?? ''}
 					courseVideos={courseVideos}
 					onVideoPlayerEvent={handleVideoPlayerEvent}
-					onVideoPlayerEnd={onActivityComplete}
+					onVideoPlayerEnd={handleUnitComplete}
 					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
 					onCompletionThresholdPassed={() => {
 						onCompletionThresholdPassed(courseUnit);
