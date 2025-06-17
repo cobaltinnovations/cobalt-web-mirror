@@ -99,6 +99,7 @@ export enum CourseUnitTypeId {
 	CARD_SORT = 'CARD_SORT',
 	QUIZ = 'QUIZ',
 	REORDER = 'REORDER',
+	THINGS_TO_SHARE = 'THINGS_TO_SHARE',
 }
 
 export enum CourseSessionUnitStatusId {

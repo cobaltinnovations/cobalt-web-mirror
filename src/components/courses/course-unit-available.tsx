@@ -154,7 +154,8 @@ export const CourseUnitAvailable = ({
 			)}
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
-				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK) && (
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE) && (
 				<div className={classes.imageOuter}>
 					<img src={courseUnit.imageUrl} alt="" />
 				</div>
