@@ -104,6 +104,15 @@ export const ScreeningAnswerSingleSelect = ({
 										className="mb-2"
 										label={option.freeformSupplementText ?? ''}
 										value={supplementText}
+										onFocus={() => {
+											onChange(
+												value.find(
+													(v) => v.screeningAnswerOptionId === option.screeningAnswerOptionId
+												)
+													? value
+													: [{ screeningAnswerOptionId: option.screeningAnswerOptionId }]
+											);
+										}}
 										onChange={({ currentTarget }) => {
 											onChange(
 												value.map((v) =>
