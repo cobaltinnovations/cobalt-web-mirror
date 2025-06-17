@@ -52,6 +52,7 @@ export interface CourseUnitModel {
 	courseUnitDownloadableFiles: CourseUnitDownloadableFile[];
 	unitCompletionTypeId: UnitCompletionTypeId;
 	showRestartActivityWhenComplete: boolean;
+	showUnitAsComplete: boolean;
 }
 
 export interface CourseSessionModel {

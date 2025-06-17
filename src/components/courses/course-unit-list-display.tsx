@@ -55,7 +55,13 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 				{isLocked ? (
 					<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
 				) : isComplete ? (
-					<CheckIcon className="text-white" width={compact ? 18 : 24} height={compact ? 18 : 24} />
+					<>
+						{courseUnit.showUnitAsComplete ? (
+							<CheckIcon className="text-white" width={compact ? 18 : 24} height={compact ? 18 : 24} />
+						) : (
+							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
+						)}
+					</>
 				) : (
 					courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
 				)}
