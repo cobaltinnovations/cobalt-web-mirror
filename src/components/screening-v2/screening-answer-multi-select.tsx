@@ -87,6 +87,7 @@ export const ScreeningAnswerMultiSelect = ({
 								<div>
 									<InputHelper
 										{...supplementProps}
+										className="mb-1"
 										label={option.freeformSupplementText ?? ''}
 										value={supplementText}
 										onChange={({ currentTarget }) => {
