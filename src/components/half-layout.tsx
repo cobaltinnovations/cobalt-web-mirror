@@ -86,9 +86,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	illustration: {
 		maxWidth: 548,
+		width: '80%',
 		margin: '0 auto',
 		display: 'block',
 		maxHeight: '80vh',
+		objectFit: 'contain',
 	},
 	inCrisisButtonOuter: {
 		top: 40,
