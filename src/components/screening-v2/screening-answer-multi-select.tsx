@@ -1,7 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { Collapse, Form } from 'react-bootstrap';
 import classNames from 'classnames';
-import { ScreeningAnswerOption, ScreeningAnswerSelection, ScreeningAnswersQuestionResult } from '@/lib/models';
+import {
+	screeningAnswerContentHintIdToInputType,
+	ScreeningAnswerOption,
+	ScreeningAnswerSelection,
+	ScreeningAnswersQuestionResult,
+} from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 
 interface ScreeningAnswerMultiSelectProps {
@@ -36,6 +41,12 @@ export const ScreeningAnswerMultiSelect = ({
 				const supplementText = currentValue?.text ?? '';
 				const isChecked = !!currentValue;
 				const questionResult = questionResultsByScreeningAnswerOptionId?.[option.screeningAnswerOptionId];
+				const type = option.freeformSupplementContentHintId
+					? screeningAnswerContentHintIdToInputType[option.freeformSupplementContentHintId]
+					: undefined;
+				const supplementProps = {
+					...(type ? { type } : { as: 'textarea' as React.ElementType }),
+				};
 
 				return (
 					<React.Fragment key={option.screeningAnswerOptionId}>
@@ -75,7 +86,7 @@ export const ScreeningAnswerMultiSelect = ({
 							<Collapse in={isChecked}>
 								<div>
 									<InputHelper
-										as="textarea"
+										{...supplementProps}
 										label={option.freeformSupplementText ?? ''}
 										value={supplementText}
 										onChange={({ currentTarget }) => {

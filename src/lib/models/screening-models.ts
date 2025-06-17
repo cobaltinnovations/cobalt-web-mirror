@@ -103,6 +103,17 @@ export enum ScreeningAnswerContentHintId {
 	FREEFORM_TEXT = 'FREEFORM_TEXT',
 }
 
+export const screeningAnswerContentHintIdToInputType = {
+	[ScreeningAnswerContentHintId.NONE]: 'text',
+	[ScreeningAnswerContentHintId.FIRST_NAME]: 'text',
+	[ScreeningAnswerContentHintId.LAST_NAME]: 'text',
+	[ScreeningAnswerContentHintId.FULL_NAME]: 'text',
+	[ScreeningAnswerContentHintId.PHONE_NUMBER]: 'tel',
+	[ScreeningAnswerContentHintId.EMAIL_ADDRESS]: 'email',
+	[ScreeningAnswerContentHintId.INTEGER]: 'number',
+	[ScreeningAnswerContentHintId.FREEFORM_TEXT]: 'text',
+};
+
 export interface ScreeningQuestion {
 	screeningQuestionId: string;
 	screeningVersionId: string;
@@ -128,6 +139,7 @@ export interface ScreeningAnswerOption {
 	displayOrder: number;
 	freeformSupplement?: boolean;
 	freeformSupplementText?: string;
+	freeformSupplementContentHintId?: ScreeningAnswerContentHintId;
 }
 
 export interface ScreeningAnswer {

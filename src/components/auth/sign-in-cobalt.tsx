@@ -84,7 +84,7 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 										accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] || 'primary';
 
 									return (
-										<>
+										<React.Fragment key={accountSource.accountSourceId}>
 											{accountSource.supplementMessage && (
 												<InlineAlert
 													className="mb-6 text-left"
@@ -108,7 +108,7 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 											>
 												{accountSource.authenticationDescription}
 											</Button>
-										</>
+										</React.Fragment>
 									);
 								})}
 						</div>
