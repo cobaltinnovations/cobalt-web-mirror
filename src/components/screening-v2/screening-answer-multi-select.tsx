@@ -83,7 +83,7 @@ export const ScreeningAnswerMultiSelect = ({
 							}
 						/>
 						{option.freeformSupplement && (
-							<Collapse in={isChecked}>
+							<Collapse in={isChecked || option.freeformSupplementTextAutoShow}>
 								<div>
 									<InputHelper
 										{...supplementProps}

@@ -140,6 +140,7 @@ export interface ScreeningAnswerOption {
 	freeformSupplement?: boolean;
 	freeformSupplementText?: string;
 	freeformSupplementContentHintId?: ScreeningAnswerContentHintId;
+	freeformSupplementTextAutoShow?: boolean;
 }
 
 export interface ScreeningAnswer {

@@ -97,7 +97,7 @@ export const ScreeningAnswerSingleSelect = ({
 							/>
 						)}
 						{option.freeformSupplement && (
-							<Collapse in={isChecked}>
+							<Collapse in={isChecked || option.freeformSupplementTextAutoShow}>
 								<div>
 									<InputHelper
 										{...supplementProps}
