@@ -15,6 +15,7 @@ const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.El
 	INFOGRAPHIC: (size) => <ResourceIcon width={size} height={size} />,
 	QUIZ: (size) => <WorksheetIcon width={size} height={size} />,
 	REORDER: (size) => <WorksheetIcon width={size} height={size} />,
+	THINGS_TO_SHARE: (size) => <ResourceIcon width={size} height={size} />,
 	VIDEO: (size) => <VideoIcon width={size} height={size} />,
 };
 
