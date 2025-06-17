@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -176,6 +176,14 @@ const Index: FC = () => {
 		[handleError, navigate]
 	);
 
+	const memoizedOnboardingScreeningFlowParams = useMemo(
+		() => ({ screeningFlowId: institution.onboardingScreeningFlowId }),
+		[institution.onboardingScreeningFlowId]
+	);
+	const handleOnboardingScreeningFlowComplete = useCallback(() => {
+		setShowOnboardingModal(false);
+	}, []);
+
 	if (institution?.integratedCareEnabled) {
 		return <Navigate to="/ic" />;
 	}
@@ -200,10 +208,8 @@ const Index: FC = () => {
 						<Row>
 							<Col md={12} lg={{ span: 6, offset: 3 }}>
 								<ScreeningFlow
-									screeningFlowParams={{ screeningFlowId: institution.onboardingScreeningFlowId }}
-									onScreeningFlowComplete={() => {
-										setShowOnboardingModal(false);
-									}}
+									screeningFlowParams={memoizedOnboardingScreeningFlowParams}
+									onScreeningFlowComplete={handleOnboardingScreeningFlowComplete}
 								/>
 							</Col>
 						</Row>
