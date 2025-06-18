@@ -575,7 +575,7 @@ const Index: FC = () => {
 							<Row className="pb-16 pb-lg-32">
 								<Col>
 									<div className="mb-8">
-										<h3 className="mb-0">Other Courses</h3>
+										<h3 className="mb-0">Available Courses</h3>
 									</div>
 									{availableCourses.map((course, courseIndex) => {
 										const isLast = availableCourses.length - 1 === courseIndex;
