@@ -582,14 +582,18 @@ const HeaderV2 = () => {
 						},
 				  ]
 				: []),
-			{
-				testId: 'menuLinkEvents',
-				icon: EventIcon,
-				title: 'My Events',
-				to: '/my-calendar',
-			},
+			...(institution.features.find((i) => i.featureId === FeatureId.MY_EVENTS)
+				? [
+						{
+							testId: 'menuLinkEvents',
+							icon: EventIcon,
+							title: 'My Events',
+							to: '/my-calendar',
+						},
+				  ]
+				: []),
 		],
-		[institution?.requireConsentForm]
+		[institution.features, institution?.requireConsentForm]
 	);
 
 	/* ----------------------------------------------------------- */
@@ -687,6 +691,10 @@ const HeaderV2 = () => {
 							const showFeaturedItem =
 								navigationItem.navigationItemId === 'BROWSE_RESOURCES' && featuredTopicCenterItem;
 
+							if (navigationItem.items && navigationItem.items.length <= 0) {
+								return null;
+							}
+
 							return (
 								<li key={navigationItem.navigationItemId}>
 									{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
@@ -774,9 +782,11 @@ const HeaderV2 = () => {
 											</div>
 										</Link>
 									))}
+									{accountNavigationConfig.length > 0 && adminNavigationConfig.length > 0 && (
+										<hr className="m-0" />
+									)}
 									{adminNavigationConfig.length > 0 && (
 										<>
-											<hr className="m-0" />
 											{adminNavigationConfig.map((item, itemIndex) => (
 												<Link key={itemIndex} to={item.to} className="m-0" target="_blank">
 													<div className="d-flex justify-content-between align-items-center">
@@ -785,9 +795,9 @@ const HeaderV2 = () => {
 													</div>
 												</Link>
 											))}
+											<hr className="m-0" />
 										</>
 									)}
-									<hr className="m-0" />
 									<Button
 										variant="light"
 										className="fw-semibold text-gray"
@@ -945,7 +955,7 @@ const HeaderV2 = () => {
 								renderOnMount
 								className={classes.accountDropdown}
 							>
-								<p className="fw-bold text-gray">{account?.displayName}</p>
+								{account?.displayName && <p className="fw-bold text-gray">{account?.displayName}</p>}
 								{accountNavigationConfig.map((item, itemIndex) => (
 									<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
 										<div className="d-flex align-items-center">
@@ -954,9 +964,11 @@ const HeaderV2 = () => {
 										</div>
 									</Dropdown.Item>
 								))}
+								{accountNavigationConfig.length > 0 && adminNavigationConfig.length > 0 && (
+									<Dropdown.Divider />
+								)}
 								{adminNavigationConfig.length > 0 && (
 									<>
-										<Dropdown.Divider />
 										{adminNavigationConfig.map((item, itemIndex) => (
 											<Dropdown.Item key={itemIndex} as={Link} to={item.to} target="_blank">
 												<div className="d-flex justify-content-between align-items-center">
@@ -965,9 +977,9 @@ const HeaderV2 = () => {
 												</div>
 											</Dropdown.Item>
 										))}
+										<Dropdown.Divider />
 									</>
 								)}
-								<Dropdown.Divider />
 								<Dropdown.Item
 									onClick={() => {
 										signOutAndClearContext(
