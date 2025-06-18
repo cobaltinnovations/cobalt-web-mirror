@@ -17,7 +17,7 @@ import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
 import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 import { cloneDeep } from 'lodash';
-import { Button, Collapse } from 'react-bootstrap';
+import { Collapse } from 'react-bootstrap';
 import mediaQueries from '@/jss/media-queries';
 
 const CARD_FLIP_DURATION_MS = 400;
@@ -207,6 +207,7 @@ export const ScreeningQuestionContextCardSort = ({
 					setScreeningQuestionContextId(nextScreeningQuestionContextId);
 				} else {
 					setAllCardsSorted(true);
+					onScreeningFlowComplete();
 				}
 			} catch (error) {
 				handleError(error);
@@ -214,7 +215,7 @@ export const ScreeningQuestionContextCardSort = ({
 				setIsLoading(false);
 			}
 		},
-		[handleError, screeningQuestionContextId]
+		[handleError, onScreeningFlowComplete, screeningQuestionContextId]
 	);
 
 	const handleCardMouseDown = useCallback(() => {
@@ -280,9 +281,6 @@ export const ScreeningQuestionContextCardSort = ({
 					{allCardsSorted ? (
 						<div className={classes.allCardsSorted}>
 							<p>All Cards Sorted</p>
-							<Button variant="light" onClick={() => onScreeningFlowComplete()}>
-								Next
-							</Button>
 						</div>
 					) : (
 						<>
@@ -306,6 +304,7 @@ export const ScreeningQuestionContextCardSort = ({
 													cardId={questionStack.card?.id}
 													cardText={questionStack.card?.text}
 													cardIndex={0}
+													disabled={isLoading}
 												/>
 											</CSSTransition>
 											{droppableProvided.placeholder}
@@ -359,7 +358,11 @@ export const ScreeningQuestionContextCardSort = ({
 								key={messageIndex}
 								variant={message.displayTypeId.toLocaleLowerCase() as 'primary'}
 								title={message.title}
-								description={<div dangerouslySetInnerHTML={{ __html: message.message ?? '' }}></div>}
+								description={
+									message.message && (
+										<div dangerouslySetInnerHTML={{ __html: message.message ?? '' }} />
+									)
+								}
 							/>
 						))}
 					</div>

@@ -2,13 +2,20 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-small-text.svg';
+import useAccount from '@/hooks/use-account';
 
 const FooterLogo = () => {
+	const { institution } = useAccount();
+
 	return (
 		<Row className="mb-4">
 			<Col>
 				<p className="text-primary text-center text-md-start">
-					<LogoSmallText />
+					{institution.footerLogoUrl ? (
+						<img src={institution.footerLogoUrl} alt={institution.name} />
+					) : (
+						<LogoSmallText />
+					)}
 				</p>
 				<p className="text-primary text-center text-md-start">Powered by Cobalt Innovations, Inc.</p>
 			</Col>

@@ -3,7 +3,12 @@ import { CourseModel, CourseSessionModel } from '@/lib/models';
 
 export const coursesService = {
 	getCourses() {
-		return httpSingleton.orchestrateRequest<{ courses: CourseModel[] }>({
+		return httpSingleton.orchestrateRequest<{
+			available: CourseModel[];
+			comingSoon: CourseModel[];
+			inProgress: CourseModel[];
+			completed: CourseModel[];
+		}>({
 			method: 'get',
 			url: '/courses',
 		});

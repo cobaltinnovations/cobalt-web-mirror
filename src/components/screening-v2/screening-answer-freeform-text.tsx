@@ -2,22 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import {
 	ScreeningAnswerContentHintId,
+	screeningAnswerContentHintIdToInputType,
 	ScreeningAnswerOption,
 	ScreeningAnswerSelection,
 	ScreeningAnswersQuestionResult,
 } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
-
-const screeningAnswerContentHintIdToInputType = {
-	[ScreeningAnswerContentHintId.NONE]: 'text',
-	[ScreeningAnswerContentHintId.FIRST_NAME]: 'text',
-	[ScreeningAnswerContentHintId.LAST_NAME]: 'text',
-	[ScreeningAnswerContentHintId.FULL_NAME]: 'text',
-	[ScreeningAnswerContentHintId.PHONE_NUMBER]: 'tel',
-	[ScreeningAnswerContentHintId.EMAIL_ADDRESS]: 'email',
-	[ScreeningAnswerContentHintId.INTEGER]: 'number',
-	[ScreeningAnswerContentHintId.FREEFORM_TEXT]: 'text',
-};
 
 interface ScreeningAnswerFreeformTextProps {
 	options: ScreeningAnswerOption[];
@@ -63,7 +53,7 @@ export const ScreeningAnswerFreeformText = ({
 							onChange([
 								{
 									screeningAnswerOptionId: option.screeningAnswerOptionId,
-									text: currentTarget.value.trim(),
+									text: currentTarget.value,
 								},
 							]);
 						}}

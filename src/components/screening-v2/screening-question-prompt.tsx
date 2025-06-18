@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { ScreeningConfirmationPrompt } from '@/lib/models';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
+import classNames from 'classnames';
 
 interface ScreeningQuestionPromptPromps {
 	screeningConfirmationPrompt: ScreeningConfirmationPrompt;
@@ -30,14 +31,17 @@ export const ScreeningQuestionPrompt = ({
 				<h1 className="mb-6 text-center">{screeningConfirmationPrompt.titleText}</h1>
 			)}
 			<p className="mb-6 text-center">{screeningConfirmationPrompt.text}</p>
-			<div className="d-flex align-items-center justify-content-between">
-				<div>
-					{showPreviousButton && (
-						<Button type="button" onClick={onPreviousButtonClick}>
-							Previous
-						</Button>
-					)}
-				</div>
+			<div
+				className={classNames('d-flex align-items-center', {
+					'justify-content-center': !showPreviousButton,
+					'justify-content-between': showPreviousButton,
+				})}
+			>
+				{showPreviousButton && (
+					<Button type="button" onClick={onPreviousButtonClick}>
+						Previous
+					</Button>
+				)}
 				<Button type="button" onClick={onSubmitButtonClick}>
 					{screeningConfirmationPrompt.actionText}
 				</Button>

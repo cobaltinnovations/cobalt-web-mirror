@@ -12,6 +12,7 @@ export interface CourseModel {
 	defaultCourseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	currentCourseSession?: CourseSessionModel;
 	contents: Content[];
+	completionPercentage: number;
 }
 
 export type CourseSessionUnitStatusIdsByCourseUnitId = Record<string, CourseSessionUnitStatusId>;
@@ -51,6 +52,7 @@ export interface CourseUnitModel {
 	courseUnitDownloadableFiles: CourseUnitDownloadableFile[];
 	unitCompletionTypeId: UnitCompletionTypeId;
 	showRestartActivityWhenComplete: boolean;
+	showUnitAsComplete: boolean;
 }
 
 export interface CourseSessionModel {
@@ -65,6 +67,13 @@ export interface CourseSessionModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	optionalCourseModuleIds: string[];
+	completionPercentageForDisplay: string;
+	courseSessionCompletionPercentage: {
+		completionPercentage: number;
+		courseSessionId: string;
+		minutesCompleted: number;
+		totalMinutes: number;
+	};
 }
 
 export enum CourseSessionStatusId {
@@ -91,6 +100,7 @@ export enum CourseUnitTypeId {
 	CARD_SORT = 'CARD_SORT',
 	QUIZ = 'QUIZ',
 	REORDER = 'REORDER',
+	THINGS_TO_SHARE = 'THINGS_TO_SHARE',
 }
 
 export enum CourseSessionUnitStatusId {

@@ -1,33 +1,48 @@
 import React, { FC } from 'react';
-
+import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
-interface ProgressBarProps {
+interface useProgressBarStylesProps {
 	current: number;
 	max: number;
+	barColor?: string;
+	pill?: boolean;
+	size?: 'sm' | 'lg';
 }
 
 const useProgressBarStyles = createUseThemedStyles((theme) => ({
 	progressBarContainer: {
-		height: 6,
+		height: ({ size }: useProgressBarStylesProps) => (size === 'lg' ? 8 : 6),
+		overflow: 'hidden',
 		position: 'relative',
 		backgroundColor: theme.colors.n100,
+		borderRadius: ({ pill }: useProgressBarStylesProps) => (pill ? 500 : 0),
 	},
 	progressBar: {
 		top: 0,
 		left: 0,
 		bottom: 0,
 		position: 'absolute',
-		backgroundColor: theme.colors.s300,
-		width: (props: ProgressBarProps) => `${(props.current / props.max) * 100}%`,
+		backgroundColor: ({ barColor }: useProgressBarStylesProps) => barColor ?? theme.colors.s300,
+		borderRadius: ({ pill }: useProgressBarStylesProps) => (pill ? 500 : 0),
+		width: ({ current, max }: useProgressBarStylesProps) => `${(current / max) * 100}%`,
 	},
 }));
 
-const ProgressBar: FC<ProgressBarProps> = (props) => {
-	const classes = useProgressBarStyles(props);
+interface ProgressBarProps {
+	current: number;
+	max: number;
+	barColor?: string;
+	className?: string;
+	pill?: boolean;
+	size?: 'sm' | 'lg';
+}
+
+const ProgressBar: FC<ProgressBarProps> = ({ current, max, barColor, size, pill, className }) => {
+	const classes = useProgressBarStyles({ current, max, barColor, size, pill });
 
 	return (
-		<div className={classes.progressBarContainer}>
+		<div className={classNames(classes.progressBarContainer, className)}>
 			<div className={classes.progressBar} />
 		</div>
 	);

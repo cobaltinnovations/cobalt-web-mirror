@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -63,6 +63,7 @@ export const CourseUnitAvailable = ({
 		() => ({ courseSessionId, screeningFlowId: courseUnit.screeningFlowId }),
 		[courseSessionId, courseUnit.screeningFlowId]
 	);
+	const [isComplete, setIsComplete] = useState(false);
 
 	const handleVideoPlayerEvent = useCallback(
 		(eventName: string, eventPayload: unknown) => {
@@ -81,9 +82,18 @@ export const CourseUnitAvailable = ({
 		onView?.(courseUnit);
 	}, [courseUnit, onView]);
 
+	const handleUnitComplete = useCallback(() => {
+		setIsComplete(true);
+		onActivityComplete();
+	}, [onActivityComplete]);
+
 	const showNextButton = useMemo(() => {
-		return courseUnit.unitCompletionTypeId === UnitCompletionTypeId.IMMEDIATELY;
-	}, [courseUnit.unitCompletionTypeId]);
+		return (
+			courseUnit.unitCompletionTypeId === UnitCompletionTypeId.IMMEDIATELY ||
+			courseUnit.courseUnitTypeId === CourseUnitTypeId.VIDEO ||
+			isComplete
+		);
+	}, [courseUnit.courseUnitTypeId, courseUnit.unitCompletionTypeId, isComplete]);
 
 	return (
 		<>
@@ -125,7 +135,7 @@ export const CourseUnitAvailable = ({
 						<ScreeningFlow
 							cardSortOnly={courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT}
 							screeningFlowParams={screeningFlowParams}
-							onScreeningFlowComplete={onActivityComplete}
+							onScreeningFlowComplete={handleUnitComplete}
 						/>
 					</div>
 				)}
@@ -135,7 +145,7 @@ export const CourseUnitAvailable = ({
 					videoId={courseUnit.videoId ?? ''}
 					courseVideos={courseVideos}
 					onVideoPlayerEvent={handleVideoPlayerEvent}
-					onVideoPlayerEnd={onActivityComplete}
+					onVideoPlayerEnd={handleUnitComplete}
 					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
 					onCompletionThresholdPassed={() => {
 						onCompletionThresholdPassed(courseUnit);
@@ -144,38 +154,44 @@ export const CourseUnitAvailable = ({
 			)}
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
-				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK) && (
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE) && (
 				<div className={classes.imageOuter}>
 					<img src={courseUnit.imageUrl} alt="" />
 				</div>
 			)}
 
-			{(courseUnit.courseUnitDownloadableFiles ?? []).map(
-				(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
-					const isLast =
-						(courseUnit.courseUnitDownloadableFiles ?? []).length - 1 === courseUnitDownloadableFileIndex;
+			{(courseUnit.courseUnitDownloadableFiles ?? []).length > 0 && (
+				<div className="pt-8">
+					{(courseUnit.courseUnitDownloadableFiles ?? []).map(
+						(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
+							const isLast =
+								(courseUnit.courseUnitDownloadableFiles ?? []).length - 1 ===
+								courseUnitDownloadableFileIndex;
 
-					return (
-						<CourseDownloadable
-							className={classNames({
-								'mb-2': !isLast,
-							})}
-							key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
-							courseUnitDownloadableFile={courseUnitDownloadableFile}
-							trackEvent={() => {
-								analyticsService.persistEvent(
-									AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
-									{
-										courseUnitId: courseUnit.courseUnitId,
-										...(courseSessionId && { courseSessionId }),
-										courseUnitDownloadableFileId:
-											courseUnitDownloadableFile.courseUnitDownloadableFileId,
-									}
-								);
-							}}
-						/>
-					);
-				}
+							return (
+								<CourseDownloadable
+									className={classNames({
+										'mb-2': !isLast,
+									})}
+									key={courseUnitDownloadableFile.courseUnitDownloadableFileId}
+									courseUnitDownloadableFile={courseUnitDownloadableFile}
+									trackEvent={() => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_DOWNLOADABLE_FILE,
+											{
+												courseUnitId: courseUnit.courseUnitId,
+												...(courseSessionId && { courseSessionId }),
+												courseUnitDownloadableFileId:
+													courseUnitDownloadableFile.courseUnitDownloadableFileId,
+											}
+										);
+									}}
+								/>
+							);
+						}
+					)}
+				</div>
 			)}
 
 			<div className="pt-10 d-flex justify-content-end">
