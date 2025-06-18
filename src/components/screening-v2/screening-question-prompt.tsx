@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import { ScreeningConfirmationPrompt } from '@/lib/models';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
 import classNames from 'classnames';
+import { WysiwygDisplay } from '../wysiwyg-basic';
 
 interface ScreeningQuestionPromptPromps {
 	screeningConfirmationPrompt: ScreeningConfirmationPrompt;
@@ -30,7 +31,7 @@ export const ScreeningQuestionPrompt = ({
 			{screeningConfirmationPrompt.titleText && (
 				<h1 className="mb-6 text-center">{screeningConfirmationPrompt.titleText}</h1>
 			)}
-			<p className="mb-6 text-center">{screeningConfirmationPrompt.text}</p>
+			<WysiwygDisplay className="mb-6 text-center" html={screeningConfirmationPrompt.text ?? ''} />
 			<div
 				className={classNames('d-flex align-items-center', {
 					'justify-content-center': !showPreviousButton,

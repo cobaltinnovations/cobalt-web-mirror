@@ -247,6 +247,7 @@ export const ScreeningQuestionContext = ({
 						return;
 					}
 
+					setSelectedAnswers(selectedScreeningAnswers);
 					setConfirmationPrompt({
 						screeningConfirmationPrompt: confirmationPrompt,
 						isSubmitConfirmationPrompt: true,
