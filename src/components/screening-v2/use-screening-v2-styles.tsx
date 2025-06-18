@@ -20,6 +20,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			appearance: 'none',
 			position: 'relative',
 			...theme.fonts.default,
+			color: theme.colors.n900,
 			padding: '16px 68px 16px 20px',
 			backgroundColor: theme.colors.n0,
 			boxShadow: '0px 1px 0px 0px rgba(26, 26, 26, 0.07), 0px 0px 2px 0px rgba(0, 0, 0, 0.12)',

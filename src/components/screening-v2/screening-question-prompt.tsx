@@ -25,6 +25,7 @@ export const ScreeningQuestionPrompt = ({
 			{screeningConfirmationPrompt.screeningImageId && (
 				<ScreeningPromptImage
 					className="mb-6 mx-auto d-block"
+					style={{ maxWidth: '100%' }}
 					screeningImageId={screeningConfirmationPrompt.screeningImageId}
 				/>
 			)}
