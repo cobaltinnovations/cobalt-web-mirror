@@ -507,7 +507,7 @@ const Index: FC = () => {
 				)}
 
 				{content.length > 0 && (
-					<Container className="py-20 pb-20">
+					<Container className="py-20">
 						<Row>
 							<Col>
 								<div className="d-flex align-items-center justify-content-between">
@@ -548,7 +548,7 @@ const Index: FC = () => {
 					availableCourses.length > 0 ||
 					comingSoonCourses.length > 0 ||
 					completedCourses.length > 0) && (
-					<Container>
+					<Container className="pt-20">
 						{inProgressCourses.length > 0 && (
 							<Row className="pb-16 pb-lg-32">
 								<Col>
