@@ -845,6 +845,10 @@ const HeaderV2 = () => {
 										navigationItem.navigationItemId === 'BROWSE_RESOURCES' &&
 										featuredTopicCenterItem;
 
+									if (navigationItem.items && navigationItem.items.length <= 0) {
+										return null;
+									}
+
 									return (
 										<li
 											key={navigationItem.navigationItemId}
