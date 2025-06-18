@@ -60,6 +60,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: ({ compact }: UseStylesProps) => (compact ? '8px 16px' : 8),
 		textAlign: 'left',
 		alignItems: 'center',
+		color: theme.colors.n900,
 		backgroundColor: 'transparent',
 		'&:hover': {
 			backgroundColor: theme.colors.n50,
