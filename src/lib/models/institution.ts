@@ -25,6 +25,7 @@ export enum FeatureId {
 	RESOURCE_NAVIGATOR = 'RESOURCE_NAVIGATOR',
 	COUNSELING_SERVICES = 'COUNSELING_SERVICES',
 	COURSE = 'COURSE',
+	MY_EVENTS = 'MY_EVENTS',
 }
 
 export interface Institution {

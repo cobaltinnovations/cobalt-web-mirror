@@ -32,7 +32,7 @@ interface CardDraggableProps {
 	cardText?: string;
 	className?: string;
 	disabled?: boolean;
-	onMouseDown?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
+	onMouseDown?(event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>): void;
 }
 
 export const CardDraggable = ({
@@ -63,6 +63,7 @@ export const CardDraggable = ({
 						},
 						className
 					)}
+					onTouchStart={onMouseDown}
 					onMouseDown={onMouseDown}
 				>
 					<p className="text-center">{cardText}</p>

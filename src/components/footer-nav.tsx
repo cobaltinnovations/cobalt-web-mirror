@@ -4,6 +4,7 @@ import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
 import mediaQueries from '@/jss/media-queries';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
 	links: {
@@ -15,6 +16,7 @@ const useStyles = createUseStyles({
 });
 
 const FooterNav = () => {
+	const { institution } = useAccount();
 	const classes = useStyles();
 
 	const links = [
@@ -22,14 +24,18 @@ const FooterNav = () => {
 			label: 'Home',
 			to: '/',
 		},
-		{
-			label: 'Group Sessions',
-			to: '/group-sessions',
-		},
-		{
-			label: 'Resource Library',
-			to: '/resource-library',
-		},
+		...(institution.featuresEnabled
+			? [
+					{
+						label: 'Group Sessions',
+						to: '/group-sessions',
+					},
+					{
+						label: 'Resource Library',
+						to: '/resource-library',
+					},
+			  ]
+			: []),
 		{
 			label: 'Contact Us',
 			to: '/feedback',
