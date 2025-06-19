@@ -18,11 +18,9 @@ import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import {
-	getCompletedCourseUnitIds,
 	getCurrentCourseModule,
 	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
 	getOptionalCourseModules,
-	getOrderedCourseUnits,
 	getRequiredCourseModules,
 } from '@/lib/utils';
 import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
