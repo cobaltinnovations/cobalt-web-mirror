@@ -3,7 +3,13 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
-import { AnalyticsNativeEventTypeId, CourseModel, CourseModuleModel, CourseUnitModel } from '@/lib/models';
+import {
+	AnalyticsNativeEventTypeId,
+	CourseModel,
+	CourseModuleModel,
+	CourseSessionStatusId,
+	CourseUnitModel,
+} from '@/lib/models';
 import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
@@ -12,11 +18,9 @@ import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import {
-	getCompletedCourseUnitIds,
 	getCurrentCourseModule,
 	getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession,
 	getOptionalCourseModules,
-	getOrderedCourseUnits,
 	getRequiredCourseModules,
 } from '@/lib/utils';
 import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
@@ -62,10 +66,7 @@ export const Component = () => {
 			return;
 		}
 
-		const allCourseUnits = getOrderedCourseUnits(courseModules, optionalCourseModuleIds);
-		const completedCourseUnitIds = getCompletedCourseUnitIds(currentCourseSession);
-		const allCourseUnitsComplete = allCourseUnits.every((u) => completedCourseUnitIds.includes(u.courseUnitId));
-		setShowResumeButton(!allCourseUnitsComplete);
+		setShowResumeButton(currentCourseSession.courseSessionStatusId !== CourseSessionStatusId.COMPLETED);
 	}, [courseIdentifier]);
 
 	useEffect(() => {
