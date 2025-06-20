@@ -393,6 +393,10 @@ export const routes: RouteObject[] = [
 						element: <Index />,
 					},
 					{
+						path: 'account-settings',
+						lazy: () => import('@/routes/account-settings'),
+					},
+					{
 						// legacy/backwards compatibility
 						path: 'in-the-studio',
 						element: <Navigate to="/group-sessions" replace />,
