@@ -6,6 +6,9 @@ import TabBar from '@/components/tab-bar';
 import { createUseStyles } from 'react-jss';
 import useAccount from '@/hooks/use-account';
 import { HEADER_HEIGHT } from '@/components/header-v2';
+import { accountService } from '@/lib/services';
+import useHandleError from '@/hooks/use-handle-error';
+import useFlags from '@/hooks/use-flags';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -19,10 +22,35 @@ export async function loader() {
 }
 
 export const Component = () => {
+	const { addFlag } = useFlags();
 	const { account, institution } = useAccount();
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
+	const handleError = useHandleError();
+
+	const handleResetPasswordButtonClick = async () => {
+		try {
+			if (!account) {
+				throw new Error('account is undefined.');
+			}
+
+			if (!account.emailAddress) {
+				throw new Error('account.emailAddress is undefined.');
+			}
+
+			await accountService.sendForgotPasswordEmail(account.emailAddress).fetch();
+
+			addFlag({
+				variant: 'success',
+				title: 'Check your inbox',
+				description: `Email sent to ${account.emailAddress}.`,
+				actions: [],
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	};
 
 	return (
 		<>
@@ -64,13 +92,7 @@ export const Component = () => {
 									</a>
 									, please contact support for assistance.
 								</p>
-								<Button
-									onClick={() => {
-										window.open('/forgot-password', '_blank', 'noopener, noreferrer');
-									}}
-								>
-									Reset Password
-								</Button>
+								<Button onClick={handleResetPasswordButtonClick}>Reset Password</Button>
 							</Card.Body>
 						</Card>
 
