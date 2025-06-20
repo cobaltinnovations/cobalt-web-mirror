@@ -361,6 +361,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'accounts/claim-invite/:accountInviteId',
 						element: <SignUpClaim />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						// legacy/backwards compatibility
