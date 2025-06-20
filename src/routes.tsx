@@ -325,6 +325,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'sign-up',
 						element: <SignUp />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'sign-in',

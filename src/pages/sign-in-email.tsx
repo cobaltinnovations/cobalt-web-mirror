@@ -76,7 +76,7 @@ const SignInEmail = () => {
 				leftColChildren={(className) => (
 					<div className={className}>
 						<h1 className="mb-8 text-center">Sign in with email</h1>
-						<Form onSubmit={handleSignInFormSubmit}>
+						<Form className="mb-6" onSubmit={handleSignInFormSubmit}>
 							<InputHelper
 								ref={emailAddressInputRef}
 								className="mb-4"

@@ -1,70 +1,43 @@
-import * as yup from 'yup';
-
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Formik } from 'formik';
+import { Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import InputHelper from '@/components/input-helper';
-
-import { getRequiredYupFields } from '@/lib/utils';
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-
-import { createUseThemedStyles } from '@/jss/theme';
-import mediaQueries from '@/jss/media-queries';
+import HalfLayout from '@/components/half-layout';
+import InputHelper from '@/components/input-helper';
 import { useAppRootLoaderData } from '@/routes/root';
-
-const useSignUpStyles = createUseThemedStyles((theme) => ({
-	signUpOuter: {
-		background: `linear-gradient(180deg, ${theme.colors.p50} 45.31%, ${theme.colors.background} 100%)`,
-	},
-	signUp: {
-		paddingTop: 96,
-		[mediaQueries.lg]: {
-			paddingTop: 32,
-		},
-	},
-}));
-
-const signUpSchema = yup
-	.object()
-	.required()
-	.shape({
-		emailAddress: yup.string().required().default(''),
-		password: yup.string().required().default(''),
-	});
-type SignUpFormData = yup.InferType<typeof signUpSchema>;
-const requiredFields = getRequiredYupFields<SignUpFormData>(signUpSchema);
 
 const SignUp: FC = () => {
 	const { subdomain } = useAppRootLoaderData();
 	const handleError = useHandleError();
 	const navigate = useNavigate();
-	const classes = useSignUpStyles();
+	const [formValues, setFormValues] = useState({ emailAddress: '', password: '' });
 
-	async function handleFormSubmit(values: SignUpFormData) {
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
 		try {
 			const { accountInviteId } = await accountService
 				.inviteAccount({
 					subdomain,
 					accountSourceId: 'EMAIL_PASSWORD',
-					emailAddress: values.emailAddress,
-					password: values.password,
+					emailAddress: formValues.emailAddress,
+					password: formValues.password,
 				})
 				.fetch();
 
 			navigate('/sign-up-verify', {
 				state: {
-					emailAddress: values.emailAddress,
+					emailAddress: formValues.emailAddress,
 					accountInviteId,
 				},
 			});
 		} catch (error) {
 			handleError((error as any).message);
 		}
-	}
+	};
 
 	return (
 		<>
@@ -72,62 +45,52 @@ const SignUp: FC = () => {
 				<title>Cobalt | Create Account</title>
 			</Helmet>
 
-			<Container fluid className={classes.signUpOuter}>
-				<Container className={classes.signUp}>
-					<Row>
-						<h1 className="mb-4 text-center">Create account</h1>
-						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							<Formik<SignUpFormData>
-								enableReinitialize
-								validationSchema={signUpSchema}
-								initialValues={signUpSchema.cast(undefined)}
-								onSubmit={handleFormSubmit}
-							>
-								{(formikBag) => {
-									const { values, handleChange, handleSubmit, touched, errors } = formikBag;
-									return (
-										<Form className="mb-6" onSubmit={handleSubmit}>
-											<InputHelper
-												className="mb-2"
-												name="emailAddress"
-												type="email"
-												label="Email address"
-												value={values.emailAddress}
-												onChange={handleChange}
-												required={requiredFields.emailAddress}
-												error={
-													touched.emailAddress && errors.emailAddress
-														? errors.emailAddress
-														: ''
-												}
-											/>
-											<InputHelper
-												className="mb-4"
-												name="password"
-												type="password"
-												label="Create your password"
-												helperText="8+ characters, including a number"
-												value={values.password}
-												onChange={handleChange}
-												required={requiredFields.password}
-												error={touched.password && errors.password ? errors.password : ''}
-											/>
-											<div className="text-center mb-3">
-												<Button className="d-block w-100" variant="primary" type="submit">
-													Create Account
-												</Button>
-											</div>
-										</Form>
-									);
-								}}
-							</Formik>
+			<HalfLayout
+				leftColChildren={(className) => {
+					return (
+						<div className={className}>
+							<h1 className="mb-8 text-center">Create Account</h1>
+							<Form className="mb-6" onSubmit={handleFormSubmit}>
+								<InputHelper
+									className="mb-4"
+									name="emailAddress"
+									type="email"
+									label="Email address"
+									value={formValues.emailAddress}
+									onChange={({ currentTarget }) => {
+										setFormValues((pv) => ({
+											...pv,
+											emailAddress: currentTarget.value,
+										}));
+									}}
+									required
+								/>
+								<InputHelper
+									className="mb-6"
+									name="password"
+									type="password"
+									label="Create your password"
+									helperText="8+ characters, including a number"
+									value={formValues.password}
+									onChange={({ currentTarget }) => {
+										setFormValues((pv) => ({
+											...pv,
+											password: currentTarget.value,
+										}));
+									}}
+									required
+								/>
+								<Button size="lg" type="submit" className="d-block w-100">
+									Create Account
+								</Button>
+							</Form>
 							<p className="text-center">
 								Already have an account? <Link to="/sign-in/email">Sign In</Link>
 							</p>
-						</Col>
-					</Row>
-				</Container>
-			</Container>
+						</div>
+					);
+				}}
+			/>
 		</>
 	);
 };
