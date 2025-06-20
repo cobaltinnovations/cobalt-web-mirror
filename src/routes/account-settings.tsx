@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -9,6 +9,9 @@ import { HEADER_HEIGHT } from '@/components/header-v2';
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import ConfirmDialog from '@/components/confirm-dialog';
+import ConsentModal from '@/components/consent-modal';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -23,11 +26,14 @@ export async function loader() {
 
 export const Component = () => {
 	const { addFlag } = useFlags();
-	const { account, institution } = useAccount();
+	const { account, institution, signOutAndClearContext } = useAccount();
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
 	const handleError = useHandleError();
+	const [showConsentModal, setShowConsentModal] = useState(false);
+	const [revokeIsLoading, setRevokeIsLoading] = useState(false);
+	const [showRevokeConfirmation, setShowRevokeConfirmation] = useState(false);
 
 	const handleResetPasswordButtonClick = async () => {
 		try {
@@ -52,11 +58,50 @@ export const Component = () => {
 		}
 	};
 
+	const handleRevokeConsent = async () => {
+		setRevokeIsLoading(true);
+
+		try {
+			if (!account) {
+				throw new Error('account is undefined.');
+			}
+
+			await accountService.rejectConsent(account.accountId).fetch();
+			signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.CONSENT_FORM, {});
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setRevokeIsLoading(false);
+		}
+	};
+
 	return (
 		<>
 			<Helmet>
 				<title>Cobalt | Account Settings</title>
 			</Helmet>
+
+			<ConsentModal
+				readOnly
+				show={showConsentModal}
+				onHide={() => {
+					setShowConsentModal(false);
+				}}
+			/>
+
+			<ConfirmDialog
+				show={showRevokeConfirmation}
+				onHide={() => {
+					setShowRevokeConfirmation(false);
+				}}
+				titleText="Revoke Acceptance"
+				bodyText="Are you sure you want to revoke your acceptance of the User Agreement?"
+				detailText="You will be signed out of Cobalt and will not be able to sign in again until you accept the User Agreement."
+				dismissText="Cancel"
+				confirmText="Continue"
+				isConfirming={revokeIsLoading}
+				onConfirm={handleRevokeConsent}
+			/>
 
 			<Container className="py-16">
 				<Row>
@@ -102,13 +147,35 @@ export const Component = () => {
 								<Card.Title>User Agreement</Card.Title>
 							</Card.Header>
 							<Card.Body>
-								<h5 className="mb-6">Accepted</h5>
-								<p className="mb-6">Accepted: December 20, 2022, 2:24 PM</p>
+								{account?.consentFormAccepted ? (
+									<h5 className="mb-6">Accepted</h5>
+								) : (
+									<h5 className="mb-6">Declined</h5>
+								)}
+								<p className="mb-6">
+									Accepted:{' '}
+									{account?.consentFormAcceptedDateDescription ?? 'Acceptance date unavailable'}
+								</p>
 								<div className="d-flex align-items-center">
-									<Button variant="outline-primary" className="me-2">
+									<Button
+										variant="outline-primary"
+										className="me-2"
+										onClick={() => {
+											setShowConsentModal(true);
+										}}
+									>
 										View
 									</Button>
-									<Button variant="danger">Revoke</Button>
+									{account?.consentFormAccepted && (
+										<Button
+											variant="danger"
+											onClick={() => {
+												setShowRevokeConfirmation(true);
+											}}
+										>
+											Revoke
+										</Button>
+									)}
 								</div>
 							</Card.Body>
 						</Card>
