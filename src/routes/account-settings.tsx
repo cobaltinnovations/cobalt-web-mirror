@@ -19,7 +19,7 @@ export async function loader() {
 }
 
 export const Component = () => {
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
@@ -42,17 +42,27 @@ export const Component = () => {
 								<h5 className="mb-4">Email Address</h5>
 								<p className="mb-4">{account?.emailAddress ?? 'N/A'}</p>
 								<p className="mb-6">
-									If you need to change your email address, please contact <a href="email:#">#</a>
+									If you need to change your email address, please contact{' '}
+									<a href={`mailto:${institution.supportEmailAddress}`}>
+										{institution.supportEmailAddress}
+									</a>
 								</p>
 								<hr className="mb-6" />
 								<h5 className="mb-4">Password</h5>
 								<p className="mb-4">
-									We will send a verification link to <a href="email:#">#</a>. This update will not
-									take place until you follow the instructions listed in that email.
+									We will send a verification link to{' '}
+									<a href={`mailto:${account?.emailAddress ?? 'N/A'}`}>
+										{account?.emailAddress ?? 'N/A'}
+									</a>
+									. This update will not take place until you follow the instructions listed in that
+									email.
 								</p>
 								<p className="mb-6">
-									If you do not have access to <a href="email:#">#</a>, please contact support for
-									assistance.
+									If you do not have access to{' '}
+									<a href={`mailto:${account?.emailAddress ?? 'N/A'}`}>
+										{account?.emailAddress ?? 'N/A'}
+									</a>
+									, please contact support for assistance.
 								</p>
 								<Button
 									onClick={() => {
