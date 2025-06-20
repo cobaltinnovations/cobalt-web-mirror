@@ -5,6 +5,7 @@ import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
 import {
+	AccountSourceId,
 	AlertTypeId,
 	AnalyticsNativeEventClickthroughFeatureSource,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
@@ -592,8 +593,18 @@ const HeaderV2 = () => {
 						},
 				  ]
 				: []),
+			...(account?.accountSourceId === AccountSourceId.EMAIL_PASSWORD
+				? [
+						{
+							testId: 'menuLinkAccountSettings',
+							icon: AdminIcon,
+							title: 'Account Settings',
+							to: '/account-settings',
+						},
+				  ]
+				: []),
 		],
-		[institution.features, institution?.requireConsentForm]
+		[account?.accountSourceId, institution.features, institution?.requireConsentForm]
 	);
 
 	/* ----------------------------------------------------------- */
