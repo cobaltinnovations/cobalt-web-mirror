@@ -1,10 +1,11 @@
 import React, { FC, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { Helmet } from 'react-helmet';
+import HalfLayout from '@/components/half-layout';
 
 const SignUpVerify: FC = () => {
 	const handleError = useHandleError();
@@ -38,22 +39,39 @@ const SignUpVerify: FC = () => {
 				<title>Cobalt | Verify Account</title>
 			</Helmet>
 
-			<Container className="pt-4 pb-4">
-				<Row>
-					<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-						<p className="mb-6 text-center">
-							We sent a link to {locationState?.emailAddress}. Please follow this link to verify your
-							account.
-						</p>
-						<p className="mb-0 text-center fw-bold">didn’t get an email?</p>
-						<div className="text-center">
-							<Button variant="link" onClick={handleResendButtonClick}>
-								Resend
-							</Button>
+			<HalfLayout
+				leftColChildren={(className) => {
+					return (
+						<div className={className}>
+							<h1 className="mb-8 text-center">Check your inbox</h1>
+							<p className="mb-6 text-center">
+								We've sent a confirmation email to <strong>{locationState?.emailAddress}</strong>.
+								Please click the link in the email to verify your account.
+							</p>
+							<div className="text-center">
+								<Button
+									variant="link"
+									size="lg"
+									className="d-block w-100 text-decoration-none"
+									onClick={handleResendButtonClick}
+								>
+									Resend
+								</Button>
+								<Button
+									variant="link"
+									size="lg"
+									className="d-block w-100 text-decoration-none"
+									onClick={() => {
+										navigate('/sign-in-email');
+									}}
+								>
+									Log In
+								</Button>
+							</div>
 						</div>
-					</Col>
-				</Row>
-			</Container>
+					);
+				}}
+			/>
 		</>
 	);
 };

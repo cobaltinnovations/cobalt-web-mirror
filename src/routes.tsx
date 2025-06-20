@@ -353,6 +353,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'sign-up-verify',
 						element: <SignUpVerify />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'accounts/claim-invite/:accountInviteId',
