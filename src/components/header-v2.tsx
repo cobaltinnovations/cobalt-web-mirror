@@ -571,29 +571,13 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Account navigation Config */
 	/* ----------------------------------------------------------- */
+	const showAccountSettings =
+		institution?.requireConsentForm || account?.accountSourceId === AccountSourceId.EMAIL_PASSWORD;
+	const showMyEvents = !!institution.features.find((i) => i.featureId === FeatureId.MY_EVENTS);
+
 	const accountNavigationConfig = useMemo(
 		() => [
-			...(institution?.requireConsentForm
-				? [
-						{
-							testId: 'menuLinkPofile',
-							icon: AdminIcon,
-							title: 'Profile',
-							to: '/user-settings',
-						},
-				  ]
-				: []),
-			...(institution.features.find((i) => i.featureId === FeatureId.MY_EVENTS)
-				? [
-						{
-							testId: 'menuLinkEvents',
-							icon: EventIcon,
-							title: 'My Events',
-							to: '/my-calendar',
-						},
-				  ]
-				: []),
-			...(account?.accountSourceId === AccountSourceId.EMAIL_PASSWORD
+			...(showAccountSettings
 				? [
 						{
 							testId: 'menuLinkAccountSettings',
@@ -603,8 +587,18 @@ const HeaderV2 = () => {
 						},
 				  ]
 				: []),
+			...(showMyEvents
+				? [
+						{
+							testId: 'menuLinkEvents',
+							icon: EventIcon,
+							title: 'My Events',
+							to: '/my-calendar',
+						},
+				  ]
+				: []),
 		],
-		[account?.accountSourceId, institution.features, institution?.requireConsentForm]
+		[showAccountSettings, showMyEvents]
 	);
 
 	/* ----------------------------------------------------------- */
