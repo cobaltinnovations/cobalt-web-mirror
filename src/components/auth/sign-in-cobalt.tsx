@@ -1,14 +1,22 @@
 import classNames from 'classnames';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 
-import { AccountSource, AccountSourceDisplayStyleId, INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb } from '@/lib/models';
-import { institutionService } from '@/lib/services';
+import {
+	AccountSource,
+	AccountSourceDisplayStyleId,
+	AccountSourceId,
+	AnalyticsNativeEventTypeId,
+	INSTITUTION_BLURB_TYPE_ID,
+	InstitutionBlurb,
+} from '@/lib/models';
+import { analyticsService, institutionService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import Blurb from '@/components/blurb';
 import HalfLayout from '@/components/half-layout';
 import InlineAlert from '@/components/inline-alert';
+import { useNavigate } from 'react-router-dom';
 
 export interface SignInCobaltProps {
 	onAccountSourceClick: (accountSource: AccountSource) => Promise<void>;
@@ -21,6 +29,7 @@ const accountSourceVariantMap = {
 };
 
 export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
+	const navigate = useNavigate();
 	const { institution, accountSources } = useAccount();
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 	const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -36,6 +45,19 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 			// don't throw
 		}
 	}, []);
+
+	const showSignUpLogInUi = useMemo(() => {
+		const visibleAccountSources = accountSources.filter(({ visible }) => visible);
+		const containsEmailPassword = !!visibleAccountSources.find(
+			({ accountSourceId }) => accountSourceId === AccountSourceId.EMAIL_PASSWORD
+		);
+
+		if (visibleAccountSources.length === 1 && containsEmailPassword) {
+			return true;
+		}
+
+		return false;
+	}, [accountSources]);
 
 	return (
 		<>
@@ -75,43 +97,77 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 						<p className="mb-6 text-center">
 							{institution.signInDirection ?? 'Select your sign in method to continue.'}
 						</p>
-						<div className="mb-8 mb-lg-10">
-							{accountSources
-								.filter((accountSource) => accountSource.visible)
-								.map((accountSource, index) => {
-									const isLast = accountSources.length - 1 === index;
-									let variant =
-										accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] || 'primary';
+						{showSignUpLogInUi ? (
+							<div className="mb-8 mb-lg-10">
+								<Button
+									size="lg"
+									variant="primary"
+									className="mb-3 d-block w-100 text-decoration-none"
+									onClick={() => {
+										navigate('/sign-up');
+									}}
+								>
+									Sign up
+								</Button>
+								<Button
+									size="lg"
+									variant="outline-primary"
+									className="d-block w-100 text-decoration-none"
+									onClick={() => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_ACCOUNT_SOURCE,
+											{
+												accountSourceId: AccountSourceId.EMAIL_PASSWORD,
+											}
+										);
 
-									return (
-										<React.Fragment key={accountSource.accountSourceId}>
-											{accountSource.supplementMessage && (
-												<InlineAlert
-													className="mb-6 text-left"
-													variant={
-														(accountSource.supplementMessageStyle as 'primary') ?? 'info'
-													}
-													title={accountSource.supplementMessage}
-												/>
-											)}
-											<Button
-												key={`account-source-${index}`}
-												size="lg"
-												className={classNames('d-block w-100 text-decoration-none', {
-													'mb-3': !isLast,
-												})}
-												variant={variant}
-												data-testid={`signIn-${accountSource.accountSourceId}`}
-												onClick={() => {
-													onAccountSourceClick(accountSource);
-												}}
-											>
-												{accountSource.authenticationDescription}
-											</Button>
-										</React.Fragment>
-									);
-								})}
-						</div>
+										navigate('/sign-in/email');
+									}}
+								>
+									Log in
+								</Button>
+							</div>
+						) : (
+							<div className="mb-8 mb-lg-10">
+								{accountSources
+									.filter((accountSource) => accountSource.visible)
+									.map((accountSource, index) => {
+										const isLast = accountSources.length - 1 === index;
+										let variant =
+											accountSourceVariantMap[accountSource.accountSourceDisplayStyleId] ||
+											'primary';
+
+										return (
+											<React.Fragment key={accountSource.accountSourceId}>
+												{accountSource.supplementMessage && (
+													<InlineAlert
+														className="mb-6 text-left"
+														variant={
+															(accountSource.supplementMessageStyle as 'primary') ??
+															'info'
+														}
+														title={accountSource.supplementMessage}
+													/>
+												)}
+												<Button
+													key={`account-source-${index}`}
+													size="lg"
+													className={classNames('d-block w-100 text-decoration-none', {
+														'mb-3': !isLast,
+													})}
+													variant={variant}
+													data-testid={`signIn-${accountSource.accountSourceId}`}
+													onClick={() => {
+														onAccountSourceClick(accountSource);
+													}}
+												>
+													{accountSource.authenticationDescription}
+												</Button>
+											</React.Fragment>
+										);
+									})}
+							</div>
+						)}
 
 						{institution.signInPrivacyOverview && (
 							<InlineAlert
