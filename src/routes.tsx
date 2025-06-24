@@ -100,7 +100,6 @@ export const InCrisis = lazyLoadWithRefresh(() => import('@/pages/in-crisis'));
 export const ConfirmAppointment = lazyLoadWithRefresh(() => import('@/pages/confirm-appointment'));
 export const CommunityPage = lazyLoadWithRefresh(() => import('@/pages/community-page'));
 export const FeaturedTopic = lazyLoadWithRefresh(() => import('@/pages/featured-topic'));
-export const UserSettings = lazyLoadWithRefresh(() => import('@/pages/user-settings'));
 export const ResourceLibrary = lazyLoadWithRefresh(() => import('@/pages/resource-library'));
 export const ResourceLibraryTopic = lazyLoadWithRefresh(() => import('@/pages/resource-library-topic'));
 export const ResourceLibraryTags = lazyLoadWithRefresh(() => import('@/pages/resource-library-tags'));
@@ -325,6 +324,10 @@ export const routes: RouteObject[] = [
 					{
 						path: 'sign-up',
 						element: <SignUp />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'sign-in',
@@ -349,10 +352,18 @@ export const routes: RouteObject[] = [
 					{
 						path: 'sign-up-verify',
 						element: <SignUpVerify />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						path: 'accounts/claim-invite/:accountInviteId',
 						element: <SignUpClaim />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
 					},
 					{
 						// legacy/backwards compatibility
@@ -391,6 +402,10 @@ export const routes: RouteObject[] = [
 					{
 						index: true,
 						element: <Index />,
+					},
+					{
+						path: 'account-settings',
+						lazy: () => import('@/routes/account-settings'),
 					},
 					{
 						// legacy/backwards compatibility
@@ -767,10 +782,6 @@ export const routes: RouteObject[] = [
 					{
 						path: 'community/:topicCenterId',
 						element: <RedirectLegacyCommunityToPage />,
-					},
-					{
-						path: 'user-settings',
-						element: <UserSettings />,
 					},
 					{
 						path: 'resource-library',

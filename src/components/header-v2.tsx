@@ -5,6 +5,7 @@ import { CSSTransition } from 'react-transition-group';
 import classNames from 'classnames';
 
 import {
+	AccountSourceId,
 	AlertTypeId,
 	AnalyticsNativeEventClickthroughFeatureSource,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
@@ -570,19 +571,23 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Account navigation Config */
 	/* ----------------------------------------------------------- */
+	const showAccountSettings =
+		institution?.requireConsentForm || account?.accountSourceId === AccountSourceId.EMAIL_PASSWORD;
+	const showMyEvents = !!institution.features.find((i) => i.featureId === FeatureId.MY_EVENTS);
+
 	const accountNavigationConfig = useMemo(
 		() => [
-			...(institution?.requireConsentForm
+			...(showAccountSettings
 				? [
 						{
-							testId: 'menuLinkPofile',
+							testId: 'menuLinkAccountSettings',
 							icon: AdminIcon,
-							title: 'Profile',
-							to: '/user-settings',
+							title: 'Account Settings',
+							to: '/account-settings',
 						},
 				  ]
 				: []),
-			...(institution.features.find((i) => i.featureId === FeatureId.MY_EVENTS)
+			...(showMyEvents
 				? [
 						{
 							testId: 'menuLinkEvents',
@@ -593,7 +598,7 @@ const HeaderV2 = () => {
 				  ]
 				: []),
 		],
-		[institution.features, institution?.requireConsentForm]
+		[showAccountSettings, showMyEvents]
 	);
 
 	/* ----------------------------------------------------------- */
