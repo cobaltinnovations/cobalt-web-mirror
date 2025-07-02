@@ -10,7 +10,7 @@ interface ImageUploadShape {
 	onError: (callback: (error: any) => void) => this;
 }
 
-const maxFileSizeInBytes = 3000000; // 3mb;
+const maxFileSizeInBytes = 200000000; // 200mb;
 
 export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<PresignedUploadResponse>) => {
 	let onPresignedUploadObtainedCallback: (presignedUpload: PresignedUploadResponse) => void;
@@ -42,7 +42,7 @@ export const imageUploader = (blob: Blob, presignedUploadGetter: () => Promise<P
 		start: () => {
 			new Promise((resolve, reject) => {
 				if (blob.size > maxFileSizeInBytes) {
-					reject(CobaltError.fromValidationFailed('File size exceeds limit of 3mb.'));
+					reject(CobaltError.fromValidationFailed('File size exceeds limit of 200mb.'));
 				}
 
 				resolve(true);
