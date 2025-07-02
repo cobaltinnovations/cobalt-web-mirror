@@ -92,6 +92,7 @@ export interface Institution {
 	landingPageTaglineOverride?: string;
 	onboardingScreeningFlowId?: string;
 	preferLegacyTopicCenters?: boolean;
+	anonymousImplicitUrlPathRegex?: string;
 
 	headerLogoUrl?: string;
 	footerLogoUrl?: string;

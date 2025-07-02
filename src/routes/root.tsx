@@ -30,6 +30,7 @@ import Loader from '@/components/loader';
 import {
 	AccountSourceId,
 	AnonymousAccountExpirationStrategyId,
+	Institution,
 	PageSiteLocationModel,
 	SITE_LOCATION_ID,
 	TopicCenterModel,
@@ -38,32 +39,22 @@ import { clearChunkLoadErrorStorage } from '@/lib/utils/error-utils';
 
 type AppRootLoaderData = Exclude<Awaited<ReturnType<typeof loader>>, Response>;
 
-const isUrlPathAcceptableForAnonymousImplicitAccountCreation = (urlPath = window.location.pathname) => {
-	// Check for /resource-library: match exactly or followed by a slash.
-	if (urlPath === '/resource-library' || urlPath.startsWith('/resource-library/')) {
-		return true;
+const isUrlPathAcceptableForAnonymousImplicitAccountCreation = (
+	institution: Institution,
+	url = window.location.href
+) => {
+	if (!institution.anonymousImplicitUrlPathRegex) return false;
+
+	try {
+		const origin = window.location.origin;
+		const relativeUrl = url.slice(origin.length); // includes pathname + search + hash
+		const regex = new RegExp(institution.anonymousImplicitUrlPathRegex);
+		return regex.test(relativeUrl);
+	} catch (e) {
+		console.log(`Unable to process regex '${institution.anonymousImplicitUrlPathRegex}' for input '${url}'`, e);
 	}
 
-	// Check for /group-sessions: match exactly or followed by a slash.
-	if (urlPath === '/group-sessions' || urlPath.startsWith('/group-sessions/')) {
-		return true;
-	}
-
-	// Check for /connect-with-support: match exactly or followed by a slash.
-	if (urlPath === '/connect-with-support' || urlPath.startsWith('/connect-with-support/')) {
-		return true;
-	}
-
-	// Check for /in-crisis: match exactly
-	if (urlPath === '/in-crisis') {
-		return true;
-	}
-
-	// Define the other prefixes that must be followed by something (i.e., they always end with a slash).
-	const prefixes = ['/pages/', '/community/', '/featured-topics/'];
-
-	// Check if path starts with any of these prefixes.
-	return prefixes.some((prefix) => urlPath.startsWith(prefix));
+	return false;
 };
 
 export function useAppRootLoaderData() {
@@ -118,7 +109,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 		if (
 			anonymousImplicitAccountSourceSupported &&
-			isUrlPathAcceptableForAnonymousImplicitAccountCreation(window.location.pathname)
+			isUrlPathAcceptableForAnonymousImplicitAccountCreation(
+				institutionResponse.institution,
+				window.location.href
+			)
 		) {
 			const createAnonymousImplicitAccountRequest = await accountService.createAnonymousAccount({
 				accountSourceId: AccountSourceId.ANONYMOUS_IMPLICIT,
