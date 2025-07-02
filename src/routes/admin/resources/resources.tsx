@@ -69,14 +69,7 @@ export const Component = () => {
 
 	const initialSearchValue = searchParams.get('search');
 	const [searchInputValue, setSearchInputValue] = useState(initialSearchValue);
-	const searchQuery = useMemo(() => {
-		if (typeof searchInputValue === 'string') {
-			return searchInputValue;
-		}
-
-		return initialSearchValue;
-	}, [initialSearchValue, searchInputValue]);
-	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchQuery);
+	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchInputValue);
 	const [showClearButton, setShowClearButton] = useState(false);
 
 	const fetchFilters = useCallback(async () => {
@@ -121,9 +114,7 @@ export const Component = () => {
 	}, [fetchContent]);
 
 	useEffect(() => {
-		if (initialSearchValue === debouncedSearchQuery) {
-			return;
-		}
+		searchParams.delete('page');
 
 		if (debouncedSearchQuery) {
 			searchParams.set('search', debouncedSearchQuery);
@@ -132,7 +123,8 @@ export const Component = () => {
 		}
 
 		setSearchParams(searchParams);
-	}, [debouncedSearchQuery, initialSearchValue, searchParams, setSearchParams]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [debouncedSearchQuery]);
 
 	const handlePaginationClick = (pageIndex: number) => {
 		// bandaid to set loading while other react-router-dom calls are resolving.
@@ -325,13 +317,14 @@ export const Component = () => {
 								style={{ width: 335 }}
 								placeholder="Search"
 								value={searchInputValue ?? ''}
-								onChange={(event) => {
-									setSearchInputValue(event.currentTarget.value);
+								onChange={({ currentTarget }) => {
+									setSearchInputValue(currentTarget.value);
 								}}
 								onClear={() => {
 									setSearchInputValue('');
 									setDebouncedSearchQuery('');
 									searchParams.delete('search');
+									searchParams.delete('page');
 									setSearchParams(searchParams);
 								}}
 							/>
