@@ -156,7 +156,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '40px 24px',
 		position: 'absolute',
 		transition: '200ms left',
-		backgroundColor: theme.colors.n75,
+		backgroundColor: theme.colors.n50,
 		'&.show': {
 			left: asideWidth,
 		},
