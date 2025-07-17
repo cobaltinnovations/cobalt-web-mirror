@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button, ButtonProps } from 'react-bootstrap';
 
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import classNames from 'classnames';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import { analyticsService } from '@/lib/services';
 import { AnalyticsNativeEventOverlayViewInCrisisSource, AnalyticsNativeEventTypeId } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 type InCrisisHeaderButtonProps = Omit<ButtonProps, 'onClick' | 'children'>;
 
@@ -33,7 +33,7 @@ const InCrisisHeaderButton = ({ className, ...buttonProps }: InCrisisHeaderButto
 			size="sm"
 			{...buttonProps}
 		>
-			<PhoneIcon height={20} width={20} className="me-1" />
+			<SvgIcon kit="fas" icon="phone" size={16} className="me-2" />
 			In Crisis?
 		</Button>
 	);
