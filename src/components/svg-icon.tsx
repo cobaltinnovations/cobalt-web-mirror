@@ -1,26 +1,14 @@
 import React from 'react';
-import { byPrefixAndName } from '@awesome.me/kit-c75e843088/icons';
+import { byPrefixAndName, IconName } from '@awesome.me/kit-c75e843088/icons';
 
-type SolidIconKey = keyof typeof byPrefixAndName.fas;
-type RegularIconKey = keyof typeof byPrefixAndName.far;
-
-type SvgIconProps =
-	| {
-			kit: 'fas';
-			icon: SolidIconKey;
-			title?: string;
-			size?: number | string;
-			className?: string;
-			style?: React.CSSProperties;
-	  }
-	| {
-			kit: 'far';
-			icon: RegularIconKey;
-			title?: string;
-			size?: number | string;
-			className?: string;
-			style?: React.CSSProperties;
-	  };
+type SvgIconProps = {
+	kit: string;
+	icon: IconName;
+	title?: string;
+	size?: number | string;
+	className?: string;
+	style?: React.CSSProperties;
+};
 
 const SvgIcon = ({ kit, icon, title, size, className, style }: SvgIconProps) => {
 	const iconPack = byPrefixAndName[kit];
