@@ -35,23 +35,6 @@ const ResourceLibraryDetail: FC = () => {
 				<title>Cobalt | Resource Library</title>
 			</Helmet>
 
-			{/* <Breadcrumb
-				breadcrumbs={[
-					{
-						to: '/',
-						title: 'Home',
-					},
-					{
-						to: '/resource-library',
-						title: 'Resource Library',
-					},
-					{
-						to: '/#',
-						title: item?.title ?? 'Content',
-					},
-				]}
-			/> */}
-
 			<AsyncPage fetchData={fetchData} loadingComponent={<ResourceDisplaySkeleton />}>
 				<ResourceDisplay trackView content={item} />
 			</AsyncPage>

@@ -203,42 +203,12 @@ const ResourceLibraryTopic = () => {
 			<AsyncPage
 				fetchData={fetchPageBlockingData}
 				loadingComponent={
-					<>
-						{/* <Breadcrumb
-							breadcrumbs={[
-								{
-									to: '/',
-									title: 'Home',
-								},
-								{
-									to: '/resource-library',
-									title: 'Resource Library',
-								},
-							]}
-						/> */}
-						<HeroContainer>
-							<SkeletonText type="h1" className="mb-4 text-center" width="50%" />
-							<SkeletonText type="p" className="mb-0 text-center fs-large" numberOfLines={3} />
-						</HeroContainer>
-					</>
+					<HeroContainer>
+						<SkeletonText type="h1" className="mb-4 text-center" width="50%" />
+						<SkeletonText type="p" className="mb-0 text-center fs-large" numberOfLines={3} />
+					</HeroContainer>
 				}
 			>
-				{/* <Breadcrumb
-					breadcrumbs={[
-						{
-							to: '/',
-							title: 'Home',
-						},
-						{
-							to: '/resource-library',
-							title: 'Resource Library',
-						},
-						{
-							to: `/resource-library/tag-groups/${tagGroup?.urlName}`,
-							title: tagGroup?.name ?? '',
-						},
-					]}
-				/> */}
 				<HeroContainer className={getBackgroundClassForColorId(tagGroup?.colorId)}>
 					<h1 className="mb-4 text-center">{tagGroup?.name}</h1>
 					<p className="mb-6 text-center fs-large">{tagGroup?.description}</p>
