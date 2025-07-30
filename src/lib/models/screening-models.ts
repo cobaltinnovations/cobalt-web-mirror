@@ -1,3 +1,5 @@
+import { AccountSource } from './institution';
+
 export interface ScreeningFlow {
 	screeningFlowId: string;
 	institutionId: string;
@@ -41,6 +43,7 @@ export interface ScreeningFlowVersion {
 	screeningFlowVersionId: string;
 	skippable: boolean;
 	versionNumber: number;
+	requiredAccountSources?: AccountSource[];
 }
 
 export enum ScreeningFlowTypeId {

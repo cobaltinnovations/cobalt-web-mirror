@@ -2,7 +2,6 @@ import React, { ReactNode, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
@@ -10,72 +9,9 @@ import { ReactComponent as DangerIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { ReactComponent as FlagDangerIcon } from '@/assets/icons/flag-danger.svg';
 
-const useStyles = createUseThemedStyles((theme) => ({
-	inlineAlert: {
-		padding: 16,
-		display: 'flex',
-		borderRadius: 4,
-		backgroundColor: theme.colors.n50,
-		border: `1px solid ${theme.colors.border}`,
-		'&--primary': {
-			backgroundColor: theme.colors.p50,
-			borderColor: theme.colors.p500,
-			'& svg': {
-				color: theme.colors.p500,
-			},
-		},
-		'&--secondary': {
-			backgroundColor: theme.colors.a50,
-			borderColor: theme.colors.a500,
-			'& svg': {
-				color: theme.colors.a500,
-			},
-		},
-		'&--success': {
-			backgroundColor: theme.colors.s50,
-			borderColor: theme.colors.s500,
-			'& svg': {
-				color: theme.colors.s500,
-			},
-		},
-		'&--warning': {
-			backgroundColor: theme.colors.w50,
-			borderColor: theme.colors.w500,
-			'& svg': {
-				color: theme.colors.w500,
-			},
-		},
-		'&--danger, &--flag-danger': {
-			backgroundColor: theme.colors.d50,
-			borderColor: theme.colors.d500,
-			'& svg': {
-				color: theme.colors.d500,
-			},
-		},
-		'&--info': {
-			backgroundColor: theme.colors.i50,
-			borderColor: theme.colors.i500,
-			'& svg': {
-				color: theme.colors.i500,
-			},
-		},
-		'&--attention': {
-			backgroundColor: theme.colors.t50,
-			borderColor: theme.colors.t500,
-			'& svg': {
-				color: theme.colors.t500,
-			},
-		},
-	},
-	iconOuter: {
-		width: 24,
-		flexShrink: 0,
-		marginRight: 16,
-	},
-	informationOuter: {
-		flex: 1,
-	},
-}));
+/* --------------------------------------------------------------- */
+/* inline alert styles were moved to the useGlobalStyles hook! */
+/* --------------------------------------------------------------- */
 
 interface InlineAlertAction {
 	title: string;
@@ -92,8 +28,6 @@ interface InlineAlertProps {
 }
 
 export const InlineAlert = ({ title, description, action, variant = 'info', className }: InlineAlertProps) => {
-	const classes = useStyles({});
-
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
 		return {
 			primary: <InfoIcon width={24} height={24} />,
@@ -119,15 +53,15 @@ export const InlineAlert = ({ title, description, action, variant = 'info', clas
 	return (
 		<div
 			className={classNames(
-				classes.inlineAlert,
+				'inline-alert',
 				{
-					[`${classes.inlineAlert}--${variant}`]: !!variant,
+					[`inline-alert--${variant}`]: !!variant,
 				},
 				className
 			)}
 		>
-			<div className={classes.iconOuter}>{variant && icon[variant]}</div>
-			<div className={classes.informationOuter}>
+			<div className="icon-outer">{variant && icon[variant]}</div>
+			<div className="information-outer">
 				<p
 					className={classNames('fs-large fw-semibold', {
 						'mb-0': !description && !action,

@@ -19,6 +19,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const myChartAccessToken = url.searchParams.get('myChartAccessToken');
 	const accountSourceId = url.searchParams.get('accountSourceId');
+	let forceDestination = url.searchParams.get('forceDestination');
+
+	// We might need to URL-decode the `forceDestionation` query parameter
+	if (forceDestination && forceDestination.includes('%')) {
+		forceDestination = decodeURIComponent(forceDestination);
+	}
 
 	let accessToken = url.searchParams.get('accessToken');
 
@@ -96,10 +102,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	// Only send an analytics event if this is a non-redundant invocation.
 	// Suppose we did not do this: there would then be duplicate analytics events fired for sign-in
 	if (!accessTokenAlreadyOnFile) {
+		let analyticsRedirectUrl = forceDestination
+			? forceDestination
+			: authRedirectUrl && authRedirectUrl !== '/'
+			? authRedirectUrl
+			: undefined;
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_IN, {
 			accountId: accountId,
-			redirectUrl: authRedirectUrl && authRedirectUrl !== '/' ? authRedirectUrl : undefined,
+			redirectUrl: analyticsRedirectUrl,
 		});
+	}
+
+	if (forceDestination) {
+		authRedirectUrl = forceDestination;
 	}
 
 	return {

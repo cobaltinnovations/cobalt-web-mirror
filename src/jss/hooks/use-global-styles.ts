@@ -389,5 +389,70 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				display: 'none',
 			},
 		},
+
+		'.inline-alert': {
+			padding: 16,
+			display: 'flex',
+			borderRadius: 4,
+			backgroundColor: theme.colors.n50,
+			border: `1px solid ${theme.colors.border}`,
+			'&--primary': {
+				backgroundColor: theme.colors.p50,
+				borderColor: theme.colors.p500,
+				'& svg': {
+					color: theme.colors.p500,
+				},
+			},
+			'&--secondary': {
+				backgroundColor: theme.colors.a50,
+				borderColor: theme.colors.a500,
+				'& svg': {
+					color: theme.colors.a500,
+				},
+			},
+			'&--success': {
+				backgroundColor: theme.colors.s50,
+				borderColor: theme.colors.s500,
+				'& svg': {
+					color: theme.colors.s500,
+				},
+			},
+			'&--warning': {
+				backgroundColor: theme.colors.w50,
+				borderColor: theme.colors.w500,
+				'& svg': {
+					color: theme.colors.w500,
+				},
+			},
+			'&--danger, &--flag-danger': {
+				backgroundColor: theme.colors.d50,
+				borderColor: theme.colors.d500,
+				'& svg': {
+					color: theme.colors.d500,
+				},
+			},
+			'&--info': {
+				backgroundColor: theme.colors.i50,
+				borderColor: theme.colors.i500,
+				'& svg': {
+					color: theme.colors.i500,
+				},
+			},
+			'&--attention': {
+				backgroundColor: theme.colors.t50,
+				borderColor: theme.colors.t500,
+				'& svg': {
+					color: theme.colors.t500,
+				},
+			},
+			'& .icon-outer': {
+				width: 24,
+				flexShrink: 0,
+				marginRight: 16,
+			},
+			'& .information-outer': {
+				flex: 1,
+			},
+		},
 	},
 }));
