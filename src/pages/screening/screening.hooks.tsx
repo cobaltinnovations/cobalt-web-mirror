@@ -335,7 +335,11 @@ export function useScreeningFlow({
 			throw new Error('Unknown Active Flow Version');
 		}
 
-		if (activeFlowVersion.requiredAccountSources && account?.accountSourceId) {
+		if (
+			activeFlowVersion.requiredAccountSources &&
+			activeFlowVersion.requiredAccountSources.length > 0 &&
+			account?.accountSourceId
+		) {
 			const currentAccountSourceId = account.accountSourceId;
 			const availableAccountSourceIds = activeFlowVersion.requiredAccountSources.map((as) => as.accountSourceId);
 			const accountSourceIdIsValid = availableAccountSourceIds.includes(currentAccountSourceId);
