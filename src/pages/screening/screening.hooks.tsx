@@ -326,36 +326,50 @@ export function useScreeningFlow({
 		[createScreeningSession, disabled, hasIncompleteScreening, resumeScreeningSession]
 	);
 
-	const startScreeningFlow = useCallback(async () => {
-		if (disabled) {
-			throw new Error('Screening Flow is disabled');
-		}
-
-		if (!activeFlowVersion) {
-			throw new Error('Unknown Active Flow Version');
-		}
-
-		if (
-			activeFlowVersion.requiredAccountSources &&
-			activeFlowVersion.requiredAccountSources.length > 0 &&
-			account?.accountSourceId
-		) {
-			const currentAccountSourceId = account.accountSourceId;
-			const availableAccountSourceIds = activeFlowVersion.requiredAccountSources.map((as) => as.accountSourceId);
-			const accountSourceIdIsValid = availableAccountSourceIds.includes(currentAccountSourceId);
-
-			if (!accountSourceIdIsValid) {
-				setShowAccountSourcesModal(true);
-				return;
+	const startScreeningFlow = useCallback(
+		async (forceCreate?: boolean) => {
+			if (disabled) {
+				throw new Error('Screening Flow is disabled');
 			}
-		}
 
-		if (activeFlowVersion.phoneNumberRequired) {
-			setShowPhoneModal(true);
-		} else {
-			resumeOrCreateScreeningSession();
-		}
-	}, [account?.accountSourceId, activeFlowVersion, disabled, resumeOrCreateScreeningSession]);
+			if (!activeFlowVersion) {
+				throw new Error('Unknown Active Flow Version');
+			}
+
+			if (
+				activeFlowVersion.requiredAccountSources &&
+				activeFlowVersion.requiredAccountSources.length > 0 &&
+				account?.accountSourceId
+			) {
+				const currentAccountSourceId = account.accountSourceId;
+				const availableAccountSourceIds = activeFlowVersion.requiredAccountSources.map(
+					(as) => as.accountSourceId
+				);
+				const accountSourceIdIsValid = availableAccountSourceIds.includes(currentAccountSourceId);
+
+				if (!accountSourceIdIsValid) {
+					setShowAccountSourcesModal(true);
+					return;
+				}
+			}
+
+			if (activeFlowVersion.phoneNumberRequired) {
+				setShowPhoneModal(true);
+			} else {
+				if (forceCreate) {
+					if (disabled) {
+						throw new Error('Screening Flow is disabled');
+					}
+
+					createScreeningSession();
+					return;
+				}
+
+				resumeOrCreateScreeningSession();
+			}
+		},
+		[account?.accountSourceId, activeFlowVersion, createScreeningSession, disabled, resumeOrCreateScreeningSession]
+	);
 
 	const startScreeningFlowIfNoneCompleted = useCallback(async () => {
 		if (disabled) {
