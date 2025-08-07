@@ -838,6 +838,11 @@ export const routes: RouteObject[] = [
 						element: <RedirectToCurrentFeaturedTopic />,
 					},
 					{
+						id: 'page-detail-about',
+						path: 'about',
+						lazy: () => import('@/routes/about'),
+					},
+					{
 						id: 'page-detail',
 						path: 'pages/:urlName',
 						lazy: () => import('@/routes/page-detail'),
