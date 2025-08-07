@@ -250,7 +250,7 @@ const Index: FC = () => {
 					{showFeatureScreeningCta && (
 						<FeatureScreeningCta
 							onStartAssessment={() => {
-								startScreeningFlow();
+								startScreeningFlow(true);
 								trackEvent({
 									action: 'HP Take Assessment',
 								});
