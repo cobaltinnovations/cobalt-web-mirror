@@ -26,8 +26,6 @@ import {
 } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
-import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { analyticsService, integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
@@ -39,6 +37,7 @@ import InlineAlert from '@/components/inline-alert';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
 import useFlags from '@/hooks/use-flags';
 import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -445,10 +444,12 @@ const ScreeningResultCard = ({ screening, id }: { screening: ScreeningSessionScr
 						)}
 					</p>
 					{(screening.belowScoringThreshold === undefined || screening.belowScoringThreshold === null) && (
-						<NaIcon className="text-gray" />
+						<SvgIcon kit="far" icon="face-meh" className="text-gray" />
 					)}
 					{screening.belowScoringThreshold === false && <DissatisfiedIcon className="text-danger" />}
-					{screening.belowScoringThreshold === true && <SatisfiedIcon className="text-success" />}
+					{screening.belowScoringThreshold === true && (
+						<SvgIcon kit="far" icon="face-smile" className="text-success" />
+					)}
 				</div>
 			</Card.Header>
 			{screening.screeningQuestionResults && (
