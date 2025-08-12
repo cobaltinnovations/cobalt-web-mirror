@@ -106,16 +106,24 @@ interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
 	imageName?: string;
 	onSave(blob: Blob, fileName: string): void;
+	cropImage?: boolean;
 }
 
-const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, imageName, onSave, onHide, ...props }) => {
+const SessionCropModal: FC<SessionCropModalProps> = ({
+	cropImage = true,
+	imageSource,
+	imageName,
+	onSave,
+	onHide,
+	...props
+}) => {
 	useTrackModalView('SessionCropModal', props.show);
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
 	const [crop, setCrop] = useState<ReactCrop.Crop>({
 		width: 90,
-		aspect: 16 / 9,
+		...(cropImage && { aspect: 16 / 9 }),
 		unit: '%' as '%',
 	});
 	const [isDragging, setIsDragging] = useState(false);
@@ -164,10 +172,10 @@ const SessionCropModal: FC<SessionCropModalProps> = ({ imageSource, imageName, o
 	const handleEntered = useCallback(() => {
 		setCrop({
 			width: 90,
-			aspect: 16 / 9,
+			...(cropImage && { aspect: 16 / 9 }),
 			unit: '%' as '%',
 		});
-	}, []);
+	}, [cropImage]);
 
 	const handleHide = useCallback(() => {
 		if (isDragging) {

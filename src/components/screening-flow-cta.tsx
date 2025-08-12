@@ -46,7 +46,9 @@ const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 					size="lg"
 					variant={buttonVariant ?? 'primary'}
 					className="d-inline-flex align-items-center"
-					onClick={startScreeningFlow}
+					onClick={() => {
+						startScreeningFlow();
+					}}
 				>
 					<AssessmentIcon className="me-2" />
 					Take the Assessment

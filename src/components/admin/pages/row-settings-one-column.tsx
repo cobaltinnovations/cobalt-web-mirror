@@ -182,6 +182,7 @@ export const RowSettingsOneColumn = () => {
 								filename: name,
 							}).fetch;
 						}}
+						cropImage={false}
 					/>
 					<InputHelper
 						type="text"

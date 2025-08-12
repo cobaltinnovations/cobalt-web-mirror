@@ -25,7 +25,8 @@ type AccountContextConfig = {
 	isIntegratedCareStaff: boolean;
 	signOutAndClearContext: (
 		source: AnalyticsNativeEventAccountSignedOutSource,
-		supplementalData: Record<string, any>
+		supplementalData: Record<string, any>,
+		ignoreRedirect?: boolean
 	) => void;
 };
 
@@ -41,7 +42,11 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 	const { accountId, institutionResponse, accountResponse } = useAppRootLoaderData();
 
 	const signOutAndClearContext = useCallback(
-		async (source: AnalyticsNativeEventAccountSignedOutSource, supplementalData: Record<string, any> = {}) => {
+		async (
+			source: AnalyticsNativeEventAccountSignedOutSource,
+			supplementalData: Record<string, any> = {},
+			ignoreRedirect?: boolean
+		) => {
 			Cookies.remove('accessToken');
 			Cookies.remove('accountId');
 			Cookies.remove('roleId');
@@ -85,6 +90,10 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 				// Fail silently and just log the user out normally
 				console.warn('Encountered issue during sign-out', error);
 			} finally {
+				if (ignoreRedirect) {
+					return;
+				}
+
 				const url = new URL(window.location.href);
 				url.pathname = '/sign-in';
 				url.search = '';

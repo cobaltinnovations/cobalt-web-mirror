@@ -238,7 +238,9 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 										<Button
 											variant="link"
 											className="ms-1 p-0 fw-normal"
-											onClick={startScreeningFlow}
+											onClick={() => {
+												startScreeningFlow();
+											}}
 										>
 											Retake the assessment
 										</Button>

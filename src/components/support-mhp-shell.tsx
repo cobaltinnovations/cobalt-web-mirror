@@ -127,7 +127,7 @@ export const SupportMentalHealthProvidersShell = ({
 										{
 											variant: 'primary',
 											title: connectedCta,
-											onClick: startScreeningFlow,
+											onClick: () => startScreeningFlow(),
 										},
 									]}
 								/>

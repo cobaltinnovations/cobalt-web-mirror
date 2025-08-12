@@ -81,18 +81,14 @@ const ScreeningQuestionsPage = () => {
 
 			const selections: ScreeningAnswerSelection[] = [
 				...submission.answers.map((screeningAnswerOptionId) => {
-					const answer: ScreeningAnswerSelection = {
+					return {
 						screeningAnswerOptionId,
+						...(submission.supplementText[screeningAnswerOptionId] && {
+							text: submission.supplementText[screeningAnswerOptionId],
+						}),
 					};
-
-					const answerText = submission.supplementText[screeningAnswerOptionId];
-
-					if (answerText) {
-						answer.text = answerText;
-					}
-
-					return answer;
 				}),
+
 				// answers to text questions
 				...Object.entries(submission.answerText)
 					.filter(([_, text]) => !!text)
@@ -101,7 +97,25 @@ const ScreeningQuestionsPage = () => {
 						text,
 					})),
 			];
-			const submit = screeningService.answerQuestion(screeningQuestionContextId, selections, submission.force);
+
+			// seems like freeform text input answers get duplicated when previously answers
+			// this selectionsMap stuff de-dups then and chooses the one with text, if it exists
+			const selectionsMap = new Map<string, ScreeningAnswerSelection>();
+			for (const item of selections) {
+				const existing = selectionsMap.get(item.screeningAnswerOptionId);
+				// if we haven’t stored this id yet, or the new item has text while
+				// the stored one doesn’t, overwrite
+				if (!existing || (item.text !== undefined && existing.text === undefined)) {
+					selectionsMap.set(item.screeningAnswerOptionId, item);
+				}
+			}
+			const selectionsArray = Array.from(selectionsMap.values());
+
+			const submit = screeningService.answerQuestion(
+				screeningQuestionContextId,
+				selectionsArray,
+				submission.force
+			);
 
 			setIsSubmitting(true);
 			submit
@@ -417,17 +431,29 @@ const ScreeningQuestionsPage = () => {
 	const disableNextBtn = useMemo(() => {
 		if (!screeningQuestionContextResponse) {
 			return isSubmitting;
-		} else if (
+		}
+
+		if (
 			screeningQuestionContextResponse.screeningQuestion.screeningAnswerFormatId ===
 			ScreeningAnswerFormatId.FREEFORM_TEXT
 		) {
+			if (
+				screeningQuestionContextResponse.screeningQuestion.screeningAnswerContentHintId ===
+					ScreeningAnswerContentHintId.PHONE_NUMBER &&
+				confirmationPrompt
+			) {
+				return false;
+			}
+
 			return (
 				isSubmitting ||
 				// the user has filled inputs for all available options
 				Object.values(answerText).filter(Boolean).length !==
 					screeningQuestionContextResponse.screeningAnswerOptions.length
 			);
-		} else if (typeof screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount !== 'number') {
+		}
+
+		if (typeof screeningQuestionContextResponse.screeningQuestion.minimumAnswerCount !== 'number') {
 			return (
 				isSubmitting ||
 				(!confirmationPrompt &&
@@ -576,7 +602,7 @@ const ScreeningQuestionsPage = () => {
 
 										{screeningQuestionContextResponse?.screeningQuestion.footerText && (
 											<div
-												className="mt-3 mb-5 wysiwyg-display"
+												className="mt-3 mb-5"
 												dangerouslySetInnerHTML={{
 													__html: screeningQuestionContextResponse?.screeningQuestion
 														.footerText,

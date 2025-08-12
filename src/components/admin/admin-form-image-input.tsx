@@ -11,6 +11,7 @@ export interface AdminFormImageInputProps {
 	presignedUploadGetter: (blob: Blob, name: string) => () => Promise<PresignedUploadResponse>;
 	className?: string;
 	onUploadComplete?(fileUploadId: string): void;
+	cropImage?: boolean;
 }
 
 export const AdminFormImageInput = ({
@@ -19,6 +20,7 @@ export const AdminFormImageInput = ({
 	presignedUploadGetter,
 	className,
 	onUploadComplete,
+	cropImage = true,
 }: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -40,6 +42,7 @@ export const AdminFormImageInput = ({
 	return (
 		<>
 			<SessionCropModal
+				cropImage={cropImage}
 				imageName={sessionCropModalImageConfig.name}
 				imageSource={sessionCropModalImageConfig.source}
 				show={isCropModalOpen}

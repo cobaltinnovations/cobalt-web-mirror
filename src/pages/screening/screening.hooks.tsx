@@ -1,7 +1,6 @@
-import CollectPhoneModal from '@/components/collect-phone-modal';
-import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
-import useAnalytics from '@/hooks/use-analytics';
-import useHandleError from '@/hooks/use-handle-error';
+import Cookies from 'js-cookie';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import {
 	ScreeningFlowVersion,
 	ScreeningSession,
@@ -9,12 +8,15 @@ import {
 	ScreeningSessionDestinationId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
-import React, { useMemo } from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
+import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
+import useAnalytics from '@/hooks/use-analytics';
+import useHandleError from '@/hooks/use-handle-error';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
-import Cookies from 'js-cookie';
 import Loader from '@/components/loader';
+import CollectPhoneModal from '@/components/collect-phone-modal';
+import AccountSourcesModal from '@/components/account-sources-modal';
+import useAccount from '@/hooks/use-account';
+import useAccountSourceClickHandler from '@/hooks/use-account-source-click-handler';
 
 export function useScreeningNavigation() {
 	const navigate = useNavigate();
@@ -224,6 +226,10 @@ export function useScreeningFlow({
 	const [isCreatingScreeningSession, setIsCreatingScreeningSession] = useState(false);
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
 
+	const handleAccountSourceClick = useAccountSourceClickHandler();
+	const { account } = useAccount();
+	const [showAccountSourcesModal, setShowAccountSourcesModal] = useState(false);
+
 	const incompleteSessions = useMemo(() => {
 		return screeningSessions.filter((session) => !session.completed);
 	}, [screeningSessions]);
@@ -320,21 +326,50 @@ export function useScreeningFlow({
 		[createScreeningSession, disabled, hasIncompleteScreening, resumeScreeningSession]
 	);
 
-	const startScreeningFlow = useCallback(async () => {
-		if (disabled) {
-			throw new Error('Screening Flow is disabled');
-		}
+	const startScreeningFlow = useCallback(
+		async (forceCreate?: boolean) => {
+			if (disabled) {
+				throw new Error('Screening Flow is disabled');
+			}
 
-		if (!activeFlowVersion) {
-			throw new Error('Unknown Active Flow Version');
-		}
+			if (!activeFlowVersion) {
+				throw new Error('Unknown Active Flow Version');
+			}
 
-		if (activeFlowVersion.phoneNumberRequired) {
-			setShowPhoneModal(true);
-		} else {
-			resumeOrCreateScreeningSession();
-		}
-	}, [activeFlowVersion, disabled, resumeOrCreateScreeningSession]);
+			if (
+				activeFlowVersion.requiredAccountSources &&
+				activeFlowVersion.requiredAccountSources.length > 0 &&
+				account?.accountSourceId
+			) {
+				const currentAccountSourceId = account.accountSourceId;
+				const availableAccountSourceIds = activeFlowVersion.requiredAccountSources.map(
+					(as) => as.accountSourceId
+				);
+				const accountSourceIdIsValid = availableAccountSourceIds.includes(currentAccountSourceId);
+
+				if (!accountSourceIdIsValid) {
+					setShowAccountSourcesModal(true);
+					return;
+				}
+			}
+
+			if (activeFlowVersion.phoneNumberRequired) {
+				setShowPhoneModal(true);
+			} else {
+				if (forceCreate) {
+					if (disabled) {
+						throw new Error('Screening Flow is disabled');
+					}
+
+					createScreeningSession();
+					return;
+				}
+
+				resumeOrCreateScreeningSession();
+			}
+		},
+		[account?.accountSourceId, activeFlowVersion, createScreeningSession, disabled, resumeOrCreateScreeningSession]
+	);
 
 	const startScreeningFlowIfNoneCompleted = useCallback(async () => {
 		if (disabled) {
@@ -438,6 +473,21 @@ export function useScreeningFlow({
 		/>
 	);
 
+	const renderedAccountSourcesModal = (
+		<>
+			{activeFlowVersion?.requiredAccountSources && (
+				<AccountSourcesModal
+					accountSources={activeFlowVersion.requiredAccountSources}
+					onAccountSourceClick={handleAccountSourceClick}
+					show={showAccountSourcesModal}
+					onHide={() => {
+						setShowAccountSourcesModal(false);
+					}}
+				/>
+			)}
+		</>
+	);
+
 	// used to block render/ui until flowVersion/completion-state is resolved
 	const renderedPreScreeningLoader =
 		disabled || didCheckScreeningSessions ? null : (
@@ -452,6 +502,7 @@ export function useScreeningFlow({
 		hasCompletedScreening,
 		renderedCollectPhoneModal,
 		renderedPreScreeningLoader,
+		renderedAccountSourcesModal,
 		startScreeningFlow,
 		createScreeningSession,
 		resumeScreeningSession,

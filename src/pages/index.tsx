@@ -80,7 +80,8 @@ const Index: FC = () => {
 		instantiateOnLoad: false,
 		disabled: !institution?.featuresEnabled,
 	});
-	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = featuresScreeningFlow;
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedAccountSourcesModal, renderedPreScreeningLoader } =
+		featuresScreeningFlow;
 
 	const checkScreenFlowStatus = useCallback(async () => {
 		if (!institution?.recommendedContentEnabled || !institution?.contentScreeningFlowId) {
@@ -220,6 +221,7 @@ const Index: FC = () => {
 			{institution?.featuresEnabled ? (
 				<>
 					{renderedCollectPhoneModal}
+					{renderedAccountSourcesModal}
 
 					<Container className="pt-16 pt-lg-24 pb-16">
 						<Row>
@@ -248,7 +250,7 @@ const Index: FC = () => {
 					{showFeatureScreeningCta && (
 						<FeatureScreeningCta
 							onStartAssessment={() => {
-								startScreeningFlow();
+								startScreeningFlow(true);
 								trackEvent({
 									action: 'HP Take Assessment',
 								});
