@@ -76,7 +76,7 @@ export const DraggableItem = ({
 			{...draggableProvided.draggableProps}
 		>
 			<div className={classes.handleOuter} {...draggableProvided.dragHandleProps}>
-				<SvgIcon kit="far" icon="grip-lines" size={24} className="text-gray" />
+				<SvgIcon kit="fas" icon="grip-lines" size={24} className="text-gray" />
 			</div>
 			{onClick ? (
 				<button type="button" className={classes.sectionButton} onClick={onClick}>

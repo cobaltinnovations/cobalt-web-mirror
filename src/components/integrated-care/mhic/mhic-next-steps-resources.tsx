@@ -274,7 +274,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																{...draggableProvided.dragHandleProps}
 															>
 																<SvgIcon
-																	kit="far"
+																	kit="fas"
 																	icon="grip-lines"
 																	size={24}
 																	className="text-gray"
