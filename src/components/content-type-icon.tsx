@@ -1,12 +1,7 @@
 import React from 'react';
 import { ContentTypeId } from '@/lib/models';
 
-import { ReactComponent as AppIcon } from '@/assets/icons/icon-app.svg';
-import { ReactComponent as ArticleIcon } from '@/assets/icons/icon-article.svg';
-import { ReactComponent as AudioIcon } from '@/assets/icons/icon-audio.svg';
-import { ReactComponent as PodcastIcon } from '@/assets/icons/icon-podcast.svg';
-import { ReactComponent as VideoIcon } from '@/assets/icons/icon-video.svg';
-import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
+import SvgIcon from './svg-icon';
 
 interface Props extends React.SVGProps<SVGSVGElement> {
 	contentTypeId: ContentTypeId;
@@ -16,19 +11,19 @@ interface Props extends React.SVGProps<SVGSVGElement> {
 const ContentTypeIcon = ({ contentTypeId, ...props }: Props) => {
 	switch (contentTypeId) {
 		case ContentTypeId.APP:
-			return <AppIcon {...props} />;
+			return <SvgIcon kit="far" icon="mobile" size={16} {...props} />;
 		case ContentTypeId.ARTICLE:
 		case ContentTypeId.EXT_BLOG:
 		case ContentTypeId.INT_BLOG:
-			return <ArticleIcon {...props} />;
+			return <SvgIcon kit="far" icon="newspaper" size={16} {...props} />;
 		case ContentTypeId.AUDIO:
-			return <AudioIcon {...props} />;
+			return <SvgIcon kit="far" icon="volume" size={16} {...props} />;
 		case ContentTypeId.PODCAST:
-			return <PodcastIcon {...props} />;
+			return <SvgIcon kit="far" icon="podcast" size={16} {...props} />;
 		case ContentTypeId.VIDEO:
-			return <VideoIcon {...props} />;
+			return <SvgIcon kit="far" icon="video" size={16} {...props} />;
 		case ContentTypeId.WORKSHEET:
-			return <WorksheetIcon {...props} />;
+			return <SvgIcon kit="far" icon="clipboard-check" size={16} {...props} />;
 		default:
 			return null;
 	}
