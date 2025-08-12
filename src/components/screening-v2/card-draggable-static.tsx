@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
+import SvgIcon from '../svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
@@ -36,7 +36,7 @@ export const CardDraggableStatic = ({ cardText, className }: CardDraggableStatic
 		<div className={classNames(classes.cardDraggable, className)}>
 			<p className="text-center">{cardText}</p>
 			<div className={classes.dragHandleOuter}>
-				<DragIndicator className="text-gray" />
+				<SvgIcon kit="far" icon="grip-lines" size={24} className="text-gray" />
 			</div>
 		</div>
 	);
