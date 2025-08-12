@@ -25,7 +25,6 @@ import {
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { analyticsService, integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
@@ -444,7 +443,7 @@ const ScreeningResultCard = ({ screening, id }: { screening: ScreeningSessionScr
 						)}
 					</p>
 					{(screening.belowScoringThreshold === undefined || screening.belowScoringThreshold === null) && (
-						<NaIcon className="text-gray" />
+						<SvgIcon kit="far" icon="face-meh" className="text-gray" />
 					)}
 					{screening.belowScoringThreshold === false && (
 						<SvgIcon kit="far" icon="face-frown-slight" className="text-danger" />

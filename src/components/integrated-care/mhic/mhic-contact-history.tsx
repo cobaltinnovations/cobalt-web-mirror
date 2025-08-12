@@ -33,8 +33,8 @@ import { ReactComponent as EnvelopeIcon } from '@/assets/icons/icon-mail.svg';
 
 import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { ReactComponent as SearchCloseIcon } from '@/assets/icons/icon-search-close.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -143,7 +143,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 					) : showErrorIcon ? (
 						<FlagDanger className="text-danger" />
 					) : (
-						<NaIcon />
+						<SvgIcon kit="far" icon="face-meh" />
 					),
 					title: `${messageEnqueued ? '' : 'Sent'} ${
 						msg.patientOrderScheduledMessageTypeDescription
@@ -217,7 +217,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 							<SearchCloseIcon className="text-n300" />
 						</div>
 					) : (
-						<NaIcon />
+						<SvgIcon kit="far" icon="face-meh" />
 					),
 				title: outreachResult?.patientOrderOutreachResultTypeDescription ?? '',
 				descriptionHtml: outreach.note,
