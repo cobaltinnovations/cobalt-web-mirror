@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { ScreeningImageId } from '@/lib/models';
 import { ReactComponent as Appointment } from '@/assets/screening-images/appointment.svg';
 import { ReactComponent as ConnectedToCare } from '@/assets/screening-images/connected-to-care.svg';
 import { ReactComponent as ConnectingToCare } from '@/assets/screening-images/connecting-to-care.svg';
@@ -12,9 +12,15 @@ import { ReactComponent as Safety } from '@/assets/screening-images/safety.svg';
 import { ReactComponent as ScreeningComplete } from '@/assets/screening-images/screening-complete.svg';
 import { ReactComponent as ScreeningToDo } from '@/assets/screening-images/screening-to-do.svg';
 import { ReactComponent as Welcome } from '@/assets/screening-images/welcome.svg';
-import { ScreeningImageId } from '@/lib/models';
 
-const idImageMap = {
+const idImageMap: Record<
+	ScreeningImageId,
+	React.FunctionComponent<
+		React.SVGProps<SVGSVGElement> & {
+			title?: string;
+		}
+	>
+> = {
 	[ScreeningImageId.Appointment]: Appointment,
 	[ScreeningImageId.ConnectedToCare]: ConnectedToCare,
 	[ScreeningImageId.ConnectingToCare]: ConnectingToCare,
@@ -22,12 +28,14 @@ const idImageMap = {
 	[ScreeningImageId.Goals]: Goals,
 	[ScreeningImageId.KeepGoing]: KeepGoing,
 	[ScreeningImageId.NextAppointmentScheduled]: NextAppointmentScheduled,
+	[ScreeningImageId.PeoplePuzzle]: Safety,
 	[ScreeningImageId.Resources]: Resources,
 	[ScreeningImageId.Safety]: Safety,
 	[ScreeningImageId.ScreeningComplete]: ScreeningComplete,
 	[ScreeningImageId.ScreeningToDo]: ScreeningToDo,
 	[ScreeningImageId.Welcome]: Welcome,
 };
+
 interface ScreeningPromptImageProps extends React.SVGProps<SVGSVGElement> {
 	screeningImageId: ScreeningImageId;
 }
