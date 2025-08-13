@@ -29,7 +29,7 @@ const InCrisisModal: FC<InCrisisModalProps> = ({ isCall, ...modalProps }) => {
 				<Modal.Title>&nbsp;</Modal.Title>
 			</Modal.Header>
 			<Modal.Body className="pt-2 pb-8">
-				<h3 className="mb-4">If you are in crisis</h3>
+				<h3 className="mb-4">If you are in crisis:</h3>
 				<h5 className={isCall ? 'mb-4' : 'mb-8'}>
 					Contact one of the listed resources or go to your nearest emergency department or crisis center.
 				</h5>
