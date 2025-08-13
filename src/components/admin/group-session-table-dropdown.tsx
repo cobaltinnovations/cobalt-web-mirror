@@ -5,10 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
+import SvgIcon from '../svg-icon';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
@@ -62,7 +62,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						as={Link}
 						to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
 					>
-						<EditIcon className="me-2 text-n500" width={24} height={24} />
+						<EditIcon className="me-2 text-n500" width={20} height={20} />
 						Edit
 					</Dropdown.Item>
 				)}
@@ -72,7 +72,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						as={Link}
 						to={`/admin/group-sessions/duplicate/${groupSession.groupSessionId}`}
 					>
-						<CopyIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="clone" size={20} className="me-2 text-n500" />
 						Duplicate
 					</Dropdown.Item>
 				)}
@@ -84,7 +84,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						target="_blank"
 						to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
 					>
-						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+						<ExternalIcon className="me-2 text-n500" width={20} height={20} />
 						Preview
 					</Dropdown.Item>
 				)}
@@ -98,7 +98,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						}}
 						target="_blank"
 					>
-						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+						<ExternalIcon className="me-2 text-n500" width={20} height={20} />
 						View on Cobalt
 					</Dropdown.Item>
 				)}
@@ -113,7 +113,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							});
 						}}
 					>
-						<GroupSessionsIcon className="me-2 text-n500" width={24} height={24} />
+						<GroupSessionsIcon className="me-2 text-n500" width={20} height={20} />
 						View Registrants
 					</Dropdown.Item>
 				)}
@@ -127,7 +127,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onCancel(groupSession.groupSessionId);
 						}}
 					>
-						<XCloseIcon className="me-2 text-n500" width={24} height={24} />
+						<XCloseIcon className="me-2 text-n500" width={20} height={20} />
 						Cancel
 					</Dropdown.Item>
 				)}
@@ -138,7 +138,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onDelete(groupSession.groupSessionId);
 						}}
 					>
-						<DeleteIcon className="me-2 text-n500" width={24} height={24} />
+						<DeleteIcon className="me-2 text-n500" width={20} height={20} />
 						Delete
 					</Dropdown.Item>
 				)}

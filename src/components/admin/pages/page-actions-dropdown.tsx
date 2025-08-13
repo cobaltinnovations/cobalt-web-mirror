@@ -7,10 +7,10 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface PageActionsDropdownProps {
 	page: PageDetailModel;
@@ -43,7 +43,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 						onDuplicate(page);
 					}}
 				>
-					<CopyIcon className="me-2 text-n500" width={20} height={20} />
+					<SvgIcon kit="far" icon="clone" size={20} className="me-2 text-n500" />
 					Duplicate
 				</Dropdown.Item>
 				<Dropdown.Divider />

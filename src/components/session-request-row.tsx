@@ -6,9 +6,9 @@ import SessionDropdown from '@/components/session-dropdown';
 
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
+import SvgIcon from './svg-icon';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as AddIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { Link } from 'react-router-dom';
@@ -123,7 +123,14 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(session.groupSessionRequestStatusId === SESSION_STATUS.ARCHIVED
 								? [
 										{
-											icon: <CopyIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon
+													kit="far"
+													icon="clone"
+													size={20}
+													className={classes.iconPath}
+												/>
+											),
 											title: 'Unarchive',
 											onClick: () => {
 												onUnarchiveClick(session.groupSessionRequestId);
