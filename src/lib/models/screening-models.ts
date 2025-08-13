@@ -171,6 +171,7 @@ export enum ScreeningImageId {
 	ScreeningComplete = 'SCREENING_COMPLETE',
 	ScreeningToDo = 'SCREENING_TO_DO',
 	Welcome = 'WELCOME',
+	PeoplePuzzle = 'PEOPLE_PUZZLE',
 }
 
 export interface ScreeningConfirmationPrompt {
