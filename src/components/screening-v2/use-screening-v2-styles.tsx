@@ -65,7 +65,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 					transform: 'translate(0, -50%) rotate(180deg)',
 				},
 			},
-			'&:focus': {
+			'&:focus-visible': {
 				outline: 'none',
 				boxShadow: `0 0 0 4px ${Color(theme.colors.p500).alpha(0.24).string()}`,
 			},
@@ -139,7 +139,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 						},
 					},
 				},
-				'&:focus': {
+				'&:focus-visible': {
 					'& + label': {
 						outline: 'none',
 						boxShadow: `0 0 0 4px ${Color(theme.colors.p500).alpha(0.24).string()}`,
