@@ -7,8 +7,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
-import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	displaySingleColumn?: boolean;
@@ -225,7 +225,7 @@ function MegaFilter({
 					setShow(true);
 				}}
 			>
-				{displayFilterIcon && <FilterIcon className="me-2" width={20} height={20} />}
+				{displayFilterIcon && <SvgIcon kit="fas" icon="bars-filter" size={16} className="me-2" />}
 				<span>{buttonTitle}</span>
 				{displayCount && activeLength > 0 && <span>&nbsp;&bull; {activeLength}</span>}
 				{displayDownArrow && <ArrowDown className="ms-1" width={24} height={24} />}

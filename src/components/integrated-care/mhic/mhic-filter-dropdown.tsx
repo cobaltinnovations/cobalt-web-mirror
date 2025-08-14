@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
-import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
@@ -22,6 +21,7 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 enum FilterTypeId {
 	SELECT = 'SELECT',
@@ -246,7 +246,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>
-				<FilterIcon className="me-2" />
+				<SvgIcon kit="fas" icon="bars-filter" size={16} className="me-2" />
 				<span>Filter</span>
 			</Dropdown.Toggle>
 			<Dropdown.Menu
