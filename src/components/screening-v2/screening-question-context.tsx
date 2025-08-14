@@ -358,14 +358,14 @@ export const ScreeningQuestionContext = ({
 										<p className="mb-2">{screeningQuestionContext.screeningQuestion.introText}</p>
 									)}
 
-									<h2
+									<h3
 										className={classNames({
 											'mb-2': screeningQuestionContext.screeningQuestion.supplementText,
 											'mb-8': !screeningQuestionContext.screeningQuestion.supplementText,
 										})}
 									>
 										{screeningQuestionContext.screeningQuestion.questionText}
-									</h2>
+									</h3>
 
 									{screeningQuestionContext.screeningQuestion.supplementText && (
 										<p className="mb-6">

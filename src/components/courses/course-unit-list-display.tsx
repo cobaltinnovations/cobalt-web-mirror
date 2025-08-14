@@ -9,14 +9,14 @@ import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg
 import { ReactComponent as VideoIcon } from '@/assets/icons/icon-video.svg';
 import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
 
-const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.Element> = {
-	CARD_SORT: (size) => <WorksheetIcon width={size} height={size} />,
-	HOMEWORK: (size) => <ResourceIcon width={size} height={size} />,
-	INFOGRAPHIC: (size) => <ResourceIcon width={size} height={size} />,
-	QUIZ: (size) => <WorksheetIcon width={size} height={size} />,
-	REORDER: (size) => <WorksheetIcon width={size} height={size} />,
-	THINGS_TO_SHARE: (size) => <ResourceIcon width={size} height={size} />,
-	VIDEO: (size) => <VideoIcon width={size} height={size} />,
+const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number, className?: string) => JSX.Element> = {
+	CARD_SORT: (size, className?: string) => <WorksheetIcon width={size} height={size} className={className} />,
+	HOMEWORK: (size, className?: string) => <ResourceIcon width={size} height={size} className={className} />,
+	INFOGRAPHIC: (size, className?: string) => <ResourceIcon width={size} height={size} className={className} />,
+	QUIZ: (size, className?: string) => <WorksheetIcon width={size} height={size} className={className} />,
+	REORDER: (size, className?: string) => <WorksheetIcon width={size} height={size} className={className} />,
+	THINGS_TO_SHARE: (size, className?: string) => <ResourceIcon width={size} height={size} className={className} />,
+	VIDEO: (size, className?: string) => <VideoIcon width={size} height={size} className={className} />,
 };
 
 interface UseStylesProps {
@@ -59,7 +59,7 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 						{courseUnit.showUnitAsComplete ? (
 							<CheckIcon className="text-white" width={compact ? 18 : 24} height={compact ? 18 : 24} />
 						) : (
-							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
+							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24, 'text-white')
 						)}
 					</>
 				) : (

@@ -174,7 +174,7 @@ interface CourseUnitLayoutProps {
 	title?: string;
 	onExitButtonClick(): void;
 	onNeedHelpButtonClick(): void;
-	menuElement: JSX.Element;
+	menuElement: (isMobile: boolean) => JSX.Element;
 	showMenu: boolean;
 	onShowMenuToggle(showMenu: boolean): void;
 }
@@ -263,7 +263,7 @@ export const CourseUnitLayout = ({
 						Close
 					</Button>
 				</div>
-				<div className="aside-scroller">{menuElement}</div>
+				<div className="aside-scroller">{menuElement(size.current === SIZES.MOBILE)}</div>
 			</div>
 			<div
 				className={classNames(classes.previewPane, {

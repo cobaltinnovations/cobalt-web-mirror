@@ -92,10 +92,9 @@ export const ItemDraggable = ({
 						},
 						className
 					)}
+					{...draggableProvided.dragHandleProps}
 				>
-					<div {...draggableProvided.dragHandleProps}>
-						<div className="drag-handle" />
-					</div>
+					<div className="drag-handle" />
 					<p className="mb-0 ms-2">{cardText}</p>
 				</div>
 			)}

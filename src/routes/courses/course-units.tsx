@@ -246,7 +246,7 @@ export const Component = () => {
 				onNeedHelpButtonClick={() => {
 					navigate('/feedback');
 				}}
-				menuElement={
+				menuElement={(isMobile) => (
 					<>
 						{course &&
 							requiredModules.map((courseModule) => (
@@ -266,6 +266,10 @@ export const Component = () => {
 											: course.defaultCourseUnitLockStatusesByCourseUnitId
 									}
 									onCourseUnitClick={(desiredCourseUnit) => {
+										if (isMobile) {
+											setShowMenu(false);
+										}
+
 										navigate(
 											`/courses/${course.urlName}/course-units/${desiredCourseUnit.courseUnitId}`
 										);
@@ -341,7 +345,7 @@ export const Component = () => {
 							</>
 						)}
 					</>
-				}
+				)}
 			>
 				<AsyncWrapper fetchData={fetchData}>
 					<Container>
