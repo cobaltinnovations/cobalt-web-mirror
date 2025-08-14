@@ -3,7 +3,7 @@ import { Dropdown } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
+import SvgIcon from '@/components/svg-icon';
 
 export enum PastScheduledMessageGroupsOrOutreachType {
 	SCHEDULED_MESSAGE = 'SCHEDULED_MESSAGE',
@@ -52,10 +52,10 @@ export const MhicOutreachItem = ({
 						<Dropdown.Toggle
 							as={DropdownToggle}
 							id={`mhic-outreach-attempt__dropdown-menu--${id}`}
-							className="p-2"
+							className="p-2 border-0"
 							disabled={disabled}
 						>
-							<MoreIcon className="d-flex" />
+							<SvgIcon kit="far" icon="ellipsis" size={20} className="d-flex" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 							<Dropdown.Item onClick={onEditClick}>Edit</Dropdown.Item>

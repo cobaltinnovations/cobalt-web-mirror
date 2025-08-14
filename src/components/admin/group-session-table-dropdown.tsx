@@ -6,7 +6,6 @@ import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import SvgIcon from '../svg-icon';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
@@ -47,9 +46,9 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 			<Dropdown.Toggle
 				as={DropdownToggle}
 				id={`admin-group-sessions__dropdown-menu--${groupSession.groupSessionId}`}
-				className="p-2"
+				className="p-2 border-0"
 			>
-				<MoreIcon className="d-flex" />
+				<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 				{canEdit && (

@@ -1,8 +1,8 @@
 import React, { FC, ReactElement, PropsWithChildren } from 'react';
 import { Dropdown } from 'react-bootstrap';
 
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sessionToggle: {
@@ -101,7 +101,7 @@ const SessionDropdown: FC<SessionDropdownProps> = ({ id, items }) => {
 	return (
 		<Dropdown drop="start">
 			<Dropdown.Toggle as={SessionToggle} id={id} className={classes.sessionToggle}>
-				<MoreIcon className={classes.icon} />
+				<SvgIcon kit="far" icon="ellipsis" size={20} className={classes.icon} />
 			</Dropdown.Toggle>
 			<Dropdown.Menu as={SessionMenu} className={classes.sessionMenu}>
 				{items.map((item, index) => {

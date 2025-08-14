@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 import { Dropdown } from 'react-bootstrap';
 
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 import { MhicAssignOrderModal } from './mhic-assign-order-modal';
@@ -146,7 +145,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 
 			<Dropdown className={classNames(classes.shelfMoreButton, 'position-absolute')}>
 				<Dropdown.Toggle as={DropdownToggle} id={`mhic-shelf__dropdown-menu`} className="p-2 border-0">
-					<MoreIcon className="d-flex" />
+					<SvgIcon kit="far" icon="ellipsis" size={20} className="d-flex" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 					<Dropdown.Item

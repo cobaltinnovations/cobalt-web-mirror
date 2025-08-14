@@ -5,7 +5,6 @@ import { Dropdown } from 'react-bootstrap';
 import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 import SvgIcon from '@/components/svg-icon';
@@ -22,8 +21,8 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 
 	return (
 		<Dropdown>
-			<Dropdown.Toggle as={DropdownToggle} id={`dropdown--${page.pageId}`} className="p-2">
-				<MoreIcon className="d-flex" />
+			<Dropdown.Toggle as={DropdownToggle} id={`dropdown--${page.pageId}`} className="p-2 border-0">
+				<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 				<Dropdown.Item

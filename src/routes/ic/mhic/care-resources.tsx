@@ -9,7 +9,6 @@ import { MhicCareResourceFormModal, MhicPageHeader } from '@/components/integrat
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import SvgIcon from '@/components/svg-icon';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
@@ -263,7 +262,12 @@ export const Component = () => {
 													id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
 													className="p-2 border-0"
 												>
-													<MoreIcon className="d-flex" />
+													<SvgIcon
+														kit="far"
+														icon="ellipsis-vertical"
+														size={20}
+														className="d-flex"
+													/>
 												</Dropdown.Toggle>
 												<Dropdown.Menu
 													as={DropdownMenu}

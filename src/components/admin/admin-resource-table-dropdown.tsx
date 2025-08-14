@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import { AdminContent, AdminContentAction, ContentStatusId } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
+import SvgIcon from '../svg-icon';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { ReactComponent as UnArchiveIcon } from '@/assets/icons/unarchive.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
@@ -181,7 +181,7 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 					id={`admin-resources__dropdown-menu--${content.contentId}`}
 					className="p-2 border-0"
 				>
-					<MoreIcon className="d-flex" />
+					<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 					{content.actions.map((action) => {
