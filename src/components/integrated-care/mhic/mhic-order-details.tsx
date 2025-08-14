@@ -37,13 +37,13 @@ import {
 import { analyticsService, integratedCareService } from '@/lib/services';
 
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
 import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -533,7 +533,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													);
 												}}
 											>
-												Review <ExternalIcon className="ms-2" width={20} height={20} />
+												Review{' '}
+												<SvgIcon
+													kit="far"
+													icon="arrow-up-right-from-square"
+													size={20}
+													className="ms-2"
+												/>
 											</Button>
 										</div>
 									</div>

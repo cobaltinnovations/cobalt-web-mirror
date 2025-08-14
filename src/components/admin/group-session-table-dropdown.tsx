@@ -8,7 +8,6 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import SvgIcon from '../svg-icon';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 
@@ -81,7 +80,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						target="_blank"
 						to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
 					>
-						<ExternalIcon className="me-2 text-n500" width={20} height={20} />
+						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={20} className="me-2 text-n500" />
 						Preview
 					</Dropdown.Item>
 				)}
@@ -95,7 +94,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						}}
 						target="_blank"
 					>
-						<ExternalIcon className="me-2 text-n500" width={20} height={20} />
+						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={20} className="me-2 text-n500" />
 						View on Cobalt
 					</Dropdown.Item>
 				)}

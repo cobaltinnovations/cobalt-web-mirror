@@ -30,7 +30,6 @@ import { analyticsService, integratedCareService, screeningService } from '@/lib
 import AsyncWrapper from '@/components/async-page';
 
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import InlineAlert from '@/components/inline-alert';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
@@ -213,7 +212,12 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											disabled={isExportingResults}
 										>
 											Export Results
-											<ExternalIcon className="ms-2" width={20} height={20} />
+											<SvgIcon
+												kit="far"
+												icon="arrow-up-right-from-square"
+												size={20}
+												className="ms-2"
+											/>
 										</Button>
 									</div>
 								</div>
