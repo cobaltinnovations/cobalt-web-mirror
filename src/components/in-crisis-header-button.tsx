@@ -33,7 +33,7 @@ const InCrisisHeaderButton = ({ className, ...buttonProps }: InCrisisHeaderButto
 			size="sm"
 			{...buttonProps}
 		>
-			<SvgIcon kit="fas" icon="phone" size={16} className="me-2" />
+			<SvgIcon kit="fas" icon="phone-volume" size={16} className="me-2" />
 			In Crisis?
 		</Button>
 	);

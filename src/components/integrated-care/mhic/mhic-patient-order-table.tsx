@@ -26,7 +26,6 @@ import NoData from '@/components/no-data';
 
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import SvgIcon from '@/components/svg-icon';
 
 const dispositionVariantMap = {
@@ -48,15 +47,15 @@ const nextContextTypeMap: Record<
 	},
 	[PatientOrderContactTypeId.ASSESSMENT]: {
 		title: 'Assessment',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.OTHER]: {
 		title: 'Other',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.ASSESSMENT_OUTREACH]: {
 		title: 'Assessment Outreach',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.RESOURCE_CHECK_IN]: {
 		title: 'Resource Check In',
@@ -64,7 +63,7 @@ const nextContextTypeMap: Record<
 	},
 	[PatientOrderContactTypeId.RESOURCE_FOLLOWUP]: {
 		title: 'Resource Followup',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 };
 

@@ -70,7 +70,7 @@ export const InCrisisTemplate = ({ isModal = false }: InCrisisTemplateProps) => 
 							<p className="mb-0">{link.description}</p>
 						</div>
 						<div className={classes.iconOuter}>
-							<SvgIcon kit="fas" icon="phone" size={20} className="d-flex" />
+							<SvgIcon kit="fas" icon="phone-volume" size={20} className="d-flex" />
 						</div>
 					</Button>
 				);

@@ -7,8 +7,8 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
+import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	backgroundImage?: string;
@@ -144,7 +144,7 @@ const HalfLayout = ({ leftColChildren }: HalfLayoutProps) => {
 								className="d-flex align-items-center"
 								onClick={() => openInCrisisModal()}
 							>
-								<PhoneIcon className="me-2" />
+								<SvgIcon kit="far" icon="phone-volume" size={16} className="me-2" />
 								Crisis support
 							</Button>
 						)}
@@ -176,7 +176,7 @@ const HalfLayout = ({ leftColChildren }: HalfLayoutProps) => {
 							className="d-flex align-items-center"
 							onClick={() => openInCrisisModal()}
 						>
-							<PhoneIcon className="me-2" />
+							<SvgIcon kit="far" icon="phone-volume" size={16} className="me-2" />
 							Crisis support
 						</Button>
 					</div>

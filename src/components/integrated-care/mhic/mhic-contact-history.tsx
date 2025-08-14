@@ -28,8 +28,6 @@ import {
 	PastScheduledMessageGroupsOrOutreachType,
 } from '@/components/integrated-care/mhic';
 
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
-
 import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as SearchCloseIcon } from '@/assets/icons/icon-search-close.svg';
@@ -295,7 +293,12 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 													setShowOutreachModal(true);
 												}}
 											>
-												<PhoneIcon width={20} height={20} className="me-3 text-gray" />
+												<SvgIcon
+													kit="far"
+													icon="phone-volume"
+													size={20}
+													className="me-3 text-gray"
+												/>
 												<span>Call</span>
 											</Dropdown.Item>
 											<Dropdown.Item
