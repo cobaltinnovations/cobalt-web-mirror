@@ -10,7 +10,7 @@ import useFlags from '@/hooks/use-flags';
 import { PatientOrderDispositionId, PatientOrderModel, PatientOrderResourcingStatusId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 
-import { ReactComponent as SwapIcon } from '@/assets/icons/icon-swap.svg';
+import SvgIcon from '@/components/svg-icon';
 import { ReactComponent as CallMsgIcon } from '@/assets/icons/icon-call-msg.svg';
 import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
@@ -154,7 +154,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowAssignOrderModal(true);
 						}}
 					>
-						<SwapIcon className="text-gray" /> Assign MHIC
+						<SvgIcon kit="far" icon="user-plus" size={24} className="text-gray" /> Assign MHIC
 					</Dropdown.Item>
 					<Dropdown.Item
 						onClick={() => {
