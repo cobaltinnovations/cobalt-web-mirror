@@ -1,3 +1,4 @@
+import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
 import { Button, Offcanvas, OffcanvasProps } from 'react-bootstrap';
@@ -32,6 +33,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'& .offcanvas-body': {
 			padding: '32px 40px 0',
 			backgroundColor: theme.colors.n50,
+			[mediaQueries.lg]: {
+				padding: '32px 32px 0',
+			},
 		},
 	},
 }));

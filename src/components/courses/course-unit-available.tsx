@@ -17,6 +17,7 @@ import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	screeningFlowOuter: {
@@ -25,6 +26,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
+		[mediaQueries.lg]: {
+			padding: 32,
+		},
 	},
 	imageOuter: {
 		'& img': {
