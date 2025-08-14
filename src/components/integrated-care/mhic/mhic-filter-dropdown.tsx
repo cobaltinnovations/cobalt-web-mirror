@@ -11,7 +11,6 @@ import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
 	PatientOrderAssignmentStatusId,
@@ -319,7 +318,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 						>
 							<PlusIcon className="me-2" />
 							<span>Add Filter</span>
-							<ArrowDown className="ms-2" />
+							<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-2" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu
 							as={DropdownMenu}

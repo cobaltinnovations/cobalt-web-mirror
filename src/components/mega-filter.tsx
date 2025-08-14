@@ -6,7 +6,6 @@ import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import SvgIcon from './svg-icon';
 
@@ -228,7 +227,7 @@ function MegaFilter({
 				{displayFilterIcon && <SvgIcon kit="fas" icon="bars-filter" size={16} className="me-2" />}
 				<span>{buttonTitle}</span>
 				{displayCount && activeLength > 0 && <span>&nbsp;&bull; {activeLength}</span>}
-				{displayDownArrow && <ArrowDown className="ms-1" width={24} height={24} />}
+				{displayDownArrow && <SvgIcon kit="fas" icon="caret-down" size={12} className="ms-1" />}
 			</button>
 		</>
 	);
