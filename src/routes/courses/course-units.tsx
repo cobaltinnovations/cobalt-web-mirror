@@ -269,6 +269,7 @@ export const Component = () => {
 										if (isMobile) {
 											setShowMenu(false);
 										}
+
 										navigate(
 											`/courses/${course.urlName}/course-units/${desiredCourseUnit.courseUnitId}`
 										);

@@ -95,6 +95,10 @@ export const CourseUnitAvailable = ({
 		);
 	}, [courseUnit.courseUnitTypeId, courseUnit.unitCompletionTypeId, isComplete]);
 
+	const memoizedCompletionThresholdPassed = useCallback(() => {
+		onCompletionThresholdPassed(courseUnit);
+	}, [courseUnit, onCompletionThresholdPassed]);
+
 	return (
 		<>
 			{dependencyCourseUnits.length > 0 && (
@@ -147,9 +151,7 @@ export const CourseUnitAvailable = ({
 					onVideoPlayerEvent={handleVideoPlayerEvent}
 					onVideoPlayerEnd={handleUnitComplete}
 					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
-					onCompletionThresholdPassed={() => {
-						onCompletionThresholdPassed(courseUnit);
-					}}
+					onCompletionThresholdPassed={memoizedCompletionThresholdPassed}
 				/>
 			)}
 
