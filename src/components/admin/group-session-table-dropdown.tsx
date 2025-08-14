@@ -9,7 +9,6 @@ import SvgIcon from '../svg-icon';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
@@ -126,7 +125,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onCancel(groupSession.groupSessionId);
 						}}
 					>
-						<XCloseIcon className="me-2 text-n500" width={20} height={20} />
+						<SvgIcon kit="far" icon="circle-xmark" size={20} className="me-2 text-n500" />
 						Cancel
 					</Dropdown.Item>
 				)}
