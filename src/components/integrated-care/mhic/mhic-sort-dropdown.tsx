@@ -7,9 +7,9 @@ import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
-import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
 import { PatientOrderSortColumnId, SortDirectionId } from '@/lib/models';
 import { useSearchParams } from 'react-router-dom';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenuBody: {
@@ -161,7 +161,7 @@ export const MhicSortDropdown = ({ align, className }: MhicSortDropdownProps) =>
 				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>
-				<SortIcon className="me-2" />
+				<SvgIcon kit="far" icon="arrow-up-arrow-down" size={16} className="me-2" />
 				<span>Sort By{selectedSortByOption ? `: ${selectedSortByOption.title}` : ''}</span>
 			</Dropdown.Toggle>
 			<Dropdown.Menu

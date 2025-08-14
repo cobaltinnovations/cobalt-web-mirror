@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
 import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
@@ -87,7 +86,11 @@ function FilterDropdownV2<T extends Option>({
 	const classes = useStyles({ width });
 	const [show, setShow] = useState(false);
 	const [selectedValue, setSelectedValue] = useState<T>();
-	const icon = isSortFilter ? <SortIcon /> : <SvgIcon kit="fas" icon="caret-down" size={12} />;
+	const icon = isSortFilter ? (
+		<SvgIcon kit="far" icon="arrow-up-arrow-down" size={16} />
+	) : (
+		<SvgIcon kit="fas" icon="caret-down" size={12} />
+	);
 
 	return (
 		<Dropdown
