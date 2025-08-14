@@ -1,6 +1,6 @@
 import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
+import SvgIcon from './svg-icon';
 import FileInputButton from '@/components/file-input-button';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
@@ -90,7 +90,7 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 									renderOnMount
 								>
 									<Dropdown.Item className="d-flex align-items-center" onClick={onRemove}>
-										<TrashIcon className="me-2 text-n500" width={24} height={24} />
+										<SvgIcon kit="far" icon="trash-can" size={24} className="me-2 text-n500" />
 										Delete
 									</Dropdown.Item>
 								</Dropdown.Menu>

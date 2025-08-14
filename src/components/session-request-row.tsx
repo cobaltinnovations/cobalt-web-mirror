@@ -10,7 +10,6 @@ import SvgIcon from './svg-icon';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as AddIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -137,7 +136,14 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 											},
 										},
 										{
-											icon: <DeleteIcon className={classes.iconTrash} />,
+											icon: (
+												<SvgIcon
+													kit="far"
+													icon="trash-can"
+													size={20}
+													className={classes.iconTrash}
+												/>
+											),
 											title: 'Delete',
 											onClick: () => {
 												onDeleteClick(session.groupSessionRequestId);

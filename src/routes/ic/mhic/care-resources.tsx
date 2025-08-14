@@ -10,7 +10,7 @@ import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
+import SvgIcon from '@/components/svg-icon';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import InputHelperSearch from '@/components/input-helper-search';
@@ -277,7 +277,12 @@ export const Component = () => {
 															setCareResourceToDelete(careResource);
 														}}
 													>
-														<DeleteIcon className="me-2 text-n500" />
+														<SvgIcon
+															kit="far"
+															icon="trash-can"
+															size={20}
+															className="me-2 text-n500"
+														/>
 														Delete
 													</Dropdown.Item>
 												</Dropdown.Menu>

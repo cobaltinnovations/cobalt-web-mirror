@@ -4,8 +4,8 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 
@@ -86,7 +86,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 					{customHeaderElements}
 					{showDeleteButton && (
 						<Button variant="link" className="p-2" onClick={onDeleteButtonClick}>
-							<TrashIcon />
+							<SvgIcon kit="far" icon="trash-can" size={16} />
 						</Button>
 					)}
 					{showCloseButton && (

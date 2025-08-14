@@ -10,11 +10,11 @@ import NoData from '@/components/no-data';
 import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { CareResourceLocationModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
+import SvgIcon from '@/components/svg-icon';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -306,7 +306,12 @@ export const Component = () => {
 																	setCareResourceLocationToDelete(crl);
 																}}
 															>
-																<DeleteIcon className="me-2 text-n500" />
+																<SvgIcon
+																	kit="far"
+																	icon="trash-can"
+																	size={20}
+																	className="me-2 text-n500"
+																/>
 																Delete
 															</Dropdown.Item>
 														</Dropdown.Menu>
