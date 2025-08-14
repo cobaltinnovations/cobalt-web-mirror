@@ -3,7 +3,6 @@ import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
@@ -72,7 +71,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 				<div className="d-flex align-items-center">
 					{showBackButton && (
 						<Button variant="link" className="p-2 me-2" onClick={onBackButtonClick}>
-							<BackArrowIcon />
+							<SvgIcon kit="far" icon="arrow-left" size={20} />
 						</Button>
 					)}
 					<h5 className="mb-0 text-truncate">{title}</h5>

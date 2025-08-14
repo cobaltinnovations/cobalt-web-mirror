@@ -5,10 +5,10 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries, { screenWidths } from '@/jss/media-queries';
 
-import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as MenuIcon } from '@/assets/icons/icon-menu.svg';
+import SvgIcon from '../svg-icon';
 
 const headerHeight = 60;
 const asideWidth = 344;
@@ -220,7 +220,7 @@ export const CourseUnitLayout = ({
 				<div className={classes.headerLeft}>
 					<div className={classes.exitButtonOuter}>
 						<Button type="button" variant="link" className={classes.exitButton} onClick={onExitButtonClick}>
-							<BackArrowIcon className="me-lg-1" />
+							<SvgIcon kit="far" icon="arrow-left" size={20} className="me-lg-1" />
 							<span className="d-none d-lg-inline">Exit</span>
 						</Button>
 					</div>
