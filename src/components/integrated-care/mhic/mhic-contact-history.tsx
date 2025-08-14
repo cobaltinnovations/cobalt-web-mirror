@@ -29,7 +29,6 @@ import {
 } from '@/components/integrated-care/mhic';
 
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
-import { ReactComponent as EnvelopeIcon } from '@/assets/icons/icon-mail.svg';
 
 import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
@@ -307,7 +306,12 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 													setShowOutreachModal(true);
 												}}
 											>
-												<EnvelopeIcon width={20} height={20} className="me-3 text-gray" />
+												<SvgIcon
+													kit="far"
+													icon="envelope"
+													size={20}
+													className="me-3 text-gray"
+												/>
 												<span>{institution.myChartName}</span>
 											</Dropdown.Item>
 										</Dropdown.Menu>

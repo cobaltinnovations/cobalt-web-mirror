@@ -26,8 +26,8 @@ import NoData from '@/components/no-data';
 
 import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
-import { ReactComponent as MailIcon } from '@/assets/icons/icon-mail.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const dispositionVariantMap = {
 	[PatientOrderDispositionId.OPEN]: 'success',
@@ -44,7 +44,7 @@ const nextContextTypeMap: Record<
 > = {
 	[PatientOrderContactTypeId.WELCOME_MESSAGE]: {
 		title: 'Welcome Message',
-		icon: () => <MailIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="envelope" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.ASSESSMENT]: {
 		title: 'Assessment',
@@ -60,7 +60,7 @@ const nextContextTypeMap: Record<
 	},
 	[PatientOrderContactTypeId.RESOURCE_CHECK_IN]: {
 		title: 'Resource Check In',
-		icon: () => <MailIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="envelope" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.RESOURCE_FOLLOWUP]: {
 		title: 'Resource Followup',
