@@ -36,7 +36,7 @@ export const CardDraggableStatic = ({ cardText, className }: CardDraggableStatic
 		<div className={classNames(classes.cardDraggable, className)}>
 			<p className="text-center">{cardText}</p>
 			<div className={classes.dragHandleOuter}>
-				<SvgIcon kit="fas" icon="grip-lines" size={24} className="text-gray" />
+				<SvgIcon kit="far" icon="grip-lines" size={24} className="text-gray" />
 			</div>
 		</div>
 	);
