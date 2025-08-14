@@ -156,13 +156,21 @@ export const CourseUnitAvailable = ({
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE) && (
-				<div className={classes.imageOuter}>
-					<img src={courseUnit.imageUrl} alt="" />
-				</div>
+				<>
+					{courseUnit.imageUrl && (
+						<div
+							className={classNames(classes.imageOuter, {
+								'mb-8': (courseUnit.courseUnitDownloadableFiles ?? []).length > 0,
+							})}
+						>
+							<img src={courseUnit.imageUrl} alt="" />
+						</div>
+					)}
+				</>
 			)}
 
 			{(courseUnit.courseUnitDownloadableFiles ?? []).length > 0 && (
-				<div className="pt-8">
+				<div>
 					{(courseUnit.courseUnitDownloadableFiles ?? []).map(
 						(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
 							const isLast =
