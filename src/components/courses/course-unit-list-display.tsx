@@ -6,8 +6,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
-import { ReactComponent as VideoIcon } from '@/assets/icons/icon-video.svg';
 import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
+import SvgIcon from '../svg-icon';
 
 const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.Element> = {
 	CARD_SORT: (size) => <WorksheetIcon width={size} height={size} />,
@@ -16,7 +16,7 @@ const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.El
 	QUIZ: (size) => <WorksheetIcon width={size} height={size} />,
 	REORDER: (size) => <WorksheetIcon width={size} height={size} />,
 	THINGS_TO_SHARE: (size) => <ResourceIcon width={size} height={size} />,
-	VIDEO: (size) => <VideoIcon width={size} height={size} />,
+	VIDEO: (size) => <SvgIcon kit="far" icon="video" size={size} />,
 };
 
 interface UseStylesProps {
