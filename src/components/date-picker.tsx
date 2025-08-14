@@ -1,7 +1,7 @@
 import React, { FC, forwardRef } from 'react';
 import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
 
-import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
+import SvgIcon from './svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import moment from 'moment';
 
@@ -85,7 +85,7 @@ const CustomDateInput = forwardRef(
 					</span>
 				)}
 				<span className="date-picker-value">{value}</span>
-				<CalendarIcon className="date-picker-icon" />
+				<SvgIcon kit="far" icon="calendar" size={20} className="date-picker-icon" />
 			</button>
 		);
 	}
