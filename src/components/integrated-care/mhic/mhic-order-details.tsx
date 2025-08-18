@@ -41,7 +41,6 @@ import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
-import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
 import SvgIcon from '@/components/svg-icon';
 
 interface Props {
@@ -518,7 +517,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowResetModel(true);
 												}}
 											>
-												<ResetIcon className="me-1" />
+												<SvgIcon
+													kit="fas"
+													icon="arrow-rotate-left"
+													size={16}
+													className="me-1"
+												/>
 												Reset
 											</Button>
 											<Button
@@ -715,7 +719,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											},
 											{
 												variant: 'link',
-												icon: <ResetIcon className="me-1" />,
+												icon: (
+													<SvgIcon
+														kit="fas"
+														icon="arrow-rotate-left"
+														size={16}
+														className="me-1"
+													/>
+												),
 												className: 'text-decoration-none',
 												title: 'Reset',
 												onClick: () => {

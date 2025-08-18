@@ -34,7 +34,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import InlineAlert from '@/components/inline-alert';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
 import useFlags from '@/hooks/use-flags';
-import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
 import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseStyles(() => ({
@@ -203,7 +202,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<ResetIcon className="me-1" />
+											<SvgIcon kit="fas" icon="arrow-rotate-left" size={16} className="me-1" />
 											Reset
 										</Button>
 										<Button
