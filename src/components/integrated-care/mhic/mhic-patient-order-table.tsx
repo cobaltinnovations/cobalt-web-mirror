@@ -24,7 +24,6 @@ import classNames from 'classnames';
 import { PatientOrdersListResponse } from '@/lib/services';
 import NoData from '@/components/no-data';
 
-import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
 import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
 import SvgIcon from '@/components/svg-icon';
 
@@ -462,7 +461,12 @@ export const MhicPatientOrderTable = ({
 													{getFlagCount(po) > 0 && (
 														<>
 															<span className="text-gray">{getFlagCount(po)}</span>
-															<FlagIcon className={getFlagColor(po)} />
+															<SvgIcon
+																kit="fas"
+																icon="flag-pennant"
+																size={20}
+																className={getFlagColor(po)}
+															/>
 														</>
 													)}
 												</TableCell>

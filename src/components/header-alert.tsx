@@ -3,11 +3,8 @@ import { Button } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
-import { ReactComponent as PrimaryIcon } from '@/assets/icons/flag-primary.svg';
-import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
-import { ReactComponent as DangerIcon } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	headerAlert: {
@@ -76,10 +73,10 @@ const HeaderAlert = ({
 
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
 		return {
-			primary: <PrimaryIcon width={24} height={24} />,
-			success: <SuccessIcon width={24} height={24} />,
-			warning: <WarningIcon width={24} height={24} />,
-			danger: <DangerIcon width={24} height={24} />,
+			primary: <SvgIcon kit="fas" icon="circle-info" size={20} />,
+			success: <SvgIcon kit="fas" icon="circle-check" size={20} />,
+			warning: <SvgIcon kit="fas" icon="triangle-exclamation" size={20} />,
+			danger: <SvgIcon kit="fas" icon="diamond-exclamation" size={20} />,
 		};
 	}, []);
 

@@ -28,8 +28,6 @@ import {
 	PastScheduledMessageGroupsOrOutreachType,
 } from '@/components/integrated-care/mhic';
 
-import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as SearchCloseIcon } from '@/assets/icons/icon-search-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
@@ -136,9 +134,9 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 					date: msg.scheduledAtDateTime,
 					dateDescription: msg.scheduledAtDateTimeDescription,
 					icon: showSuccessIcon ? (
-						<FlagSuccess className="text-success" />
+						<SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />
 					) : showErrorIcon ? (
-						<FlagDanger className="text-danger" />
+						<SvgIcon kit="fas" icon="diamond-exclamation" size={20} className="text-danger" />
 					) : (
 						<SvgIcon kit="far" icon="face-meh" />
 					),
@@ -208,7 +206,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 				icon:
 					outreachResult?.patientOrderOutreachResultStatusId ===
 					PatientOrderOutreachResultStatusId.CONNECTED ? (
-						<FlagSuccess className="text-success" />
+						<SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />
 					) : PatientOrderOutreachResultStatusId.NOT_CONNECTED ? (
 						<div style={{ padding: 2 }}>
 							<SearchCloseIcon className="text-n300" />

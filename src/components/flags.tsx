@@ -7,12 +7,9 @@ import { FlagModel } from '@/contexts/flags-context';
 import useFlags from '@/hooks/use-flags';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as FlagPrimary } from '@/assets/icons/flag-primary.svg';
-import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as FlagWarning } from '@/assets/icons/flag-warning.svg';
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	removalDurationInMs: number;
@@ -290,10 +287,10 @@ const Flag = ({
 			)}
 			<div className="flag-inner">
 				<div className="icon-outer">
-					{isPrimary && <FlagPrimary />}
-					{isSuccess && <FlagSuccess />}
-					{isWarning && <FlagWarning />}
-					{isDanger && <FlagDanger />}
+					{isPrimary && <SvgIcon kit="fas" icon="circle-info" size={20} />}
+					{isSuccess && <SvgIcon kit="fas" icon="circle-check" size={20} />}
+					{isWarning && <SvgIcon kit="fas" icon="triangle-exclamation" size={20} />}
+					{isDanger && <SvgIcon kit="fas" icon="diamond-exclamation" size={20} />}
 				</div>
 				<div className="px-4 flex-grow-1">
 					<h6

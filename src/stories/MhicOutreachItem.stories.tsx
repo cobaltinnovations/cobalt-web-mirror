@@ -1,5 +1,3 @@
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
-import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
 import { MhicOutreachItem, PastScheduledMessageGroupsOrOutreachType } from '@/components/integrated-care/mhic';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
@@ -52,7 +50,7 @@ export const Success: Story = {
 	},
 	args: {
 		id: 'outreach-success-id',
-		icon: <FlagSuccess className="text-success" />,
+		icon: <SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />,
 	},
 };
 
@@ -71,7 +69,7 @@ export const Error: Story = {
 	},
 	args: {
 		id: 'outreach-erro-id',
-		icon: <FlagDanger className="text-danger" />,
+		icon: <SvgIcon kit="fas" icon="diamond-exclamation" size={20} className="text-danger" />,
 	},
 };
 
