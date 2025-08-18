@@ -19,7 +19,6 @@ import useFlags from '@/hooks/use-flags';
 import TabBar from '@/components/tab-bar';
 import { MhicComments, MhicContactHistory, MhicOrderDetails } from '@/components/integrated-care/mhic';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
 import { Await } from 'react-router-dom';
@@ -229,7 +228,7 @@ const ShelfContent = ({
 						});
 					}}
 				>
-					<CloseIcon width={20} height={20} className="d-block" />
+					<SvgIcon kit="far" icon="xmark" size={20} className="d-block" />
 				</Button>
 
 				<div className="mb-2 d-flex align-items-center">

@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries, { screenWidths } from '@/jss/media-queries';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from '../svg-icon';
 
 const headerHeight = 60;
@@ -257,7 +256,7 @@ export const CourseUnitLayout = ({
 							onShowMenuToggle(false);
 						}}
 					>
-						<CloseIcon width={16} height={16} className="me-1 flex-shrink-0" />
+						<SvgIcon kit="fas" icon="xmark" size={16} className="me-1 flex-shrink-0" />
 						Close
 					</Button>
 				</div>

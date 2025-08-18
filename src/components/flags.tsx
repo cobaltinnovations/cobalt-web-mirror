@@ -7,7 +7,6 @@ import { FlagModel } from '@/contexts/flags-context';
 import useFlags from '@/hooks/use-flags';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import SvgIcon from './svg-icon';
 
@@ -362,7 +361,7 @@ const Flag = ({
 										onRemove(flag.flagId);
 									}}
 								>
-									<CloseIcon width={20} height={20} />
+									<SvgIcon kit="fas" icon="xmark" size={16} />
 								</Button>
 							)}
 						</>

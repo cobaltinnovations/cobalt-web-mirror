@@ -15,7 +15,6 @@ import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment
 import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AddNotesIcon } from '@/assets/icons/icon-add-notes.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { useNavigate, useRevalidator } from 'react-router-dom';
 import { MhicScheduleAssessmentModal } from './mhic-schedule-assessment-modal';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
@@ -153,7 +152,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowAssignOrderModal(true);
 						}}
 					>
-						<SvgIcon kit="far" icon="user-plus" size={24} className="text-gray" /> Assign MHIC
+						<SvgIcon kit="far" icon="user-plus" size={20} className="text-gray" /> Assign MHIC
 					</Dropdown.Item>
 					<Dropdown.Item
 						onClick={() => {
@@ -214,7 +213,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowCloseEpisodeModal(true);
 						}}
 					>
-						<CloseIcon className="text-gray" /> Close Episode
+						<SvgIcon kit="far" icon="xmark" size={20} className="text-gray" /> Close Episode
 					</Dropdown.Item>
 				</Dropdown.Menu>
 			</Dropdown>

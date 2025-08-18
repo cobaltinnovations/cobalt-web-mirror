@@ -2,8 +2,6 @@ import React, { ReactNode, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
-
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -98,7 +96,7 @@ const HeaderAlert = ({
 			{dismissable && (
 				<div className={classes.buttonOuter}>
 					<Button variant="link" onClick={onDismiss} disabled={disabled}>
-						<CloseIcon />
+						<SvgIcon kit="fas" icon="xmark" size={16} />
 					</Button>
 				</div>
 			)}

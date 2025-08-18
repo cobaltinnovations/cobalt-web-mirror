@@ -6,7 +6,6 @@ import { CareResourceLocationModel } from '@/lib/models';
 import { careResourceService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { MhicInternalNotesModal } from '@/components/integrated-care/mhic';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -69,7 +68,7 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 							className={classNames(classes.shelfCloseButton, 'p-2 border-0 position-absolute')}
 							onClick={onClose}
 						>
-							<CloseIcon width={20} height={20} className="d-block" />
+							<SvgIcon kit="far" icon="xmark" size={20} className="d-block" />
 						</Button>
 						<div className="mb-2 d-flex align-items-center">
 							<h4 className="mb-0 me-2">{careResourceLocation.resourceName}</h4>

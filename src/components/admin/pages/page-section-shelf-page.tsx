@@ -2,7 +2,6 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
@@ -89,7 +88,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 					)}
 					{showCloseButton && (
 						<Button variant="link" className="p-2" onClick={onCloseButtonButtonClick}>
-							<CloseIcon />
+							<SvgIcon kit="fas" icon="xmark" size={16} />
 						</Button>
 					)}
 				</div>
