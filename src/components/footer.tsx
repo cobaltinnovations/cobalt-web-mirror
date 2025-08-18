@@ -196,6 +196,13 @@ const Footer: FC = () => {
 								<Col xs={12} lg={2}>
 									<p className="mb-3 fs-large fw-semibold text-n500">Cobalt</p>
 									<ul className="list-unstyled">
+										{institution.aboutPageEnabled && (
+											<li className="mb-3">
+												<Link className="fw-normal text-decoration-none" to="/about">
+													About
+												</Link>
+											</li>
+										)}
 										{institution.faqEnabled && (
 											<li className="mb-3">
 												<Link className="fw-normal text-decoration-none" to="/faqs">

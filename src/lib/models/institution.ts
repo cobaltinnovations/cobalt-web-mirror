@@ -120,6 +120,8 @@ export interface Institution {
 	signInQuoteTitle?: string;
 	signInQuoteBlurb?: string;
 	signInQuoteDetail?: string;
+
+	aboutPageEnabled: boolean;
 }
 
 export interface InstitutionFeature {
