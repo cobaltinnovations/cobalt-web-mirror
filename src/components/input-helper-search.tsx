@@ -76,7 +76,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 		return (
 			<div className={className}>
 				<Form.Group className={classNames(classes.inputHelper)}>
-					<SvgIcon kit="far" icon="magnifying-glass" size={20} className={classes.searchIcon} />
+					<SvgIcon kit="far" icon="magnifying-glass" size={16} className={classes.searchIcon} />
 					<Form.Control
 						ref={ref}
 						className={classes.input}
@@ -88,7 +88,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 					/>
 					{props.value && (
 						<Button variant="link" className={classes.clearButton} onClick={onClear}>
-							<SvgIcon kit="fas" icon="circle-xmark" size={24} />
+							<SvgIcon kit="fas" icon="circle-xmark" size={20} />
 						</Button>
 					)}
 				</Form.Group>
