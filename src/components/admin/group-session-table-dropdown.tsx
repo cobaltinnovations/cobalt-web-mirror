@@ -6,7 +6,6 @@ import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import SvgIcon from '../svg-icon';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 
@@ -57,7 +56,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						as={Link}
 						to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
 					>
-						<EditIcon className="me-2 text-n500" width={20} height={20} />
+						<SvgIcon kit="far" icon="pen" size={16} className="me-2 text-n500" />
 						Edit
 					</Dropdown.Item>
 				)}
@@ -67,7 +66,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						as={Link}
 						to={`/admin/group-sessions/duplicate/${groupSession.groupSessionId}`}
 					>
-						<SvgIcon kit="far" icon="clone" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="clone" size={16} className="me-2 text-n500" />
 						Duplicate
 					</Dropdown.Item>
 				)}
@@ -79,7 +78,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						target="_blank"
 						to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
 					>
-						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="me-2 text-n500" />
 						Preview
 					</Dropdown.Item>
 				)}
@@ -93,7 +92,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						}}
 						target="_blank"
 					>
-						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="me-2 text-n500" />
 						View on Cobalt
 					</Dropdown.Item>
 				)}
@@ -108,7 +107,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							});
 						}}
 					>
-						<SvgIcon kit="far" icon="user-group" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="user-group" size={16} className="me-2 text-n500" />
 						View Registrants
 					</Dropdown.Item>
 				)}
@@ -122,7 +121,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onCancel(groupSession.groupSessionId);
 						}}
 					>
-						<SvgIcon kit="far" icon="circle-xmark" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="circle-xmark" size={16} className="me-2 text-n500" />
 						Cancel
 					</Dropdown.Item>
 				)}
@@ -133,7 +132,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onDelete(groupSession.groupSessionId);
 						}}
 					>
-						<SvgIcon kit="far" icon="trash-can" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="trash-can" size={16} className="me-2 text-n500" />
 						Delete
 					</Dropdown.Item>
 				)}

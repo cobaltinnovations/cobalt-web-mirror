@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/t
 import { MhicCareResourceFormModal, MhicCareResourceLocationDetails } from '@/components/integrated-care/mhic';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import NoData from '@/components/no-data';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { CareResourceLocationModel } from '@/lib/models';
@@ -105,7 +104,7 @@ export const Component = () => {
 										setShowFormModal(true);
 									}}
 								>
-									<EditIcon width={20} height={20} className="d-flex me-2" />
+									<SvgIcon kit="far" icon="pen" size={16} className="d-flex me-2" />
 									Edit
 								</Button>
 							</Card.Body>
@@ -301,7 +300,12 @@ export const Component = () => {
 																	);
 																}}
 															>
-																<EditIcon className="me-2 text-n500" />
+																<SvgIcon
+																	kit="far"
+																	icon="pen"
+																	size={16}
+																	className="me-2 text-n500"
+																/>
 																Edit
 															</Dropdown.Item>
 															<Dropdown.Item
@@ -313,7 +317,7 @@ export const Component = () => {
 																<SvgIcon
 																	kit="far"
 																	icon="trash-can"
-																	size={20}
+																	size={16}
 																	className="me-2 text-n500"
 																/>
 																Delete

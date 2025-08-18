@@ -5,7 +5,6 @@ import { Dropdown } from 'react-bootstrap';
 import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 import SvgIcon from '@/components/svg-icon';
 
@@ -31,7 +30,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 						navigate(`/admin/pages/${page.pageId}`);
 					}}
 				>
-					<EditIcon className="me-2 text-n500" width={20} height={20} />
+					<SvgIcon kit="far" icon="pen" size={16} className="me-2 text-n500" />
 					Edit
 				</Dropdown.Item>
 				<Dropdown.Item
@@ -40,7 +39,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 						onDuplicate(page);
 					}}
 				>
-					<SvgIcon kit="far" icon="clone" size={20} className="me-2 text-n500" />
+					<SvgIcon kit="far" icon="clone" size={16} className="me-2 text-n500" />
 					Duplicate
 				</Dropdown.Item>
 				<Dropdown.Divider />
@@ -51,7 +50,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 							onDelete(page);
 						}}
 					>
-						<SvgIcon kit="far" icon="trash-can" size={20} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="trash-can" size={16} className="me-2 text-n500" />
 						Delete
 					</Dropdown.Item>
 				)}
@@ -63,7 +62,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 								window.open(page.relativeUrl, '_blank', 'noopener, noreferrer');
 							}}
 						>
-							<SvgIcon kit="far" icon="arrow-up-right-from-square" size={20} className="me-2 text-n500" />
+							<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="me-2 text-n500" />
 							View on Cobalt
 						</Dropdown.Item>
 						<Dropdown.Divider />

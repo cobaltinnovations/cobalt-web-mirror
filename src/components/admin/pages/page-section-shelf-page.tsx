@@ -2,7 +2,6 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
@@ -77,7 +76,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 					<h5 className="mb-0 text-truncate">{title}</h5>
 					{showEditButton && (
 						<Button variant="link" className="p-2 ms-2" onClick={onEditButtonClick}>
-							<EditIcon />
+							<SvgIcon kit="far" icon="pen" size={16} />
 						</Button>
 					)}
 				</div>

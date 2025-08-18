@@ -36,7 +36,6 @@ import {
 } from '@/lib/models';
 import { analyticsService, integratedCareService } from '@/lib/services';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
@@ -376,7 +375,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 																setShowScheduleCallEditModal(true);
 															}}
 														>
-															<EditIcon className="d-flex" />
+															<SvgIcon
+																kit="far"
+																icon="pen"
+																size={16}
+																className="d-flex"
+															/>
 														</Button>
 													</div>
 												</Card.Header>
@@ -458,7 +462,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowAddVoicemailTaskModal(true);
 												}}
 											>
-												<EditIcon className="d-flex" />
+												<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 											</Button>
 										</div>
 									</Card.Header>
@@ -769,7 +773,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<EditIcon className="d-flex" />
+											<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 										</Button>
 									</div>
 								</Card.Header>
@@ -918,7 +922,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<EditIcon className="d-flex" />
+											<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 										</Button>
 									</div>
 								</Card.Header>
