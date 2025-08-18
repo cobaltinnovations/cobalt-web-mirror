@@ -14,8 +14,8 @@ import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-help-fill.svg';
 import { analyticsService } from '@/lib/services';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	callToAction: {
@@ -162,7 +162,7 @@ const CallToAction = ({ callToAction, className }: Props) => {
 							setShowModal(true);
 						}}
 					>
-						<InfoIcon className="me-2" />
+						<SvgIcon kit="fas" icon="circle-question" size={20} className="me-2" />
 						{callToAction.modalButtonText}
 					</Button>
 				)}

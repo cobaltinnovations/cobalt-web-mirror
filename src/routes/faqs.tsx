@@ -11,8 +11,8 @@ import { HEADER_HEIGHT } from '@/components/header-v2';
 import HeroContainer from '@/components/hero-container';
 import TabBar from '@/components/tab-bar';
 
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseStyles({
 	scrollAnchor: {
@@ -63,7 +63,12 @@ export const Component = () => {
 									{faqsByFaqTopicId[faqTopic.faqTopicId].map((faq) => {
 										return (
 											<div key={faq.faqId} className="mb-8 d-flex">
-												<QuestionMarkIcon className="me-4 text-primary flex-shrink-0 " />
+												<SvgIcon
+													kit="fas"
+													icon="circle-question"
+													size={24}
+													className="me-4 text-primary flex-shrink-0 "
+												/>
 												<div>
 													<h5 className="mb-2">
 														<Link

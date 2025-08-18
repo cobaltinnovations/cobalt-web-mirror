@@ -29,6 +29,7 @@ import {
 } from 'react-router-dom';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
+import SvgIcon from '@/components/svg-icon';
 import GroupSession from '@/components/group-session';
 import {
 	CONTENT_VISIBILITY_TYPE_ID,
@@ -57,7 +58,6 @@ import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
 import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
 import ReactQuill from 'react-quill';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -943,7 +943,12 @@ export const Component = () => {
 								setShowImageSitesModal(true);
 							}}
 						>
-							<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon
+								kit="fas"
+								icon="circle-question"
+								size={20}
+								className="me-2 text-p500 flex-shrink-0"
+							/>
 							<p className="mb-0 fw-semibold">Where can I find images?</p>
 						</Button>
 						<Button
@@ -954,7 +959,12 @@ export const Component = () => {
 								setShowImageSelectionTipsModal(true);
 							}}
 						>
-							<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon
+								kit="fas"
+								icon="circle-question"
+								size={20}
+								className="me-2 text-p500 flex-shrink-0"
+							/>
 							<p className="mb-0 fw-semibold">How do I choose an appropriate image?</p>
 						</Button>
 					</>
