@@ -13,7 +13,6 @@ import InputHelperSearch from '@/components/input-helper-search';
 import { AdminResourcesTableDropdown } from '@/components/admin';
 import ContentTypeIcon from '@/components/content-type-icon';
 import LoadingButton from '@/components/loading-button';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import AsyncWrapper from '@/components/async-page';
 import SvgIcon from '@/components/svg-icon';
 
@@ -304,12 +303,13 @@ export const Component = () => {
 					<Col lg={6}>
 						<div className="mb-6 d-flex align-items-center justify-content-end">
 							<Button
-								className="ps-4"
+								variant="primary"
+								className="d-flex align-items-center"
 								onClick={() => {
 									navigate('/admin/resources/add');
 								}}
 							>
-								<PlusIcon className="me-2" />
+								<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
 								Add Resource
 							</Button>
 							<InputHelperSearch

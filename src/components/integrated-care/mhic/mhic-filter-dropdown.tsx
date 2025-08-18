@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
 	PatientOrderAssignmentStatusId,
@@ -316,7 +315,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 							id="order-filters--select-filter"
 							className="d-inline-flex align-items-center"
 						>
-							<PlusIcon className="me-2" />
+							<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
 							<span>Add Filter</span>
 							<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-2" />
 						</Dropdown.Toggle>

@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/t
 import { MhicCareResourceFormModal, MhicCareResourceLocationDetails } from '@/components/integrated-care/mhic';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import NoData from '@/components/no-data';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { CareResourceLocationModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
@@ -195,8 +194,8 @@ export const Component = () => {
 										navigate(`./location/add`);
 									}}
 								>
-									<PlusIcon width={20} height={20} className="d-flex me-2" />
-									Add
+									<SvgIcon kit="fas" icon="plus" size={16} className="d-flex me-2" />
+									Add Location
 								</Button>
 							</Card.Body>
 							<Card.Body className="p-0 border-top bg-n75">

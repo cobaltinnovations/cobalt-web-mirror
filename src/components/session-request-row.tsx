@@ -7,8 +7,6 @@ import SessionDropdown from '@/components/session-dropdown';
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
 import SvgIcon from './svg-icon';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as AddIcon } from '@/assets/icons/icon-plus.svg';
 import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
@@ -89,7 +87,9 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(canEditSession
 								? [
 										{
-											icon: <EditIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon kit="far" icon="pen" size={16} className={classes.iconPath} />
+											),
 											title: 'Edit',
 											onClick: () => {
 												onEditClick(session.groupSessionRequestId);
@@ -100,7 +100,9 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(canAddSession
 								? [
 										{
-											icon: <AddIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon kit="fas" icon="plus" size={16} className={classes.iconPath} />
+											),
 											title: 'Add',
 											onClick: () => {
 												onAddClick(session.groupSessionRequestId);
@@ -126,7 +128,7 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 												<SvgIcon
 													kit="far"
 													icon="clone"
-													size={20}
+													size={16}
 													className={classes.iconPath}
 												/>
 											),
@@ -140,7 +142,7 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 												<SvgIcon
 													kit="far"
 													icon="trash-can"
-													size={20}
+													size={16}
 													className={classes.iconTrash}
 												/>
 											),

@@ -8,7 +8,6 @@ import useHandleError from '@/hooks/use-handle-error';
 import { MhicCareResourceFormModal, MhicPageHeader } from '@/components/integrated-care/mhic';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import SvgIcon from '@/components/svg-icon';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
@@ -184,7 +183,7 @@ export const Component = () => {
 										setShowFormModal(true);
 									}}
 								>
-									<PlusIcon className="me-2" /> Add Resource
+									<SvgIcon kit="fas" icon="plus" size={16} className="me-2" /> Add Resource
 								</Button>
 							</div>
 						</MhicPageHeader>
@@ -284,7 +283,7 @@ export const Component = () => {
 														<SvgIcon
 															kit="far"
 															icon="trash-can"
-															size={20}
+															size={16}
 															className="me-2 text-n500"
 														/>
 														Delete

@@ -8,7 +8,7 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ContentTypeIcon from '@/components/content-type-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { SkeletonBadge, SkeletonImage, SkeletonText } from './skeleton-loaders';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	resourceLibraryCard: {
@@ -317,7 +317,7 @@ const ResourceLibraryCard = ({
 										setShowTags(!showTags);
 									}}
 								>
-									<PlusIcon className="d-flex" width={20} height={20} />
+									<SvgIcon kit="fas" icon="plus" size={14} className="d-flex" />
 								</Button>
 							)}
 							{tags.map((tag) => {

@@ -89,7 +89,7 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 									renderOnMount
 								>
 									<Dropdown.Item className="d-flex align-items-center" onClick={onRemove}>
-										<SvgIcon kit="far" icon="trash-can" size={20} className="me-2 text-n500" />
+										<SvgIcon kit="far" icon="trash-can" size={16} className="me-2 text-n500" />
 										Delete
 									</Dropdown.Item>
 								</Dropdown.Menu>
