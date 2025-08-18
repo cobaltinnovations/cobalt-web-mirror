@@ -7,7 +7,6 @@ import mediaQueries, { screenWidths } from '@/jss/media-queries';
 
 import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as MenuIcon } from '@/assets/icons/icon-menu.svg';
 import SvgIcon from '../svg-icon';
 
 const headerHeight = 60;
@@ -249,7 +248,7 @@ export const CourseUnitLayout = ({
 							onShowMenuToggle(!showMenu);
 						}}
 					>
-						<MenuIcon width={16} height={16} className="me-1 flex-shrink-0" />
+						<SvgIcon kit="fas" icon="bars" size={16} className="me-1 flex-shrink-0" />
 						<span className="hide-menu-button__text">Hide Menu</span>
 					</Button>
 					<Button
