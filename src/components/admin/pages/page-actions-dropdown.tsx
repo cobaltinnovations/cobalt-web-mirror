@@ -4,8 +4,6 @@ import { Dropdown } from 'react-bootstrap';
 
 import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-
-import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 import SvgIcon from '@/components/svg-icon';
 
 interface PageActionsDropdownProps {
@@ -72,7 +70,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 								onUnpublish(page);
 							}}
 						>
-							<MinusIcon className="me-2 text-n500" width={20} height={20} />
+							<SvgIcon kit="fas" icon="minus" size={16} className="me-2 text-n500" />
 							Unpublish
 						</Dropdown.Item>
 					</>

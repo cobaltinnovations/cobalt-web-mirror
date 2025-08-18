@@ -20,7 +20,6 @@ import {
 } from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
 
-import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import SvgIcon from '@/components/svg-icon';
 
@@ -298,7 +297,12 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																		handleMinusButtonClick(crl);
 																	}}
 																>
-																	<MinusIcon className="d-flex" />
+																	<SvgIcon
+																		kit="fas"
+																		icon="minus"
+																		size={16}
+																		className="d-flex"
+																	/>
 																</Button>
 															</div>
 														</li>
