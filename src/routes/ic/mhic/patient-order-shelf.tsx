@@ -256,7 +256,7 @@ const ShelfContent = ({
 						text={patientOrderResponse.patientOrder.patientMrn ?? ''}
 					>
 						<Button variant="link" className="p-2">
-							<SvgIcon kit="far" icon="copy" size={20} />
+							<SvgIcon kit="far" icon="copy" size={16} />
 						</Button>
 					</CopyToClipboard>
 					<span className="text-n300 me-2">|</span>
