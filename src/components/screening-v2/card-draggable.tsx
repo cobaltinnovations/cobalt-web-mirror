@@ -68,7 +68,7 @@ export const CardDraggable = ({
 				>
 					<p className="text-center">{cardText}</p>
 					<div className={classes.dragHandleOuter}>
-						<SvgIcon kit="far" icon="grip-lines" size={24} className="text-gray" />
+						<SvgIcon kit="far" icon="grip-lines" size={20} className="text-gray" />
 					</div>
 				</div>
 			)}

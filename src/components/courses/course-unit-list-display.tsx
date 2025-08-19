@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
-import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
 import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
 import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
 import SvgIcon from '../svg-icon';
@@ -53,7 +52,7 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 		<div className="d-flex align-items-center">
 			<div className={classNames(classes.iconOuter, { complete: isComplete })}>
 				{isLocked ? (
-					<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
+					<SvgIcon kit="far" icon="lock" size={compact ? 18 : 24} />
 				) : isComplete ? (
 					<>
 						{courseUnit.showUnitAsComplete ? (

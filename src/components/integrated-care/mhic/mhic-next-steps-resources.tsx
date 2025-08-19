@@ -275,7 +275,7 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																<SvgIcon
 																	kit="far"
 																	icon="grip-lines"
-																	size={24}
+																	size={20}
 																	className="text-gray"
 																/>
 															</div>
