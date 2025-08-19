@@ -1,5 +1,4 @@
 import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
-import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import TimeSlotInput from '@/components/time-slot-input';
@@ -27,8 +26,6 @@ import {
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import SvgIcon from '@/components/svg-icon';
 import GroupSession from '@/components/group-session';
 import {
@@ -1506,7 +1503,7 @@ export const Component = () => {
 						<>
 							{isPreview ? (
 								<>
-									<LeftChevron /> Back to Edit
+									<SvgIcon kit="fas" icon="chevron-left" size={16} /> Back to Edit
 								</>
 							) : isNotDraft ? (
 								'Exit Editor'
@@ -1534,7 +1531,8 @@ export const Component = () => {
 								'Publish'
 							) : (
 								<>
-									{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+									{isNotDraft ? 'Publish Changes' : 'Next: Preview'}{' '}
+									<SvgIcon kit="far" icon="chevron-left" size={16} />
 								</>
 							)}
 						</>
@@ -1695,7 +1693,7 @@ export const Component = () => {
 										disabled={!registrantDownloadLink}
 										href={registrantDownloadLink || undefined}
 									>
-										<DownloadIcon className="text-primary me-2" />
+										<SvgIcon kit="far" icon="download" size={20} className="text-primary me-2" />
 										Email Addresses
 									</Button>
 								</div>

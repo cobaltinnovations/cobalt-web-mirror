@@ -14,7 +14,6 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '../table';
 import SvgIcon from '../svg-icon';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
@@ -211,7 +210,7 @@ const AdminAnalyticsWidgetOptions = ({ widget }: AdminAnalyticsWidgetOptionsProp
 						});
 					}}
 				>
-					<DownloadIcon className="me-2 text-n500" width={24} height={24} />
+					<SvgIcon kit="far" icon="download" size={16} className="me-2 text-n500" />
 					Download .csv
 				</Dropdown.Item>
 			</Dropdown.Menu>

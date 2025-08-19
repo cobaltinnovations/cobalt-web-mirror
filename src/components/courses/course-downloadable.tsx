@@ -4,9 +4,9 @@ import { CourseUnitDownloadableFile } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DocxIcon } from '@/assets/icons/filetype-docx.svg';
 import { ReactComponent as DocIcon } from '@/assets/icons/filetype-doc.svg';
-import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
 import { ReactComponent as PdfIcon } from '@/assets/icons/filetype-pdf.svg';
 import { ReactComponent as CsvIcon } from '@/assets/icons/filetype-csv.svg';
+import SvgIcon from '../svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	courseDownloadable: {
@@ -75,7 +75,7 @@ export const CourseDownloadable = ({ courseUnitDownloadableFile, className, trac
 				<p className="m-0 text-n500">{courseUnitDownloadableFile.filesizeDescription}</p>
 			</div>
 			<div className={classes.downloadIconOuter}>
-				<DownloadIcon className="text-primary" />
+				<SvgIcon kit="far" icon="download" size={20} className="text-primary" />
 			</div>
 		</a>
 	);
