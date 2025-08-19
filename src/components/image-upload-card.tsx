@@ -1,10 +1,10 @@
-import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 import FileInputButton from '@/components/file-input-button';
 import React, { FC } from 'react';
 import { Button, Card } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	uploadIcon: {
@@ -71,7 +71,7 @@ const ImageUploadCard: FC<ImageUploadCardProps> = ({
 								variant="light"
 								size="sm"
 							>
-								<UploadIcon />
+								<SvgIcon kit="far" icon="upload" size={20} />
 							</Button>
 
 							<p className="mb-2">

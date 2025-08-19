@@ -1532,7 +1532,7 @@ export const Component = () => {
 							) : (
 								<>
 									{isNotDraft ? 'Publish Changes' : 'Next: Preview'}{' '}
-									<SvgIcon kit="far" icon="chevron-left" size={16} />
+									<SvgIcon kit="fas" icon="chevron-right" size={16} />
 								</>
 							)}
 						</>
@@ -1693,7 +1693,7 @@ export const Component = () => {
 										disabled={!registrantDownloadLink}
 										href={registrantDownloadLink || undefined}
 									>
-										<SvgIcon kit="far" icon="download" size={20} className="text-primary me-2" />
+										<SvgIcon kit="far" icon="download" size={16} className="text-primary me-2" />
 										Email Addresses
 									</Button>
 								</div>
