@@ -16,16 +16,16 @@ const PathwaysIcon = ({
 }) => {
 	const iconMap: Record<FeatureId, JSX.Element> = {
 		[FeatureId.COUNSELING_SERVICES]: (
-			<SvgIcon kit="fas" icon="handshake-simple" className={className} {...svgProps} />
+			<SvgIcon kit="fak" icon="handshake-simple" className={className} {...svgProps} />
 		),
 		[FeatureId.THERAPY]: <SvgIcon kit="fas" icon="comment-dots" className={className} {...svgProps} />,
 		[FeatureId.MEDICATION_PRESCRIBER]: <SvgIcon kit="fak" icon="pill" className={className} {...svgProps} />,
 		[FeatureId.GROUP_SESSIONS]: (
 			<SvgIcon kit="fak" icon="people-group-support" className={className} {...svgProps} />
 		),
-		[FeatureId.COACHING]: <SvgIcon kit="fas" icon="handshake-simple" className={className} {...svgProps} />,
+		[FeatureId.COACHING]: <SvgIcon kit="fak" icon="handshake-simple" className={className} {...svgProps} />,
 		[FeatureId.SPIRITUAL_SUPPORT]: (
-			<SvgIcon kit="fak" icon="hands-holding-heart-custom" className={className} {...svgProps} />
+			<SvgIcon kit="fas" icon="hands-holding-heart" className={className} {...svgProps} />
 		),
 		[FeatureId.CRISIS_SUPPORT]: <SvgIcon kit="fas" icon="star-of-life" className={className} {...svgProps} />,
 		[FeatureId.SELF_HELP_RESOURCES]: <SvgIcon kit="fak" icon="menu-book" className={className} {...svgProps} />,

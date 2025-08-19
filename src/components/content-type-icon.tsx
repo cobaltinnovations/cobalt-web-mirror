@@ -21,9 +21,9 @@ const ContentTypeIcon = ({ contentTypeId, ...props }: Props) => {
 		case ContentTypeId.PODCAST:
 			return <SvgIcon kit="far" icon="podcast" size={16} {...props} />;
 		case ContentTypeId.VIDEO:
-			return <SvgIcon kit="far" icon="video" size={16} {...props} />;
+			return <SvgIcon kit="fak" icon="video" size={16} {...props} />;
 		case ContentTypeId.WORKSHEET:
-			return <SvgIcon kit="far" icon="clipboard-check" size={16} {...props} />;
+			return <SvgIcon kit="far" icon="clipboard-list-check" size={16} {...props} />;
 		default:
 			return null;
 	}

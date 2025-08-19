@@ -4,18 +4,16 @@ import classNames from 'classnames';
 import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
-import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
-import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
 import SvgIcon from '../svg-icon';
 
 const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.Element> = {
-	CARD_SORT: (size) => <WorksheetIcon width={size} height={size} />,
-	HOMEWORK: (size) => <ResourceIcon width={size} height={size} />,
-	INFOGRAPHIC: (size) => <ResourceIcon width={size} height={size} />,
-	QUIZ: (size) => <WorksheetIcon width={size} height={size} />,
-	REORDER: (size) => <WorksheetIcon width={size} height={size} />,
-	THINGS_TO_SHARE: (size) => <ResourceIcon width={size} height={size} />,
-	VIDEO: (size) => <SvgIcon kit="far" icon="video" size={size} />,
+	CARD_SORT: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
+	HOMEWORK: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
+	INFOGRAPHIC: (size) => <SvgIcon kit="far" icon="newspaper" size={size} />,
+	QUIZ: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
+	REORDER: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
+	THINGS_TO_SHARE: (size) => <SvgIcon kit="far" icon="download" size={size} />,
+	VIDEO: (size) => <SvgIcon kit="fak" icon="video" size={size} />,
 };
 
 interface UseStylesProps {
@@ -52,17 +50,17 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 		<div className="d-flex align-items-center">
 			<div className={classNames(classes.iconOuter, { complete: isComplete })}>
 				{isLocked ? (
-					<SvgIcon kit="far" icon="lock" size={compact ? 18 : 24} />
+					<SvgIcon kit="far" icon="lock" size={compact ? 16 : 20} />
 				) : isComplete ? (
 					<>
 						{courseUnit.showUnitAsComplete ? (
-							<CheckIcon className="text-white" width={compact ? 18 : 24} height={compact ? 18 : 24} />
+							<CheckIcon className="text-white" width={compact ? 16 : 20} height={compact ? 16 : 20} />
 						) : (
-							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
+							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 16 : 20)
 						)}
 					</>
 				) : (
-					courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
+					courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 16 : 20)
 				)}
 			</div>
 			<div className="ps-4">
