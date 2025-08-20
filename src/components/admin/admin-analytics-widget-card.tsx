@@ -12,7 +12,6 @@ import { DropdownMenu, DropdownToggle } from '../dropdown';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '../table';
 
 import SvgIcon from '../svg-icon';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
@@ -160,7 +159,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 										<TableCell>
 											<Button variant="link" size="sm">
 												{isExpanded ? (
-													<DownChevron />
+													<SvgIcon kit="far" icon="chevron-down" size={16} />
 												) : (
 													<SvgIcon
 														kit="far"

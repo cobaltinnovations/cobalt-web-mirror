@@ -4,9 +4,9 @@ import { Marker, Map } from '@vis.gl/react-google-maps';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ResourcePacketLocation } from '@/lib/models';
 import { buildQueryParamUrl } from '@/lib/utils';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	careResourceAccordion: {
@@ -70,7 +70,13 @@ export const CareResourceAccordion = ({ careResourceLocation, className }: CareR
 				}}
 			>
 				{careResourceLocation.careResourceLocationName}
-				<DownChevron className="d-flex" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
+				<SvgIcon
+					kit="far"
+					icon="chevron-down"
+					size={16}
+					className="d-flex"
+					style={{ transform: `scaleY(${show ? -1 : 1})` }}
+				/>
 			</button>
 			<Collapse in={show} mountOnEnter unmountOnExit>
 				<div>

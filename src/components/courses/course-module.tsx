@@ -9,8 +9,8 @@ import {
 	CourseUnitModel,
 } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { CourseUnitListDisplay } from './course-unit-list-display';
+import SvgIcon from '../svg-icon';
 
 interface UseStylesProps {
 	compact?: boolean;
@@ -116,7 +116,10 @@ export const CourseModule = ({
 						</span>
 					)}
 				</div>
-				<DownChevron
+				<SvgIcon
+					kit="far"
+					icon="chevron-down"
+					size={16}
 					className="d-flex text-n500 flex-shrink-0"
 					style={{ transform: `rotate(${show ? '180deg' : '0deg'})` }}
 				/>

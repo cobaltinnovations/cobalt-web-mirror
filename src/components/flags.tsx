@@ -7,7 +7,6 @@ import { FlagModel } from '@/contexts/flags-context';
 import useFlags from '@/hooks/use-flags';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
@@ -347,7 +346,10 @@ const Flag = ({
 										setIsExpanded(!isExpanded);
 									}}
 								>
-									<DownChevron
+									<SvgIcon
+										kit="far"
+										icon="chevron-down"
+										size={16}
 										className={classNames({
 											expanded: isExpanded,
 										})}
