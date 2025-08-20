@@ -92,7 +92,7 @@ const FilterDropdown = ({
 	const icon = showSortIcon ? (
 		<SvgIcon kit="far" icon="arrow-up-arrow-down" size={16} />
 	) : (
-		<SvgIcon kit="fas" icon="caret-down" size={12} />
+		<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-1" />
 	);
 
 	return (

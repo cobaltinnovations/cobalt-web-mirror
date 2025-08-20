@@ -89,7 +89,7 @@ function FilterDropdownV2<T extends Option>({
 	const icon = isSortFilter ? (
 		<SvgIcon kit="far" icon="arrow-up-arrow-down" size={16} />
 	) : (
-		<SvgIcon kit="fas" icon="caret-down" size={12} />
+		<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-1" />
 	);
 
 	return (
