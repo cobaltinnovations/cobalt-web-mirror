@@ -28,7 +28,6 @@ import {
 	PastScheduledMessageGroupsOrOutreachType,
 } from '@/components/integrated-care/mhic';
 
-import { ReactComponent as SearchCloseIcon } from '@/assets/icons/icon-search-close.svg';
 import SvgIcon from '@/components/svg-icon';
 
 interface Props {
@@ -138,7 +137,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 					) : showErrorIcon ? (
 						<SvgIcon kit="fas" icon="diamond-exclamation" size={20} className="text-danger" />
 					) : (
-						<SvgIcon kit="far" icon="face-meh" />
+						<SvgIcon kit="far" icon="face-meh" size={20} />
 					),
 					title: `${messageEnqueued ? '' : 'Sent'} ${
 						msg.patientOrderScheduledMessageTypeDescription
@@ -209,10 +208,10 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 						<SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />
 					) : PatientOrderOutreachResultStatusId.NOT_CONNECTED ? (
 						<div style={{ padding: 2 }}>
-							<SearchCloseIcon className="text-n300" />
+							<SvgIcon kit="fas" icon="circle-xmark" size={20} className="text-n300" />
 						</div>
 					) : (
-						<SvgIcon kit="far" icon="face-meh" />
+						<SvgIcon kit="far" icon="face-meh" size={20} />
 					),
 				title: outreachResult?.patientOrderOutreachResultTypeDescription ?? '',
 				descriptionHtml: outreach.note,
