@@ -96,7 +96,7 @@ const HeaderAlert = ({
 			{dismissable && (
 				<div className={classes.buttonOuter}>
 					<Button variant="link" onClick={onDismiss} disabled={disabled}>
-						<SvgIcon kit="fas" icon="xmark" size={16} />
+						<SvgIcon kit="far" icon="xmark" size={16} />
 					</Button>
 				</div>
 			)}

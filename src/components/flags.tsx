@@ -355,13 +355,13 @@ const Flag = ({
 								</Button>
 							) : (
 								<Button
-									variant="link"
-									className="p-0"
+									variant="light"
+									className="p-1 border-0"
 									onClick={() => {
 										onRemove(flag.flagId);
 									}}
 								>
-									<SvgIcon kit="fas" icon="xmark" size={16} />
+									<SvgIcon kit="far" icon="xmark" size={16} className="d-flex" />
 								</Button>
 							)}
 						</>

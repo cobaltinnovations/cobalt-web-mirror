@@ -303,7 +303,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 										handleFilterRemoveButtonClick(filterId);
 									}}
 								>
-									<SvgIcon kit="fas" icon="minus" size={16} className="d-block" />
+									<SvgIcon kit="fas" icon="minus" size={16} className="d-flex" />
 								</Button>
 							</div>
 						);
