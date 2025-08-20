@@ -137,7 +137,7 @@ const Helpful = ({ contentId, title, className }: HelpfulProps) => {
 								value={CONTENT_FEEDBACK_TYPE_ID.THUMBS_UP}
 								isLoading={isSubmitting}
 							>
-								<SvgIcon kit="fas" icon="thumbs-up" size={20} />
+								<SvgIcon kit="fas" icon="thumbs-up" size={16} className="d-block" />
 							</LoadingButton>
 							<LoadingButton
 								type="submit"
@@ -146,7 +146,7 @@ const Helpful = ({ contentId, title, className }: HelpfulProps) => {
 								value={CONTENT_FEEDBACK_TYPE_ID.THUMBS_DOWN}
 								isLoading={isSubmitting}
 							>
-								<SvgIcon kit="fas" icon="thumbs-down" size={20} />
+								<SvgIcon kit="fas" icon="thumbs-down" size={16} className="d-block" />
 							</LoadingButton>
 						</Form>
 					</div>
