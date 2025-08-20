@@ -2,7 +2,6 @@ import React from 'react';
 import { DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import SvgIcon from '@/components/svg-icon';
 
 interface UseStylesProps {
@@ -86,7 +85,7 @@ export const DraggableItem = ({
 					</div>
 					<div className="d-flex flex-shrink-0 align-items-center">
 						<span className="text-n500">{asideTitle}</span>
-						<RightChevron className="text-n500" />
+						<SvgIcon kit="far" icon="chevron-right" size={16} className="text-n500" />
 					</div>
 				</button>
 			) : (

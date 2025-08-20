@@ -4,10 +4,9 @@ import MultiCarousel, { CarouselProps as MultiCarouselProps, ButtonGroupProps } 
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
 
-import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import { createUseThemedStyles } from '@/jss/theme';
+import SvgIcon from './svg-icon';
 
 const gutterWidth = 30;
 
@@ -86,7 +85,7 @@ const CustomButtonGroup = ({ next, previous, carouselState }: ButtonGroupProps) 
 				disabled={noMorePreviousSlides}
 				onClick={previous}
 			>
-				<LeftChevron />
+				<SvgIcon kit="far" icon="chevron-left" size={16} />
 			</Button>
 			<Button
 				className={classNames(classes.carouselButton, classes.carouselButtonNext)}
@@ -94,7 +93,7 @@ const CustomButtonGroup = ({ next, previous, carouselState }: ButtonGroupProps) 
 				disabled={noMoreNextSlides}
 				onClick={next}
 			>
-				<RightChevron />
+				<SvgIcon kit="far" icon="chevron-right" size={16} />
 			</Button>
 		</>
 	);

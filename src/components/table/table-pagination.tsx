@@ -4,8 +4,7 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import SvgIcon from '../svg-icon';
 
 const useTablePaginationStyles = createUseThemedStyles((theme) => ({
 	paginationButton: {
@@ -128,7 +127,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 				onClick={handlePreviousButtonClick}
 				disabled={page === 0 || disabled}
 			>
-				<LeftChevron width={24} height={24} />
+				<SvgIcon kit="far" icon="chevron-left" size={16} />
 			</Button>
 			{pageButtons.length > 1 &&
 				pageButtons.map((button) => {
@@ -156,7 +155,7 @@ export const TablePagination: FC<TablePaginationProps> = React.memo(({ page, siz
 				onClick={handleNextButtonClick}
 				disabled={page === lastPage || disabled}
 			>
-				<RightChevron width={24} height={24} />
+				<SvgIcon kit="far" icon="chevron-right" size={16} />
 			</Button>
 		</ButtonGroup>
 	);

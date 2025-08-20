@@ -3,7 +3,6 @@ import { Button } from 'react-bootstrap';
 import { CourseUnitModel } from '@/lib/models';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import NoData from '@/components/no-data';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import SvgIcon from '../svg-icon';
 
 interface CourseUnitCompleteProps {
@@ -42,7 +41,7 @@ export const CourseUnitComplete = ({
 					onClick={onNextButtonClick}
 				>
 					Next
-					<RightChevron className="ms-1" />
+					<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 				</Button>
 			</div>
 		</>

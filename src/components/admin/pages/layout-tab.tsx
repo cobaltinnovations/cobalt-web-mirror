@@ -5,7 +5,6 @@ import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea
 
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { DraggableItem } from './draggable-item';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { cloneDeep } from 'lodash';
@@ -106,7 +105,7 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 					onClick={() => setCurrentPageSectionId(HERO_SECTION_ID)}
 				>
 					<span>Hero</span>
-					<RightChevron className="text-n500" />
+					<SvgIcon kit="far" icon="chevron-right" size={16} className="text-n500" />
 				</button>
 			</div>
 			<DragDropContext onDragEnd={handleDragEnd}>

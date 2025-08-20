@@ -16,9 +16,8 @@ import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
 import InlineAlert from '@/components/inline-alert';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import classNames from 'classnames';
+import SvgIcon from '../svg-icon';
 
 const QUESTION_TRANSITION_DURATION_MS = 600;
 
@@ -421,11 +420,16 @@ export const ScreeningQuestionContext = ({
 													screeningQuestionContext.preQuestionScreeningConfirmationPrompt) && (
 													<Button
 														type="button"
-														variant="link"
+														variant="light border-0"
 														className="d-flex align-items-center text-decoration-none ps-3"
 														onClick={handleQuestionPreviousButtonClick}
 													>
-														<LeftChevron className="me-2" />
+														<SvgIcon
+															kit="far"
+															icon="chevron-left"
+															size={16}
+															className="me-2"
+														/>
 														Back
 													</Button>
 												)}
@@ -440,7 +444,12 @@ export const ScreeningQuestionContext = ({
 														onClick={handleSkipButtonClick}
 													>
 														Skip
-														<RightChevron className="ms-1" />
+														<SvgIcon
+															kit="far"
+															icon="chevron-right"
+															size={16}
+															className="ms-1"
+														/>
 													</Button>
 												)}
 												{showNextButton && (
@@ -455,7 +464,12 @@ export const ScreeningQuestionContext = ({
 														}
 													>
 														Next
-														<RightChevron className="ms-1" />
+														<SvgIcon
+															kit="far"
+															icon="chevron-right"
+															size={16}
+															className="ms-1"
+														/>
 													</Button>
 												)}
 											</div>

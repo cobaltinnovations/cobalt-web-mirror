@@ -7,10 +7,10 @@ import { AvailabilityForm, AvailabilityFormSchema } from './availability-form';
 import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-utils';
 
 import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as ChevronLeftIcon } from '@/assets/icons/icon-chevron-left.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useLocation, useParams } from 'react-router-dom';
 import { useCobaltTheme } from '@/jss/theme';
+import SvgIcon from '@/components/svg-icon';
 
 interface EditAvailabilityPanelProps {
 	onClose: (logicalAvailabilityId?: string) => void;
@@ -87,7 +87,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 					className="p-0"
 					onClick={() => onClose(logicalAvailabilityId)}
 				>
-					<ChevronLeftIcon fill={theme.colors.p500} className="me-1" />
+					<SvgIcon kit="far" icon="chevron-left" size={16} className="me-1" />
 					Back
 				</Button>
 				<Button

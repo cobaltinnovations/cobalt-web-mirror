@@ -13,7 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '../table';
 
 import SvgIcon from '../svg-icon';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
@@ -160,7 +159,16 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 									{hasNestedRows && (
 										<TableCell>
 											<Button variant="link" size="sm">
-												{isExpanded ? <DownChevron /> : <RightChevron className="text-gray" />}
+												{isExpanded ? (
+													<DownChevron />
+												) : (
+													<SvgIcon
+														kit="far"
+														icon="chevron-right"
+														size={16}
+														className="text-gray"
+													/>
+												)}
 											</Button>
 										</TableCell>
 									)}
