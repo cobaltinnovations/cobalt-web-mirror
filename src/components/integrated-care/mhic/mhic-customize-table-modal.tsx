@@ -14,7 +14,7 @@ import {
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DragHandleIcon } from '@/assets/icons/icon-drag-handle.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
@@ -124,7 +124,7 @@ export const MhicCustomizeTableModal: FC<Props> = ({ onSave, ...props }) => {
 														<p className="mb-0">{column.title}</p>
 													</div>
 													<div {...provided.dragHandleProps}>
-														<DragHandleIcon />
+														<SvgIcon kit="far" icon="grip-lines" size={20} />
 													</div>
 												</PortalAwareItem>
 											)}
