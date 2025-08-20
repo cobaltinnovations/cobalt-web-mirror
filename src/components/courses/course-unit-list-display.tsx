@@ -3,7 +3,6 @@ import classNames from 'classnames';
 
 import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import SvgIcon from '../svg-icon';
 
 const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.Element> = {
@@ -54,7 +53,7 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 				) : isComplete ? (
 					<>
 						{courseUnit.showUnitAsComplete ? (
-							<CheckIcon className="text-white" width={compact ? 16 : 20} height={compact ? 16 : 20} />
+							<SvgIcon kit="fak" icon="check" size={compact ? 16 : 20} className="text-white" />
 						) : (
 							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 16 : 20)
 						)}

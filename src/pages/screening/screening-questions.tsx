@@ -18,7 +18,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useLocation, useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
-import { ReactComponent as CheckMarkIcon } from '@/assets/icons/icon-check.svg';
 import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
@@ -322,7 +321,7 @@ const ScreeningQuestionsPage = () => {
 										}}
 									>
 										<div className="checkmark-wrapper d-flex align-items-center justify-content-center me-2">
-											{isChecked && <CheckMarkIcon />}
+											{isChecked && <SvgIcon kit="fak" icon="check" size={16} />}
 										</div>
 										{option.answerOptionText}
 									</ToggleButton>

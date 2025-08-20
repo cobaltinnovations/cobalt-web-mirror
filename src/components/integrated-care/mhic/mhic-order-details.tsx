@@ -518,10 +518,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												}}
 											>
 												<SvgIcon
-													kit="fas"
+													kit="far"
 													icon="arrow-rotate-left"
 													size={16}
-													className="me-1"
+													className="me-2"
 												/>
 												Reset
 											</Button>
@@ -721,10 +721,10 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												variant: 'link',
 												icon: (
 													<SvgIcon
-														kit="fas"
+														kit="far"
 														icon="arrow-rotate-left"
 														size={16}
-														className="me-1"
+														className="me-2"
 													/>
 												),
 												className: 'text-decoration-none',

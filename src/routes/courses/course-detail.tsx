@@ -218,12 +218,12 @@ export const Component = () => {
 																}}
 															>
 																<SvgIcon
-																	kit="fas"
+																	kit="far"
 																	icon="arrow-rotate-left"
 																	size={16}
-																	className="me-1"
+																	className="me-2"
 																/>
-																Restart Course
+																Restart
 															</Button>
 														</div>
 													) : (

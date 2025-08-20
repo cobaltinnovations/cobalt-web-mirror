@@ -27,7 +27,7 @@ export const CourseUnitComplete = ({
 					{
 						variant: 'light',
 						className: 'ps-3',
-						icon: <SvgIcon kit="fas" icon="arrow-rotate-left" size={16} className="me-2" />,
+						icon: <SvgIcon kit="far" icon="arrow-rotate-left" size={16} className="me-2" />,
 						title: 'Restart Activity',
 						onClick: onRestartActivityButtonClick,
 					},

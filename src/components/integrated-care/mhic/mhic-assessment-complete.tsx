@@ -202,7 +202,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<SvgIcon kit="fas" icon="arrow-rotate-left" size={16} className="me-1" />
+											<SvgIcon kit="far" icon="arrow-rotate-left" size={16} className="me-2" />
 											Reset
 										</Button>
 										<Button
