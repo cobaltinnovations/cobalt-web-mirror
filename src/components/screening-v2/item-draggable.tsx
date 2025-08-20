@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ScreeningAnswersCorrectnessIndicatorId, ScreeningAnswersDisplayTypeId } from '@/lib/models';
 
-import dragIndicator from '@/assets/icons/drag-indicator.svg';
+import dragIndicator from '@/assets/icons/icon-grip-dots.svg';
 import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
 import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 
