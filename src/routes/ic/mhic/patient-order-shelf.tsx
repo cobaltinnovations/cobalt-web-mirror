@@ -228,7 +228,7 @@ const ShelfContent = ({
 						});
 					}}
 				>
-					<SvgIcon kit="far" icon="xmark" size={20} className="d-block" />
+					<SvgIcon kit="far" icon="xmark" size={16} className="d-block" />
 				</Button>
 
 				<div className="mb-2 d-flex align-items-center">

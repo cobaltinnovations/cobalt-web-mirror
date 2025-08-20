@@ -47,7 +47,7 @@ export const MhicComment = ({ name, date, tag, message, onEdit, onDelete, disabl
 							className="p-2 border-0"
 							disabled={disabled}
 						>
-							<SvgIcon kit="far" icon="ellipsis" size={20} className="d-flex" />
+							<SvgIcon kit="far" icon="ellipsis" size={16} className="d-flex" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 							<Dropdown.Item onClick={onEdit}>Edit</Dropdown.Item>

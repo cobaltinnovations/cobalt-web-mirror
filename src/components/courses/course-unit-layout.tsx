@@ -256,7 +256,7 @@ export const CourseUnitLayout = ({
 							onShowMenuToggle(false);
 						}}
 					>
-						<SvgIcon kit="fas" icon="xmark" size={16} className="me-1 flex-shrink-0" />
+						<SvgIcon kit="far" icon="xmark" size={16} className="me-1 flex-shrink-0" />
 						Close
 					</Button>
 				</div>

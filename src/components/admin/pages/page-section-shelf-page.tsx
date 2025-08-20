@@ -74,21 +74,21 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 					)}
 					<h5 className="mb-0 text-truncate">{title}</h5>
 					{showEditButton && (
-						<Button variant="link" className="p-2 ms-2" onClick={onEditButtonClick}>
-							<SvgIcon kit="far" icon="pen" size={16} />
+						<Button variant="light" className="p-2 ms-2 border-0" onClick={onEditButtonClick}>
+							<SvgIcon kit="far" icon="pen" size={16} className="d-block" />
 						</Button>
 					)}
 				</div>
 				<div className="d-flex align-items-center">
 					{customHeaderElements}
 					{showDeleteButton && (
-						<Button variant="link" className="p-2" onClick={onDeleteButtonClick}>
-							<SvgIcon kit="far" icon="trash-can" size={16} />
+						<Button variant="light" className="p-2 border-0" onClick={onDeleteButtonClick}>
+							<SvgIcon kit="far" icon="trash-can" size={16} className="d-block" />
 						</Button>
 					)}
 					{showCloseButton && (
-						<Button variant="link" className="p-2" onClick={onCloseButtonButtonClick}>
-							<SvgIcon kit="fas" icon="xmark" size={16} />
+						<Button variant="light" className="p-2 border-0" onClick={onCloseButtonButtonClick}>
+							<SvgIcon kit="far" icon="xmark" size={16} className="d-block" />
 						</Button>
 					)}
 				</div>

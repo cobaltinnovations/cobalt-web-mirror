@@ -139,7 +139,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 
 			<Dropdown className={classNames(classes.shelfMoreButton, 'position-absolute')}>
 				<Dropdown.Toggle as={DropdownToggle} id={`mhic-shelf__dropdown-menu`} className="p-2 border-0">
-					<SvgIcon kit="far" icon="ellipsis" size={20} className="d-flex" />
+					<SvgIcon kit="far" icon="ellipsis" size={16} className="d-flex" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 					<Dropdown.Item

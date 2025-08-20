@@ -55,7 +55,7 @@ export const MhicOutreachItem = ({
 							className="p-2 border-0"
 							disabled={disabled}
 						>
-							<SvgIcon kit="far" icon="ellipsis" size={20} className="d-flex" />
+							<SvgIcon kit="far" icon="ellipsis" size={16} className="d-flex" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 							<Dropdown.Item onClick={onEditClick}>Edit</Dropdown.Item>

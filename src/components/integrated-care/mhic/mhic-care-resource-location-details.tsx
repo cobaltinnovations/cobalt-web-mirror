@@ -68,7 +68,7 @@ export const MhicCareResourceLocationDetails = ({ careResourceLocationId, onClos
 							className={classNames(classes.shelfCloseButton, 'p-2 border-0 position-absolute')}
 							onClick={onClose}
 						>
-							<SvgIcon kit="far" icon="xmark" size={20} className="d-block" />
+							<SvgIcon kit="far" icon="xmark" size={16} className="d-block" />
 						</Button>
 						<div className="mb-2 d-flex align-items-center">
 							<h4 className="mb-0 me-2">{careResourceLocation.resourceName}</h4>

@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
 	PatientOrderAssignmentStatusId,
 	PatientOrderOutreachStatusId,
@@ -298,13 +297,13 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 									</InputHelper>
 								)}
 								<Button
-									variant="light"
+									variant="danger"
 									className="p-2 flex-shrink-0"
 									onClick={() => {
 										handleFilterRemoveButtonClick(filterId);
 									}}
 								>
-									<CloseIcon />
+									<SvgIcon kit="fas" icon="minus" size={16} className="d-block" />
 								</Button>
 							</div>
 						);

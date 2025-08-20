@@ -78,7 +78,7 @@ const FileUploadCard: FC<FileUploadCardProps> = ({
 									id={'file-upload-card-' + imagePreview}
 									className="p-2"
 								>
-									<SvgIcon kit="far" icon="ellipsis" size={20} className="d-flex" />
+									<SvgIcon kit="far" icon="ellipsis" size={16} className="d-flex" />
 								</Dropdown.Toggle>
 								<Dropdown.Menu
 									compact
