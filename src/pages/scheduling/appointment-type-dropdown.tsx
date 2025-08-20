@@ -1,4 +1,4 @@
-import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-unfold.svg';
+import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-select.svg';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { SchedulingAppointmentType } from '@/lib/models';
