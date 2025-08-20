@@ -24,7 +24,6 @@ import classNames from 'classnames';
 import { PatientOrdersListResponse } from '@/lib/services';
 import NoData from '@/components/no-data';
 
-import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
 import SvgIcon from '@/components/svg-icon';
 
 const dispositionVariantMap = {
@@ -568,7 +567,10 @@ export const MhicPatientOrderTable = ({
 																dispositionVariantMap[po.patientOrderDispositionId]
 															}
 														>
-															<FilledCircleIcon
+															<SvgIcon
+																kit="fas"
+																icon="circle-small"
+																size={16}
 																className={
 																	classes[`${po.patientOrderDispositionId}-icon`]
 																}
