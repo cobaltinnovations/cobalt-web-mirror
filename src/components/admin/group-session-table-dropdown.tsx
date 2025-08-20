@@ -121,7 +121,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onCancel(groupSession.groupSessionId);
 						}}
 					>
-						<SvgIcon kit="far" icon="circle-xmark" size={16} className="me-2 text-n500" />
+						<SvgIcon kit="far" icon="calendar-xmark" size={16} className="me-2 text-n500" />
 						Cancel
 					</Dropdown.Item>
 				)}

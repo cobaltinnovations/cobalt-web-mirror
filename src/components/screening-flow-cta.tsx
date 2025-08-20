@@ -5,8 +5,8 @@ import classNames from 'classnames';
 
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
 import useAccount from '@/hooks/use-account';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	screeningFlowCta: {
@@ -50,7 +50,7 @@ const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 						startScreeningFlow();
 					}}
 				>
-					<AssessmentIcon className="me-2" />
+					<SvgIcon kit="far" icon="clipboard-list-check" size={16} className="me-2" />
 					Take the Assessment
 				</Button>
 			</div>

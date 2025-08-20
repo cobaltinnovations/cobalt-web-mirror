@@ -10,11 +10,6 @@ import { PatientOrderDispositionId, PatientOrderModel, PatientOrderResourcingSta
 import { integratedCareService } from '@/lib/services';
 
 import SvgIcon from '@/components/svg-icon';
-import { ReactComponent as CallMsgIcon } from '@/assets/icons/icon-call-msg.svg';
-import { ReactComponent as AssessmentIcon } from '@/assets/icons/icon-assessment.svg';
-import { ReactComponent as EditCalendarIcon } from '@/assets/icons/icon-edit-calendar.svg';
-import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as AddNotesIcon } from '@/assets/icons/icon-add-notes.svg';
 import { useNavigate, useRevalidator } from 'react-router-dom';
 import { MhicScheduleAssessmentModal } from './mhic-schedule-assessment-modal';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
@@ -159,14 +154,14 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowAddVoicemailTaskModal(true);
 						}}
 					>
-						<CallMsgIcon className="text-gray" /> Add Voicemail Task
+						<SvgIcon kit="far" icon="voicemail" size={20} className="text-gray" /> Add Voicemail Task
 					</Dropdown.Item>
 					<Dropdown.Item
 						onClick={() => {
 							setShowScheduleCallModal(true);
 						}}
 					>
-						<EventIcon className="text-gray" /> Schedule Call
+						<SvgIcon kit="far" icon="calendar-clock" size={20} className="text-gray" /> Schedule Call
 					</Dropdown.Item>
 
 					{!assessmentInProgress && !assessmentCompleted && (
@@ -177,14 +172,16 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 									navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 								}}
 							>
-								<AssessmentIcon className="text-gray" /> Start Assessment
+								<SvgIcon kit="far" icon="clipboard-list-check" size={20} className="text-gray" /> Start
+								Assessment
 							</Dropdown.Item>
 							<Dropdown.Item
 								onClick={() => {
 									setShowScheduleAssessmentModal(true);
 								}}
 							>
-								<EditCalendarIcon className="text-gray" /> Schedule Assessment
+								<SvgIcon kit="far" icon="calendar-clock" size={20} className="text-gray" /> Schedule
+								Assessment
 							</Dropdown.Item>
 						</>
 					)}
@@ -203,7 +200,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 									revalidator.revalidate();
 								}}
 							>
-								<AddNotesIcon className="text-gray" /> Add Resource Request
+								<SvgIcon kit="far" icon="note" size={20} className="text-gray" /> Add Resource Request
 							</Dropdown.Item>
 						</>
 					)}
@@ -213,7 +210,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 							setShowCloseEpisodeModal(true);
 						}}
 					>
-						<SvgIcon kit="far" icon="xmark" size={20} className="text-gray" /> Close Episode
+						<SvgIcon kit="far" icon="file-circle-xmark" size={20} className="text-gray" /> Close Episode
 					</Dropdown.Item>
 				</Dropdown.Menu>
 			</Dropdown>
