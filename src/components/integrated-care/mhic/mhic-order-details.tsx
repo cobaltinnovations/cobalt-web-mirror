@@ -545,7 +545,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												<SvgIcon
 													kit="far"
 													icon="arrow-up-right-from-square"
-													size={20}
+													size={16}
 													className="ms-2"
 												/>
 											</Button>

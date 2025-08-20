@@ -211,12 +211,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											disabled={isExportingResults}
 										>
 											Export Results
-											<SvgIcon
-												kit="far"
-												icon="arrow-up-right-from-square"
-												size={20}
-												className="ms-2"
-											/>
+											<SvgIcon kit="far" icon="copy" size={16} className="ms-2" />
 										</Button>
 									</div>
 								</div>
