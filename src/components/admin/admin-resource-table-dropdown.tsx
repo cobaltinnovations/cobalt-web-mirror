@@ -7,8 +7,8 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import SvgIcon from '../svg-icon';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
-import { ReactComponent as UnArchiveIcon } from '@/assets/icons/unarchive.svg';
+import { ReactComponent as ArchiveIcon } from '@/assets/icons/icon-archive.svg';
+import { ReactComponent as UnArchiveIcon } from '@/assets/icons/icon-unarchive.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';

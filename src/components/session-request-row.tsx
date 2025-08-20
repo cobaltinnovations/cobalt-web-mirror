@@ -7,7 +7,7 @@ import SessionDropdown from '@/components/session-dropdown';
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
 import SvgIcon from './svg-icon';
-import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
+import { ReactComponent as ArchiveIcon } from '@/assets/icons/icon-archive.svg';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
