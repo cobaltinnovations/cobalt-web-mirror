@@ -7,7 +7,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((_theme) => ({
 	modal: {
@@ -134,7 +134,12 @@ export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
 						/>
 						{urlNameValidation?.available === false ? null : (
 							<div className="d-flex align-items-center">
-								<InfoIcon className="me-1 text-n500 flex-shrink-0" width={12} height={12} />
+								<SvgIcon
+									kit="fas"
+									icon="circle-info"
+									size={16}
+									className="me-2 text-n500 flex-shrink-0"
+								/>
 								<p className="mb-0 small">
 									{window.location.host}/pages/
 									<span className="fw-bold">{formValues.friendlyUrl}</span>

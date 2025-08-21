@@ -49,7 +49,6 @@ import ResourceDisplay from '@/components/resource-display';
 import ToggledInput from '@/components/toggled-input';
 
 import NoMatch from '@/pages/no-match';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
@@ -701,7 +700,7 @@ export const Component = () => {
 						/>
 
 						<div className="d-flex  mt-2">
-							<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 							<p className="mb-0">
 								If your resource is a TED talk, you must have permission from the original creator to
 								share their video.
@@ -836,7 +835,7 @@ export const Component = () => {
 							}}
 						/>
 						<div className="d-flex mt-2">
-							<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 							<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
 						</div>
 					</AdminFormSection>
