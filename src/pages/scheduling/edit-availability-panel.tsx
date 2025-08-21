@@ -6,7 +6,6 @@ import AsyncPage from '@/components/async-page';
 import { AvailabilityForm, AvailabilityFormSchema } from './availability-form';
 import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-utils';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { useLocation, useParams } from 'react-router-dom';
 import { useCobaltTheme } from '@/jss/theme';
@@ -97,7 +96,7 @@ export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) =
 					className="p-0"
 					onClick={() => onClose()}
 				>
-					<CloseIcon />
+					<SvgIcon kit="far" icon="xmark" size={16} />
 				</Button>
 			</div>
 

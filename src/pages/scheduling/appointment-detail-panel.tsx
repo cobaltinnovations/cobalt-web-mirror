@@ -19,8 +19,6 @@ import { CopyToClipboardButton } from './copy-to-clipboard-button';
 
 import { useSchedulingStyles } from './use-scheduling-styles';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as XIcon } from '@/assets/icons/icon-close.svg';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -216,7 +214,7 @@ export const AppointmentDetailPanel = ({
 						className="p-0"
 						onClick={() => onClose()}
 					>
-						<CloseIcon />
+						<SvgIcon kit="far" icon="xmark" size={16} />
 					</Button>
 				</div>
 
@@ -427,7 +425,7 @@ const AppointmentAttendance = ({
 							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.MISSED);
 						}}
 					>
-						<XIcon />
+						<SvgIcon kit="far" icon="xmark" size={16} />
 					</button>
 				</>
 			)}
@@ -450,7 +448,7 @@ const AppointmentAttendance = ({
 						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
 					}}
 				>
-					<XIcon />
+					<SvgIcon kit="far" icon="xmark" size={16} />
 				</button>
 			)}
 		</div>

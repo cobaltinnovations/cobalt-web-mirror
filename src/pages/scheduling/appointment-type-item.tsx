@@ -2,8 +2,8 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { Button } from 'react-bootstrap';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { AppointmentType } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 const useSchedulingStyles = createUseStyles({
 	appointmentTypeColorCircle: {
@@ -47,7 +47,7 @@ export const AppointmentTypeItem = ({ appointmentType, onEdit, invertedColor }: 
 					className="p-0"
 					onClick={() => onEdit()}
 				>
-					<EditIcon />
+					<SvgIcon kit="far" icon="pen" size={16} />
 				</Button>
 			)}
 		</div>

@@ -4,12 +4,12 @@ import { AppointmentModel } from '@/lib/models';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { appointmentService } from '@/lib/services';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { AppointmentForm } from './appointment-form';
 import { useScrollCalendar } from './use-scroll-calendar';
+import SvgIcon from '@/components/svg-icon';
 
 interface EditAppointmentPanelProps {
 	setCalendarDate: (date: Date, time?: string) => void;
@@ -83,7 +83,7 @@ export const EditAppointmentPanel = ({ setCalendarDate, onClose, focusDateOnLoad
 						onClose(appointmentId);
 					}}
 				>
-					<CloseIcon />
+					<SvgIcon kit="far" icon="xmark" size={16} />
 				</Button>
 			</div>
 
