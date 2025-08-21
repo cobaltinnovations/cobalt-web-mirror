@@ -305,7 +305,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 											);
 										}}
 									>
-										<span className="text-danger">Sign Out</span>
+										<span className="text-danger">Log Out</span>
 									</Dropdown.Item>
 								</Dropdown.Menu>
 							</Dropdown>

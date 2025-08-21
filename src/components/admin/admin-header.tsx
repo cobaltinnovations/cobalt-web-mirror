@@ -7,7 +7,6 @@ import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { config } from '@/config';
 
@@ -292,7 +291,12 @@ export const AdminHeader = () => {
 									<Dropdown.Item as={Link} to="/" target="_blank">
 										<div className="d-flex justify-content-between align-items-center">
 											<p className="mb-0 pe-4 fw-semibold">Cobalt Home</p>
-											<ExternalIcon className="text-gray" />
+											<SvgIcon
+												kit="far"
+												icon="arrow-up-right-from-square"
+												size={16}
+												className="text-gray"
+											/>
 										</div>
 									</Dropdown.Item>
 
@@ -306,7 +310,7 @@ export const AdminHeader = () => {
 											);
 										}}
 									>
-										<span className="text-danger">Sign Out</span>
+										<span className="text-danger">Log Out</span>
 									</Dropdown.Item>
 								</Dropdown.Menu>
 							</Dropdown>
