@@ -28,7 +28,6 @@ import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
 import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
@@ -40,6 +39,7 @@ import { useAppRootLoaderData } from '@/routes/root';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
+import SvgIcon from './svg-icon';
 
 export const HEADER_HEIGHT = 60;
 
@@ -773,7 +773,7 @@ const HeaderV2 = () => {
 								className="py-2"
 								toggleElement={
 									<div className="d-flex align-items-center">
-										<AvatarIcon width={20} height={20} className="text-p700" />
+										<SvgIcon kit="fas" icon="circle-user" size={20} className="text-p700" />
 										<span className="ms-4">My Account</span>
 									</div>
 								}
@@ -950,7 +950,7 @@ const HeaderV2 = () => {
 								id="mhic-header__dropdown-menu"
 								className="p-0 border-0"
 							>
-								<AvatarIcon className="d-flex" />
+								<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex" />
 							</Dropdown.Toggle>
 							<Dropdown.Menu
 								as={DropdownMenu}

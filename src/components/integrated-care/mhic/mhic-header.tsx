@@ -1,4 +1,3 @@
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import useAccount from '@/hooks/use-account';
@@ -11,6 +10,7 @@ import { Link, matchPath, useLocation, useMatch, useNavigate } from 'react-route
 import { MhicHeaderAutoComplete } from './mhic-header-autocomplete';
 import HeaderNavDropdown from '@/components/header-nav-dropdown';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 interface MhicHeaderProps {
 	recentOrders?: PatientOrderAutocompleteResult[];
@@ -288,7 +288,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 									className="p-0 border-0"
 									id="mhic-header__dropdown-menu"
 								>
-									<AvatarIcon className="d-flex text-p700" />
+									<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex text-p700" />
 								</Dropdown.Toggle>
 								<Dropdown.Menu
 									as={DropdownMenu}

@@ -5,9 +5,9 @@ import { createUseThemedStyles } from '@/jss/theme';
 import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import InCrisisHeaderButton from '@/components/in-crisis-header-button';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
@@ -66,7 +66,7 @@ export const PatientHeader = () => {
 				<InCrisisHeaderButton />
 				<Dropdown className="ms-4 d-flex align-items-center">
 					<Dropdown.Toggle as={DropdownToggle} id="mhic-header__dropdown-menu" className="p-0 border-0">
-						<AvatarIcon className="d-flex text-p700" />
+						<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex text-p700" />
 					</Dropdown.Toggle>
 					<Dropdown.Menu
 						as={DropdownMenu}

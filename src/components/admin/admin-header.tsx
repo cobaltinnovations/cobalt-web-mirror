@@ -7,12 +7,12 @@ import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { config } from '@/config';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import SvgIcon from '../svg-icon';
 
 export const ADMIN_HEADER_HEIGHT = 60;
 
@@ -280,7 +280,7 @@ export const AdminHeader = () => {
 									className="p-0 border-0"
 									id="admin-header__dropdown-menu"
 								>
-									<AvatarIcon className="d-flex" />
+									<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex" />
 								</Dropdown.Toggle>
 								<Dropdown.Menu
 									as={DropdownMenu}
