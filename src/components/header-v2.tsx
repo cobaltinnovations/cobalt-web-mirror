@@ -29,7 +29,7 @@ import mediaQueries from '@/jss/media-queries';
 import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
+import { ReactComponent as SettingsIcon } from '@/assets/icons/icon-gear-fill.svg';
 import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
 import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import InCrisisHeaderButton from './in-crisis-header-button';
@@ -290,7 +290,7 @@ const AdditionalNavigationItemIconOrImage = ({
 		case 'diversity_1':
 			return <SpacesOfColorIcon {...svgProps} />;
 		default:
-			return <AdminIcon {...svgProps} />;
+			return <SettingsIcon {...svgProps} />;
 	}
 };
 
@@ -581,7 +581,7 @@ const HeaderV2 = () => {
 				? [
 						{
 							testId: 'menuLinkAccountSettings',
-							icon: AdminIcon,
+							icon: SettingsIcon,
 							title: 'Account Settings',
 							to: '/account-settings',
 						},
