@@ -13,8 +13,8 @@ import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { integratedCareService } from '@/lib/services';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -239,11 +239,12 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 							);
 						})}
 
-						<div className="d-flex">
+						<div className="d-flex align-items-center">
 							<Button
 								disabled={isSaving}
 								variant="link"
-								className="mb-4 ms-auto text-decoration-none"
+								size="sm"
+								className="mb-4 ms-auto text-decoration-none d-flex align-items-center"
 								onClick={() => {
 									setFormValues((previousValues) => ({
 										...previousValues,
@@ -251,7 +252,7 @@ export const MhicChangeTriageModal: FC<Props> = ({ patientOrder, referenceData, 
 									}));
 								}}
 							>
-								<PlusIcon /> Add Treatment Disposition
+								<SvgIcon kit="fas" icon="plus" size={16} className="me-2" /> Add Treatment Disposition
 							</Button>
 						</div>
 
