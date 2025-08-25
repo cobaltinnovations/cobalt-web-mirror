@@ -243,7 +243,7 @@ const useMegaFilterCollapseStyles = createUseThemedStyles((theme) => ({
 		display: 'flex',
 		marginBottom: 24,
 		appearance: 'none',
-		alignitems: 'center',
+		alignItems: 'center',
 		color: theme.colors.n700,
 		...theme.fonts.bodyBold,
 		...theme.fonts.h5.default,
@@ -298,7 +298,7 @@ const MegaFilterCollapse = ({
 						kit="far"
 						icon="chevron-down"
 						size={16}
-						className="d-flex"
+						className="ms-2 d-flex"
 						style={{ transform: `scaleY(${show ? -1 : 1})` }}
 					/>
 				</Button>
