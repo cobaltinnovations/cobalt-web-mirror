@@ -17,6 +17,7 @@ import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '../svg-icon';
+import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	screeningFlowOuter: {
@@ -25,6 +26,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		overflow: 'hidden',
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.n100}`,
+		[mediaQueries.lg]: {
+			padding: 32,
+		},
 	},
 	imageOuter: {
 		'& img': {
@@ -95,6 +99,10 @@ export const CourseUnitAvailable = ({
 		);
 	}, [courseUnit.courseUnitTypeId, courseUnit.unitCompletionTypeId, isComplete]);
 
+	const memoizedCompletionThresholdPassed = useCallback(() => {
+		onCompletionThresholdPassed(courseUnit);
+	}, [courseUnit, onCompletionThresholdPassed]);
+
 	return (
 		<>
 			{dependencyCourseUnits.length > 0 && (
@@ -147,22 +155,28 @@ export const CourseUnitAvailable = ({
 					onVideoPlayerEvent={handleVideoPlayerEvent}
 					onVideoPlayerEnd={handleUnitComplete}
 					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
-					onCompletionThresholdPassed={() => {
-						onCompletionThresholdPassed(courseUnit);
-					}}
+					onCompletionThresholdPassed={memoizedCompletionThresholdPassed}
 				/>
 			)}
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE) && (
-				<div className={classes.imageOuter}>
-					<img src={courseUnit.imageUrl} alt="" />
-				</div>
+				<>
+					{courseUnit.imageUrl && (
+						<div
+							className={classNames(classes.imageOuter, {
+								'mb-8': (courseUnit.courseUnitDownloadableFiles ?? []).length > 0,
+							})}
+						>
+							<img src={courseUnit.imageUrl} alt="" />
+						</div>
+					)}
+				</>
 			)}
 
 			{(courseUnit.courseUnitDownloadableFiles ?? []).length > 0 && (
-				<div className="pt-8">
+				<div>
 					{(courseUnit.courseUnitDownloadableFiles ?? []).map(
 						(courseUnitDownloadableFile, courseUnitDownloadableFileIndex) => {
 							const isLast =

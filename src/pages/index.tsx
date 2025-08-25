@@ -617,7 +617,6 @@ const Index: FC = () => {
 												className={classNames({ 'mb-8': !isLast })}
 												key={course.courseId}
 												variant="light"
-												subheading="Coming soon"
 												heading={course.title}
 												descriptionHtml={course.description}
 												imageUrl={course.imageUrl}

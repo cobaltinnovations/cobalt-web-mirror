@@ -5,14 +5,24 @@ import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '../svg-icon';
 
-const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number) => JSX.Element> = {
-	CARD_SORT: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
-	HOMEWORK: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
-	INFOGRAPHIC: (size) => <SvgIcon kit="far" icon="newspaper" size={size} />,
-	QUIZ: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
-	REORDER: (size) => <SvgIcon kit="far" icon="clipboard-list-check" size={size} />,
-	THINGS_TO_SHARE: (size) => <SvgIcon kit="far" icon="download" size={size} />,
-	VIDEO: (size) => <SvgIcon kit="fak" icon="video" size={size} />,
+const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number, className?: string) => JSX.Element> = {
+	CARD_SORT: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	HOMEWORK: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	INFOGRAPHIC: (size, className?: string) => <SvgIcon kit="far" icon="newspaper" size={size} className={className} />,
+	QUIZ: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	REORDER: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	THINGS_TO_SHARE: (size, className?: string) => (
+		<SvgIcon kit="far" icon="download" size={size} className={className} />
+	),
+	VIDEO: (size, className?: string) => <SvgIcon kit="fak" icon="video" size={size} className={className} />,
 };
 
 interface UseStylesProps {
@@ -55,7 +65,7 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 						{courseUnit.showUnitAsComplete ? (
 							<SvgIcon kit="fak" icon="check" size={compact ? 16 : 20} className="text-white" />
 						) : (
-							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 16 : 20)
+							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24, 'text-white')
 						)}
 					</>
 				) : (
