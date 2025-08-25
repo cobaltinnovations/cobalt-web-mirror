@@ -2,6 +2,7 @@ import {
 	AdminAnalyticsWidget,
 	isChartWidget,
 	isCounterWidget,
+	isLineChartWidget,
 	isTableWidget,
 } from '@/lib/services/admin-analytics-service';
 
@@ -43,6 +44,15 @@ export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyti
 					return (
 						<Col key={idx}>
 							<AnalyticsWidgetTableCard widget={widget} />
+						</Col>
+					);
+				} else if (isLineChartWidget(widget)) {
+					return (
+						<Col key={idx}>
+							<AnalyticsWidgetCard
+								widget={widget}
+								chart={<Chart.Line label={widget.widgetChartLabel} data={widget.widgetData} />}
+							/>
 						</Col>
 					);
 				}

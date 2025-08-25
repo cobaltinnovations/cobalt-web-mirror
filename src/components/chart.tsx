@@ -3,7 +3,7 @@ import { AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-se
 import { ChartDataset, LinearScaleOptions } from 'chart.js';
 import Color from 'color';
 import React, { useMemo } from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Table, TableBody, TableCell, TableHead, TableRow } from './table';
 import { DeepPartial } from 'chart.js/dist/types/utils';
 
@@ -156,7 +156,42 @@ const PieChart = ({ label, data }: ChartProps) => {
 	);
 };
 
+const LineChart = ({ label, data }: ChartProps) => {
+	const theme = useCobaltTheme();
+
+	const chartData = useMemo(() => {
+		const labels: string[] = [];
+
+		const dataset = data.reduce<ChartDataset<'line', number[]>>(
+			(acc, point, index, arr) => {
+				labels.push(point.label);
+				acc.data.push(point.count);
+
+				const legendColor = Color(theme.colors.p500)
+					.lighten(index * (1 / arr.length))
+					.hex();
+
+				Array.isArray(acc.backgroundColor) && acc.backgroundColor.push(legendColor);
+				return acc;
+			},
+			{
+				label,
+				data: [],
+				backgroundColor: [],
+			}
+		);
+
+		return {
+			labels,
+			datasets: [dataset],
+		};
+	}, [data, label, theme.colors.p500]);
+
+	return <Line data={chartData} />;
+};
+
 export const Chart = {
 	Bar: BarChart,
 	Pie: PieChart,
+	Line: LineChart,
 } as const;

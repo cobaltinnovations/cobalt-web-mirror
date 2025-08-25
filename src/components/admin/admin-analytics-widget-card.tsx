@@ -4,6 +4,7 @@ import { Button, Card, Dropdown } from 'react-bootstrap';
 import {
 	AdminAnalyticsChartWidget,
 	AdminAnalyticsCounterWidget,
+	AdminAnalyticsLineChartWidget,
 	AdminAnalyticsTableWidget,
 	AdminAnalyticsWidget,
 } from '@/lib/services/admin-analytics-service';
@@ -44,7 +45,7 @@ const useAnalyticsWidgetStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface AnalyticsWidgetCardProps {
-	widget: AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget;
+	widget: AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget | AdminAnalyticsLineChartWidget;
 	chart?: ReactNode;
 }
 
