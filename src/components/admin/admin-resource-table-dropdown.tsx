@@ -6,13 +6,6 @@ import { AdminContent, AdminContentAction, ContentStatusId } from '@/lib/models'
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
 import SvgIcon from '../svg-icon';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import { ReactComponent as ArchiveIcon } from '@/assets/icons/icon-archive.svg';
-import { ReactComponent as UnArchiveIcon } from '@/assets/icons/icon-unarchive.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
-import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import ConfirmDialog, { ConfirmDialogProps } from '../confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
 import { AdminContentResponse, ContentIdResponse, adminService } from '@/lib/services';
@@ -69,7 +62,7 @@ const adminActionConfirmDialogPropsMap: Record<
 
 const actionItemProps: Record<string, ActionItemProps> = {
 	[AdminContentAction.ARCHIVE]: {
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'box-arrow-down'} className="me-2 text-n500" size={16} />,
 		label: 'Archive',
 		dividers: false,
 		action: async (content) => {
@@ -80,7 +73,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.DELETE]: {
 		// icon: DeleteIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'trash-can'} className="me-2 text-n500" size={16} />,
 		label: 'Delete',
 		dividers: false,
 		action: async (content) => {
@@ -91,7 +84,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.EDIT]: {
 		// icon: EditIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'pen'} className="me-2 text-n500" size={16} />,
 		label: 'Edit',
 		dividers: false,
 		linkProps: (content) => {
@@ -103,7 +96,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.EXPIRE]: {
 		// icon: EventIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'calendar-circle-minus'} className="me-2 text-n500" size={16} />,
 		label: 'Force Expire',
 		dividers: false,
 		action: async (content) => {
@@ -114,7 +107,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.REMOVE]: {
 		// icon: CloseIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'circle-xmark'} className="me-2 text-n500" size={24} />,
 		label: 'Remove',
 		dividers: false,
 		action: async (content) => {
@@ -125,7 +118,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.UNARCHIVE]: {
 		// icon: UnArchiveIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'box-arrow-down-arrow-up'} className="me-2 text-n500" size={16} />,
 		label: 'Unarchive',
 		dividers: false,
 		action: async () => {
@@ -136,7 +129,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.UNEXPIRE]: {
 		// icon: UnArchiveIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'calendar-clock'} className="me-2 text-n500" size={16} />,
 		label: 'Unexpire',
 		dividers: false,
 		action: async (content) => {
@@ -149,7 +142,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 	},
 	[AdminContentAction.VIEW_ON_COBALT]: {
 		// icon: ExternalIcon,
-		icon: <SvgIcon kit={''} icon={'link'} className="me-2 text-n500" size={24} />,
+		icon: <SvgIcon kit={'far'} icon={'arrow-up-right-from-square'} className="me-2 text-n500" size={16} />,
 		label: 'View on Cobalt',
 		dividers: true,
 		linkProps: (content) => {
