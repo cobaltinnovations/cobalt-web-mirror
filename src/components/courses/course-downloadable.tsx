@@ -5,7 +5,6 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as DocxIcon } from '@/assets/icons/filetype-docx.svg';
 import { ReactComponent as DocIcon } from '@/assets/icons/filetype-doc.svg';
 import { ReactComponent as PdfIcon } from '@/assets/icons/filetype-pdf.svg';
-import { ReactComponent as CsvIcon } from '@/assets/icons/filetype-csv.svg';
 import SvgIcon from '../svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -44,12 +43,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 const iconMap: Record<string, JSX.Element> = {
-	'application/pdf': <PdfIcon className="text-n500" />,
-	'application/msword': <DocIcon className="text-n500" />,
-	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': <DocxIcon className="text-n500" />,
-	'application/vnd.openxmlformats-officedocument.wordprocessingml.template': <DocxIcon className="text-n500" />,
-	'application/vnd.ms-word.document.macroEnabled.12': <DocxIcon className="text-n500" />,
-	'text/csv': <CsvIcon className="text-n500" />,
+	'application/pdf': <SvgIcon kit="far" icon="file-pdf" size={32} className="text-n500" />,
+	'application/msword': <SvgIcon kit="far" icon="file-doc" size={32} className="text-n500" />,
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': (
+		<SvgIcon kit="far" icon="file-doc" size={32} className="text-n500" />
+	),
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.template': (
+		<SvgIcon kit="far" icon="file-doc" size={32} className="text-n500" />
+	),
+	'application/vnd.ms-word.document.macroEnabled.12': (
+		<SvgIcon kit="far" icon="file-doc" size={32} className="text-n500" />
+	),
+	'text/csv': <SvgIcon kit="far" icon="file-csv" size={32} className="text-n500" />,
 };
 
 interface CourseDownloadableProps {
