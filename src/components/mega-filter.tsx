@@ -6,7 +6,6 @@ import { AddOrRemoveValueFromArray } from '@/lib/utils/form-utils';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
@@ -295,7 +294,13 @@ const MegaFilterCollapse = ({
 					}}
 				>
 					{title}
-					<DownChevron className="d-flex" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
+					<SvgIcon
+						kit="far"
+						icon="chevron-down"
+						size={16}
+						className="d-flex"
+						style={{ transform: `scaleY(${show ? -1 : 1})` }}
+					/>
 				</Button>
 			)}
 			<Collapse in={show}>

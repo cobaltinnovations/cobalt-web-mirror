@@ -4,8 +4,7 @@ import classNames from 'classnames';
 
 import { SORT_DIRECTION } from '.';
 import { createUseThemedStyles } from '@/jss/theme';
-
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
+import SvgIcon from '../svg-icon';
 
 interface UseStylesProps {
 	header?: boolean;
@@ -108,9 +107,11 @@ export const TableCell: FC<TableCellProps> = React.memo(
 						<Button variant="link" className={classes.sortableButton} onClick={handleSortButtonClick}>
 							{children}
 							{sortDirection === SORT_DIRECTION.ASC && (
-								<DownChevron width={20} height={20} style={{ transform: 'scaleY(-1)' }} />
+								<SvgIcon kit="far" icon="chevron-down" size={16} style={{ transform: 'scaleY(-1)' }} />
 							)}
-							{sortDirection === SORT_DIRECTION.DESC && <DownChevron width={20} height={20} />}
+							{sortDirection === SORT_DIRECTION.DESC && (
+								<SvgIcon kit="far" icon="chevron-down" size={16} />
+							)}
 						</Button>
 					) : (
 						<> {children}</>

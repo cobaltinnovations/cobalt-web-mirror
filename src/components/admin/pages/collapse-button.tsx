@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useState } from 'react';
 import { Button, Collapse } from 'react-bootstrap';
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	collapseButton: {
@@ -35,7 +35,13 @@ export const CollapseButton = ({ title, initialShow, children }: PropsWithChildr
 		<>
 			<Button className={classes.collapseButton} bsPrefix="collapse-button" onClick={() => setShow(!show)}>
 				{title}
-				<DownChevron className="d-flex text-n500" style={{ transform: `scaleY(${show ? -1 : 1})` }} />
+				<SvgIcon
+					kit="far"
+					icon="chevron-down"
+					size={16}
+					className="d-flex text-n500"
+					style={{ transform: `scaleY(${show ? -1 : 1})` }}
+				/>
 			</Button>
 			<Collapse in={show}>
 				<div>{children}</div>

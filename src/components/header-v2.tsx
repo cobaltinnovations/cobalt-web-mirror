@@ -26,7 +26,6 @@ import { exploreLinks } from '@/menu-links';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import InCrisisHeaderButton from './in-crisis-header-button';
 import HeaderNavDropdown from './header-nav-dropdown';
@@ -307,7 +306,7 @@ const MobileAccordianItem = ({
 				}}
 			>
 				{toggleElement}
-				<DownChevron className="text-n300" />
+				<SvgIcon kit="far" icon="chevron-down" size={16} className="text-n300" />
 			</Button>
 			<Collapse in={isExpanded}>
 				<div>
