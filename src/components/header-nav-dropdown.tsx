@@ -52,7 +52,7 @@ const HeaderNavDropdown = ({
 		>
 			<Dropdown.Toggle as={DropdownToggle}>
 				{title}
-				<SvgIcon kit="fas" icon="angle-down" size={10} className="ms-2" />
+				<SvgIcon kit="far" icon="angle-down" size={10} className="ms-2" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				className={classNames(classes.dropdownMenu, 'p-0')}
