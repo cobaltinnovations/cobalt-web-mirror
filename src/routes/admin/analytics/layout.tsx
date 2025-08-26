@@ -14,14 +14,26 @@ import {
 	LinearScale,
 	LineElement,
 	PointElement,
+	TimeScale,
 	Tooltip,
 } from 'chart.js';
+import 'chartjs-adapter-moment';
 import React, { Suspense, useMemo } from 'react';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import { Outlet, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement);
+ChartJS.register(
+	ArcElement,
+	Tooltip,
+	Legend,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	PointElement,
+	LineElement,
+	TimeScale
+);
 
 type AdminAnalyticsLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 

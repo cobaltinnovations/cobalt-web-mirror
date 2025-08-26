@@ -51,7 +51,26 @@ export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyti
 						<Col key={idx}>
 							<AnalyticsWidgetCard
 								widget={widget}
-								chart={<Chart.Line label={widget.widgetChartLabel} data={widget.widgetData} />}
+								chart={
+									<Chart.Line
+										label={widget.widgetChartLabel}
+										data={widget.widgetData}
+										options={
+											widget.widgetTypeId === 'LINE_CHART'
+												? {
+														scales: {
+															x: {
+																type: 'time',
+																time: {
+																	unit: 'month',
+																},
+															},
+														},
+												  }
+												: undefined
+										}
+									/>
+								}
 							/>
 						</Col>
 					);

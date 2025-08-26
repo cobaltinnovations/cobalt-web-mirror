@@ -1,15 +1,33 @@
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import { AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-service';
-import { ChartDataset, LinearScaleOptions } from 'chart.js';
+import {
+	ChartDataset,
+	ChartTypeRegistry,
+	CoreChartOptions,
+	DatasetChartOptions,
+	ElementChartOptions,
+	LinearScaleOptions,
+	LineControllerChartOptions,
+	PluginChartOptions,
+	ScaleChartOptions,
+} from 'chart.js';
 import Color from 'color';
 import React, { useMemo } from 'react';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Table, TableBody, TableCell, TableHead, TableRow } from './table';
-import { DeepPartial } from 'chart.js/dist/types/utils';
+import { _DeepPartialObject, DeepPartial } from 'chart.js/dist/types/utils';
 
-interface ChartProps {
+interface ChartProps<T extends keyof ChartTypeRegistry> {
 	label: string;
 	data: AdminAnalyticsWidgetChartData[];
+	options?: _DeepPartialObject<
+		CoreChartOptions<T> &
+			ElementChartOptions<T> &
+			PluginChartOptions<T> &
+			DatasetChartOptions<T> &
+			ScaleChartOptions<T> &
+			LineControllerChartOptions
+	>;
 }
 
 const useChartStyles = createUseThemedStyles((theme) => ({
@@ -29,7 +47,7 @@ const defaultScaleOptions: DeepPartial<LinearScaleOptions> = {
 	},
 };
 
-const BarChart = ({ label, data }: ChartProps) => {
+const BarChart = ({ label, data }: ChartProps<'bar'>) => {
 	const theme = useCobaltTheme();
 	const classes = useChartStyles();
 
@@ -108,7 +126,7 @@ const BarChart = ({ label, data }: ChartProps) => {
 	);
 };
 
-const PieChart = ({ label, data }: ChartProps) => {
+const PieChart = ({ label, data }: ChartProps<'pie'>) => {
 	const theme = useCobaltTheme();
 
 	const chartData = useMemo(() => {
@@ -156,7 +174,7 @@ const PieChart = ({ label, data }: ChartProps) => {
 	);
 };
 
-const LineChart = ({ label, data }: ChartProps) => {
+const LineChart = ({ label, data, options }: ChartProps<'line'>) => {
 	const theme = useCobaltTheme();
 
 	const chartData = useMemo(() => {
@@ -181,13 +199,16 @@ const LineChart = ({ label, data }: ChartProps) => {
 			}
 		);
 
+		console.log('labels', labels);
+		console.log('labels', [dataset]);
+
 		return {
 			labels,
 			datasets: [dataset],
 		};
 	}, [data, label, theme.colors.p500]);
 
-	return <Line data={chartData} />;
+	return <Line data={chartData} options={options} />;
 };
 
 export const Chart = {
