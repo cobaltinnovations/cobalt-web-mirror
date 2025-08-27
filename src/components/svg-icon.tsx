@@ -1,8 +1,8 @@
 import React from 'react';
-import { byPrefixAndName, IconName } from '@awesome.me/kit-c75e843088/icons';
+import { byPrefixAndName, IconName, IconPrefix } from '@awesome.me/kit-c75e843088/icons';
 
 type SvgIconProps = {
-	kit: string;
+	kit: IconPrefix;
 	icon: IconName;
 	title?: string;
 	size?: number | string;
@@ -48,7 +48,7 @@ const SvgIcon = ({ kit, icon, title, size, className, style }: SvgIconProps) => 
 	);
 };
 
-export const maskImageSvg = ({ kit, icon }: { kit: string; icon: IconName }) => {
+export const maskImageSvg = ({ kit, icon }: { kit: IconPrefix; icon: IconName }) => {
 	const iconPack = byPrefixAndName[kit];
 
 	if (!iconPack) {
