@@ -217,7 +217,7 @@ export const CourseUnitLayout = ({
 				<div className={classes.headerLeft}>
 					<div className={classes.exitButtonOuter}>
 						<Button type="button" variant="link" className={classes.exitButton} onClick={onExitButtonClick}>
-							<SvgIcon kit="far" icon="arrow-left" size={20} className="me-lg-1" />
+							<SvgIcon kit="far" icon="arrow-left" size={16} className="me-lg-1" />
 							<span className="d-none d-lg-inline">Exit</span>
 						</Button>
 					</div>
