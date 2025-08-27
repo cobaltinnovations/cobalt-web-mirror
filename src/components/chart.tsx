@@ -199,9 +199,6 @@ const LineChart = ({ label, data, options }: ChartProps<'line'>) => {
 			}
 		);
 
-		console.log('labels', labels);
-		console.log('labels', [dataset]);
-
 		return {
 			labels,
 			datasets: [dataset],
