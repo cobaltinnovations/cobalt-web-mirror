@@ -459,7 +459,7 @@ export const MhicPatientOrderTable = ({
 												>
 													{getFlagCount(po) > 0 && (
 														<>
-															<span className="text-gray">{getFlagCount(po)}</span>
+															<span className="me-1 text-gray">{getFlagCount(po)}</span>
 															<SvgIcon
 																kit="fas"
 																icon="flag-pennant"
