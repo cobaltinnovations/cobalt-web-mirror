@@ -14,8 +14,7 @@ import InlineAlert from '@/components/inline-alert';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
-import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
-import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 import { cloneDeep } from 'lodash';
 import { Collapse } from 'react-bootstrap';
 import mediaQueries from '@/jss/media-queries';
@@ -65,13 +64,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 		'&--correct': {
 			'&:before': {
-				maskImage: `url(${checkCircleFill}) !important`,
+				maskSize: 20,
+				maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-check' }),
 				backgroundColor: `${theme.colors.s500} !important`,
 			},
 		},
 		'&--incorrect': {
 			'&:before': {
-				maskImage: `url(${cancelFill}) !important`,
+				maskSize: 20,
+				maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-xmark' }),
 				backgroundColor: `${theme.colors.n500} !important`,
 			},
 		},

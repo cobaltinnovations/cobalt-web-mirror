@@ -3,9 +3,6 @@ import { Draggable } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ScreeningAnswersCorrectnessIndicatorId, ScreeningAnswersDisplayTypeId } from '@/lib/models';
-
-import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
-import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
 import { maskImageSvg } from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -38,12 +35,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 		'&.correct .drag-handle': {
 			maskSize: 20,
-			maskImage: `url(${checkCircleFill})`,
+			maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-check' }),
 			backgroundColor: theme.colors.s500,
 		},
 		'&.incorrect .drag-handle': {
 			maskSize: 20,
-			maskImage: `url(${cancelFill})`,
+			maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-xmark' }),
 			backgroundColor: theme.colors.n500,
 		},
 		'&.success:after': {

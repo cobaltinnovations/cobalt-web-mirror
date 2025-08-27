@@ -48,8 +48,6 @@ const SvgIcon = ({ kit, icon, title, size, className, style }: SvgIconProps) => 
 	);
 };
 
-export default SvgIcon;
-
 export const maskImageSvg = ({ kit, icon }: { kit: string; icon: IconName }) => {
 	const iconPack = byPrefixAndName[kit];
 
@@ -88,3 +86,5 @@ export const maskImageSvg = ({ kit, icon }: { kit: string; icon: IconName }) => 
 
 	return `url(data:image/svg+xml;utf8,${svgData})`;
 };
+
+export default SvgIcon;
