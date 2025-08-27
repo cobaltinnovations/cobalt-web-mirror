@@ -98,7 +98,7 @@ export const getKalturaScriptForVideo = ({
 }: {
 	videoPlayerId: string;
 	courseVideo: CourseVideoModel;
-	eventCallback: (eventName: string, event: string | number | object) => void;
+	eventCallback: (eventName: string, event: string | number | object, mediaProxy: unknown) => void;
 	errorCallback: (error: unknown) => void;
 }) => {
 	const script = document.createElement('script');
@@ -110,10 +110,24 @@ export const getKalturaScriptForVideo = ({
 			targetId: videoPlayerId,
 			wid: courseVideo.kalturaWid,
 			uiconf_id: courseVideo.kalturaUiconfId,
-			entry_id: courseVideo.kalturaEntryId,
+			...(courseVideo.kalturaEntryId && { entry_id: courseVideo.kalturaEntryId }),
+			...(courseVideo.kalturaPlaylistId && {
+				flashvars: {
+					playlistAPI: {
+						plugin: true,
+						includeInLayout: true,
+						autoPlay: false,
+						autoInsert: true,
+						layout: 'vertical',
+						kpl0Name: '',
+						kpl0Url: `http://www.kaltura.com/index.php/partnerservices2/executeplaylist?uid=&partner_id=${courseVideo.kalturaPartnerId}&subp_id=${courseVideo.kalturaPartnerId}00&format=8&ks={ks}&playlist_id=${courseVideo.kalturaPlaylistId}`,
+					},
+				},
+			}),
 			readyCallback: (playerID: string) => {
 				const kdp = document.getElementById(playerID);
 				const events = [
+					// generic
 					'layoutBuildDone',
 					'playerReady',
 					'mediaLoaded',
@@ -136,14 +150,25 @@ export const getKalturaScriptForVideo = ({
 					'playerPlayEnd',
 					'onChangeMedia',
 					'onChangeMediaDone',
+					// playlist specific
+					'playlistReady',
+					'playlistItemChanged',
+					'playlistPlayNext',
+					'playlistPlayPrev',
+					'playlistEnded',
+					'playlistUpdate',
+					'mediaReady',
 				];
 
 				for (let i = 0; i < events.length; i++) {
-					if (!kdp) return;
+					if (!kdp) {
+						return;
+					}
 
 					// @ts-ignore
 					kdp.kBind(events[i], (event: string | number | object) => {
-						eventCallback(events[i], event);
+						// @ts-ignore
+						eventCallback(events[i], event, kdp.evaluate('{mediaProxy.entry}'));
 					});
 				}
 			},
