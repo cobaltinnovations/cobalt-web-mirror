@@ -289,14 +289,14 @@ export const AdminHeader = () => {
 									renderOnMount
 								>
 									<Dropdown.Item as={Link} to="/" target="_blank">
-										<div className="d-flex justify-content-between align-items-center">
-											<p className="mb-0 pe-4 fw-semibold">Cobalt Home</p>
+										<div className="d-flex align-items-center">
 											<SvgIcon
 												kit="far"
-												icon="arrow-up-right-from-square"
+												icon="arrow-left-arrow-right"
 												size={16}
-												className="text-gray"
+												className="me-4 text-gray"
 											/>
+											<p className="mb-0 pe-4 fw-semibold">Cobalt Home</p>
 										</div>
 									</Dropdown.Item>
 
@@ -310,7 +310,15 @@ export const AdminHeader = () => {
 											);
 										}}
 									>
-										<span className="text-danger">Log Out</span>
+										<div className="d-flex align-items-center">
+											<SvgIcon
+												kit="far"
+												icon="arrow-left-from-bracket"
+												size={16}
+												className="me-4 text-danger"
+											/>
+											<p className="mb-0 pe-4 fw-semibold text-danger">Log Out</p>
+										</div>
 									</Dropdown.Item>
 								</Dropdown.Menu>
 							</Dropdown>

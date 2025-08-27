@@ -185,7 +185,12 @@ const GroupSession = ({
 												className="text-primary me-4"
 											/>
 										) : (
-											<SvgIcon kit="far" icon="clock" size={20} className="text-primary me-4" />
+											<SvgIcon
+												kit="far"
+												icon="calendar"
+												size={20}
+												className="text-primary me-4"
+											/>
 										)}
 
 										{groupSession.singleSessionFlag ? (

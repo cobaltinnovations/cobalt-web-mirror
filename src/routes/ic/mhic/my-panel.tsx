@@ -55,7 +55,7 @@ export const Component = () => {
 		const itemsWithoutCounts = [
 			{
 				title: 'Priorities',
-				icon: () => <SvgIcon kit="far" icon="square-list" size={24} className="text-p300" />,
+				icon: () => <SvgIcon kit="far" icon="calendar-day" size={20} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic');
 				},
@@ -63,7 +63,7 @@ export const Component = () => {
 			},
 			{
 				title: 'Assigned Orders',
-				icon: () => <SvgIcon kit="far" icon="files" size={24} className="text-p300" />,
+				icon: () => <SvgIcon kit="far" icon="table-list" size={20} className="text-p300" />,
 				onClick: () => {
 					navigate('/ic/mhic/my-patients/' + MhicMyPatientView.All);
 				},
@@ -84,7 +84,7 @@ export const Component = () => {
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.NEED_ASSESSMENT.patientOrderCountDescription ?? '0',
-								icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-n300" />,
+								icon: () => <SvgIcon kit="fas" icon="square-small" size={20} className="text-n300" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedAssessment);
 								},
@@ -109,7 +109,7 @@ export const Component = () => {
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.SCHEDULED_OUTREACH.patientOrderCountDescription ?? '0',
 								icon: () => (
-									<SvgIcon kit="fas" icon="square-small" size={24} className="text-warning" />
+									<SvgIcon kit="fas" icon="square-small" size={20} className="text-warning" />
 								),
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.FollowUpCalls);
@@ -122,7 +122,7 @@ export const Component = () => {
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.NEED_DOCUMENTATION.patientOrderCountDescription ?? '0',
 								icon: () => (
-									<SvgIcon kit="fas" icon="square-small" size={24} className="text-warning" />
+									<SvgIcon kit="fas" icon="square-small" size={20} className="text-warning" />
 								),
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.NeedDocumentation);
@@ -134,7 +134,7 @@ export const Component = () => {
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.SUBCLINICAL.patientOrderCountDescription ?? '0',
-								icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-p100" />,
+								icon: () => <SvgIcon kit="fas" icon="square-small" size={20} className="text-p100" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.Subclinical);
 								},
@@ -145,7 +145,7 @@ export const Component = () => {
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId.MHP
 										.patientOrderCountDescription ?? '0',
-								icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-p300" />,
+								icon: () => <SvgIcon kit="fas" icon="square-small" size={20} className="text-p300" />,
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.MHP);
 								},
@@ -157,7 +157,7 @@ export const Component = () => {
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId
 										.SPECIALTY_CARE.patientOrderCountDescription ?? '0',
 								icon: () => (
-									<SvgIcon kit="fas" icon="square-small" size={24} className="text-primary" />
+									<SvgIcon kit="fas" icon="square-small" size={20} className="text-primary" />
 								),
 								onClick: () => {
 									navigate('/ic/mhic/my-patients/' + MhicMyPatientView.SpecialtyCare);
@@ -169,7 +169,7 @@ export const Component = () => {
 								description:
 									patientOrderPanelCountsResponse?.patientOrderCountsByPatientOrderViewTypeId.CLOSED
 										.patientOrderCountDescription ?? '0',
-								icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-gray" />,
+								icon: () => <SvgIcon kit="fas" icon="square-small" size={20} className="text-gray" />,
 								onClick: () => {
 									navigate(`/ic/mhic/my-patients/${MhicMyPatientView.Closed}`);
 								},

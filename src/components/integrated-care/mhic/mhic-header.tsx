@@ -305,7 +305,15 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 											);
 										}}
 									>
-										<span className="text-danger">Log Out</span>
+										<div className="d-flex align-items-center">
+											<SvgIcon
+												kit="far"
+												icon="arrow-left-from-bracket"
+												size={16}
+												className="me-4 text-danger"
+											/>
+											<p className="mb-0 pe-4 fw-semibold text-danger">Log Out</p>
+										</div>
 									</Dropdown.Item>
 								</Dropdown.Menu>
 							</Dropdown>
