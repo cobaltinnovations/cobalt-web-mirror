@@ -104,7 +104,7 @@ export const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, Appoi
 					{selectedAppointmentType && <AppointmentTypeItem appointmentType={selectedAppointmentType} />}
 				</div>
 
-				<SvgIcon kit="fas" icon="angles-up-down" size={16} className="ms-auto" />
+				<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-auto" />
 			</button>
 		);
 	}

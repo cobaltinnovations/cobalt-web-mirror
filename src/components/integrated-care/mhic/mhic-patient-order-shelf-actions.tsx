@@ -143,45 +143,50 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 				</Dropdown.Toggle>
 				<Dropdown.Menu as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							setShowAssignOrderModal(true);
 						}}
 					>
-						<SvgIcon kit="far" icon="user-plus" size={20} className="text-gray" /> Assign MHIC
+						<SvgIcon kit="far" icon="user-plus" size={20} className="me-2 text-gray" /> Assign MHIC
 					</Dropdown.Item>
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							setShowAddVoicemailTaskModal(true);
 						}}
 					>
-						<SvgIcon kit="far" icon="voicemail" size={20} className="text-gray" /> Add Voicemail Task
+						<SvgIcon kit="far" icon="voicemail" size={20} className="me-2 text-gray" /> Add Voicemail Task
 					</Dropdown.Item>
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							setShowScheduleCallModal(true);
 						}}
 					>
-						<SvgIcon kit="far" icon="calendar-clock" size={20} className="text-gray" /> Schedule Call
+						<SvgIcon kit="far" icon="calendar-clock" size={20} className="me-2 text-gray" /> Schedule Call
 					</Dropdown.Item>
 
 					{!assessmentInProgress && !assessmentCompleted && (
 						<>
 							<Dropdown.Divider />
 							<Dropdown.Item
+								className="d-flex align-items-center"
 								onClick={() => {
 									navigate(`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`);
 								}}
 							>
-								<SvgIcon kit="far" icon="clipboard-list-check" size={20} className="text-gray" /> Start
-								Assessment
+								<SvgIcon kit="far" icon="clipboard-list-check" size={20} className="me-2 text-gray" />{' '}
+								Start Assessment
 							</Dropdown.Item>
 							<Dropdown.Item
+								className="d-flex align-items-center"
 								onClick={() => {
 									setShowScheduleAssessmentModal(true);
 								}}
 							>
-								<SvgIcon kit="far" icon="calendar-clock" size={20} className="text-gray" /> Schedule
-								Assessment
+								<SvgIcon kit="far" icon="calendar-clock" size={20} className="me-2 text-gray" />{' '}
+								Schedule Assessment
 							</Dropdown.Item>
 						</>
 					)}
@@ -189,6 +194,7 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 						<>
 							<Dropdown.Divider />
 							<Dropdown.Item
+								className="d-flex align-items-center"
 								onClick={async () => {
 									await integratedCareService
 										.updateResourcingStatus(patientOrder.patientOrderId, {
@@ -200,17 +206,20 @@ export const MhicPatientOrderShelfActions = ({ patientOrder }: MhicPatientOrderS
 									revalidator.revalidate();
 								}}
 							>
-								<SvgIcon kit="far" icon="note" size={20} className="text-gray" /> Add Resource Request
+								<SvgIcon kit="far" icon="note" size={20} className="me-2 text-gray" /> Add Resource
+								Request
 							</Dropdown.Item>
 						</>
 					)}
 					<Dropdown.Divider />
 					<Dropdown.Item
+						className="d-flex align-items-center"
 						onClick={() => {
 							setShowCloseEpisodeModal(true);
 						}}
 					>
-						<SvgIcon kit="far" icon="file-circle-xmark" size={20} className="text-gray" /> Close Episode
+						<SvgIcon kit="far" icon="file-circle-xmark" size={20} className="me-2 text-gray" /> Close
+						Episode
 					</Dropdown.Item>
 				</Dropdown.Menu>
 			</Dropdown>

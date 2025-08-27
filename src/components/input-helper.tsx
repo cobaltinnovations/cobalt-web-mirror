@@ -169,7 +169,7 @@ const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(
 						{children}
 					</FormControlComponent>
 					{props.as === 'select' && (
-						<SvgIcon kit="fas" icon="angles-up-down" size={16} className={classes.downChevron} />
+						<SvgIcon kit="fas" icon="caret-down" size={12} className={classes.downChevron} />
 					)}
 				</Form.Group>
 				{(helperText || characterCounter) && (
