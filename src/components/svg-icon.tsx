@@ -36,7 +36,7 @@ const SvgIcon = ({ kit, icon, title, size, className, style }: SvgIconProps) => 
 			fill="currentColor"
 			xmlns="http://www.w3.org/2000/svg"
 			className={className}
-			style={style}
+			style={{ overflow: 'visible', ...style }}
 			role={title ? 'img' : undefined}
 			aria-hidden={title ? undefined : 'true'}
 			aria-labelledby={titleId}
