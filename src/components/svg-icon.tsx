@@ -49,3 +49,42 @@ const SvgIcon = ({ kit, icon, title, size, className, style }: SvgIconProps) => 
 };
 
 export default SvgIcon;
+
+export const maskImageSvg = ({ kit, icon }: { kit: string; icon: IconName }) => {
+	const iconPack = byPrefixAndName[kit];
+
+	if (!iconPack) {
+		console.warn(`SvgIcon: ${kit} is not a valid kit.`);
+		return null;
+	}
+
+	const iconDefinition = iconPack[icon];
+
+	if (!iconDefinition) {
+		console.warn(`SvgIcon: ${icon} is not a valid icon in the ${kit} kit.`);
+		return null;
+	}
+
+	const [width, height, , , pathData] = iconDefinition.icon;
+
+	const makePaths = (d: string | string[]) => {
+		return Array.isArray(d) ? d.map((p) => `<path d="${p}"/>`).join('') : `<path d="${d}"/>`;
+	};
+
+	const svg = `
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 ${width} ${height}"
+			fill="currentColor"
+			aria-hidden="true"
+			focusable="false"
+		>
+			${makePaths(pathData)}
+		</svg>
+	`;
+	const svgData = encodeURIComponent(svg);
+
+	return `url(data:image/svg+xml;utf8,${svgData})`;
+};

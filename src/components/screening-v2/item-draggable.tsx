@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ScreeningAnswersCorrectnessIndicatorId, ScreeningAnswersDisplayTypeId } from '@/lib/models';
 
-import dragIndicator from '@/assets/icons/icon-grip-dots.svg';
 import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
 import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
@@ -33,7 +33,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			maskSize: 24,
 			maskPosition: 'center',
 			maskRepeat: 'no-repeat',
-			maskImage: `url(${dragIndicator})`,
+			maskImage: maskImageSvg({ kit: 'far', icon: 'grip-lines' }),
 			backgroundColor: theme.colors.n500,
 		},
 		'&.correct .drag-handle': {
