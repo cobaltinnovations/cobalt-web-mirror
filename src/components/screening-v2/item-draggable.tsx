@@ -25,9 +25,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 			border: `1px solid ${theme.colors.n100}`,
 		},
 		'& .drag-handle': {
-			width: 24,
-			height: 24,
-			maskSize: 24,
+			width: 20,
+			height: 20,
+			maskSize: 20,
 			maskPosition: 'center',
 			maskRepeat: 'no-repeat',
 			maskImage: maskImageSvg({ kit: 'far', icon: 'grip-lines' }),

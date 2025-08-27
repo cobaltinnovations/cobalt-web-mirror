@@ -69,7 +69,7 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 				<div className="d-flex align-items-center">
 					{showBackButton && (
 						<Button variant="link" className="p-2 me-2" onClick={onBackButtonClick}>
-							<SvgIcon kit="far" icon="arrow-left" size={20} />
+							<SvgIcon kit="far" icon="arrow-left" size={16} />
 						</Button>
 					)}
 					<h5 className="mb-0 text-truncate">{title}</h5>
