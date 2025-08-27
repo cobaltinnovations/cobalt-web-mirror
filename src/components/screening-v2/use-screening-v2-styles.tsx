@@ -169,7 +169,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			'&--correct': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label:before': {
-						maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-check' }),
+						maskImage: `${maskImageSvg({ kit: 'fas', icon: 'circle-check' })} !important`,
 						backgroundColor: `${theme.colors.s500} !important`,
 					},
 				},
@@ -177,7 +177,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			'&--incorrect': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label:before': {
-						maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-xmark' }),
+						maskImage: `${maskImageSvg({ kit: 'fas', icon: 'circle-xmark' })} !important`,
 						backgroundColor: `${theme.colors.n500} !important`,
 					},
 				},
