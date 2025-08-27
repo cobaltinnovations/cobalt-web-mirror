@@ -1,4 +1,3 @@
-import { ReactComponent as UnfoldIcon } from '@/assets/icons/icon-select.svg';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { SchedulingAppointmentType } from '@/lib/models';
@@ -6,6 +5,7 @@ import { schedulingService } from '@/lib/services';
 import React, { forwardRef, useEffect, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { AppointmentTypeItem } from './appointment-type-item';
+import SvgIcon from '@/components/svg-icon';
 
 interface AppointmentTypeDropdownProps {
 	testId?: string;
@@ -104,7 +104,7 @@ export const AppointmentTypeDropdownToggle = forwardRef<HTMLButtonElement, Appoi
 					{selectedAppointmentType && <AppointmentTypeItem appointmentType={selectedAppointmentType} />}
 				</div>
 
-				<UnfoldIcon className="ms-auto" />
+				<SvgIcon kit="fas" icon="angles-up-down" size={16} className="ms-auto" />
 			</button>
 		);
 	}
