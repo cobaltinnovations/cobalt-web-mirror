@@ -1,7 +1,5 @@
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
-import backArrowIcon from '@/assets/icons/icon-back-arrow.svg';
-
 import { maskImageSvg } from '@/components/svg-icon';
 
 export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
@@ -36,20 +34,20 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			},
 			'&:after': {
 				right: 24,
-				width: 24,
-				height: 24,
+				width: 20,
+				height: 20,
 				top: '50%',
 				opacity: 0,
-				maskSize: 24,
+				maskSize: 20,
 				content: '""',
 				position: 'absolute',
 				pointerEvents: 'none',
 				maskPosition: 'center',
 				maskRepeat: 'no-repeat',
 				transition: '200ms all',
-				maskImage: `url(${backArrowIcon})`,
+				maskImage: maskImageSvg({ kit: 'far', icon: 'arrow-right' }),
 				backgroundColor: theme.colors.p500,
-				transform: 'translate(-50%, -50%) rotate(180deg)',
+				transform: 'translate(-50%, -50%)',
 			},
 			'&:hover': {
 				'&:before': {
@@ -58,7 +56,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 				},
 				'&:after': {
 					opacity: 1,
-					transform: 'translate(0, -50%) rotate(180deg)',
+					transform: 'translate(0, -50%)',
 				},
 			},
 			'&:focus-visible': {
