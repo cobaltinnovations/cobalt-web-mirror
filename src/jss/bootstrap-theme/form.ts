@@ -1,6 +1,5 @@
 import { CobaltTheme } from '@/jss/theme';
-import plusIcon from '@/assets/icons/icon-plus.svg';
-import checkIcon from '@/assets/icons/icon-check.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 
 export const form = (theme: CobaltTheme) => {
 	return {
@@ -245,13 +244,13 @@ export const form = (theme: CobaltTheme) => {
 							'&:before': {
 								width: 20,
 								height: 20,
+								maskSize: 20,
 								content: '""',
 								marginRight: 4,
-								maskSize: '20 20',
 								display: 'inline-flex',
 								maskPosition: 'center',
 								maskRepeat: 'no-repeat',
-								maskImage: `url(${plusIcon})`,
+								maskImage: maskImageSvg({ kit: 'fas', icon: 'plus' }),
 								backgroundColor: theme.colors.p500,
 							},
 						},
@@ -260,7 +259,7 @@ export const form = (theme: CobaltTheme) => {
 							backgroundColor: theme.colors.p700,
 							'&:before': {
 								backgroundColor: theme.colors.n0,
-								maskImage: `url(${checkIcon})`,
+								maskImage: maskImageSvg({ kit: 'fas', icon: 'check' }),
 							},
 						},
 					},
