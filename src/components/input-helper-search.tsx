@@ -88,7 +88,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 					/>
 					{props.value && (
 						<Button variant="link" className={classes.clearButton} onClick={onClear}>
-							<SvgIcon kit="fas" icon="circle-xmark" size={20} />
+							<SvgIcon kit="fas" icon="circle-xmark" size={20} className="d-flex" />
 						</Button>
 					)}
 				</Form.Group>
