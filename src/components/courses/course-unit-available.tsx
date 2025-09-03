@@ -70,13 +70,14 @@ export const CourseUnitAvailable = ({
 	const [isComplete, setIsComplete] = useState(false);
 
 	const handleVideoPlayerEvent = useCallback(
-		(eventName: string, eventPayload: unknown) => {
+		(eventName: string, eventPayload: unknown, mediaProxy: unknown) => {
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
 				courseUnitId: courseUnit.courseUnitId,
 				...(courseSessionId && { courseSessionId }),
 				videoId: courseUnit.videoId,
 				eventName,
 				eventPayload,
+				...(mediaProxy ? { mediaProxy } : {}),
 			});
 		},
 		[courseSessionId, courseUnit.courseUnitId, courseUnit.videoId]

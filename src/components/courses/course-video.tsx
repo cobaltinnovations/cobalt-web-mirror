@@ -36,7 +36,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface CourseVideoProps {
 	videoId: string;
 	courseVideos: CourseVideoModel[];
-	onVideoPlayerEvent(eventName: string, eventPayload: unknown): void;
+	onVideoPlayerEvent(eventName: string, eventPayload: unknown, mediaProxy: unknown): void;
 	completionThresholdInSeconds: number;
 	onCompletionThresholdPassed(): void;
 	onVideoPlayerEnd(): void;
@@ -70,15 +70,20 @@ export const CourseVideo = ({
 		stopVideoLoadingTimer();
 		videoLoadingTimeoutRef.current = setTimeout(() => {
 			setVideoPlayerTimedOut(true);
-			onVideoPlayerEvent('INITIALIZATION_ERROR', {});
+			onVideoPlayerEvent('INITIALIZATION_ERROR', {}, {});
 		}, 15000);
 	}, [onVideoPlayerEvent, stopVideoLoadingTimer]);
 
 	const throttledPlayerEvent = useRef(
-		throttle((eventName: string, eventPayload: unknown) => onVideoPlayerEvent(eventName, eventPayload), 5000, {
-			leading: true,
-			trailing: false,
-		})
+		throttle(
+			(eventName: string, eventPayload: unknown, mediaProxy: unknown) =>
+				onVideoPlayerEvent(eventName, eventPayload, mediaProxy),
+			5000,
+			{
+				leading: true,
+				trailing: false,
+			}
+		)
 	).current;
 
 	useEffect(() => {
@@ -91,10 +96,11 @@ export const CourseVideo = ({
 		setVideoPlayerTimedOut(false);
 		startVideoLoadingTimer();
 
+		const videoIsPlaylist = !!(video.kalturaPlaylistId && !video.kalturaEntryId);
 		const { script } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
-			eventCallback: (eventName, eventPayload) => {
+			eventCallback: (eventName, eventPayload, mediaProxy) => {
 				if (eventName === 'playerReady') {
 					setVideoPlayerReady(true);
 					setVideoPlayerTimedOut(false);
@@ -111,13 +117,15 @@ export const CourseVideo = ({
 				}
 
 				if (eventName === 'playerPlayEnd') {
-					onVideoPlayerEnd();
+					if (!videoIsPlaylist) {
+						onVideoPlayerEnd();
+					}
 				}
 
 				if (eventName === 'playerUpdatePlayhead') {
-					throttledPlayerEvent(eventName, eventPayload);
+					throttledPlayerEvent(eventName, eventPayload, mediaProxy);
 				} else {
-					onVideoPlayerEvent(eventName, eventPayload);
+					onVideoPlayerEvent(eventName, eventPayload, mediaProxy);
 				}
 			},
 			errorCallback: (error) => {

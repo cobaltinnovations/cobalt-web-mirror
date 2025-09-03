@@ -111,7 +111,8 @@ export enum CourseSessionUnitStatusId {
 export interface CourseVideoModel {
 	created: string;
 	createdDescription: string;
-	kalturaEntryId: string;
+	kalturaEntryId?: string | null;
+	kalturaPlaylistId?: string | null;
 	kalturaPartnerId: string;
 	kalturaUiconfId: string;
 	kalturaWid: string;
