@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { CourseUnitModel } from '@/lib/models';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
@@ -8,15 +8,22 @@ import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
 
 interface CourseUnitCompleteProps {
 	courseUnit: CourseUnitModel;
+	completionMessages: Record<string, string>;
 	onRestartActivityButtonClick(): void;
 	onNextButtonClick(): void;
 }
 
 export const CourseUnitComplete = ({
 	courseUnit,
+	completionMessages,
 	onRestartActivityButtonClick,
 	onNextButtonClick,
 }: CourseUnitCompleteProps) => {
+	const completionMessage = useMemo(
+		() => completionMessages[courseUnit.courseUnitId] ?? '',
+		[completionMessages, courseUnit.courseUnitId]
+	);
+
 	return (
 		<>
 			<h2 className="mb-10">{courseUnit.title}</h2>
@@ -24,6 +31,7 @@ export const CourseUnitComplete = ({
 			<NoData
 				className="mb-10 bg-white"
 				title="Activity Complete"
+				description={completionMessage}
 				actions={[
 					{
 						variant: 'light',
