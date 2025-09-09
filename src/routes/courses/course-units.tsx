@@ -369,6 +369,10 @@ export const Component = () => {
 									{courseUnitCompleted && courseUnit.showRestartActivityWhenComplete ? (
 										<CourseUnitComplete
 											courseUnit={courseUnit}
+											completionMessages={
+												course.currentCourseSession
+													?.courseSessionUnitCompletionMessagesByCourseUnitId ?? {}
+											}
 											onRestartActivityButtonClick={() => {
 												setCourseUnitCompleted(false);
 											}}

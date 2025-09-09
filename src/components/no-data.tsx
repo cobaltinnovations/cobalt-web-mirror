@@ -47,14 +47,13 @@ const NoData = ({ illustration, title, description, actions, className }: NoData
 				{title}
 			</h4>
 			{description && (
-				<p
+				<div
 					className={classNames('text-center', {
 						'mb-0': actions.length <= 0,
 						'mb-6': actions.length > 0,
 					})}
-				>
-					{description}
-				</p>
+					dangerouslySetInnerHTML={{ __html: description ?? '' }}
+				/>
 			)}
 			{actions.length > 0 && (
 				<div className="d-flex justify-content-center align-items-center">

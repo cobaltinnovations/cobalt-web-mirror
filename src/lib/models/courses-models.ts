@@ -74,6 +74,7 @@ export interface CourseSessionModel {
 		minutesCompleted: number;
 		totalMinutes: number;
 	};
+	courseSessionUnitCompletionMessagesByCourseUnitId: Record<string, string>;
 }
 
 export enum CourseSessionStatusId {
