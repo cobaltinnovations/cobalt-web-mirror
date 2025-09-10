@@ -19,6 +19,7 @@ export async function loader() {
 	const accounts = await integratedCareService.getPanelAccounts().fetch();
 
 	return {
+		orderServicerAccounts: accounts.orderServicerAccounts,
 		panelAccounts: accounts.panelAccounts,
 	};
 }

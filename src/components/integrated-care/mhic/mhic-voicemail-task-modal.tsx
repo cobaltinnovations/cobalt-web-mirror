@@ -24,7 +24,7 @@ interface Props extends ModalProps {
 export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, patientOrder, onSave, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
-	const { panelAccounts } = useMhicLayoutLoaderData();
+	const { orderServicerAccounts } = useMhicLayoutLoaderData();
 	const { addFlag } = useFlags();
 
 	const [panelAccountId, setPanelAccountId] = useState(patientOrder.panelAccountId ?? '');
@@ -59,7 +59,7 @@ export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, p
 
 				const response = await integratedCareService.getPatientOrder(patientOrder.patientOrderId).fetch();
 
-				const assignedMhic = panelAccounts.find((pA) => pA.accountId === panelAccountId);
+				const assignedMhic = orderServicerAccounts.find((pA) => pA.accountId === panelAccountId);
 				addFlag({
 					variant: 'success',
 					title: `Voicemail task ${update ? 'updated' : 'created'}`,
@@ -82,7 +82,7 @@ export const MhicVoicemailTaskModal: FC<Props> = ({ patientOrderVoicemailTask, p
 			message,
 			onSave,
 			panelAccountId,
-			panelAccounts,
+			orderServicerAccounts,
 			patientOrder,
 			patientOrderVoicemailTask?.patientOrderVoicemailTaskId,
 		]
