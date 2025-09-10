@@ -29,6 +29,6 @@ COPY --chown=appuser:appuser . /home/appuser/app/
 
 WORKDIR /home/appuser/app
 RUN npm --no-git-tag-version version prerelease --preid=${GIT_COMMIT_HASH}
-RUN npm ci && npm run build -- ${BUILD_FLAGS} --commitHash=${GIT_COMMIT_HASH} --cobaltWebEnv=${COBALT_WEB_ENV}
+RUN export COBALT_WEB_FONTAWESOME_PACKAGE_TOKEN=$COBALT_WEB_FONTAWESOME_PACKAGE_TOKEN npm ci && npm run build -- ${BUILD_FLAGS} --commitHash=${GIT_COMMIT_HASH} --cobaltWebEnv=${COBALT_WEB_ENV}
 
 CMD ["sh", "-c", "npm run start"]
