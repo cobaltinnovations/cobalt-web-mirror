@@ -17,12 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import { WysiwygDisplay } from './wysiwyg-basic';
-import { ReactComponent as CalendarIcon } from '@/assets/icons/icon-calendar.svg';
-import { ReactComponent as ChairIcon } from '@/assets/icons/chair-fill.svg';
-import { ReactComponent as ClockIcon } from '@/assets/icons/schedule.svg';
-import { ReactComponent as DevicesIcon } from '@/assets/icons/devices.svg';
-import { ReactComponent as LocationIcon } from '@/assets/icons/icon-location-on.svg';
 import classNames from 'classnames';
+import SvgIcon from './svg-icon';
 
 const baseSpacerSize = 4;
 const containerPaddingMultiplier = 16;
@@ -182,9 +178,19 @@ const GroupSession = ({
 
 									<div className="d-flex">
 										{isExternal ? (
-											<CalendarIcon height={20} width={20} className="text-primary me-4" />
+											<SvgIcon
+												kit="far"
+												icon="calendar"
+												size={20}
+												className="text-primary me-4"
+											/>
 										) : (
-											<ClockIcon height={20} width={20} className="text-primary me-4" />
+											<SvgIcon
+												kit="far"
+												icon="calendar"
+												size={20}
+												className="text-primary me-4"
+											/>
 										)}
 
 										{groupSession.singleSessionFlag ? (
@@ -211,7 +217,12 @@ const GroupSession = ({
 								<Row className="mb-6">
 									<Col>
 										<div className="d-flex">
-											<ChairIcon className="text-primary me-4" />
+											<SvgIcon
+												kit="far"
+												icon="loveseat"
+												size={24}
+												className="text-primary me-4"
+											/>
 
 											{isExternal ? (
 												<p className="mb-0">{groupSession.seats} offered</p>
@@ -241,7 +252,12 @@ const GroupSession = ({
 								<Col>
 									{groupSession.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL ? (
 										<div className="d-flex">
-											<DevicesIcon className="text-primary me-4" />
+											<SvgIcon
+												kit="far"
+												icon="laptop-mobile"
+												size={24}
+												className="text-primary me-4"
+											/>
 											<div>
 												<p className="mb-1 fw-bold">Online Video Call</p>
 												<p className="mb-0">Attend this session virtually</p>
@@ -249,7 +265,12 @@ const GroupSession = ({
 										</div>
 									) : (
 										<div className="d-flex">
-											<LocationIcon className="text-primary me-4" />
+											<SvgIcon
+												kit="far"
+												icon="location-dot"
+												size={24}
+												className="text-primary me-4"
+											/>
 											<div>
 												<p className="mb-0 fw-bold">In person</p>
 												{groupSession.inPersonLocation && (

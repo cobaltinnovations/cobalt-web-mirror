@@ -29,7 +29,7 @@ import {
 	CourseUnitLayout,
 	CourseUnitLocked,
 } from '@/components/courses';
-import { ReactComponent as MenuIcon } from '@/assets/icons/icon-menu.svg';
+import SvgIcon from '@/components/svg-icon';
 
 export async function loader() {
 	return null;
@@ -358,7 +358,7 @@ export const Component = () => {
 										setShowMenu(true);
 									}}
 								>
-									<MenuIcon className="me-1 flex-shrink-0" />
+									<SvgIcon kit="fas" icon="bars" size={20} className="me-1 flex-shrink-0" />
 									Course Content
 								</Button>
 							</Col>

@@ -2,8 +2,8 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	disabled: boolean;
@@ -86,7 +86,7 @@ const Select: FC<SelectProps> = ({ className, ...props }) => {
 			>
 				{props.children}
 			</Form.Select>
-			<DownChevron className={classes.downChevron} />
+			<SvgIcon kit="far" icon="chevron-down" size={16} className={classes.downChevron} />
 		</div>
 	);
 };

@@ -19,15 +19,11 @@ import { CopyToClipboardButton } from './copy-to-clipboard-button';
 
 import { useSchedulingStyles } from './use-scheduling-styles';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
-import { ReactComponent as XIcon } from '@/assets/icons/icon-close.svg';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useScrollCalendar } from './use-scroll-calendar';
 import { createUseThemedStyles } from '@/jss/theme';
 import ConfirmDialog from '@/components/confirm-dialog';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	appointmentsList: {
@@ -218,7 +214,7 @@ export const AppointmentDetailPanel = ({
 						className="p-0"
 						onClick={() => onClose()}
 					>
-						<CloseIcon />
+						<SvgIcon kit="far" icon="xmark" size={16} />
 					</Button>
 				</div>
 
@@ -249,7 +245,7 @@ export const AppointmentDetailPanel = ({
 						data-testid="appointmentDetailCopyVideoUrlButton"
 						className="me-1"
 						text={appointment?.videoconferenceUrl}
-						iconSize={18}
+						iconSize={16}
 					/>
 
 					<Link to={'edit'}>
@@ -259,7 +255,7 @@ export const AppointmentDetailPanel = ({
 							size="sm"
 							className="px-2"
 						>
-							<EditIcon width={18} height={18} />
+							<SvgIcon kit="far" icon="pen" size={16} />
 						</Button>
 					</Link>
 				</div>
@@ -341,7 +337,7 @@ export const AppointmentDetailPanel = ({
 								onAddAppointment();
 							}}
 						>
-							<PlusIcon />
+							<SvgIcon kit="fas" icon="plus" size={16} />
 						</button>
 					</div>
 					{allAppointments.length > 0 && (
@@ -421,7 +417,7 @@ const AppointmentAttendance = ({
 							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.ATTENDED);
 						}}
 					>
-						<CheckIcon />
+						<SvgIcon kit="fak" icon="check" size={20} />
 					</button>
 					<button
 						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ms-2')}
@@ -429,7 +425,7 @@ const AppointmentAttendance = ({
 							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.MISSED);
 						}}
 					>
-						<XIcon />
+						<SvgIcon kit="far" icon="xmark" size={16} />
 					</button>
 				</>
 			)}
@@ -441,7 +437,7 @@ const AppointmentAttendance = ({
 						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
 					}}
 				>
-					<CheckIcon />
+					<SvgIcon kit="fak" icon="check" size={20} />
 				</button>
 			)}
 
@@ -452,7 +448,7 @@ const AppointmentAttendance = ({
 						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
 					}}
 				>
-					<XIcon />
+					<SvgIcon kit="far" icon="xmark" size={16} />
 				</button>
 			)}
 		</div>

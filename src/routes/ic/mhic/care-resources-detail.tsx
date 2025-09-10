@@ -7,14 +7,11 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/t
 import { MhicCareResourceFormModal, MhicCareResourceLocationDetails } from '@/components/integrated-care/mhic';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import NoData from '@/components/no-data';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import { CareResourceLocationModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
+import SvgIcon from '@/components/svg-icon';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -106,7 +103,7 @@ export const Component = () => {
 										setShowFormModal(true);
 									}}
 								>
-									<EditIcon width={20} height={20} className="d-flex me-2" />
+									<SvgIcon kit="far" icon="pen" size={16} className="d-flex me-2" />
 									Edit
 								</Button>
 							</Card.Body>
@@ -197,8 +194,8 @@ export const Component = () => {
 										navigate(`./location/add`);
 									}}
 								>
-									<PlusIcon width={20} height={20} className="d-flex me-2" />
-									Add
+									<SvgIcon kit="fas" icon="plus" size={16} className="d-flex me-2" />
+									Add Location
 								</Button>
 							</Card.Body>
 							<Card.Body className="p-0 border-top bg-n75">
@@ -281,7 +278,12 @@ export const Component = () => {
 															id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
 															className="p-2 border-0"
 														>
-															<MoreIcon className="d-flex" />
+															<SvgIcon
+																kit="far"
+																icon="ellipsis-vertical"
+																size={20}
+																className="d-flex"
+															/>
 														</Dropdown.Toggle>
 														<Dropdown.Menu
 															as={DropdownMenu}
@@ -297,7 +299,12 @@ export const Component = () => {
 																	);
 																}}
 															>
-																<EditIcon className="me-2 text-n500" />
+																<SvgIcon
+																	kit="far"
+																	icon="pen"
+																	size={16}
+																	className="me-2 text-n500"
+																/>
 																Edit
 															</Dropdown.Item>
 															<Dropdown.Item
@@ -306,7 +313,12 @@ export const Component = () => {
 																	setCareResourceLocationToDelete(crl);
 																}}
 															>
-																<DeleteIcon className="me-2 text-n500" />
+																<SvgIcon
+																	kit="far"
+																	icon="trash-can"
+																	size={16}
+																	className="me-2 text-n500"
+																/>
 																Delete
 															</Dropdown.Item>
 														</Dropdown.Menu>

@@ -12,9 +12,9 @@ import FooterContent from './footer-content';
 import FooterLogo from './footer-logo';
 import FooterNav from './footer-nav';
 
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { FeatureId } from '@/lib/models';
 import { RouteHandle } from '@/routes';
+import SvgIcon from './svg-icon';
 
 const useFooterStyles = createUseThemedStyles((theme) => ({
 	footer: {
@@ -105,7 +105,12 @@ const Footer: FC = () => {
 										className="d-inline-flex align-items-center text-white text-decoration-none"
 									>
 										Contact Us
-										<ExternalIcon className="ms-2" />
+										<SvgIcon
+											kit="far"
+											icon="arrow-up-right-from-square"
+											size={16}
+											className="ms-2"
+										/>
 									</Button>
 								</div>
 							</Col>

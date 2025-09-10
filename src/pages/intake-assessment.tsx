@@ -119,23 +119,6 @@ const IntakeAssessment: FC = () => {
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>
-				{/* <Breadcrumb
-					breadcrumbs={[
-						{
-							to: '/',
-							title: 'Home',
-						},
-						{
-							to: exitUrl,
-							title: 'Connect with Support',
-						},
-						{
-							to: '/#',
-							title: 'Appointment',
-						},
-					]}
-				/> */}
-
 				<ProgressBar
 					current={assessment?.assessmentProgress || 0}
 					max={assessment?.assessmentProgressTotal || 0}

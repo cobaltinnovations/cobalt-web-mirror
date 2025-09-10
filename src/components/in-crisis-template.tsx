@@ -5,10 +5,10 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { CRISIS_RESOURCES } from '@/crisis-resources';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	linkButton: {
@@ -70,7 +70,7 @@ export const InCrisisTemplate = ({ isModal = false }: InCrisisTemplateProps) => 
 							<p className="mb-0">{link.description}</p>
 						</div>
 						<div className={classes.iconOuter}>
-							<PhoneIcon />
+							<SvgIcon kit="fas" icon="phone-volume" size={20} className="d-flex" />
 						</div>
 					</Button>
 				);

@@ -1,9 +1,9 @@
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { adminService, imageUploader } from '@/lib/services';
 import React, { useState } from 'react';
 import FileUploadCard from '../file-upload-card';
 import InputHelper from '../input-helper';
+import SvgIcon from '../svg-icon';
 
 export interface AdminFormNonImageFileInputProps {
 	defaultFileName?: string;
@@ -72,7 +72,7 @@ export const AdminFormNonImageFileInput = ({
 			<InputHelper className="mt-3" disabled label="Web address to content" value={uploadedFileSrc || 'www.'} />
 
 			<div className="d-flex  mt-2">
-				<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+				<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 				<p className="mb-0">Only one file may be uploaded</p>
 			</div>
 		</>

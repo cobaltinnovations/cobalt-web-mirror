@@ -9,8 +9,7 @@ import InlineAlert from '@/components/inline-alert';
 import LoadingButton from '@/components/loading-button';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import { ReactComponent as ThumpUpIcon } from '@/assets/icons/thumb-up.svg';
-import { ReactComponent as ThumpDownIcon } from '@/assets/icons/thumb-down.svg';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	helpful: {
@@ -138,7 +137,7 @@ const Helpful = ({ contentId, title, className }: HelpfulProps) => {
 								value={CONTENT_FEEDBACK_TYPE_ID.THUMBS_UP}
 								isLoading={isSubmitting}
 							>
-								<ThumpUpIcon />
+								<SvgIcon kit="fas" icon="thumbs-up" size={16} className="d-block" />
 							</LoadingButton>
 							<LoadingButton
 								type="submit"
@@ -147,7 +146,7 @@ const Helpful = ({ contentId, title, className }: HelpfulProps) => {
 								value={CONTENT_FEEDBACK_TYPE_ID.THUMBS_DOWN}
 								isLoading={isSubmitting}
 							>
-								<ThumpDownIcon />
+								<SvgIcon kit="fas" icon="thumbs-down" size={16} className="d-block" />
 							</LoadingButton>
 						</Form>
 					</div>

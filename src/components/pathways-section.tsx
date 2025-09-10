@@ -9,10 +9,10 @@ import PathwaysIcon from '@/components/pathways-icons';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import useAnalytics from '@/hooks/use-analytics';
 import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId, FeatureId } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
+import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	featuresLength: number;
@@ -229,7 +229,12 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 					<Row className="pt-12">
 						<Col>
 							<div className="d-flex align-items-center justify-content-center">
-								<InfoIcon className="me-2 text-p300 flex-shrink-0" width={20} height={20} />
+								<SvgIcon
+									kit="fas"
+									icon="circle-info"
+									size={20}
+									className="me-2 text-p300 flex-shrink-0"
+								/>
 								<p className="mb-0">
 									{(institution?.features ?? []).some((feature) => feature.recommended)
 										? 'Recommendations are based on your recent assessment scores.'

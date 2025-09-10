@@ -20,10 +20,10 @@ import MegaFilter, {
 	getMegaFilterWithValueCleared,
 	megaFilterValueAsSearchParams,
 } from '@/components/mega-filter';
-import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel.svg';
 import useAccount from '@/hooks/use-account';
 import NoData from '@/components/no-data';
 import InlineAlert from '@/components/inline-alert';
+import SvgIcon from '@/components/svg-icon';
 
 interface Props extends OffcanvasProps {
 	patientOrder: PatientOrderModel;
@@ -572,7 +572,7 @@ export const MhicCareResourceSearchModal: FC<Props> = ({ patientOrder, ...props 
 										}));
 									}}
 								>
-									<CancelIcon className="me-1" />
+									<SvgIcon kit="far" icon="circle-xmark" size={20} className="me-1" />
 									Clear Filters
 								</Button>
 							)}

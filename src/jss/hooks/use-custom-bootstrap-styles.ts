@@ -2,7 +2,7 @@ import { badge, button, card, form, modal, screeningButtonGroup, surveyForm } fr
 import mediaQueries from '@/jss/media-queries';
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
-import closeIcon from '@/assets/icons/icon-search-close.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 
 export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 	'@global': {
@@ -439,6 +439,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 			'& .rbt-close': {
 				width: 18,
 				height: 18,
+				maskSize: 18,
 				opacity: 0.4,
 				fontSize: 0,
 				lineHeight: 0,
@@ -447,7 +448,7 @@ export const useCustomBootstrapStyles = createUseThemedStyles((theme) => ({
 				background: 'none',
 				maskPosition: 'center',
 				maskRepeat: 'no-repeat',
-				maskImage: `url(${closeIcon})`,
+				maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-xmark' }),
 				backgroundColor: theme.colors.n900,
 			},
 			'& .rbt-close-content': {

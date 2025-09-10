@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 
 import { PatientOrderScheduledMessageGroup } from '@/lib/models';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface MhicScheduledMessageGroupProps {
 	message: PatientOrderScheduledMessageGroup;
@@ -24,7 +24,7 @@ export const MhicScheduledMessageGroup = ({ message, onEditClick, disabled }: Mh
 						}}
 						disabled={disabled}
 					>
-						<EditIcon className="d-flex" />
+						<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 					</Button>
 				</div>
 			</Card.Header>

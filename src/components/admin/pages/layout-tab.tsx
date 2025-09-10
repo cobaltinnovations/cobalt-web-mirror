@@ -5,13 +5,12 @@ import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea
 
 import { HERO_SECTION_ID } from '@/components/admin/pages/section-hero-settings-form';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
 import { DraggableItem } from './draggable-item';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { cloneDeep } from 'lodash';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionItem: {
@@ -98,7 +97,7 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 				})}
 			>
 				<div className={classes.handleOuter}>
-					<LockIcon className="text-n300" />
+					<SvgIcon kit="far" icon="lock" size={20} className="text-n300" />
 				</div>
 				<button
 					type="button"
@@ -106,7 +105,7 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 					onClick={() => setCurrentPageSectionId(HERO_SECTION_ID)}
 				>
 					<span>Hero</span>
-					<RightChevron className="text-n500" />
+					<SvgIcon kit="far" icon="chevron-right" size={16} className="text-n500" />
 				</button>
 			</div>
 			<DragDropContext onDragEnd={handleDragEnd}>

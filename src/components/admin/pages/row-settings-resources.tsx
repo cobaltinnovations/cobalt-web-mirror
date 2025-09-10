@@ -7,7 +7,7 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { DraggableItem, PageSectionShelfPage, SelectResourcesModal } from '@/components/admin/pages';
-import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface RowSettingsResourcesProps {
 	onBackButtonClick(event?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
@@ -144,7 +144,7 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 															handleRemoveItem(content.contentId);
 														}}
 													>
-														<MinusIcon className="d-flex" />
+														<SvgIcon kit="fas" icon="minus" size={16} className="d-flex" />
 													</Button>
 												}
 											/>

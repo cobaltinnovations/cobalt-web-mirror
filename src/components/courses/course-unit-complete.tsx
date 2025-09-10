@@ -3,8 +3,7 @@ import { Button } from 'react-bootstrap';
 import { CourseUnitModel } from '@/lib/models';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import NoData from '@/components/no-data';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
+import SvgIcon from '../svg-icon';
 
 interface CourseUnitCompleteProps {
 	courseUnit: CourseUnitModel;
@@ -36,7 +35,7 @@ export const CourseUnitComplete = ({
 					{
 						variant: 'light',
 						className: 'ps-3',
-						icon: <BeforeIcon className="me-2" />,
+						icon: <SvgIcon kit="far" icon="arrow-rotate-left" size={16} className="me-2" />,
 						title: 'Restart Activity',
 						onClick: onRestartActivityButtonClick,
 					},
@@ -50,7 +49,7 @@ export const CourseUnitComplete = ({
 					onClick={onNextButtonClick}
 				>
 					Next
-					<RightChevron className="ms-1" />
+					<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 				</Button>
 			</div>
 		</>

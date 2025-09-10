@@ -11,10 +11,7 @@ import { buildBackendDownloadUrl } from '@/lib/utils';
 import { DropdownMenu, DropdownToggle } from '../dropdown';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '../table';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
+import SvgIcon from '../svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 
@@ -161,7 +158,16 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 									{hasNestedRows && (
 										<TableCell>
 											<Button variant="link" size="sm">
-												{isExpanded ? <DownChevron /> : <RightChevron className="text-gray" />}
+												{isExpanded ? (
+													<SvgIcon kit="far" icon="chevron-down" size={16} />
+												) : (
+													<SvgIcon
+														kit="far"
+														icon="chevron-right"
+														size={16}
+														className="text-gray"
+													/>
+												)}
 											</Button>
 										</TableCell>
 									)}
@@ -199,7 +205,7 @@ const AdminAnalyticsWidgetOptions = ({ widget }: AdminAnalyticsWidgetOptionsProp
 				id={`admin-analytics-widget--${widget.widgetTitle}`}
 				className="p-0"
 			>
-				<MoreIcon />
+				<SvgIcon kit="far" icon="ellipsis" size={20} />
 			</Dropdown.Toggle>
 
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
@@ -211,7 +217,7 @@ const AdminAnalyticsWidgetOptions = ({ widget }: AdminAnalyticsWidgetOptionsProp
 						});
 					}}
 				>
-					<DownloadIcon className="me-2 text-n500" width={24} height={24} />
+					<SvgIcon kit="far" icon="download" size={16} className="me-2 text-n500" />
 					Download .csv
 				</Dropdown.Item>
 			</Dropdown.Menu>

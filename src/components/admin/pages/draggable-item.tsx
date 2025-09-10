@@ -2,8 +2,7 @@ import React from 'react';
 import { DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface UseStylesProps {
 	clickable?: boolean;
@@ -76,7 +75,7 @@ export const DraggableItem = ({
 			{...draggableProvided.draggableProps}
 		>
 			<div className={classes.handleOuter} {...draggableProvided.dragHandleProps}>
-				<DragIndicator className="text-gray" />
+				<SvgIcon kit="far" icon="grip-lines" size={20} className="text-gray" />
 			</div>
 			{onClick ? (
 				<button type="button" className={classes.sectionButton} onClick={onClick}>
@@ -86,7 +85,7 @@ export const DraggableItem = ({
 					</div>
 					<div className="d-flex flex-shrink-0 align-items-center">
 						<span className="text-n500">{asideTitle}</span>
-						<RightChevron className="text-n500" />
+						<SvgIcon kit="far" icon="chevron-right" size={16} className="text-n500" />
 					</div>
 				</button>
 			) : (

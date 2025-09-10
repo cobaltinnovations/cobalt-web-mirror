@@ -1,8 +1,8 @@
-import { ReactComponent as DotIcon } from '@/assets/icons/icon-dot.svg';
 import { MhicNavigation } from '@/components/integrated-care/mhic';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { icMhicRouterParams } from './helpers/ic-router-params';
+import SvgIcon from '@/components/svg-icon';
 
 const meta: Meta<typeof MhicNavigation> = {
 	title: 'MhicNavigation',
@@ -27,7 +27,7 @@ export const Default: Story = {
 			{
 				title: 'Title',
 				description: '100',
-				icon: () => <DotIcon width={24} height={24} className="text-n300" />,
+				icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-n300" />,
 				onClick: () => {
 					//
 				},
@@ -36,7 +36,7 @@ export const Default: Story = {
 			{
 				title: 'Title',
 				description: '100',
-				icon: () => <DotIcon width={24} height={24} className="text-secondary" />,
+				icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-secondary" />,
 				onClick: () => {
 					//
 				},
@@ -45,7 +45,7 @@ export const Default: Story = {
 			{
 				title: 'Title',
 				description: '100',
-				icon: () => <DotIcon width={24} height={24} className="text-p100" />,
+				icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-p100" />,
 				onClick: () => {
 					//
 				},
@@ -54,7 +54,7 @@ export const Default: Story = {
 			{
 				title: 'Title',
 				description: '100',
-				icon: () => <DotIcon width={24} height={24} className="text-p300" />,
+				icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-p300" />,
 				onClick: () => {
 					//
 				},
@@ -63,7 +63,7 @@ export const Default: Story = {
 			{
 				title: 'Title',
 				description: '100',
-				icon: () => <DotIcon width={24} height={24} className="text-primary" />,
+				icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-primary" />,
 				onClick: () => {
 					//
 				},
@@ -72,7 +72,7 @@ export const Default: Story = {
 			{
 				title: 'Title',
 				description: '100',
-				icon: () => <DotIcon width={24} height={24} className="text-gray" />,
+				icon: () => <SvgIcon kit="fas" icon="square-small" size={24} className="text-gray" />,
 				onClick: () => {
 					//
 				},

@@ -1,8 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react';
 import classNames from 'classnames';
 
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
 import { createUseThemedStyles } from '@/jss/theme';
+import SvgIcon from './svg-icon';
 
 const useFilterPillStyles = createUseThemedStyles((theme) => ({
 	pill: {
@@ -70,7 +70,10 @@ const FilterPill = React.forwardRef<HTMLButtonElement, FilterPillProps>(
 				{...props}
 			>
 				{children}
-				<ArrowDown
+				<SvgIcon
+					kit="fas"
+					icon="caret-down"
+					size={12}
 					className={classNames(classes.arrowDown, {
 						[classes.disabledArrowDown]: props.disabled,
 					})}

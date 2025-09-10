@@ -1,12 +1,6 @@
 import Color from 'color';
 import { createUseThemedStyles } from '@/jss/theme';
-import radioSelected from '@/assets/icons/screening-v2/radio-selected.svg';
-import radioUnselected from '@/assets/icons/screening-v2/radio-unselected.svg';
-import checkboxSelected from '@/assets/icons/screening-v2/checkbox-selected.svg';
-import checkboxUnselected from '@/assets/icons/screening-v2/checkbox-unselected.svg';
-import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
-import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
-import backArrowIcon from '@/assets/icons/icon-back-arrow.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 
 export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 	'@global': {
@@ -40,20 +34,20 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			},
 			'&:after': {
 				right: 24,
-				width: 24,
-				height: 24,
+				width: 20,
+				height: 20,
 				top: '50%',
 				opacity: 0,
-				maskSize: 24,
+				maskSize: 20,
 				content: '""',
 				position: 'absolute',
 				pointerEvents: 'none',
 				maskPosition: 'center',
 				maskRepeat: 'no-repeat',
 				transition: '200ms all',
-				maskImage: `url(${backArrowIcon})`,
+				maskImage: maskImageSvg({ kit: 'far', icon: 'arrow-right' }),
 				backgroundColor: theme.colors.p500,
-				transform: 'translate(-50%, -50%) rotate(180deg)',
+				transform: 'translate(-50%, -50%)',
 			},
 			'&:hover': {
 				'&:before': {
@@ -62,7 +56,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 				},
 				'&:after': {
 					opacity: 1,
-					transform: 'translate(0, -50%) rotate(180deg)',
+					transform: 'translate(0, -50%)',
 				},
 			},
 			'&:focus-visible': {
@@ -159,21 +153,21 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 				},
 			},
 			'& input[type=radio] + label:before': {
-				maskImage: `url(${radioUnselected})`,
+				maskImage: maskImageSvg({ kit: 'far', icon: 'circle' }),
 			},
 			'& input[type=radio]:checked + label:before': {
-				maskImage: `url(${radioSelected})`,
+				maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-dot' }),
 			},
 			'& input[type=checkbox] + label:before': {
-				maskImage: `url(${checkboxUnselected})`,
+				maskImage: maskImageSvg({ kit: 'far', icon: 'square' }),
 			},
 			'& input[type=checkbox]:checked + label:before': {
-				maskImage: `url(${checkboxSelected})`,
+				maskImage: maskImageSvg({ kit: 'fas', icon: 'square-check' }),
 			},
 			'&--correct': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label:before': {
-						maskImage: `url(${checkCircleFill}) !important`,
+						maskImage: `${maskImageSvg({ kit: 'fas', icon: 'circle-check' })} !important`,
 						backgroundColor: `${theme.colors.s500} !important`,
 					},
 				},
@@ -181,7 +175,7 @@ export const useScreeningV2Styles = createUseThemedStyles((theme) => ({
 			'&--incorrect': {
 				'& input[type=radio], & input[type=checkbox]': {
 					'& + label:before': {
-						maskImage: `url(${cancelFill}) !important`,
+						maskImage: `${maskImageSvg({ kit: 'fas', icon: 'circle-xmark' })} !important`,
 						backgroundColor: `${theme.colors.n500} !important`,
 					},
 				},

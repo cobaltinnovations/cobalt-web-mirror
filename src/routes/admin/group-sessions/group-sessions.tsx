@@ -33,6 +33,7 @@ import {
 	GroupSessionTableDropdown,
 } from '@/components/admin';
 import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';
+import SvgIcon from '@/components/svg-icon';
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -188,10 +189,13 @@ export const Component = () => {
 						<div className="mb-6 d-flex align-items-center justify-content-between">
 							<h2 className="mb-0">Group Sessions</h2>
 							<Button
+								variant="primary"
+								className="d-flex align-items-center"
 								onClick={() => {
 									setShowAddGroupSessionModal(true);
 								}}
 							>
+								<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
 								Add Group Session
 							</Button>
 						</div>

@@ -7,12 +7,11 @@ import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { config } from '@/config';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import SvgIcon from '../svg-icon';
 
 export const ADMIN_HEADER_HEIGHT = 60;
 
@@ -280,7 +279,7 @@ export const AdminHeader = () => {
 									className="p-0 border-0"
 									id="admin-header__dropdown-menu"
 								>
-									<AvatarIcon className="d-flex" />
+									<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex" />
 								</Dropdown.Toggle>
 								<Dropdown.Menu
 									as={DropdownMenu}
@@ -290,9 +289,14 @@ export const AdminHeader = () => {
 									renderOnMount
 								>
 									<Dropdown.Item as={Link} to="/" target="_blank">
-										<div className="d-flex justify-content-between align-items-center">
+										<div className="d-flex align-items-center">
+											<SvgIcon
+												kit="far"
+												icon="arrow-left-arrow-right"
+												size={16}
+												className="me-4 text-gray"
+											/>
 											<p className="mb-0 pe-4 fw-semibold">Cobalt Home</p>
-											<ExternalIcon className="text-gray" />
 										</div>
 									</Dropdown.Item>
 
@@ -306,7 +310,15 @@ export const AdminHeader = () => {
 											);
 										}}
 									>
-										<span className="text-danger">Sign Out</span>
+										<div className="d-flex align-items-center">
+											<SvgIcon
+												kit="far"
+												icon="arrow-left-from-bracket"
+												size={16}
+												className="me-4 text-danger"
+											/>
+											<p className="mb-0 pe-4 fw-semibold text-danger">Log Out</p>
+										</div>
 									</Dropdown.Item>
 								</Dropdown.Menu>
 							</Dropdown>

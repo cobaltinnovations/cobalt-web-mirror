@@ -1,6 +1,5 @@
 import { CobaltTheme } from '@/jss/theme';
-import plusIcon from '@/assets/icons/icon-plus.svg';
-import checkIcon from '@/assets/icons/icon-check.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 
 export const form = (theme: CobaltTheme) => {
 	return {
@@ -78,34 +77,54 @@ export const form = (theme: CobaltTheme) => {
 					marginRight: 24,
 					display: 'inline-flex',
 				},
+
 				'& .form-check-input': {
-					marginTop: 0,
-					marginRight: '1rem',
-					appearance: 'none',
+					border: 0,
 					width: 20,
 					height: 20,
+					maskSize: 20,
+					marginTop: 0,
 					flexShrink: 0,
-					color: theme.colors.p500,
-					backgroundColor: theme.colors.n0,
-					border: `2px solid ${theme.colors.border}`,
-					display: 'grid',
-					placeContent: 'center',
+					borderRadius: 0,
+					appearance: 'none',
+					marginRight: '1rem',
+					backgroundImage: 'none !important',
+					backgroundColor: theme.colors.n100,
 
-					'&:before': {
-						content: '""',
-						borderRadius: '50%',
+					'&:hover': {
+						backgroundColor: theme.colors.n300,
 					},
 
-					'&:focus,&:active': {
-						boxShadow: 'none',
-						borderColor: '#437DE8 !important',
+					'&:focus-visible': {
+						backgroundColor: '#437DE8',
 					},
 
 					'&:disabled': {
 						opacity: 1,
+						backgroundColor: `${theme.colors.border} !important`,
 
 						'& + label': {
 							opacity: 1,
+						},
+					},
+
+					'&:checked': {
+						backgroundColor: theme.colors.p500,
+						'&:hover': {
+							backgroundColor: theme.colors.p300,
+						},
+						'&:focus-visible': {
+							backgroundColor: '#437DE8',
+						},
+					},
+
+					'&.is-invalid': {
+						backgroundColor: `${theme.colors.d500} !important`,
+						'&:disabled': {
+							backgroundColor: `${theme.colors.d500} !important`,
+						},
+						'& + label': {
+							color: theme.colors.n900,
 						},
 					},
 
@@ -116,109 +135,25 @@ export const form = (theme: CobaltTheme) => {
 					},
 				},
 				'& input[type=checkbox]': {
-					backgroundPosition: 'center',
-					backgroundRepeat: 'no-repeat',
-					backgroundSize: '12px 12px',
-
-					'&:hover': {
-						borderColor: theme.colors.p100,
-						backgroundColor: theme.colors.p50,
-					},
-
-					'&:disabled': {
-						color: 'red',
-						borderColor: `${theme.colors.border} !important`,
-						backgroundColor: `${theme.colors.border} !important`,
-
-						'&:checked': {
-							backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-checkmark-dark.svg)`,
-						},
-
-						'&:indeterminate': {
-							backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-minus-dark.svg)`,
-						},
-					},
-
-					'&:checked,&:indeterminate': {
-						borderColor: theme.colors.p500,
-						backgroundColor: theme.colors.p500,
-
-						'&:hover': {
-							borderColor: theme.colors.p300,
-							backgroundColor: theme.colors.p300,
-						},
-					},
+					maskImage: maskImageSvg({ kit: 'far', icon: 'square' }),
 
 					'&:checked': {
-						backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-checkmark-white.svg)`,
+						maskImage: maskImageSvg({ kit: 'fas', icon: 'square-check' }),
 					},
 
 					'&:indeterminate': {
-						backgroundImage: `url(${__PUBLIC_URL__}/static/images/icon-minus-white.svg)`,
-					},
-
-					'&.is-invalid': {
-						borderColor: `${theme.colors.d500} !important`,
-
-						'&:focus,&:active': {
-							borderColor: '#437DE8 !important',
-						},
-
-						'& + label': {
-							color: theme.colors.n900,
+						backgroundColor: theme.colors.p500,
+						maskImage: maskImageSvg({ kit: 'fas', icon: 'square-minus' }),
+						'&:hover': {
+							backgroundColor: theme.colors.p300,
 						},
 					},
 				},
 				'& input[type=radio]': {
-					backgroundImage: 'initial',
-
-					'&:before': {
-						width: 10,
-						height: 10,
-					},
-
-					'&:hover': {
-						borderColor: theme.colors.p300,
-						backgroundColor: theme.colors.p50,
-					},
-
-					'&:disabled': {
-						borderColor: `${theme.colors.n300} !important`,
-						backgroundColor: `${theme.colors.n100} !important`,
-					},
+					maskImage: maskImageSvg({ kit: 'far', icon: 'circle' }),
 
 					'&:checked': {
-						backgroundImage: 'initial',
-						borderColor: theme.colors.p500,
-						backgroundColor: theme.colors.n0,
-
-						'&:before': {
-							boxShadow: `inset 1em 1em ${theme.colors.p500}`,
-						},
-
-						'&:disabled': {
-							'&:before': {
-								boxShadow: `inset 1em 1em ${theme.colors.n500} !important`,
-							},
-						},
-
-						'&:hover': {
-							borderColor: theme.colors.p300,
-							'&:before': {
-								boxShadow: `inset 1em 1em ${theme.colors.p300}`,
-							},
-						},
-					},
-
-					'&.is-invalid': {
-						borderColor: `${theme.colors.d500} !important`,
-						'&:disabled': {
-							borderColor: `${theme.colors.d500} !important`,
-						},
-
-						'& + label': {
-							color: theme.colors.n900,
-						},
+						maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-dot' }),
 					},
 				},
 				'&--pill': {
@@ -245,13 +180,13 @@ export const form = (theme: CobaltTheme) => {
 							'&:before': {
 								width: 20,
 								height: 20,
+								maskSize: 20,
 								content: '""',
 								marginRight: 4,
-								maskSize: '20 20',
 								display: 'inline-flex',
 								maskPosition: 'center',
 								maskRepeat: 'no-repeat',
-								maskImage: `url(${plusIcon})`,
+								maskImage: maskImageSvg({ kit: 'fas', icon: 'plus' }),
 								backgroundColor: theme.colors.p500,
 							},
 						},
@@ -260,43 +195,26 @@ export const form = (theme: CobaltTheme) => {
 							backgroundColor: theme.colors.p700,
 							'&:before': {
 								backgroundColor: theme.colors.n0,
-								maskImage: `url(${checkIcon})`,
+								maskImage: maskImageSvg({ kit: 'fas', icon: 'check' }),
 							},
 						},
 					},
 				},
+
 				'&.no-label': {
 					padding: 0,
 					'& input': {
 						margin: 0,
 					},
 				},
+
 				'&.form-switch': {
 					alignItems: 'start',
 					'& .form-check-input': {
-						width: 36,
-						border: 0,
-						height: 20,
 						marginLeft: 0,
-						cursor: 'pointer',
-						backgroundSize: 20,
-						backgroundPosition: 0,
-						backgroundColor: theme.colors.n100,
-						backgroundImage: `url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27%3e%3ccircle r=%273%27 fill=%27${encodeURIComponent(
-							theme.colors.n0
-						)}%27/%3e%3c/svg%3e")`,
-						'&:hover': {
-							backgroundColor: theme.colors.n300,
-						},
+						maskImage: `${maskImageSvg({ kit: 'fas', icon: 'toggle-off' })} !important`,
 						'&:checked': {
-							backgroundPosition: '16px 0',
-							backgroundColor: theme.colors.p500,
-							backgroundImage: `url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27%3e%3ccircle r=%273%27 fill=%27${encodeURIComponent(
-								theme.colors.n0
-							)}%27/%3e%3c/svg%3e")`,
-							'&:hover': {
-								backgroundColor: theme.colors.p300,
-							},
+							maskImage: `${maskImageSvg({ kit: 'fas', icon: 'toggle-on' })} !important`,
 						},
 					},
 				},

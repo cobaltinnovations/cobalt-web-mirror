@@ -6,7 +6,6 @@ import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
 import { Helmet } from 'react-helmet';
 
-import Breadcrumb from '@/components/breadcrumb';
 import InputHelper from '@/components/input-helper';
 import SessionCropModal from '@/components/session-crop-modal';
 import SessionFormSubmitBanner from '@/components/session-form-submit-banner';
@@ -172,20 +171,6 @@ const GroupSessionsByRequestCreate: FC = () => {
 					</h2>
 				</HeroContainer>
 
-				{/* {account?.roleId === ROLE_ID.ADMINISTRATOR && (
-					<Breadcrumb
-						breadcrumbs={[
-							{
-								to: '/group-sessions/by-request',
-								title: 'Group Sessions by Request',
-							},
-							{
-								to: '/group-sessions/by-request/create',
-								title: initialValues?.title ? initialValues.title : 'Create Group Session',
-							},
-						]}
-					/>
-				)} */}
 				<Container className="pt-5 pb-32">
 					<Row className="mb-5">
 						<Col lg={{ span: 8, offset: 2 }}>

@@ -1,8 +1,7 @@
 import React, { ElementType, PropsWithChildren, ReactNode, useState } from 'react';
 import { Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
-
-import { ReactComponent as SelectIcon } from '@/assets/icons/icon-select.svg';
+import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 
 interface UseStylesProps {
@@ -169,7 +168,9 @@ const InputHelper = React.forwardRef<HTMLInputElement, InputHelperProps>(
 					>
 						{children}
 					</FormControlComponent>
-					{props.as === 'select' && <SelectIcon className={classes.downChevron} />}
+					{props.as === 'select' && (
+						<SvgIcon kit="fas" icon="caret-down" size={12} className={classes.downChevron} />
+					)}
 				</Form.Group>
 				{(helperText || characterCounter) && (
 					<div className="mt-2 ps-3 pe-3 d-flex justify-content-between">

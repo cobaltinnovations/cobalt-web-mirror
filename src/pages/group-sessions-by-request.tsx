@@ -7,11 +7,11 @@ import { Helmet } from 'react-helmet';
 import { Table, TableHead, TableCell, TableBody, TableRow, TablePagination } from '@/components/table';
 import SessionRequestRow from '@/components/session-request-row';
 import QuickFilterDropdown from '@/components/quick-filter-dropdown';
+import SvgIcon from '@/components/svg-icon';
 
 import { groupSessionsService } from '@/lib/services/group-sessions-service';
 import { GroupSessionRequestModel, GROUP_SESSION_STATUS_ID } from '@/lib/models';
 
-import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
@@ -133,7 +133,7 @@ const GroupSessionsByRequest: FC = () => {
 								+ Add Group Session by Request
 							</Button>
 							<div className="d-flex align-items-center justify-content-center">
-								<FilterIcon className={classes.filterIcon} />
+								<SvgIcon kit="far" icon="bars-filter" size={16} className={classes.filterIcon} />
 								<small className="mb-0 me-2 text-uppercase text-muted fw-bold">Quick Filters:</small>
 								<QuickFilterDropdown
 									active={!!statusFilterValue}

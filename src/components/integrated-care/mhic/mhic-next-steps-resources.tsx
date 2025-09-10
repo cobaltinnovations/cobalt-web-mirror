@@ -20,9 +20,8 @@ import {
 } from '@/components/integrated-care/mhic';
 import InlineAlert from '@/components/inline-alert';
 
-import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
-import { ReactComponent as MinusIcon } from '@/assets/icons/icon-minus.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
+import SvgIcon from '@/components/svg-icon';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -273,7 +272,12 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																className="p-4 flex-shrink-0"
 																{...draggableProvided.dragHandleProps}
 															>
-																<DragIndicator className="text-gray" />
+																<SvgIcon
+																	kit="far"
+																	icon="grip-lines"
+																	size={20}
+																	className="text-gray"
+																/>
 															</div>
 															<div className="py-4 flex-fill">
 																<span className="d-block">
@@ -293,7 +297,12 @@ export const MhicNextStepsResources = ({ patientOrder, referenceData, disabled, 
 																		handleMinusButtonClick(crl);
 																	}}
 																>
-																	<MinusIcon className="d-flex" />
+																	<SvgIcon
+																		kit="fas"
+																		icon="minus"
+																		size={16}
+																		className="d-flex"
+																	/>
 																</Button>
 															</div>
 														</li>

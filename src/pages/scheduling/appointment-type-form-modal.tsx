@@ -9,9 +9,9 @@ import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import { useCobaltTheme } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
+import SvgIcon from '@/components/svg-icon';
 
 enum QUESTION_CONTENT_HINT_IDS {
 	FIRST_NAME = 'FIRST_NAME',
@@ -405,7 +405,7 @@ export const AppointmentTypeFormModal = ({
 									setScreeningQuestions(screeningQuestionsClone);
 								}}
 							>
-								<CloseIcon height={24} width={24} />
+								<SvgIcon kit="far" icon="xmark" size={16} />
 							</Button>
 							<InputHelper
 								data-testid="appointmentTypeFormScreeningQuestionInput"

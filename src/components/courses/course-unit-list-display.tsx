@@ -3,20 +3,26 @@ import classNames from 'classnames';
 
 import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
-import { ReactComponent as LockIcon } from '@/assets/icons/icon-lock.svg';
-import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
-import { ReactComponent as VideoIcon } from '@/assets/icons/icon-video.svg';
-import { ReactComponent as WorksheetIcon } from '@/assets/icons/icon-worksheet.svg';
+import SvgIcon from '../svg-icon';
 
 const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number, className?: string) => JSX.Element> = {
-	CARD_SORT: (size, className?: string) => <WorksheetIcon width={size} height={size} className={className} />,
-	HOMEWORK: (size, className?: string) => <ResourceIcon width={size} height={size} className={className} />,
-	INFOGRAPHIC: (size, className?: string) => <ResourceIcon width={size} height={size} className={className} />,
-	QUIZ: (size, className?: string) => <WorksheetIcon width={size} height={size} className={className} />,
-	REORDER: (size, className?: string) => <WorksheetIcon width={size} height={size} className={className} />,
-	THINGS_TO_SHARE: (size, className?: string) => <ResourceIcon width={size} height={size} className={className} />,
-	VIDEO: (size, className?: string) => <VideoIcon width={size} height={size} className={className} />,
+	CARD_SORT: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	HOMEWORK: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	INFOGRAPHIC: (size, className?: string) => <SvgIcon kit="far" icon="newspaper" size={size} className={className} />,
+	QUIZ: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	REORDER: (size, className?: string) => (
+		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
+	),
+	THINGS_TO_SHARE: (size, className?: string) => (
+		<SvgIcon kit="far" icon="download" size={size} className={className} />
+	),
+	VIDEO: (size, className?: string) => <SvgIcon kit="fak" icon="video" size={size} className={className} />,
 };
 
 interface UseStylesProps {
@@ -53,17 +59,17 @@ export const CourseUnitListDisplay = ({ courseUnit, isComplete, isLocked, compac
 		<div className="d-flex align-items-center">
 			<div className={classNames(classes.iconOuter, { complete: isComplete })}>
 				{isLocked ? (
-					<LockIcon width={compact ? 18 : 24} height={compact ? 18 : 24} />
+					<SvgIcon kit="far" icon="lock" size={compact ? 16 : 20} />
 				) : isComplete ? (
 					<>
 						{courseUnit.showUnitAsComplete ? (
-							<CheckIcon className="text-white" width={compact ? 18 : 24} height={compact ? 18 : 24} />
+							<SvgIcon kit="fak" icon="check" size={compact ? 16 : 20} className="text-white" />
 						) : (
 							courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24, 'text-white')
 						)}
 					</>
 				) : (
-					courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 18 : 24)
+					courseUnitTypeIdIconMap[courseUnit.courseUnitTypeId](compact ? 16 : 20)
 				)}
 			</div>
 			<div className="ps-4">

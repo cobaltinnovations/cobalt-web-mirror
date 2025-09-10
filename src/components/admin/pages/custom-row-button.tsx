@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as ImageIcon } from '@/assets/icons/icon-image.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	customRowButton: {
@@ -83,7 +83,7 @@ export const CustomRowButton = ({ title, cols = 1, className, onClick }: CustomR
 			{Array.apply(null, Array(cols)).map((_col, colIndex) => (
 				<div className={classes.column} key={colIndex}>
 					<div className={classes.image}>
-						<ImageIcon className="text-gray" />
+						<SvgIcon kit="far" icon="image" size={40} className="text-gray" />
 					</div>
 					<div className={classes.header} />
 					<div className={classes.paragraph} />

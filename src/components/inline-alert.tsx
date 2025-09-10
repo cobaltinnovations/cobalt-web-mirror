@@ -1,13 +1,7 @@
 import React, { ReactNode, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
-
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
-import { ReactComponent as SuccessIcon } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as WarningIcon } from '@/assets/icons/flag-warning.svg';
-import { ReactComponent as DangerIcon } from '@/assets/icons/icon-flag.svg';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
-import { ReactComponent as FlagDangerIcon } from '@/assets/icons/flag-danger.svg';
+import SvgIcon from './svg-icon';
 
 /* --------------------------------------------------------------- */
 /* inline alert styles were moved to the useGlobalStyles hook! */
@@ -30,13 +24,13 @@ interface InlineAlertProps {
 export const InlineAlert = ({ title, description, action, variant = 'info', className }: InlineAlertProps) => {
 	const icon: Record<Exclude<typeof variant, undefined>, ReactNode> = useMemo(() => {
 		return {
-			primary: <InfoIcon width={24} height={24} />,
-			success: <SuccessIcon width={24} height={24} />,
-			warning: <WarningIcon width={24} height={24} />,
-			danger: <DangerIcon width={24} height={24} />,
-			info: <InfoIcon width={24} height={24} />,
-			attention: <QuestionMarkIcon width={24} height={24} />,
-			'flag-danger': <FlagDangerIcon width={24} height={24} />,
+			primary: <SvgIcon kit="fas" icon="circle-info" size={20} />,
+			success: <SvgIcon kit="fas" icon="circle-check" size={20} />,
+			warning: <SvgIcon kit="fas" icon="triangle-exclamation" size={20} />,
+			danger: <SvgIcon kit="fas" icon="diamond-exclamation" size={20} />,
+			info: <SvgIcon kit="fas" icon="circle-info" size={20} />,
+			attention: <SvgIcon kit="fas" icon="circle-question" size={20} />,
+			'flag-danger': <SvgIcon kit="fas" icon="flag-pennant" size={20} />,
 		};
 	}, []);
 

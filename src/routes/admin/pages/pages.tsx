@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } fro
 import { AddPageModal, PageActionsDropdown } from '@/components/admin/pages';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
+import SvgIcon from '@/components/svg-icon';
 
 export async function loader() {
 	return null;
@@ -165,10 +166,13 @@ export const Component = () => {
 						<div className="mb-6 d-flex align-items-center justify-content-between">
 							<h2 className="mb-0">Pages</h2>
 							<Button
+								variant="primary"
+								className="d-flex align-items-center"
 								onClick={() => {
 									setShowAddPageModal(true);
 								}}
 							>
+								<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
 								Add Page
 							</Button>
 						</div>

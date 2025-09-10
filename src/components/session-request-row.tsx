@@ -6,11 +6,7 @@ import SessionDropdown from '@/components/session-dropdown';
 
 import { GroupSessionRequestModel, ROLE_ID } from '@/lib/models';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as AddIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
-import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
+import SvgIcon from './svg-icon';
 import { Link } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -90,7 +86,9 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(canEditSession
 								? [
 										{
-											icon: <EditIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon kit="far" icon="pen" size={16} className={classes.iconPath} />
+											),
 											title: 'Edit',
 											onClick: () => {
 												onEditClick(session.groupSessionRequestId);
@@ -101,7 +99,9 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(canAddSession
 								? [
 										{
-											icon: <AddIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon kit="fas" icon="plus" size={16} className={classes.iconPath} />
+											),
 											title: 'Add',
 											onClick: () => {
 												onAddClick(session.groupSessionRequestId);
@@ -112,7 +112,14 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(session.groupSessionRequestStatusId === SESSION_STATUS.ADDED
 								? [
 										{
-											icon: <ArchiveIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon
+													kit="far"
+													icon="box-arrow-down"
+													size={16}
+													className={classes.iconPath}
+												/>
+											),
 											title: 'Archive',
 											onClick: () => {
 												onArchiveClick(session.groupSessionRequestId);
@@ -123,14 +130,28 @@ const SessionRequestRow: FC<SessionRequestRowProps> = ({
 							...(session.groupSessionRequestStatusId === SESSION_STATUS.ARCHIVED
 								? [
 										{
-											icon: <CopyIcon className={classes.iconPath} />,
+											icon: (
+												<SvgIcon
+													kit="far"
+													icon="clone"
+													size={16}
+													className={classes.iconPath}
+												/>
+											),
 											title: 'Unarchive',
 											onClick: () => {
 												onUnarchiveClick(session.groupSessionRequestId);
 											},
 										},
 										{
-											icon: <DeleteIcon className={classes.iconTrash} />,
+											icon: (
+												<SvgIcon
+													kit="far"
+													icon="trash-can"
+													size={16}
+													className={classes.iconTrash}
+												/>
+											),
 											title: 'Delete',
 											onClick: () => {
 												onDeleteClick(session.groupSessionRequestId);

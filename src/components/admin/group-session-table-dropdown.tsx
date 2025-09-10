@@ -5,13 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GROUP_SESSION_STATUS_ID, GroupSessionModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as GroupSessionsIcon } from '@/assets/icons/icon-group.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
-import { ReactComponent as XCloseIcon } from '@/assets/icons/icon-cancel.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
+import SvgIcon from '../svg-icon';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import { GroupSessionSchedulingSystemId } from '@/lib/services';
 
@@ -51,9 +45,9 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 			<Dropdown.Toggle
 				as={DropdownToggle}
 				id={`admin-group-sessions__dropdown-menu--${groupSession.groupSessionId}`}
-				className="p-2"
+				className="p-2 border-0"
 			>
-				<MoreIcon className="d-flex" />
+				<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 				{canEdit && (
@@ -62,7 +56,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						as={Link}
 						to={`/admin/group-sessions/edit/${groupSession.groupSessionId}`}
 					>
-						<EditIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="pen" size={16} className="me-2 text-n500" />
 						Edit
 					</Dropdown.Item>
 				)}
@@ -72,7 +66,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						as={Link}
 						to={`/admin/group-sessions/duplicate/${groupSession.groupSessionId}`}
 					>
-						<CopyIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="clone" size={16} className="me-2 text-n500" />
 						Duplicate
 					</Dropdown.Item>
 				)}
@@ -84,7 +78,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						target="_blank"
 						to={`/admin/group-sessions/preview/${groupSession.groupSessionId}`}
 					>
-						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="me-2 text-n500" />
 						Preview
 					</Dropdown.Item>
 				)}
@@ -98,7 +92,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 						}}
 						target="_blank"
 					>
-						<ExternalIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="me-2 text-n500" />
 						View on Cobalt
 					</Dropdown.Item>
 				)}
@@ -113,7 +107,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							});
 						}}
 					>
-						<GroupSessionsIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="user-group" size={16} className="me-2 text-n500" />
 						View Registrants
 					</Dropdown.Item>
 				)}
@@ -127,7 +121,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onCancel(groupSession.groupSessionId);
 						}}
 					>
-						<XCloseIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="calendar-xmark" size={16} className="me-2 text-n500" />
 						Cancel
 					</Dropdown.Item>
 				)}
@@ -138,7 +132,7 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 							onDelete(groupSession.groupSessionId);
 						}}
 					>
-						<DeleteIcon className="me-2 text-n500" width={24} height={24} />
+						<SvgIcon kit="far" icon="trash-can" size={16} className="me-2 text-n500" />
 						Delete
 					</Dropdown.Item>
 				)}
