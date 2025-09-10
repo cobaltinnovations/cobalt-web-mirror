@@ -3,10 +3,7 @@ import { Draggable } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ScreeningAnswersCorrectnessIndicatorId, ScreeningAnswersDisplayTypeId } from '@/lib/models';
-
-import dragIndicator from '@/assets/icons/drag-indicator.svg';
-import checkCircleFill from '@/assets/icons/screening-v2/check-circle-fill.svg';
-import cancelFill from '@/assets/icons/screening-v2/cancel-fill.svg';
+import { maskImageSvg } from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
@@ -28,22 +25,22 @@ const useStyles = createUseThemedStyles((theme) => ({
 			border: `1px solid ${theme.colors.n100}`,
 		},
 		'& .drag-handle': {
-			width: 24,
-			height: 24,
-			maskSize: 24,
+			width: 20,
+			height: 20,
+			maskSize: 20,
 			maskPosition: 'center',
 			maskRepeat: 'no-repeat',
-			maskImage: `url(${dragIndicator})`,
+			maskImage: maskImageSvg({ kit: 'far', icon: 'grip-lines' }),
 			backgroundColor: theme.colors.n500,
 		},
 		'&.correct .drag-handle': {
 			maskSize: 20,
-			maskImage: `url(${checkCircleFill})`,
+			maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-check' }),
 			backgroundColor: theme.colors.s500,
 		},
 		'&.incorrect .drag-handle': {
 			maskSize: 20,
-			maskImage: `url(${cancelFill})`,
+			maskImage: maskImageSvg({ kit: 'fas', icon: 'circle-xmark' }),
 			backgroundColor: theme.colors.n500,
 		},
 		'&.success:after': {

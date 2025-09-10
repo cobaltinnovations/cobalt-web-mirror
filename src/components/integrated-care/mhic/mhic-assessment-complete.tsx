@@ -25,20 +25,16 @@ import {
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 
-import { ReactComponent as DissatisfiedIcon } from '@/assets/icons/sentiment-dissatisfied.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
-import { ReactComponent as SatisfiedIcon } from '@/assets/icons/sentiment-satisfied.svg';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { analyticsService, integratedCareService, screeningService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useHandleError from '@/hooks/use-handle-error';
 import InlineAlert from '@/components/inline-alert';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
 import useFlags from '@/hooks/use-flags';
-import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -206,7 +202,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<ResetIcon className="me-1" />
+											<SvgIcon kit="far" icon="arrow-rotate-left" size={16} className="me-2" />
 											Reset
 										</Button>
 										<Button
@@ -215,7 +211,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											disabled={isExportingResults}
 										>
 											Export Results
-											<ExternalIcon className="ms-2" width={20} height={20} />
+											<SvgIcon kit="far" icon="copy" size={16} className="ms-2" />
 										</Button>
 									</div>
 								</div>
@@ -445,10 +441,14 @@ const ScreeningResultCard = ({ screening, id }: { screening: ScreeningSessionScr
 						)}
 					</p>
 					{(screening.belowScoringThreshold === undefined || screening.belowScoringThreshold === null) && (
-						<NaIcon className="text-gray" />
+						<SvgIcon kit="far" icon="face-meh" className="text-gray" />
 					)}
-					{screening.belowScoringThreshold === false && <DissatisfiedIcon className="text-danger" />}
-					{screening.belowScoringThreshold === true && <SatisfiedIcon className="text-success" />}
+					{screening.belowScoringThreshold === false && (
+						<SvgIcon kit="far" icon="face-frown-slight" className="text-danger" />
+					)}
+					{screening.belowScoringThreshold === true && (
+						<SvgIcon kit="far" icon="face-smile" className="text-success" />
+					)}
 				</div>
 			</Card.Header>
 			{screening.screeningQuestionResults && (

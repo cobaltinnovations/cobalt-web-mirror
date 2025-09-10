@@ -27,7 +27,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { config } from '@/config';
 import { PatientOrdersListResponse, analyticsService, integratedCareService } from '@/lib/services';
 
-import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
+import SvgIcon from '@/components/svg-icon';
 import { MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { useIntegratedCareLoaderData } from '../landing';
 import { useMhicLayoutLoaderData } from './mhic-layout';
@@ -302,7 +302,7 @@ export const Component = () => {
 											}
 											className="d-flex align-items-center"
 										>
-											<UploadIcon className="me-2" />
+											<SvgIcon kit="far" icon="upload" size={16} className="me-2" />
 											Import
 										</Button>
 									</FileInputButton>

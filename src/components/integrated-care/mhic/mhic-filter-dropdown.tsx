@@ -10,10 +10,6 @@ import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
-import { ReactComponent as FilterIcon } from '@/assets/icons/filter.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import {
 	PatientOrderAssignmentStatusId,
 	PatientOrderOutreachStatusId,
@@ -22,6 +18,7 @@ import {
 	PatientOrderSafetyPlanningStatusId,
 	PatientOrderScreeningStatusId,
 } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 enum FilterTypeId {
 	SELECT = 'SELECT',
@@ -246,7 +243,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>
-				<FilterIcon className="me-2" />
+				<SvgIcon kit="fas" icon="bars-filter" size={16} className="me-2" />
 				<span>Filter</span>
 			</Dropdown.Toggle>
 			<Dropdown.Menu
@@ -300,13 +297,13 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 									</InputHelper>
 								)}
 								<Button
-									variant="light"
+									variant="danger"
 									className="p-2 flex-shrink-0"
 									onClick={() => {
 										handleFilterRemoveButtonClick(filterId);
 									}}
 								>
-									<CloseIcon />
+									<SvgIcon kit="fas" icon="minus" size={16} className="d-flex" />
 								</Button>
 							</div>
 						);
@@ -317,9 +314,9 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 							id="order-filters--select-filter"
 							className="d-inline-flex align-items-center"
 						>
-							<PlusIcon className="me-2" />
+							<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
 							<span>Add Filter</span>
-							<ArrowDown className="ms-2" />
+							<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-2" />
 						</Dropdown.Toggle>
 						<Dropdown.Menu
 							as={DropdownMenu}

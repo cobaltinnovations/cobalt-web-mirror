@@ -36,14 +36,12 @@ import {
 } from '@/lib/models';
 import { analyticsService, integratedCareService } from '@/lib/services';
 
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
-import { ReactComponent as ResetIcon } from '@/assets/icons/icon-before.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -376,7 +374,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 																setShowScheduleCallEditModal(true);
 															}}
 														>
-															<EditIcon className="d-flex" />
+															<SvgIcon
+																kit="far"
+																icon="pen"
+																size={16}
+																className="d-flex"
+															/>
 														</Button>
 													</div>
 												</Card.Header>
@@ -458,7 +461,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowAddVoicemailTaskModal(true);
 												}}
 											>
-												<EditIcon className="d-flex" />
+												<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 											</Button>
 										</div>
 									</Card.Header>
@@ -514,7 +517,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													setShowResetModel(true);
 												}}
 											>
-												<ResetIcon className="me-1" />
+												<SvgIcon
+													kit="far"
+													icon="arrow-rotate-left"
+													size={16}
+													className="me-2"
+												/>
 												Reset
 											</Button>
 											<Button
@@ -533,7 +541,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 													);
 												}}
 											>
-												Review <ExternalIcon className="ms-2" width={20} height={20} />
+												Review{' '}
+												<SvgIcon
+													kit="far"
+													icon="arrow-up-right-from-square"
+													size={16}
+													className="ms-2"
+												/>
 											</Button>
 										</div>
 									</div>
@@ -705,7 +719,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 											},
 											{
 												variant: 'link',
-												icon: <ResetIcon className="me-1" />,
+												icon: (
+													<SvgIcon
+														kit="far"
+														icon="arrow-rotate-left"
+														size={16}
+														className="me-2"
+													/>
+												),
 												className: 'text-decoration-none',
 												title: 'Reset',
 												onClick: () => {
@@ -763,7 +784,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<EditIcon className="d-flex" />
+											<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 										</Button>
 									</div>
 								</Card.Header>
@@ -912,7 +933,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												PatientOrderDispositionId.OPEN
 											}
 										>
-											<EditIcon className="d-flex" />
+											<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
 										</Button>
 									</div>
 								</Card.Header>

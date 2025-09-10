@@ -1,7 +1,7 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import React from 'react';
-import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import SvgIcon from './svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	floatingActionButton: {
@@ -38,7 +38,7 @@ const FloatingActionButton = ({
 	return (
 		<button className={classNames(classes.floatingActionButton, className)} {...buttonProps}>
 			{children}
-			<PlusIcon width={24} height={24} className={classes.addIcon} />
+			<SvgIcon kit="fas" icon="plus" size={20} className={classes.addIcon} />
 		</button>
 	);
 };

@@ -3,8 +3,7 @@ import { Button, Form, FormControlProps } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
-import { ReactComponent as CancelIcon } from '@/assets/icons/icon-cancel-fill.svg';
+import SvgIcon from './svg-icon';
 
 const useInputHelperSearchStyles = createUseThemedStyles((theme) => ({
 	inputHelper: {
@@ -77,7 +76,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 		return (
 			<div className={className}>
 				<Form.Group className={classNames(classes.inputHelper)}>
-					<SearchIcon width={20} height={20} className={classes.searchIcon} />
+					<SvgIcon kit="far" icon="magnifying-glass" size={16} className={classes.searchIcon} />
 					<Form.Control
 						ref={ref}
 						className={classes.input}
@@ -89,7 +88,7 @@ const InputHelperSearch = React.forwardRef<HTMLInputElement, InputHelperSearchPr
 					/>
 					{props.value && (
 						<Button variant="link" className={classes.clearButton} onClick={onClear}>
-							<CancelIcon width={22} height={22} />
+							<SvgIcon kit="fas" icon="circle-xmark" size={20} className="d-flex" />
 						</Button>
 					)}
 				</Form.Group>

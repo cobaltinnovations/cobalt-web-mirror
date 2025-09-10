@@ -26,13 +26,7 @@ import { exploreLinks } from '@/menu-links';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { ReactComponent as AvatarIcon } from '@/assets/icons/icon-avatar.svg';
-import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
-import { ReactComponent as SpacesOfColorIcon } from '@/assets/icons/icon-spaces-of-color.svg';
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
 import InCrisisHeaderButton from './in-crisis-header-button';
 import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
@@ -40,6 +34,7 @@ import { useAppRootLoaderData } from '@/routes/root';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
+import SvgIcon from './svg-icon';
 
 export const HEADER_HEIGHT = 60;
 
@@ -288,9 +283,9 @@ const AdditionalNavigationItemIconOrImage = ({
 
 	switch (iconName) {
 		case 'diversity_1':
-			return <SpacesOfColorIcon {...svgProps} />;
+			return <SvgIcon kit="fak" icon="people-group-support" size={16} {...svgProps} />;
 		default:
-			return <AdminIcon {...svgProps} />;
+			return <SvgIcon kit="far" icon="gear" size={16} {...svgProps} />;
 	}
 };
 
@@ -311,7 +306,7 @@ const MobileAccordianItem = ({
 				}}
 			>
 				{toggleElement}
-				<DownChevron className="text-n300" />
+				<SvgIcon kit="far" icon="chevron-down" size={16} className="text-n300" />
 			</Button>
 			<Collapse in={isExpanded}>
 				<div>
@@ -581,7 +576,7 @@ const HeaderV2 = () => {
 				? [
 						{
 							testId: 'menuLinkAccountSettings',
-							icon: AdminIcon,
+							icon: <SvgIcon kit="fas" icon="gear" size={20} className="text-p300" />,
 							title: 'Account Settings',
 							to: '/account-settings',
 						},
@@ -591,7 +586,7 @@ const HeaderV2 = () => {
 				? [
 						{
 							testId: 'menuLinkEvents',
-							icon: EventIcon,
+							icon: <SvgIcon kit="far" icon="calendar" size={20} className="text-p300" />,
 							title: 'My Events',
 							to: '/my-calendar',
 						},
@@ -610,7 +605,9 @@ const HeaderV2 = () => {
 				? [
 						{
 							testId: 'menuLinkScheduling',
-							icon: ExternalIcon,
+							icon: (
+								<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="text-gray" />
+							),
 							title: 'Patient Scheduling',
 							to: '/scheduling',
 						},
@@ -620,7 +617,9 @@ const HeaderV2 = () => {
 				? [
 						{
 							testId: '',
-							icon: ExternalIcon,
+							icon: (
+								<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="text-gray" />
+							),
 							title: 'Admin',
 							to: '/admin',
 						},
@@ -773,7 +772,7 @@ const HeaderV2 = () => {
 								className="py-2"
 								toggleElement={
 									<div className="d-flex align-items-center">
-										<AvatarIcon width={20} height={20} className="text-p700" />
+										<SvgIcon kit="fas" icon="circle-user" size={24} className="text-p700" />
 										<span className="ms-4">My Account</span>
 									</div>
 								}
@@ -782,7 +781,7 @@ const HeaderV2 = () => {
 									{accountNavigationConfig.map((item, itemIndex) => (
 										<Link key={itemIndex} to={item.to} className="m-0">
 											<div className="d-flex align-items-center">
-												<item.icon className="text-p300" />
+												<SvgIcon kit="far" icon="gear" size={16} className="text-p300" />
 												<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
 											</div>
 										</Link>
@@ -796,7 +795,7 @@ const HeaderV2 = () => {
 												<Link key={itemIndex} to={item.to} className="m-0" target="_blank">
 													<div className="d-flex justify-content-between align-items-center">
 														<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
-														<item.icon className="text-gray" />
+														{item.icon}
 													</div>
 												</Link>
 											))}
@@ -813,7 +812,15 @@ const HeaderV2 = () => {
 											);
 										}}
 									>
-										Log Out
+										<div className="d-flex align-items-center">
+											<SvgIcon
+												kit="far"
+												icon="arrow-left-from-bracket"
+												size={16}
+												className="me-4 text-danger"
+											/>
+											<p className="mb-0 pe-4 fw-semibold text-danger">Log Out</p>
+										</div>
 									</Button>
 								</div>
 							</MobileAccordianItem>
@@ -950,7 +957,7 @@ const HeaderV2 = () => {
 								id="mhic-header__dropdown-menu"
 								className="p-0 border-0"
 							>
-								<AvatarIcon className="d-flex" />
+								<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex" />
 							</Dropdown.Toggle>
 							<Dropdown.Menu
 								as={DropdownMenu}
@@ -964,7 +971,7 @@ const HeaderV2 = () => {
 								{accountNavigationConfig.map((item, itemIndex) => (
 									<Dropdown.Item key={itemIndex} as={Link} to={item.to}>
 										<div className="d-flex align-items-center">
-											<item.icon className="text-p300" />
+											{item.icon}
 											<p className="mb-0 ps-4 fw-semibold">{item.title}</p>
 										</div>
 									</Dropdown.Item>
@@ -978,7 +985,7 @@ const HeaderV2 = () => {
 											<Dropdown.Item key={itemIndex} as={Link} to={item.to} target="_blank">
 												<div className="d-flex justify-content-between align-items-center">
 													<p className="mb-0 pe-4 fw-semibold">{item.title}</p>
-													<item.icon className="text-gray" />
+													{item.icon}
 												</div>
 											</Dropdown.Item>
 										))}
@@ -993,7 +1000,15 @@ const HeaderV2 = () => {
 										);
 									}}
 								>
-									<p className="mb-0 text-gray">Log Out</p>
+									<div className="d-flex align-items-center">
+										<SvgIcon
+											kit="far"
+											icon="arrow-left-from-bracket"
+											size={20}
+											className="me-4 text-danger"
+										/>
+										<p className="mb-0 pe-4 fw-semibold text-danger">Log Out</p>
+									</div>
 								</Dropdown.Item>
 							</Dropdown.Menu>
 						</Dropdown>

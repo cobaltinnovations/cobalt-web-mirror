@@ -28,13 +28,7 @@ import {
 	PastScheduledMessageGroupsOrOutreachType,
 } from '@/components/integrated-care/mhic';
 
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
-import { ReactComponent as EnvelopeIcon } from '@/assets/icons/icon-mail.svg';
-
-import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
-import { ReactComponent as SearchCloseIcon } from '@/assets/icons/icon-search-close.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -139,11 +133,11 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 					date: msg.scheduledAtDateTime,
 					dateDescription: msg.scheduledAtDateTimeDescription,
 					icon: showSuccessIcon ? (
-						<FlagSuccess className="text-success" />
+						<SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />
 					) : showErrorIcon ? (
-						<FlagDanger className="text-danger" />
+						<SvgIcon kit="fas" icon="diamond-exclamation" size={20} className="text-danger" />
 					) : (
-						<NaIcon />
+						<SvgIcon kit="far" icon="circle" size={20} />
 					),
 					title: `${messageEnqueued ? '' : 'Sent'} ${
 						msg.patientOrderScheduledMessageTypeDescription
@@ -211,13 +205,13 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 				icon:
 					outreachResult?.patientOrderOutreachResultStatusId ===
 					PatientOrderOutreachResultStatusId.CONNECTED ? (
-						<FlagSuccess className="text-success" />
+						<SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />
 					) : PatientOrderOutreachResultStatusId.NOT_CONNECTED ? (
 						<div style={{ padding: 2 }}>
-							<SearchCloseIcon className="text-n300" />
+							<SvgIcon kit="fas" icon="circle-xmark" size={20} className="text-n300" />
 						</div>
 					) : (
-						<NaIcon />
+						<SvgIcon kit="far" icon="face-meh" size={20} />
 					),
 				title: outreachResult?.patientOrderOutreachResultTypeDescription ?? '',
 				descriptionHtml: outreach.note,
@@ -296,7 +290,12 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 													setShowOutreachModal(true);
 												}}
 											>
-												<PhoneIcon width={20} height={20} className="me-3 text-gray" />
+												<SvgIcon
+													kit="far"
+													icon="phone-volume"
+													size={20}
+													className="me-3 text-gray"
+												/>
 												<span>Call</span>
 											</Dropdown.Item>
 											<Dropdown.Item
@@ -307,7 +306,12 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 													setShowOutreachModal(true);
 												}}
 											>
-												<EnvelopeIcon width={20} height={20} className="me-3 text-gray" />
+												<SvgIcon
+													kit="far"
+													icon="envelope"
+													size={20}
+													className="me-3 text-gray"
+												/>
 												<span>{institution.myChartName}</span>
 											</Dropdown.Item>
 										</Dropdown.Menu>

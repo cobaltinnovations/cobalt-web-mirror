@@ -1,18 +1,11 @@
-import React, { ComponentType, useState } from 'react';
+import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import { AdminContent, AdminContentAction, ContentStatusId } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 
-import { ReactComponent as ExternalIcon } from '@/assets/icons/icon-external.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as ArchiveIcon } from '@/assets/icons/archive.svg';
-import { ReactComponent as UnArchiveIcon } from '@/assets/icons/unarchive.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
-import { ReactComponent as EventIcon } from '@/assets/icons/icon-event.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import SvgIcon from '../svg-icon';
 import ConfirmDialog, { ConfirmDialogProps } from '../confirm-dialog';
 import useHandleError from '@/hooks/use-handle-error';
 import { AdminContentResponse, ContentIdResponse, adminService } from '@/lib/services';
@@ -23,7 +16,7 @@ interface AdminResourcesTableDropdownProps {
 }
 
 interface ActionItemProps {
-	icon: ComponentType<React.SVGProps<SVGSVGElement>>;
+	icon: React.JSX.Element | null;
 	label: string;
 	dividers: boolean;
 	action?(content: AdminContent): Promise<AdminContentResponse | ContentIdResponse | void>;
@@ -69,7 +62,7 @@ const adminActionConfirmDialogPropsMap: Record<
 
 const actionItemProps: Record<string, ActionItemProps> = {
 	[AdminContentAction.ARCHIVE]: {
-		icon: ArchiveIcon,
+		icon: <SvgIcon kit={'far'} icon={'box-arrow-down'} className="me-2 text-n500" size={16} />,
 		label: 'Archive',
 		dividers: false,
 		action: async (content) => {
@@ -79,7 +72,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.DELETE]: {
-		icon: DeleteIcon,
+		// icon: DeleteIcon,
+		icon: <SvgIcon kit={'far'} icon={'trash-can'} className="me-2 text-n500" size={16} />,
 		label: 'Delete',
 		dividers: false,
 		action: async (content) => {
@@ -89,7 +83,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.EDIT]: {
-		icon: EditIcon,
+		// icon: EditIcon,
+		icon: <SvgIcon kit={'far'} icon={'pen'} className="me-2 text-n500" size={16} />,
 		label: 'Edit',
 		dividers: false,
 		linkProps: (content) => {
@@ -100,7 +95,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		},
 	},
 	[AdminContentAction.EXPIRE]: {
-		icon: EventIcon,
+		// icon: EventIcon,
+		icon: <SvgIcon kit={'far'} icon={'calendar-circle-minus'} className="me-2 text-n500" size={16} />,
 		label: 'Force Expire',
 		dividers: false,
 		action: async (content) => {
@@ -110,7 +106,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.REMOVE]: {
-		icon: CloseIcon,
+		// icon: CloseIcon,
+		icon: <SvgIcon kit={'far'} icon={'circle-xmark'} className="me-2 text-n500" size={24} />,
 		label: 'Remove',
 		dividers: false,
 		action: async (content) => {
@@ -120,7 +117,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.UNARCHIVE]: {
-		icon: UnArchiveIcon,
+		// icon: UnArchiveIcon,
+		icon: <SvgIcon kit={'far'} icon={'box-arrow-down-arrow-up'} className="me-2 text-n500" size={16} />,
 		label: 'Unarchive',
 		dividers: false,
 		action: async () => {
@@ -130,7 +128,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.UNEXPIRE]: {
-		icon: UnArchiveIcon,
+		// icon: UnArchiveIcon,
+		icon: <SvgIcon kit={'far'} icon={'calendar-clock'} className="me-2 text-n500" size={16} />,
 		label: 'Unexpire',
 		dividers: false,
 		action: async (content) => {
@@ -142,7 +141,8 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		requiresRefresh: true,
 	},
 	[AdminContentAction.VIEW_ON_COBALT]: {
-		icon: ExternalIcon,
+		// icon: ExternalIcon,
+		icon: <SvgIcon kit={'far'} icon={'arrow-up-right-from-square'} className="me-2 text-n500" size={16} />,
 		label: 'View on Cobalt',
 		dividers: true,
 		linkProps: (content) => {
@@ -181,7 +181,7 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 					id={`admin-resources__dropdown-menu--${content.contentId}`}
 					className="p-2 border-0"
 				>
-					<MoreIcon className="d-flex" />
+					<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 					{content.actions.map((action) => {
@@ -199,7 +199,7 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 
 								{linkProps ? (
 									<Dropdown.Item className="d-flex align-items-center" {...linkProps}>
-										<actionProps.icon className="me-2 text-n500" width={24} height={24} />
+										{actionProps.icon}
 										{actionProps.label}
 									</Dropdown.Item>
 								) : (
@@ -244,7 +244,7 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 											});
 										}}
 									>
-										<actionProps.icon className="me-2 text-n500" width={24} height={24} />
+										{actionProps.icon}
 										{actionProps.label}
 									</Dropdown.Item>
 								)}

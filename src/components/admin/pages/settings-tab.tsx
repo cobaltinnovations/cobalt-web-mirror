@@ -6,7 +6,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import InputHelper from '@/components/input-helper';
 import { EditUrlModal } from '@/components/admin/pages';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
+import SvgIcon from '@/components/svg-icon';
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
@@ -107,7 +107,7 @@ export const SettingsTab = () => {
 					}}
 					disabled={page?.editingLivePage}
 				>
-					<EditIcon className="me-2" width={20} height={20} />
+					<SvgIcon kit="far" icon="pen" size={16} className="me-2" />
 					Edit URL
 				</Button>
 			</div>

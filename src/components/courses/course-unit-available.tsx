@@ -16,7 +16,7 @@ import { ScreeningFlow } from '@/components/screening-v2';
 import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
+import SvgIcon from '../svg-icon';
 import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -70,13 +70,14 @@ export const CourseUnitAvailable = ({
 	const [isComplete, setIsComplete] = useState(false);
 
 	const handleVideoPlayerEvent = useCallback(
-		(eventName: string, eventPayload: unknown) => {
+		(eventName: string, eventPayload: unknown, mediaProxy: unknown) => {
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
 				courseUnitId: courseUnit.courseUnitId,
 				...(courseSessionId && { courseSessionId }),
 				videoId: courseUnit.videoId,
 				eventName,
 				eventPayload,
+				...(mediaProxy ? { mediaProxy } : {}),
 			});
 		},
 		[courseSessionId, courseUnit.courseUnitId, courseUnit.videoId]
@@ -217,7 +218,7 @@ export const CourseUnitAvailable = ({
 						onClick={onNextButtonClick}
 					>
 						Next
-						<RightChevron className="ms-1" />
+						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 					</Button>
 				) : (
 					<Button
@@ -227,7 +228,7 @@ export const CourseUnitAvailable = ({
 						onClick={onSkipActivityButtonClick}
 					>
 						Skip Activity
-						<RightChevron className="ms-1" />
+						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 					</Button>
 				)}
 			</div>

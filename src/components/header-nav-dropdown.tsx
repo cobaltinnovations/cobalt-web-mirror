@@ -2,17 +2,16 @@ import classNames from 'classnames';
 import React, { PropsWithChildren, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 
-import { ReactComponent as DownChevron } from '@/assets/icons/icon-chevron-down.svg';
-import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { createUseThemedStyles } from '@/jss/theme';
-
-import { HeaderNavFeaturedItem, NavFeaturedItem } from './header-nav-featured-item';
-import { analyticsService } from '@/lib/services';
 import {
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
 	SITE_LOCATION_ID,
 } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
+import SvgIcon from '@/components/svg-icon';
+import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import { HeaderNavFeaturedItem, NavFeaturedItem } from '@/components/header-nav-featured-item';
+import { createUseThemedStyles } from '@/jss/theme';
 
 interface UseStylesProps {
 	hasFeaturedItem: boolean;
@@ -53,7 +52,7 @@ const HeaderNavDropdown = ({
 		>
 			<Dropdown.Toggle as={DropdownToggle}>
 				{title}
-				<DownChevron width={16} height={16} />
+				<SvgIcon kit="fas" icon="chevron-down" size={10} className="ms-2" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				className={classNames(classes.dropdownMenu, 'p-0')}

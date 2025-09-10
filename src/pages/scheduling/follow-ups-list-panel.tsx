@@ -1,6 +1,6 @@
+import SvgIcon from '@/components/svg-icon';
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 
 interface FollowUpsListPanelProps {
 	onClose: () => void;
@@ -12,7 +12,7 @@ export const FollowUpsListPanel = ({ onClose }: FollowUpsListPanelProps) => {
 				<h4>2 / 3 follow-ups</h4>
 
 				<Button variant="link" size="sm" className="p-0" onClick={() => onClose()}>
-					<CloseIcon />
+					<SvgIcon kit="far" icon="xmark" size={16} />
 				</Button>
 			</div>
 

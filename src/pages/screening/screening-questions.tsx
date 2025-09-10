@@ -18,13 +18,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useLocation, useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
-import { ReactComponent as CheckMarkIcon } from '@/assets/icons/check.svg';
 import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 import { Helmet } from 'react-helmet';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -322,7 +321,7 @@ const ScreeningQuestionsPage = () => {
 										}}
 									>
 										<div className="checkmark-wrapper d-flex align-items-center justify-content-center me-2">
-											{isChecked && <CheckMarkIcon />}
+											{isChecked && <SvgIcon kit="fak" icon="check" size={16} />}
 										</div>
 										{option.answerOptionText}
 									</ToggleButton>
@@ -724,7 +723,7 @@ const ScreeningQuestionsPage = () => {
 													setShowHelpModal(true);
 												}}
 											>
-												<QuestionMarkIcon className="me-2" />
+												<SvgIcon kit="fas" icon="circle-question" size={20} className="me-2" />
 												Need help with the assessment?
 											</Button>
 										</div>

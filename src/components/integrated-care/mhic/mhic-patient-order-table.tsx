@@ -24,10 +24,7 @@ import classNames from 'classnames';
 import { PatientOrdersListResponse } from '@/lib/services';
 import NoData from '@/components/no-data';
 
-import { ReactComponent as FlagIcon } from '@/assets/icons/icon-flag.svg';
-import { ReactComponent as FilledCircleIcon } from '@/assets/icons/icon-filled-circle.svg';
-import { ReactComponent as MailIcon } from '@/assets/icons/icon-mail.svg';
-import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const dispositionVariantMap = {
 	[PatientOrderDispositionId.OPEN]: 'success',
@@ -44,27 +41,27 @@ const nextContextTypeMap: Record<
 > = {
 	[PatientOrderContactTypeId.WELCOME_MESSAGE]: {
 		title: 'Welcome Message',
-		icon: () => <MailIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="envelope" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.ASSESSMENT]: {
 		title: 'Assessment',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.OTHER]: {
 		title: 'Other',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.ASSESSMENT_OUTREACH]: {
 		title: 'Assessment Outreach',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.RESOURCE_CHECK_IN]: {
 		title: 'Resource Check In',
-		icon: () => <MailIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="envelope" size={20} className="me-2 text-gray" />,
 	},
 	[PatientOrderContactTypeId.RESOURCE_FOLLOWUP]: {
 		title: 'Resource Followup',
-		icon: () => <PhoneIcon className="me-2 text-gray" />,
+		icon: () => <SvgIcon kit="far" icon="phone" size={20} className="me-2 text-gray" />,
 	},
 };
 
@@ -462,8 +459,13 @@ export const MhicPatientOrderTable = ({
 												>
 													{getFlagCount(po) > 0 && (
 														<>
-															<span className="text-gray">{getFlagCount(po)}</span>
-															<FlagIcon className={getFlagColor(po)} />
+															<span className="me-1 text-gray">{getFlagCount(po)}</span>
+															<SvgIcon
+																kit="fas"
+																icon="flag-pennant"
+																size={20}
+																className={getFlagColor(po)}
+															/>
 														</>
 													)}
 												</TableCell>
@@ -565,7 +567,10 @@ export const MhicPatientOrderTable = ({
 																dispositionVariantMap[po.patientOrderDispositionId]
 															}
 														>
-															<FilledCircleIcon
+															<SvgIcon
+																kit="fas"
+																icon="circle-small"
+																size={16}
 																className={
 																	classes[`${po.patientOrderDispositionId}-icon`]
 																}

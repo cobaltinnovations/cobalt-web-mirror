@@ -74,6 +74,7 @@ export interface CourseSessionModel {
 		minutesCompleted: number;
 		totalMinutes: number;
 	};
+	courseSessionUnitCompletionMessagesByCourseUnitId: Record<string, string>;
 }
 
 export enum CourseSessionStatusId {
@@ -111,7 +112,8 @@ export enum CourseSessionUnitStatusId {
 export interface CourseVideoModel {
 	created: string;
 	createdDescription: string;
-	kalturaEntryId: string;
+	kalturaEntryId?: string | null;
+	kalturaPlaylistId?: string | null;
 	kalturaPartnerId: string;
 	kalturaUiconfId: string;
 	kalturaWid: string;

@@ -1,5 +1,3 @@
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
-import { ReactComponent as LeftChevron } from '@/assets/icons/icon-chevron-left.svg';
 import DatePicker from '@/components/date-picker';
 import InputHelper from '@/components/input-helper';
 import TimeSlotInput from '@/components/time-slot-input';
@@ -27,8 +25,7 @@ import {
 	useRouteLoaderData,
 	useSearchParams,
 } from 'react-router-dom';
-import { ReactComponent as RightChevron } from '@/assets/icons/icon-chevron-right.svg';
-import { ReactComponent as DownloadIcon } from '@/assets/icons/icon-download.svg';
+import SvgIcon from '@/components/svg-icon';
 import GroupSession from '@/components/group-session';
 import {
 	CONTENT_VISIBILITY_TYPE_ID,
@@ -57,7 +54,6 @@ import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
 import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
 import ReactQuill from 'react-quill';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -597,7 +593,7 @@ export const Component = () => {
 
 				{!formValues.title || urlNameValidations[debouncedUrlNameQuery]?.available === false ? null : (
 					<div className="d-flex mt-2">
-						<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+						<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 						<p className="mb-0">
 							URL will appear as https://{window.location.host}/group-sessions/
 							<span className="fw-bold">{formValues.urlName}</span>
@@ -943,7 +939,12 @@ export const Component = () => {
 								setShowImageSitesModal(true);
 							}}
 						>
-							<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon
+								kit="fas"
+								icon="circle-question"
+								size={20}
+								className="me-2 text-p500 flex-shrink-0"
+							/>
 							<p className="mb-0 fw-semibold">Where can I find images?</p>
 						</Button>
 						<Button
@@ -954,7 +955,12 @@ export const Component = () => {
 								setShowImageSelectionTipsModal(true);
 							}}
 						>
-							<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon
+								kit="fas"
+								icon="circle-question"
+								size={20}
+								className="me-2 text-p500 flex-shrink-0"
+							/>
 							<p className="mb-0 fw-semibold">How do I choose an appropriate image?</p>
 						</Button>
 					</>
@@ -974,7 +980,7 @@ export const Component = () => {
 					}}
 				/>
 				<div className="d-flex mt-2">
-					<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+					<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 					<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
 				</div>
 			</AdminFormSection>
@@ -1496,7 +1502,7 @@ export const Component = () => {
 						<>
 							{isPreview ? (
 								<>
-									<LeftChevron /> Back to Edit
+									<SvgIcon kit="fas" icon="chevron-left" size={16} /> Back to Edit
 								</>
 							) : isNotDraft ? (
 								'Exit Editor'
@@ -1524,7 +1530,8 @@ export const Component = () => {
 								'Publish'
 							) : (
 								<>
-									{isNotDraft ? 'Publish Changes' : 'Next: Preview'} <RightChevron />
+									{isNotDraft ? 'Publish Changes' : 'Next: Preview'}{' '}
+									<SvgIcon kit="fas" icon="chevron-right" size={16} />
 								</>
 							)}
 						</>
@@ -1685,7 +1692,7 @@ export const Component = () => {
 										disabled={!registrantDownloadLink}
 										href={registrantDownloadLink || undefined}
 									>
-										<DownloadIcon className="text-primary me-2" />
+										<SvgIcon kit="far" icon="download" size={16} className="text-primary me-2" />
 										Email Addresses
 									</Button>
 								</div>

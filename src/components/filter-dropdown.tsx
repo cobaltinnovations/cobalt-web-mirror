@@ -4,8 +4,7 @@ import classNames from 'classnames';
 
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as ArrowDown } from '@/assets/icons/icon-arrow-drop-down.svg';
-import { ReactComponent as SortIcon } from '@/assets/icons/sort.svg';
+import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	width: number;
@@ -90,7 +89,11 @@ const FilterDropdown = ({
 	const classes = useStyles({ width });
 	const [show, setShow] = useState(false);
 
-	const icon = showSortIcon ? <SortIcon /> : <ArrowDown />;
+	const icon = showSortIcon ? (
+		<SvgIcon kit="far" icon="arrow-up-arrow-down" size={16} />
+	) : (
+		<SvgIcon kit="fas" icon="caret-down" size={12} className="ms-1" />
+	);
 
 	return (
 		<Dropdown
@@ -116,9 +119,9 @@ const FilterDropdown = ({
 				})}
 				id={id}
 			>
-				{iconLeft && <div className="me-1">{icon}</div>}
+				{iconLeft && <div className="me-1 d-flex">{icon}</div>}
 				<span>{title}</span>
-				{!iconLeft && <div className="ms-1">{icon}</div>}
+				{!iconLeft && <div className="ms-1 d-flex">{icon}</div>}
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				as={DropdownMenu}

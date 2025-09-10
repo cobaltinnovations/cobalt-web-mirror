@@ -49,13 +49,12 @@ import ResourceDisplay from '@/components/resource-display';
 import ToggledInput from '@/components/toggled-input';
 
 import NoMatch from '@/pages/no-match';
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import { createUseThemedStyles } from '@/jss/theme';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
 import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
 import ReactQuill from 'react-quill';
-import { ReactComponent as QuestionMarkIcon } from '@/assets/icons/icon-help-fill.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	offCanvas: {
@@ -701,7 +700,7 @@ export const Component = () => {
 						/>
 
 						<div className="d-flex  mt-2">
-							<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 							<p className="mb-0">
 								If your resource is a TED talk, you must have permission from the original creator to
 								share their video.
@@ -794,7 +793,12 @@ export const Component = () => {
 										setShowImageSitesModal(true);
 									}}
 								>
-									<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+									<SvgIcon
+										kit="fas"
+										icon="circle-question"
+										size={20}
+										className="me-2 text-p500 flex-shrink-0"
+									/>
 									<p className="mb-0 fw-semibold">Where can I find images?</p>
 								</Button>
 								<Button
@@ -805,7 +809,12 @@ export const Component = () => {
 										setShowImageSelectionTipsModal(true);
 									}}
 								>
-									<QuestionMarkIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+									<SvgIcon
+										kit="fas"
+										icon="circle-question"
+										size={20}
+										className="me-2 text-p500 flex-shrink-0"
+									/>
 									<p className="mb-0 fw-semibold">How do I choose an appropriate image?</p>
 								</Button>
 							</>
@@ -826,7 +835,7 @@ export const Component = () => {
 							}}
 						/>
 						<div className="d-flex mt-2">
-							<InfoIcon className="me-2 text-p500 flex-shrink-0" width={20} height={20} />
+							<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 							<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
 						</div>
 					</AdminFormSection>

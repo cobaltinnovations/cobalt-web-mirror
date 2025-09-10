@@ -23,9 +23,9 @@ import {
 	getOptionalCourseModules,
 	getRequiredCourseModules,
 } from '@/lib/utils';
-import { ReactComponent as BeforeIcon } from '@/assets/icons/icon-before.svg';
 import ConfirmDialog from '@/components/confirm-dialog';
 import ResourceLibraryCard from '@/components/resource-library-card';
+import SvgIcon from '@/components/svg-icon';
 
 export async function loader() {
 	return null;
@@ -217,8 +217,13 @@ export const Component = () => {
 																	setShowRestartCourseModal(true);
 																}}
 															>
-																<BeforeIcon className="me-1" />
-																Restart Course
+																<SvgIcon
+																	kit="far"
+																	icon="arrow-rotate-left"
+																	size={16}
+																	className="me-2"
+																/>
+																Restart
 															</Button>
 														</div>
 													) : (

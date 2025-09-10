@@ -1,7 +1,6 @@
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import SvgIcon from '../svg-icon';
 
 export interface OptionModel {
 	[key: string]: any;
@@ -42,9 +41,9 @@ export function AdminBadgeSelectControl<T extends OptionModel>({
 						}}
 					>
 						{isSelected ? (
-							<CheckIcon width={20} height={20} className="me-2" />
+							<SvgIcon kit="fak" icon="check" size={16} className="me-2" />
 						) : (
-							<PlusIcon width={20} height={20} className="me-2" />
+							<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
 						)}
 						{option[labelKey]}
 					</Button>

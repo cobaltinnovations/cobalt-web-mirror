@@ -2,9 +2,9 @@ import React, { PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CheckIcon } from '@/assets/icons/icon-check.svg';
 import classNames from 'classnames';
 import mediaQueries from '@/jss/media-queries';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	checkOuter: {
@@ -62,7 +62,7 @@ export const NextStepsItem = ({
 							[classes.checkOuterGreen]: complete,
 						})}
 					>
-						<CheckIcon width={24} height={24} />
+						<SvgIcon kit="fak" icon="check" size={20} />
 					</div>
 					<div className={classes.infoOuter}>
 						<div className="mb-4 pe-0 pe-lg-4 mb-lg-0 flex-grow-1">

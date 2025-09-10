@@ -3,11 +3,11 @@ import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
 
-import { ReactComponent as InfoIcon } from '@/assets/icons/icon-info-fill.svg';
 import 'react-image-crop/dist/ReactCrop.css';
 import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 import useFlags from '@/hooks/use-flags';
+import SvgIcon from './svg-icon';
 
 function getCroppedImageAsBlob(
 	image: HTMLImageElement,
@@ -208,7 +208,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 					onDragEnd={handleDragEnd}
 				/>
 				<div className="d-flex mt-5 align-items-center">
-					<InfoIcon className={classes.infoIcon} />
+					<SvgIcon kit="fas" icon="triangle-exclamation" size={16} className={classes.infoIcon} />
 					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
 				</div>
 			</Modal.Body>

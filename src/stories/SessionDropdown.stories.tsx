@@ -2,7 +2,7 @@ import SessionDropdown from '@/components/session-dropdown';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
-import { ReactComponent as HomeIcon } from '@/assets/icons/icon-home.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const meta: Meta<typeof SessionDropdown> = {
 	title: 'SessionDropdown',
@@ -29,21 +29,21 @@ export const Default: Story = {
 		id: 'dropdown-1',
 		items: [
 			{
-				icon: <HomeIcon />,
+				icon: <SvgIcon kit="far" icon="home" size={20} />,
 				title: 'Action 1',
 				onClick: () => {
 					alert('Action 1 Clicked');
 				},
 			},
 			{
-				icon: <HomeIcon />,
+				icon: <SvgIcon kit="far" icon="home" size={20} />,
 				title: 'Action 2',
 				onClick: () => {
 					alert('Action 2 Clicked');
 				},
 			},
 			{
-				icon: <HomeIcon />,
+				icon: <SvgIcon kit="far" icon="home" size={20} />,
 				title: 'Action 3',
 				onClick: () => {
 					alert('Action 3 Clicked');

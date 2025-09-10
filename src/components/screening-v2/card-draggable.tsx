@@ -2,7 +2,7 @@ import React from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DragIndicator } from '@/assets/icons/drag-indicator.svg';
+import SvgIcon from '../svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
@@ -68,7 +68,7 @@ export const CardDraggable = ({
 				>
 					<p className="text-center">{cardText}</p>
 					<div className={classes.dragHandleOuter}>
-						<DragIndicator className="text-gray" />
+						<SvgIcon kit="far" icon="grip-lines" size={20} className="text-gray" />
 					</div>
 				</div>
 			)}

@@ -1,15 +1,7 @@
 import React from 'react';
 
-import { ReactComponent as TherapyIcon } from '@/assets/icons/icon-therapy.svg';
-import { ReactComponent as MedicationIcon } from '@/assets/icons/icon-medication.svg';
-import { ReactComponent as CoachingIcon } from '@/assets/icons/icon-coaching.svg';
-import { ReactComponent as SpiritualIcon } from '@/assets/icons/icon-spiritual.svg';
-import { ReactComponent as CrisisIcon } from '@/assets/icons/icon-crisis.svg';
-import { ReactComponent as GroupIcon } from '@/assets/icons/icon-group-sessions.svg';
-import { ReactComponent as ResourceIcon } from '@/assets/icons/icon-resource.svg';
-import { ReactComponent as InstitutionResourcesIcon } from '@/assets/icons/icon-institution-resources.svg';
-import { ReactComponent as AdminIcon } from '@/assets/icons/icon-admin.svg';
 import { FeatureId } from '@/lib/models';
+import SvgIcon from '@/components/svg-icon';
 
 const PathwaysIcon = ({
 	featureId,
@@ -22,28 +14,35 @@ const PathwaysIcon = ({
 	};
 	className?: string;
 }) => {
-	switch (featureId) {
-		case FeatureId.THERAPY:
-			return <TherapyIcon className={className} {...svgProps} />;
-		case FeatureId.MEDICATION_PRESCRIBER:
-			return <MedicationIcon className={className} {...svgProps} />;
-		case FeatureId.GROUP_SESSIONS:
-			return <GroupIcon className={className} {...svgProps} />;
-		case FeatureId.COACHING:
-		case FeatureId.COUNSELING_SERVICES:
-		case FeatureId.MENTAL_HEALTH_PROVIDERS:
-			return <CoachingIcon className={className} {...svgProps} />;
-		case FeatureId.SELF_HELP_RESOURCES:
-			return <ResourceIcon className={className} {...svgProps} />;
-		case FeatureId.INSTITUTION_RESOURCES:
-			return <InstitutionResourcesIcon className={className} {...svgProps} />;
-		case FeatureId.SPIRITUAL_SUPPORT:
-			return <SpiritualIcon className={className} {...svgProps} />;
-		case FeatureId.CRISIS_SUPPORT:
-			return <CrisisIcon className={className} {...svgProps} />;
-		default:
-			return <AdminIcon className={className} {...svgProps} />;
-	}
+	const iconMap: Record<FeatureId, JSX.Element> = {
+		[FeatureId.COUNSELING_SERVICES]: (
+			<SvgIcon kit="fak" icon="handshake-simple" className={className} {...svgProps} />
+		),
+		[FeatureId.THERAPY]: <SvgIcon kit="fas" icon="comment-dots" className={className} {...svgProps} />,
+		[FeatureId.MEDICATION_PRESCRIBER]: <SvgIcon kit="fak" icon="pill" className={className} {...svgProps} />,
+		[FeatureId.GROUP_SESSIONS]: (
+			<SvgIcon kit="fak" icon="people-group-support" className={className} {...svgProps} />
+		),
+		[FeatureId.COACHING]: <SvgIcon kit="fak" icon="handshake-simple" className={className} {...svgProps} />,
+		[FeatureId.SPIRITUAL_SUPPORT]: (
+			<SvgIcon kit="fas" icon="hands-holding-heart" className={className} {...svgProps} />
+		),
+		[FeatureId.CRISIS_SUPPORT]: <SvgIcon kit="fas" icon="star-of-life" className={className} {...svgProps} />,
+		[FeatureId.SELF_HELP_RESOURCES]: <SvgIcon kit="fak" icon="menu-book" className={className} {...svgProps} />,
+
+		[FeatureId.COURSE]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.INSTITUTION_RESOURCES]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.MENTAL_HEALTH_PROVIDERS]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.MHP]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.MSW]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.MY_EVENTS]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.PSYCHIATRIST]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.PSYCHOLOGIST]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.PSYCHOTHERAPIST]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.RESOURCE_NAVIGATOR]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+	};
+
+	return iconMap[featureId];
 };
 
 export default PathwaysIcon;

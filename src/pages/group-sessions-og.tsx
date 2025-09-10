@@ -19,8 +19,8 @@ import useHandleError from '@/hooks/use-handle-error';
 import { Helmet } from 'react-helmet';
 import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
 import NoData from '@/components/no-data';
-import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';
+import SvgIcon from '@/components/svg-icon';
 
 const GroupSessionsOg = () => {
 	const handleError = useHandleError();
@@ -302,8 +302,8 @@ const GroupSessionsOg = () => {
 											setShowSelectGroupSessionTypeModal(true);
 										}}
 									>
-										<PlusIcon className="text-primary me-2" height={24} width={24} /> Submit a
-										Session
+										<SvgIcon kit="fas" icon="plus" size={16} className="text-primary me-2" /> Submit
+										a Session
 									</Button>
 								</Col>
 							)}

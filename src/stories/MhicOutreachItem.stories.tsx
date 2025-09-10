@@ -1,10 +1,8 @@
-import { ReactComponent as FlagDanger } from '@/assets/icons/flag-danger.svg';
-import { ReactComponent as FlagSuccess } from '@/assets/icons/flag-success.svg';
-import { ReactComponent as NaIcon } from '@/assets/icons/sentiment-na.svg';
 import { MhicOutreachItem, PastScheduledMessageGroupsOrOutreachType } from '@/components/integrated-care/mhic';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { icMhicRouterParams } from './helpers/ic-router-params';
+import SvgIcon from '@/components/svg-icon';
 
 const meta: Meta<typeof MhicOutreachItem> = {
 	title: 'MhicOutreachItem',
@@ -52,7 +50,7 @@ export const Success: Story = {
 	},
 	args: {
 		id: 'outreach-success-id',
-		icon: <FlagSuccess className="text-success" />,
+		icon: <SvgIcon kit="fas" icon="circle-check" size={20} className="text-success" />,
 	},
 };
 
@@ -71,7 +69,7 @@ export const Error: Story = {
 	},
 	args: {
 		id: 'outreach-erro-id',
-		icon: <FlagDanger className="text-danger" />,
+		icon: <SvgIcon kit="fas" icon="diamond-exclamation" size={20} className="text-danger" />,
 	},
 };
 
@@ -90,6 +88,6 @@ export const NA: Story = {
 	},
 	args: {
 		id: 'outreach-na-id',
-		icon: <NaIcon />,
+		icon: <SvgIcon kit="far" icon="face-meh" />,
 	},
 };

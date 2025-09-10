@@ -8,9 +8,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { MhicCareResourceFormModal, MhicPageHeader } from '@/components/integrated-care/mhic';
 import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
-import { ReactComponent as MoreIcon } from '@/assets/icons/more-horiz.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/icon-delete.svg';
+import SvgIcon from '@/components/svg-icon';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import InputHelperSearch from '@/components/input-helper-search';
@@ -185,7 +183,7 @@ export const Component = () => {
 										setShowFormModal(true);
 									}}
 								>
-									<PlusIcon className="me-2" /> Add Resource
+									<SvgIcon kit="fas" icon="plus" size={16} className="me-2" /> Add Resource
 								</Button>
 							</div>
 						</MhicPageHeader>
@@ -263,7 +261,12 @@ export const Component = () => {
 													id={`mhic-resources__dropdown-menu--${careResource.careResourceId}`}
 													className="p-2 border-0"
 												>
-													<MoreIcon className="d-flex" />
+													<SvgIcon
+														kit="far"
+														icon="ellipsis-vertical"
+														size={20}
+														className="d-flex"
+													/>
 												</Dropdown.Toggle>
 												<Dropdown.Menu
 													as={DropdownMenu}
@@ -277,7 +280,12 @@ export const Component = () => {
 															setCareResourceToDelete(careResource);
 														}}
 													>
-														<DeleteIcon className="me-2 text-n500" />
+														<SvgIcon
+															kit="far"
+															icon="trash-can"
+															size={16}
+															className="me-2 text-n500"
+														/>
 														Delete
 													</Dropdown.Item>
 												</Dropdown.Menu>

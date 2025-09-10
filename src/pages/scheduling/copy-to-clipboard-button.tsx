@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 import { Button, ButtonProps } from 'react-bootstrap';
-import { ReactComponent as CopyIcon } from '@/assets/icons/icon-content-copy.svg';
+import SvgIcon from '@/components/svg-icon';
 
 interface CopyToClipboardButtonProps extends ButtonProps {
 	text?: string;
@@ -32,7 +32,7 @@ export const CopyToClipboardButton = ({
 			className={classNames('px-2', className)}
 			{...buttonProps}
 		>
-			<CopyIcon width={iconSize} height={iconSize} />
+			<SvgIcon kit="far" icon="copy" size={iconSize} />
 		</Button>
 	);
 };

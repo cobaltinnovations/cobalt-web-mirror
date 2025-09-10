@@ -1,13 +1,12 @@
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
 import { AppointmentType, LogicalAvailability, SchedulingAppointmentType } from '@/lib/models';
 import { schedulingService } from '@/lib/services';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link, useParams } from 'react-router-dom';
 import { AppointmentTypeItem } from './appointment-type-item';
+import SvgIcon from '@/components/svg-icon';
 
 interface SelectedAvailabilityPanelProps {
 	onClose: () => void;
@@ -76,7 +75,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 					className="ms-auto p-0"
 					onClick={() => onClose()}
 				>
-					<CloseIcon />
+					<SvgIcon kit="far" icon="xmark" size={16} />
 				</Button>
 			</div>
 
@@ -94,7 +93,7 @@ export const SelectedAvailabilityPanel = ({ onClose }: SelectedAvailabilityPanel
 
 					<Link to={`edit`}>
 						<Button data-testid="viewAvailabilityEditButton" variant="link" size="sm" className="p-0">
-							<EditIcon />
+							<SvgIcon kit="far" icon="pen" size={16} />
 						</Button>
 					</Link>
 				</div>

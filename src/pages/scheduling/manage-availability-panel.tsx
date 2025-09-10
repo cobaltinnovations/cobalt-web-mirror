@@ -8,11 +8,9 @@ import AsyncPage from '@/components/async-page';
 import { AppointmentTypeFormModal } from './appointment-type-form-modal';
 import { AppointmentTypeItem } from './appointment-type-item';
 
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
 import { Link } from 'react-router-dom';
 import { useSchedulingStyles } from './use-scheduling-styles';
+import SvgIcon from '@/components/svg-icon';
 
 interface ManageAvailabilityPanelProps {
 	onClose: () => void;
@@ -75,7 +73,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 						className="p-0"
 						onClick={() => onClose()}
 					>
-						<CloseIcon />
+						<SvgIcon kit="far" icon="xmark" size={16} />
 					</Button>
 				</div>
 
@@ -88,7 +86,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 							className={classes.roundBtn}
 							onClick={() => setAppointmentTypeModalOpen(true)}
 						>
-							<PlusIcon />
+							<SvgIcon kit="fas" icon="plus" size={16} />
 						</Button>
 					</div>
 
@@ -115,7 +113,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 								variant="link"
 								className={classes.roundBtn}
 							>
-								<PlusIcon />
+								<SvgIcon kit="fas" icon="plus" size={16} />
 							</Button>
 						</Link>
 					</div>
@@ -139,7 +137,7 @@ export const ManageAvailabilityPanel = ({ onClose }: ManageAvailabilityPanelProp
 								variant="link"
 								className={classes.roundBtn}
 							>
-								<PlusIcon />
+								<SvgIcon kit="fas" icon="plus" size={16} />
 							</Button>
 						</Link>
 					</div>
@@ -183,7 +181,7 @@ const LogicalAvailabilityItem = ({ logicalAvailability }: LogicalAvailabilityIte
 				</div>
 				<Link to={`${logicalAvailability.logicalAvailabilityId}/edit`}>
 					<Button data-testid="availabilityItemEditButton" variant="link" size="sm" className="p-0">
-						<EditIcon height={24} width={24} />
+						<SvgIcon kit="far" icon="pen" size={16} />
 					</Button>
 				</Link>
 			</div>

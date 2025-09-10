@@ -1,5 +1,5 @@
-import { ReactComponent as SearchIcon } from '@/assets/icons/icon-search.svg';
 import InputHelperSearch from '@/components/input-helper-search';
+import SvgIcon from '@/components/svg-icon';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -197,7 +197,7 @@ export const MhicHeaderAutoComplete = ({ recentOrders = [] }: MhicHeaderAutoComp
 								}}
 								className={classNames('d-flex align-items-center', classes.viewAllSearch)}
 							>
-								<SearchIcon />
+								<SvgIcon kit="far" icon="magnifying-glass" size={20} />
 								<p className="ms-3 mb-0">
 									View all results with <span className="fw-bold">{typeaheadState.text}</span>
 								</p>

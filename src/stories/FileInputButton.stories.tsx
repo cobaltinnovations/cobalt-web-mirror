@@ -1,8 +1,8 @@
 import FileInputButton from '@/components/file-input-button';
+import SvgIcon from '@/components/svg-icon';
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { Button, Container } from 'react-bootstrap';
-import { ReactComponent as UploadIcon } from '@/assets/icons/icon-upload.svg';
 
 const meta: Meta<typeof FileInputButton> = {
 	title: 'FileInputButton',
@@ -23,7 +23,7 @@ export const Default: Story = {
 			<Container>
 				<FileInputButton {...args}>
 					<Button as="div" variant="outline-primary" className="d-flex align-items-center">
-						<UploadIcon className="me-2" />
+						<SvgIcon kit="far" icon="upload" size={20} className="me-2" />
 						Import CSV
 					</Button>
 				</FileInputButton>

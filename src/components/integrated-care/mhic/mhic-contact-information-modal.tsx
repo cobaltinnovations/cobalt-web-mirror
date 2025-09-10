@@ -9,7 +9,7 @@ import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import InputHelper from '@/components/input-helper';
-// import { ReactComponent as PlusIcon } from '@/assets/icons/icon-plus.svg';
+// import SvgIcon from '@/components/svg-icon';
 
 // enum PHONE_NUMBER_TYPES {
 // 	MOBILE = 'MOBILE',
@@ -272,7 +272,7 @@ export const MhicContactInformationModal: FC<Props> = ({ patientOrder, onSave, .
 						variant="light"
 						onClick={handleAddPhoneNumberButtonClick}
 					>
-						<PlusIcon className="me-1" width={24} height={24} />
+						<SvgIcon kit="far" icon="plus" size={16} className="me-2" />
 						Add Phone Number
 					</Button>
 				</div> */}

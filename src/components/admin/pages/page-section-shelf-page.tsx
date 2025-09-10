@@ -2,10 +2,7 @@ import React, { FC, PropsWithChildren } from 'react';
 import { Button } from 'react-bootstrap';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as EditIcon } from '@/assets/icons/icon-edit.svg';
-import { ReactComponent as BackArrowIcon } from '@/assets/icons/icon-back-arrow.svg';
-import { ReactComponent as TrashIcon } from '@/assets/icons/icon-delete.svg';
-import { ReactComponent as CloseIcon } from '@/assets/icons/icon-close.svg';
+import SvgIcon from '@/components/svg-icon';
 
 const PAGE_SECTION_SHELF_HEADER_HEIGHT = 57;
 
@@ -72,26 +69,26 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 				<div className="d-flex align-items-center">
 					{showBackButton && (
 						<Button variant="link" className="p-2 me-2" onClick={onBackButtonClick}>
-							<BackArrowIcon />
+							<SvgIcon kit="far" icon="arrow-left" size={16} />
 						</Button>
 					)}
 					<h5 className="mb-0 text-truncate">{title}</h5>
 					{showEditButton && (
-						<Button variant="link" className="p-2 ms-2" onClick={onEditButtonClick}>
-							<EditIcon />
+						<Button variant="light" className="p-2 ms-2 border-0" onClick={onEditButtonClick}>
+							<SvgIcon kit="far" icon="pen" size={16} className="d-block" />
 						</Button>
 					)}
 				</div>
 				<div className="d-flex align-items-center">
 					{customHeaderElements}
 					{showDeleteButton && (
-						<Button variant="link" className="p-2" onClick={onDeleteButtonClick}>
-							<TrashIcon />
+						<Button variant="light" className="p-2 border-0" onClick={onDeleteButtonClick}>
+							<SvgIcon kit="far" icon="trash-can" size={16} className="d-block" />
 						</Button>
 					)}
 					{showCloseButton && (
-						<Button variant="link" className="p-2" onClick={onCloseButtonButtonClick}>
-							<CloseIcon />
+						<Button variant="light" className="p-2 border-0" onClick={onCloseButtonButtonClick}>
+							<SvgIcon kit="far" icon="xmark" size={16} className="d-block" />
 						</Button>
 					)}
 				</div>
