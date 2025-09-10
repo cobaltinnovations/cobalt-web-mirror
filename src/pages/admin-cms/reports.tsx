@@ -62,7 +62,7 @@ const Reports = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Reports</title>
+				<title>Cobalt | Reports</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>
@@ -70,7 +70,7 @@ const Reports = () => {
 					<Row className="mb-6">
 						<Col>
 							<div className="mb-6 d-flex align-items-center justify-content-between">
-								<h2 className="mb-0">Provider Reports</h2>
+								<h2 className="mb-0">Reports</h2>
 							</div>
 							<hr />
 						</Col>
@@ -83,7 +83,7 @@ const Reports = () => {
 								<InputHelper
 									className="mb-4"
 									as="select"
-									label="Report Type ID"
+									label="Report Type"
 									value={formValues.reportTypeId}
 									onChange={({ currentTarget }) => {
 										setFormValues((previousValues) => ({

@@ -180,7 +180,7 @@ export const AdminHeader = () => {
 						{
 							testId: '',
 							navigationItemId: 'REPORTS',
-							title: 'Provider Reports',
+							title: 'Reports',
 							to: '/admin/reports',
 							active: !!reportsMatch,
 						},
