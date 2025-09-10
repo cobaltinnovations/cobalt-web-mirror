@@ -119,9 +119,9 @@ const FilterDropdown = ({
 				})}
 				id={id}
 			>
-				{iconLeft && <div className="me-1">{icon}</div>}
+				{iconLeft && <div className="me-1 d-flex">{icon}</div>}
 				<span>{title}</span>
-				{!iconLeft && <div className="ms-1">{icon}</div>}
+				{!iconLeft && <div className="ms-1 d-flex">{icon}</div>}
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				as={DropdownMenu}
