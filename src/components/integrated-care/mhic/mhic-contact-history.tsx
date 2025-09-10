@@ -137,7 +137,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 					) : showErrorIcon ? (
 						<SvgIcon kit="fas" icon="diamond-exclamation" size={20} className="text-danger" />
 					) : (
-						<SvgIcon kit="far" icon="face-meh" size={20} />
+						<SvgIcon kit="far" icon="circle" size={20} />
 					),
 					title: `${messageEnqueued ? '' : 'Sent'} ${
 						msg.patientOrderScheduledMessageTypeDescription
