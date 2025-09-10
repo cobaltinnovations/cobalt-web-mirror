@@ -69,6 +69,7 @@ export interface PatientOrderResponse {
 }
 
 export interface PanelAccountsResponse {
+	orderServicerAccounts: AccountModel[];
 	panelAccounts: AccountModel[];
 	openPatientOrderCountsByPanelAccountId: Record<string, OpenPatientOrderCountModel>;
 	overallActivePatientOrderCount: number;
