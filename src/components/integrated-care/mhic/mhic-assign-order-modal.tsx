@@ -35,8 +35,8 @@ export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, onSave, ...pr
 
 			const patientOrderCount = patientOrderIds.length;
 			const panelAccountDisplayName =
-				mhicLayoutLoaderData.panelAccounts.find((pa) => pa.accountId === selectedPanelAccountId)?.displayName ??
-				'';
+				mhicLayoutLoaderData.orderServicerAccounts.find((pa) => pa.accountId === selectedPanelAccountId)
+					?.displayName ?? '';
 
 			await integratedCareService
 				.assignPatientOrders({
@@ -51,7 +51,7 @@ export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, onSave, ...pr
 		} finally {
 			setIsSaving(false);
 		}
-	}, [handleError, onSave, mhicLayoutLoaderData.panelAccounts, patientOrderIds, selectedPanelAccountId]);
+	}, [handleError, onSave, mhicLayoutLoaderData.orderServicerAccounts, patientOrderIds, selectedPanelAccountId]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -60,7 +60,7 @@ export const MhicAssignOrderModal: FC<Props> = ({ patientOrderIds, onSave, ...pr
 			</Modal.Header>
 			<Modal.Body>
 				<Form.Label className="mb-1">Select MHIC to Assign</Form.Label>
-				{mhicLayoutLoaderData.panelAccounts.map((panelAccount) => (
+				{mhicLayoutLoaderData.orderServicerAccounts.map((panelAccount) => (
 					<Form.Check
 						key={panelAccount.accountId}
 						type="radio"
