@@ -120,7 +120,7 @@ export const getKalturaScriptForVideo = ({
 						autoInsert: true,
 						layout: 'vertical',
 						kpl0Name: '',
-						kpl0Url: `http://www.kaltura.com/index.php/partnerservices2/executeplaylist?uid=&partner_id=${courseVideo.kalturaPartnerId}&subp_id=${courseVideo.kalturaPartnerId}00&format=8&ks={ks}&playlist_id=${courseVideo.kalturaPlaylistId}`,
+						kpl0Id: courseVideo.kalturaPlaylistId,
 					},
 				},
 			}),
