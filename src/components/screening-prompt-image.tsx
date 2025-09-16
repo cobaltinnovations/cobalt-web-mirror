@@ -2,6 +2,7 @@ import React from 'react';
 import { ScreeningImageId } from '@/lib/models';
 import { ReactComponent as Appointment } from '@/assets/screening-images/appointment.svg';
 import { ReactComponent as BBSurveyIntro } from '@/assets/screening-images/BB_SurveyIntroImage.svg';
+import { ReactComponent as BBSleep } from '@/assets/screening-images/BB_CourseCover_Sleep.svg';
 import { ReactComponent as ConnectedToCare } from '@/assets/screening-images/connected-to-care.svg';
 import { ReactComponent as ConnectingToCare } from '@/assets/screening-images/connecting-to-care.svg';
 import { ReactComponent as FeelingRecently } from '@/assets/screening-images/feeling-recently.svg';
@@ -35,6 +36,7 @@ const idImageMap: Record<
 	[ScreeningImageId.ScreeningComplete]: ScreeningComplete,
 	[ScreeningImageId.ScreeningToDo]: ScreeningToDo,
 	[ScreeningImageId.Welcome]: Welcome,
+	[ScreeningImageId.Sleep]: BBSleep,
 };
 
 interface ScreeningPromptImageProps extends React.SVGProps<SVGSVGElement> {
