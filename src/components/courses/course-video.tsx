@@ -39,7 +39,6 @@ interface CourseVideoProps {
 	onVideoPlayerEvent(eventName: string, eventPayload: unknown, mediaProxy: unknown): void;
 	completionThresholdInSeconds: number;
 	onCompletionThresholdPassed(): void;
-	onVideoPlayerEnd(): void;
 }
 
 export const CourseVideo = ({
@@ -48,7 +47,6 @@ export const CourseVideo = ({
 	onVideoPlayerEvent,
 	completionThresholdInSeconds,
 	onCompletionThresholdPassed,
-	onVideoPlayerEnd,
 }: CourseVideoProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
@@ -96,7 +94,6 @@ export const CourseVideo = ({
 		setVideoPlayerTimedOut(false);
 		startVideoLoadingTimer();
 
-		const videoIsPlaylist = !!(video.kalturaPlaylistId && !video.kalturaEntryId);
 		const { script } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
@@ -114,12 +111,6 @@ export const CourseVideo = ({
 				) {
 					completionThresholdPassedRef.current = true;
 					onCompletionThresholdPassed();
-				}
-
-				if (eventName === 'playerPlayEnd') {
-					if (!videoIsPlaylist) {
-						onVideoPlayerEnd();
-					}
 				}
 
 				if (eventName === 'playerUpdatePlayhead') {
@@ -145,7 +136,6 @@ export const CourseVideo = ({
 		courseVideos,
 		handleError,
 		onCompletionThresholdPassed,
-		onVideoPlayerEnd,
 		onVideoPlayerEvent,
 		startVideoLoadingTimer,
 		stopVideoLoadingTimer,
