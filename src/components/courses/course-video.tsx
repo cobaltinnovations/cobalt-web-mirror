@@ -85,12 +85,10 @@ export const CourseVideo = ({
 	).current;
 
 	useEffect(() => {
-		let video = courseVideos.find((courseVideo) => courseVideo.videoId === videoId);
+		const video = courseVideos.find((courseVideo) => courseVideo.videoId === videoId);
 		if (!video) {
 			return;
 		}
-
-		video = { ...video, kalturaEntryId: '', kalturaPlaylistId: '1_xm8fztki' };
 
 		setVideoPlayerReady(false);
 		setVideoPlayerTimedOut(false);
