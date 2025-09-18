@@ -154,7 +154,6 @@ export const CourseUnitAvailable = ({
 					videoId={courseUnit.videoId ?? ''}
 					courseVideos={courseVideos}
 					onVideoPlayerEvent={handleVideoPlayerEvent}
-					onVideoPlayerEnd={handleUnitComplete}
 					completionThresholdInSeconds={courseUnit.completionThresholdInSeconds ?? 0}
 					onCompletionThresholdPassed={memoizedCompletionThresholdPassed}
 				/>

@@ -39,7 +39,6 @@ interface CourseVideoProps {
 	onVideoPlayerEvent(eventName: string, eventPayload: unknown, mediaProxy: unknown): void;
 	completionThresholdInSeconds: number;
 	onCompletionThresholdPassed(): void;
-	onVideoPlayerEnd(): void;
 }
 
 export const CourseVideo = ({
@@ -48,7 +47,6 @@ export const CourseVideo = ({
 	onVideoPlayerEvent,
 	completionThresholdInSeconds,
 	onCompletionThresholdPassed,
-	onVideoPlayerEnd,
 }: CourseVideoProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
@@ -107,25 +105,26 @@ export const CourseVideo = ({
 					stopVideoLoadingTimer();
 				}
 
-				if (
-					!completionThresholdPassedRef.current &&
-					eventName === 'playerUpdatePlayhead' &&
-					(eventPayload as number) > completionThresholdInSeconds
-				) {
-					completionThresholdPassedRef.current = true;
-					onCompletionThresholdPassed();
-				}
+				if (!completionThresholdPassedRef.current && eventName === 'playerUpdatePlayhead') {
+					const currentTimestampInSeconds = eventPayload as number;
+					const currentTimestampInMs = currentTimestampInSeconds * 1000;
 
-				if (eventName === 'playerPlayEnd') {
-					if (!videoIsPlaylist) {
-						onVideoPlayerEnd();
+					if (videoIsPlaylist) {
+						const currentVideoDurationInMs = mediaProxy.msDuration;
+						const currentVideoThresholdInMs = currentVideoDurationInMs * 0.9;
+
+						if (currentTimestampInMs > currentVideoThresholdInMs) {
+							console.log('PLAYLIST VIDEO WATCHED');
+
+							completionThresholdPassedRef.current = true;
+							onCompletionThresholdPassed();
+						}
+					} else {
+						if (currentTimestampInSeconds > completionThresholdInSeconds) {
+							completionThresholdPassedRef.current = true;
+							onCompletionThresholdPassed();
+						}
 					}
-				}
-
-				if (eventName === 'playerUpdatePlayhead') {
-					throttledPlayerEvent(eventName, eventPayload, mediaProxy);
-				} else {
-					onVideoPlayerEvent(eventName, eventPayload, mediaProxy);
 				}
 			},
 			errorCallback: (error) => {
@@ -145,7 +144,6 @@ export const CourseVideo = ({
 		courseVideos,
 		handleError,
 		onCompletionThresholdPassed,
-		onVideoPlayerEnd,
 		onVideoPlayerEvent,
 		startVideoLoadingTimer,
 		stopVideoLoadingTimer,

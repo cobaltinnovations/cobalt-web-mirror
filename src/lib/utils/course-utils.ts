@@ -5,6 +5,7 @@ import {
 	CourseUnitLockTypeId,
 	CourseUnitModel,
 	CourseVideoModel,
+	MediaEntry,
 } from '@/lib/models';
 
 export const getRequiredCourseModules = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
@@ -98,7 +99,7 @@ export const getKalturaScriptForVideo = ({
 }: {
 	videoPlayerId: string;
 	courseVideo: CourseVideoModel;
-	eventCallback: (eventName: string, event: string | number | object, mediaProxy: unknown) => void;
+	eventCallback: (eventName: string, event: string | number | object, mediaProxy: MediaEntry) => void;
 	errorCallback: (error: unknown) => void;
 }) => {
 	const script = document.createElement('script');
@@ -127,37 +128,62 @@ export const getKalturaScriptForVideo = ({
 			readyCallback: (playerID: string) => {
 				const kdp = document.getElementById(playerID);
 				const events = [
-					// generic
-					'layoutBuildDone',
-					'playerReady',
-					'mediaLoaded',
-					'mediaError',
-					'playerStateChange',
-					'firstPlay',
-					'playerPlayed',
-					'playerPaused',
-					'preSeek',
-					'seek',
-					'seeked',
-					'playerUpdatePlayhead',
-					'openFullScreen',
-					'closeFullScreen',
-					'volumeChanged',
-					'mute',
-					'unmute',
+					'adClicked',
+					'adEnded',
+					'adImpression',
+					'adSkippableStateChanged',
+					'adStarted',
 					'bufferChange',
+					'closeFullScreen',
 					'cuePointReached',
-					'playerPlayEnd',
+					'customEvent',
+					'firstPlay',
+					'HTML5_video_durationchange',
+					'HTML5_video_ended',
+					'HTML5_video_error',
+					'HTML5_video_loadeddata',
+					'HTML5_video_loadedmetadata',
+					'HTML5_video_pause',
+					'HTML5_video_playing',
+					'HTML5_video_progress',
+					'HTML5_video_ratechange',
+					'HTML5_video_seeked',
+					'HTML5_video_stalled',
+					'HTML5_video_timeupdate',
+					'layoutBuildDone',
+					'mediaError',
+					'mediaLoaded',
+					'mediaReady',
+					'mute',
 					'onChangeMedia',
 					'onChangeMediaDone',
-					// playlist specific
-					'playlistReady',
+					'openFullScreen',
+					'playerPaused',
+					'playerPlayed',
+					'playerPlayEnd',
+					'playerReady',
+					'playerStateChange',
+					'playerUpdatePlayhead',
+					'playlistEnded',
 					'playlistItemChanged',
 					'playlistPlayNext',
 					'playlistPlayPrev',
-					'playlistEnded',
+					'playlistReady',
 					'playlistUpdate',
-					'mediaReady',
+					'preSeek',
+					'seek',
+					'seeked',
+					'tracksChanged',
+					'unmute',
+					'USER_CLICKED_FULLSCREEN_ENTER',
+					'USER_CLICKED_FULLSCREEN_EXIT',
+					'USER_CLICKED_MUTE',
+					'USER_CLICKED_PAUSE',
+					'USER_CLICKED_PLAY',
+					'USER_CLICKED_SEEK',
+					'USER_CLICKED_UNMUTE',
+					'USER_CLICKED_VOLUME_CHANGE',
+					'volumeChanged',
 				];
 
 				for (let i = 0; i < events.length; i++) {

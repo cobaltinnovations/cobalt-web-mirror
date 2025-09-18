@@ -2,10 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { CourseUnitDownloadableFile } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as DocxIcon } from '@/assets/icons/filetype-docx.svg';
-import { ReactComponent as DocIcon } from '@/assets/icons/filetype-doc.svg';
-import { ReactComponent as PdfIcon } from '@/assets/icons/filetype-pdf.svg';
-import SvgIcon from '../svg-icon';
+import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	courseDownloadable: {
