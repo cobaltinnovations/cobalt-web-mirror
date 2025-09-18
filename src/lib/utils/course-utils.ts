@@ -5,6 +5,7 @@ import {
 	CourseUnitLockTypeId,
 	CourseUnitModel,
 	CourseVideoModel,
+	MediaEntry,
 } from '@/lib/models';
 
 export const getRequiredCourseModules = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
@@ -98,7 +99,7 @@ export const getKalturaScriptForVideo = ({
 }: {
 	videoPlayerId: string;
 	courseVideo: CourseVideoModel;
-	eventCallback: (eventName: string, event: string | number | object, mediaProxy: unknown) => void;
+	eventCallback: (eventName: string, event: string | number | object, mediaProxy: MediaEntry) => void;
 	errorCallback: (error: unknown) => void;
 }) => {
 	const script = document.createElement('script');

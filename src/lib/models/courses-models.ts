@@ -140,3 +140,69 @@ export enum UnitCompletionTypeId {
 	DO_NOT_MARK_COMPLETE = 'DO_NOT_MARK_COMPLETE',
 	COMPLETION_THRESHOLD_IN_SECONDS = 'COMPLETION_THRESHOLD_IN_SECONDS',
 }
+
+export interface MediaEntry {
+	id: string;
+	name: string;
+	description: string;
+	partnerId: number;
+	userId: string | null;
+	creatorId: string | null;
+	tags: string;
+	adminTags: string | null;
+	categories: string;
+	categoriesIds: string;
+	status: number;
+	moderationStatus: number;
+	moderationCount: number;
+	type: number;
+	createdAt: string;
+	updatedAt: string;
+	rank: number;
+	totalRank: number;
+	votes: number;
+	groupId: string | null;
+	partnerData: string | null;
+	downloadUrl: string;
+	searchText: string;
+	licenseType: number;
+	version: number;
+	thumbnailUrl: string;
+	accessControlId: number;
+	startDate: string | null;
+	endDate: string | null;
+	referenceId: string | null;
+	replacingEntryId: string | null;
+	replacedEntryId: string | null;
+	replacementStatus: number;
+	partnerSortValue: number;
+	conversionProfileId: number;
+	redirectEntryId: string | null;
+	rootEntryId: string;
+	operationAttributes: unknown[];
+	entitledUsersEdit: string;
+	entitledUsersPublish: string;
+	plays: number;
+	views: number;
+	lastPlayedAt: string;
+	width: number;
+	height: number;
+	duration: number;
+	msDuration: number;
+	durationType: string | null;
+	mediaType: number;
+	conversionQuality: number;
+	sourceType: string;
+	searchProviderType: string | null;
+	searchProviderId: string | null;
+	creditUserName: string | null;
+	creditUrl: string | null;
+	mediaDate: string | null;
+	dataUrl: string;
+	flavorParamsIds: string;
+	entitledUsersView: string;
+	capabilities: string;
+	displayInSearch: 0 | 1;
+	application: string;
+	blockAutoTranscript: boolean;
+}

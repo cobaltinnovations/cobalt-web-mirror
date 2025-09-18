@@ -85,15 +85,18 @@ export const CourseVideo = ({
 	).current;
 
 	useEffect(() => {
-		const video = courseVideos.find((courseVideo) => courseVideo.videoId === videoId);
+		let video = courseVideos.find((courseVideo) => courseVideo.videoId === videoId);
 		if (!video) {
 			return;
 		}
+
+		video = { ...video, kalturaEntryId: '', kalturaPlaylistId: '1_xm8fztki' };
 
 		setVideoPlayerReady(false);
 		setVideoPlayerTimedOut(false);
 		startVideoLoadingTimer();
 
+		const videoIsPlaylist = !!(video.kalturaPlaylistId && !video.kalturaEntryId);
 		const { script } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
@@ -104,19 +107,26 @@ export const CourseVideo = ({
 					stopVideoLoadingTimer();
 				}
 
-				if (
-					!completionThresholdPassedRef.current &&
-					eventName === 'playerUpdatePlayhead' &&
-					(eventPayload as number) > completionThresholdInSeconds
-				) {
-					completionThresholdPassedRef.current = true;
-					onCompletionThresholdPassed();
-				}
+				if (!completionThresholdPassedRef.current && eventName === 'playerUpdatePlayhead') {
+					const currentTimestampInSeconds = eventPayload as number;
+					const currentTimestampInMs = currentTimestampInSeconds * 1000;
 
-				if (eventName === 'playerUpdatePlayhead') {
-					throttledPlayerEvent(eventName, eventPayload, mediaProxy);
-				} else {
-					onVideoPlayerEvent(eventName, eventPayload, mediaProxy);
+					if (videoIsPlaylist) {
+						const currentVideoDurationInMs = mediaProxy.msDuration;
+						const currentVideoThresholdInMs = currentVideoDurationInMs * 0.9;
+
+						if (currentTimestampInMs > currentVideoThresholdInMs) {
+							console.log('PLAYLIST VIDEO WATCHED');
+
+							completionThresholdPassedRef.current = true;
+							onCompletionThresholdPassed();
+						}
+					} else {
+						if (currentTimestampInSeconds > completionThresholdInSeconds) {
+							completionThresholdPassedRef.current = true;
+							onCompletionThresholdPassed();
+						}
+					}
 				}
 			},
 			errorCallback: (error) => {
