@@ -73,6 +73,7 @@ interface CourseModuleProps {
 	courseSessionUnitStatusIdsByCourseUnitId: CourseSessionUnitStatusIdsByCourseUnitId;
 	courseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	onCourseUnitClick(courseUnit: CourseUnitModel): void;
+	subTitle?: string;
 	compact?: boolean;
 	activeCourseUnitId?: string;
 	initialShow?: boolean;
@@ -84,6 +85,7 @@ export const CourseModule = ({
 	courseSessionUnitStatusIdsByCourseUnitId,
 	courseUnitLockStatusesByCourseUnitId,
 	onCourseUnitClick,
+	subTitle,
 	compact = false,
 	activeCourseUnitId = '',
 	initialShow,
@@ -107,6 +109,7 @@ export const CourseModule = ({
 							'fs-normal': compact,
 						})}
 					>
+						{subTitle && <span className="d-block small text-muted fw-bold">{subTitle}</span>}
 						{courseModule.title}
 					</span>
 					{!compact && (
@@ -126,7 +129,7 @@ export const CourseModule = ({
 			</Button>
 			<Collapse in={show}>
 				<div className={classes.collapseBody}>
-					<div className={classNames({ 'p-4': !compact })}>
+					<div className={classNames({ 'p-4': !compact, 'pb-2': compact })}>
 						<ul className="m-0 list-unstyled">
 							{courseModule.courseUnits.map((courseUnit) => {
 								const isLocked =

@@ -80,10 +80,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		transition: '200ms transform, 200ms width',
 		borderRight: `1px solid ${theme.colors.n100}`,
 		'& .aside-header': {
+			borderBottom: `1px solid ${theme.colors.n100}`,
 			display: 'flex',
 			justifyContent: 'flex-start',
 			width: asideWidth,
-			padding: '24px 2px 0',
+			padding: '0 2px 0',
 			transition: '200ms padding',
 			[mediaQueries.lg]: {
 				justifyContent: 'flex-end',
@@ -92,6 +93,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 				display: 'flex',
 				alignItems: 'center',
 				textDecoration: 'none',
+				padding: '16px 20px',
 				'&__text': {
 					opacity: 0,
 					transition: '200ms opacity',
@@ -115,13 +117,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 			overflowY: 'auto',
 			width: asideWidth,
 			pointerEvents: 'none',
-			padding: '0 16px 24px 16px',
+			padding: '0 0 12px 0',
 			transition: '200ms opacity',
 		},
 		'&.show': {
 			'& .aside-header': {
-				padding: '24px 16px 0',
+				padding: '0 0 0',
 				'& .hide-menu-button': {
+					padding: 16,
 					'&__text': {
 						opacity: 1,
 					},

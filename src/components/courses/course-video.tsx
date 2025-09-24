@@ -114,8 +114,6 @@ export const CourseVideo = ({
 						const currentVideoThresholdInMs = currentVideoDurationInMs * 0.9;
 
 						if (currentTimestampInMs > currentVideoThresholdInMs) {
-							console.log('PLAYLIST VIDEO WATCHED');
-
 							completionThresholdPassedRef.current = true;
 							onCompletionThresholdPassed();
 						}

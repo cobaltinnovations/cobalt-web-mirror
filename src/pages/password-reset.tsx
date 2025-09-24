@@ -6,16 +6,25 @@ import { Helmet } from 'react-helmet';
 import { accountService } from '@/lib/services';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
+import useAccount from '@/hooks/use-account';
 import HalfLayout from '@/components/half-layout';
 import InputHelper from '@/components/input-helper';
+import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 const PasswordReset: FC = () => {
+	const { account, signOutAndClearContext } = useAccount();
 	const { addFlag } = useFlags();
 	const { passwordResetToken } = useParams<{ passwordResetToken?: string }>();
 	const handleError = useHandleError();
 	const navigate = useNavigate();
 	const [formValues, setFormValues] = useState({ password: '', confirmPassword: '' });
 	const passwordInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (account) {
+			signOutAndClearContext(AnalyticsNativeEventAccountSignedOutSource.ACCESS_TOKEN_EXPIRED, {}, true);
+		}
+	}, [account, signOutAndClearContext]);
 
 	useEffect(() => {
 		passwordInputRef.current?.focus();
