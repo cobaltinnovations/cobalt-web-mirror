@@ -130,7 +130,7 @@ export const CourseUnitAvailable = ({
 			)}
 
 			<h2 className="mb-10">{courseUnit.title}</h2>
-			{courseUnit.description && <WysiwygDisplay className="mb-8" html={courseUnit.description ?? ''} />}
+			{courseUnit.description && <WysiwygDisplay className="mb-8 fs-large" html={courseUnit.description ?? ''} />}
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.QUIZ ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.CARD_SORT ||

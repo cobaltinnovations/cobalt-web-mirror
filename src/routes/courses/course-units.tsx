@@ -57,6 +57,11 @@ export const Component = () => {
 		const { course: currentCourse } = await coursesService.getCourseDetail(courseIdentifier).fetch();
 		const { currentCourseSession, courseModules, defaultCourseUnitLockStatusesByCourseUnitId } = currentCourse;
 
+		if (!currentCourseSession) {
+			navigate(`/courses/${currentCourse.urlName}`, { replace: true });
+			return;
+		}
+
 		const optionalCourseModuleIds = currentCourseSession?.optionalCourseModuleIds ?? [];
 		const courseUnitLockStatusesByCourseUnitId = currentCourseSession
 			? currentCourseSession.courseUnitLockStatusesByCourseUnitId
@@ -92,7 +97,7 @@ export const Component = () => {
 				courseSessionId: currentCourseSession.courseSessionId,
 			}),
 		});
-	}, [courseIdentifier, unitId]);
+	}, [courseIdentifier, navigate, unitId]);
 
 	const navigateToNextAvailableUnit = useCallback(
 		(currentCourse: CourseModel) => {
@@ -249,8 +254,10 @@ export const Component = () => {
 				menuElement={(isMobile) => (
 					<>
 						{course &&
-							requiredModules.map((courseModule) => (
+							requiredModules.map((courseModule, courseModuleIndex) => (
 								<CourseModule
+									subTitle={`Module ${courseModuleIndex + 1}`}
+									className="border-bottom"
 									compact
 									activeCourseUnitId={unitId}
 									key={courseModule.courseModuleId}

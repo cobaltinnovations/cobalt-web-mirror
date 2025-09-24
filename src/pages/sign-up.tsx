@@ -35,7 +35,7 @@ const SignUp: FC = () => {
 				},
 			});
 		} catch (error) {
-			handleError((error as any).message);
+			handleError(error);
 		}
 	};
 
