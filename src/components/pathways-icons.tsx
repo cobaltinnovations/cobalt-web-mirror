@@ -30,16 +30,18 @@ const PathwaysIcon = ({
 		[FeatureId.CRISIS_SUPPORT]: <SvgIcon kit="fas" icon="star-of-life" className={className} {...svgProps} />,
 		[FeatureId.SELF_HELP_RESOURCES]: <SvgIcon kit="fak" icon="menu-book" className={className} {...svgProps} />,
 
-		[FeatureId.COURSE]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
-		[FeatureId.INSTITUTION_RESOURCES]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
-		[FeatureId.MENTAL_HEALTH_PROVIDERS]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.COURSE]: <SvgIcon kit="far" icon="chalkboard" className={className} {...svgProps} />,
+		[FeatureId.INSTITUTION_RESOURCES]: <SvgIcon kit="fas" icon="hospital" className={className} {...svgProps} />,
+		[FeatureId.MENTAL_HEALTH_PROVIDERS]: (
+			<SvgIcon kit="fas" icon="handshake-simple" className={className} {...svgProps} />
+		),
 		[FeatureId.MHP]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
 		[FeatureId.MSW]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
-		[FeatureId.MY_EVENTS]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.MY_EVENTS]: <SvgIcon kit="fas" icon="calendar-day" className={className} {...svgProps} />,
 		[FeatureId.PSYCHIATRIST]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
 		[FeatureId.PSYCHOLOGIST]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
 		[FeatureId.PSYCHOTHERAPIST]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
-		[FeatureId.RESOURCE_NAVIGATOR]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
+		[FeatureId.RESOURCE_NAVIGATOR]: <SvgIcon kit="fas" icon="compass" className={className} {...svgProps} />,
 	};
 
 	return iconMap[featureId];
