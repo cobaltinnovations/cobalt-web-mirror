@@ -33,7 +33,7 @@ const PathwaysIcon = ({
 		[FeatureId.COURSE]: <SvgIcon kit="far" icon="chalkboard" className={className} {...svgProps} />,
 		[FeatureId.INSTITUTION_RESOURCES]: <SvgIcon kit="fas" icon="hospital" className={className} {...svgProps} />,
 		[FeatureId.MENTAL_HEALTH_PROVIDERS]: (
-			<SvgIcon kit="fas" icon="handshake-simple" className={className} {...svgProps} />
+			<SvgIcon kit="fak" icon="handshake-simple" className={className} {...svgProps} />
 		),
 		[FeatureId.MHP]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
 		[FeatureId.MSW]: <SvgIcon kit="fas" icon="gear" className={className} {...svgProps} />,
