@@ -117,7 +117,12 @@ function requireAuthLoader({ request }: LoaderFunctionArgs) {
 	return null;
 }
 
-function requireUnauthLoader() {
+function requireUnauthLoader({ request }: LoaderFunctionArgs) {
+	const { pathname } = new URL(request.url);
+	if (pathname.includes('reset-password')) {
+		return null;
+	}
+
 	const accessToken = Cookies.get('accessToken');
 
 	if (accessToken) {
