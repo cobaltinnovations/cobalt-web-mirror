@@ -1,3 +1,4 @@
+import useAccount from '@/hooks/use-account';
 import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
@@ -5,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Onboarding = () => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const [searchParams] = useSearchParams();
 	const roleId = searchParams.get('roleId');
 
@@ -19,7 +21,7 @@ const Onboarding = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Onboarding</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Onboarding</title>
 			</Helmet>
 
 			<div />

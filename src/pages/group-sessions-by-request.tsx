@@ -15,6 +15,7 @@ import { GroupSessionRequestModel, GROUP_SESSION_STATUS_ID } from '@/lib/models'
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	filterIcon: {
@@ -29,6 +30,7 @@ const GroupSessionsByRequest: FC = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 
 	const [sizeOfPage] = useState(10);
 	const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -119,7 +121,7 @@ const GroupSessionsByRequest: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - By Request</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Sessions - By Request</title>
 			</Helmet>
 
 			<HeroContainer>

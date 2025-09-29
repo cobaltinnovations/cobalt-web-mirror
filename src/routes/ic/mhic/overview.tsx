@@ -106,7 +106,7 @@ const INITIAL_COUNTS = {
 };
 
 export const Component = () => {
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const { data, isLoading } = usePolledLoaderData({
 		useLoaderHook: useMhicOverviewLoaderData,
@@ -209,7 +209,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Overview</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Overview</title>
 			</Helmet>
 
 			<Container fluid className="py-8 overflow-visible">

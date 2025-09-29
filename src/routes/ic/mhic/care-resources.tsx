@@ -13,6 +13,7 @@ import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import InputHelperSearch from '@/components/input-helper-search';
 import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
+import useAccount from '@/hooks/use-account';
 
 export const loader = async () => {
 	return null;
@@ -24,6 +25,7 @@ export const Component = () => {
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '0', [searchParams]);
 	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
 	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
+	const { institution } = useAccount();
 
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
@@ -129,7 +131,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Resources</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Resources</title>
 			</Helmet>
 
 			<MhicCareResourceFormModal

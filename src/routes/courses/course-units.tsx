@@ -30,6 +30,7 @@ import {
 	CourseUnitLocked,
 } from '@/components/courses';
 import SvgIcon from '@/components/svg-icon';
+import useAccount from '@/hooks/use-account';
 
 export async function loader() {
 	return null;
@@ -39,6 +40,7 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [showMenu, setShowMenu] = useState(false);
 	const [course, setCourse] = useState<CourseModel>();
@@ -238,7 +240,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Courses - Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Courses - Session</title>
 			</Helmet>
 
 			<CourseUnitLayout

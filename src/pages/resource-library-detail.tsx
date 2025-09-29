@@ -8,8 +8,10 @@ import { analyticsService, contentService } from '@/lib/services';
 import { AnalyticsNativeEventTypeId, Content } from '@/lib/models';
 
 import ResourceDisplay, { ResourceDisplaySkeleton } from '@/components/resource-display';
+import useAccount from '@/hooks/use-account';
 
 const ResourceLibraryDetail: FC = () => {
+	const { institution } = useAccount();
 	const { contentId } = useParams<{
 		contentId: string;
 	}>();
@@ -32,7 +34,7 @@ const ResourceLibraryDetail: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Resource Library</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Resource Library</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData} loadingComponent={<ResourceDisplaySkeleton />}>

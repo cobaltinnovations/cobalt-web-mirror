@@ -62,7 +62,7 @@ const Reports = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Reports</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Reports</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

@@ -8,10 +8,12 @@ import { integratedCareService } from '@/lib/services';
 import { PatientOrderConsentStatusId, PatientOrderModel } from '@/lib/models';
 import AsyncWrapper from '@/components/async-page';
 import InlineAlert from '@/components/inline-alert';
+import useAccount from '@/hooks/use-account';
 
 const PatientConsent = () => {
 	const handleError = useHandleError();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [isSaving, setIsSaving] = useState(false);
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
@@ -78,7 +80,7 @@ const PatientConsent = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Consent</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Consent</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

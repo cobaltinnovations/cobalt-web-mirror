@@ -273,7 +273,7 @@ const ResourceLibrary = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Resource Library</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Resource Library</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

@@ -8,9 +8,11 @@ import { interactionService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncPage from '@/components/async-page';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
 
 const InteractionInstances: FC = () => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const { interactionId } = useParams<{ interactionId: string }>();
 	const [interactionInstance, setInteractionInstance] = useState<InteractionInstance>();
 	const [interactionOptions, setInteractionOptions] = useState<InteractionOption[]>([]);
@@ -57,7 +59,7 @@ const InteractionInstances: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Interaction</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Interaction</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

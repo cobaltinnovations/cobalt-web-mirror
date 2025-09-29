@@ -19,6 +19,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { useCobaltTheme } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
+import useAccount from '@/hooks/use-account';
 
 enum NUMBER_OF_PEOPLE {
 	LESS_THAN_FIVE = 'less than 5',
@@ -67,6 +68,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 	const handleError = useHandleError();
 	const navigate = useNavigate();
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const { fonts } = useCobaltTheme();
 	const { groupSessionRequestId } = useParams<{ groupSessionRequestId?: string }>();
 	const [session, setSession] = useState<GroupSessionRequestModel>();
@@ -117,7 +119,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | In the Studio - Group Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | In the Studio - Group Session</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

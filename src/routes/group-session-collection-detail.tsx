@@ -50,7 +50,9 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - {groupSessionCollection?.title ?? ''}</title>
+				<title>
+					{institution.name ?? 'Cobalt'} | Group Sessions - {groupSessionCollection?.title ?? ''}
+				</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

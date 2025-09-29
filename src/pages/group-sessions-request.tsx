@@ -8,6 +8,7 @@ import AsyncWrapper from '@/components/async-page';
 import useHandleError from '@/hooks/use-handle-error';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import useAccount from '@/hooks/use-account';
 
 enum ATTENDEE_COUNTS {
 	FIVE_TO_TEN = 'FIVE_TO_TEN',
@@ -52,6 +53,7 @@ const attendeeCounts = {
 
 const GroupSessionsRequest = () => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const [groupTopics, setGroupTopics] = useState<GroupTopic[]>([]);
 	const [expandedTopicIds, setExpandedTopicIds] = useState<string[]>([]);
 	const [formValues, setFormValues] = useState({
@@ -151,7 +153,7 @@ const GroupSessionsRequest = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - Request a Group Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Sessions - Request a Group Session</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

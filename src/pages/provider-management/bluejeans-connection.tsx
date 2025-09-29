@@ -4,9 +4,11 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
 
 export const ProviderManagementBluejeansConnection = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [hasBluejeansAccount, setHasBluejeansAccount] = useState(false);
 	const [emailAddress, setEmailAddress] = useState('');
@@ -19,7 +21,7 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Bluejeans Connection</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Bluejeans Connection</title>
 			</Helmet>
 
 			<Container className="py-8">

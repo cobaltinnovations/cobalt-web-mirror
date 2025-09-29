@@ -35,6 +35,7 @@ import InlineAlert from '@/components/inline-alert';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
 import useFlags from '@/hooks/use-flags';
 import SvgIcon from '@/components/svg-icon';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles(() => ({
 	scrollAnchor: {
@@ -52,6 +53,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const [notTakenScreeningTypes, setNotTakeScreeningTypes] = useState<ScreeningType[]>([]);
 
@@ -172,7 +174,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Assessment Results</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Assessment Results</title>
 			</Helmet>
 
 			<MhicResetAssessmentModel

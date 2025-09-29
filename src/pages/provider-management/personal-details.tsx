@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import useAccount from '@/hooks/use-account';
 
 interface StrengthModel {
 	id: string;
@@ -13,6 +14,7 @@ interface StrengthModel {
 
 export const ProviderManagementPersonalDetails = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [strengthOptions] = useState<StrengthModel[]>([
 		{
@@ -37,7 +39,7 @@ export const ProviderManagementPersonalDetails = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Personal Details</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Personal Details</title>
 			</Helmet>
 
 			<Container className="py-8">

@@ -24,7 +24,7 @@ const IntroAssessment: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const [searchParams] = useSearchParams();
 	const questionId = searchParams.get('questionId');
 	const sessionId = searchParams.get('sessionId');
@@ -158,7 +158,7 @@ const IntroAssessment: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Assessment</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Assessment</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData} abortFetch={questionRequest.abort}>

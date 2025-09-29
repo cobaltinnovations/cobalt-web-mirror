@@ -8,11 +8,13 @@ import useHandleError from '@/hooks/use-handle-error';
 import HalfLayout from '@/components/half-layout';
 import InputHelper from '@/components/input-helper';
 import { useAppRootLoaderData } from '@/routes/root';
+import useAccount from '@/hooks/use-account';
 
 const SignUp: FC = () => {
 	const { subdomain } = useAppRootLoaderData();
 	const handleError = useHandleError();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const [formValues, setFormValues] = useState({ emailAddress: '', password: '' });
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -42,7 +44,7 @@ const SignUp: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Create Account</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Create Account</title>
 			</Helmet>
 
 			<HalfLayout

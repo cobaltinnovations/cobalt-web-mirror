@@ -1,12 +1,14 @@
+import useAccount from '@/hooks/use-account';
 import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 const NoMatch: FC = () => {
+	const { institution } = useAccount();
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | 404</title>
+				<title>{institution.platformName ?? 'Cobalt'} | 404</title>
 			</Helmet>
 
 			<Container>

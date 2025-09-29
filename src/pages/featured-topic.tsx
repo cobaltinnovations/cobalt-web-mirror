@@ -22,18 +22,22 @@ import { SkeletonTopicCenterGroupSession, TopicCenterGroupSession } from '@/comp
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import { analyticsService } from '@/lib/services';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
 
 const FeaturedTopic = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { institution } = useAccount();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const { fetchData, topicCenter, trackContentEvent } = useTopicCenterState(topicCenterId);
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | {topicCenter?.name ?? 'Featured Topic'}</title>
+				<title>
+					{institution.name ?? 'Cobalt'} | {topicCenter?.name ?? 'Featured Topic'}
+				</title>
 			</Helmet>
 
 			<IneligibleBookingModal uiType="group-session" />

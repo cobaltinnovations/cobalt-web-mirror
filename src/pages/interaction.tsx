@@ -5,8 +5,10 @@ import { Helmet } from 'react-helmet';
 import { interactionService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import { useParams } from 'react-router-dom';
+import useAccount from '@/hooks/use-account';
 
 const Interaction: FC = () => {
+	const { institution } = useAccount();
 	const { interactionInstanceId, interactionOptionId } = useParams<{
 		interactionInstanceId: string;
 		interactionOptionId: string;
@@ -28,7 +30,7 @@ const Interaction: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Interaction</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Interaction</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

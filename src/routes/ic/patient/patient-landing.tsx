@@ -245,6 +245,7 @@ export const Component = () => {
 	}, [
 		data.patientOrderPromise,
 		institution.integratedCareAvailabilityDescription,
+		institution.integratedCarePatientIntroOverride,
 		institution.integratedCarePhoneNumberDescription,
 		institution.integratedCareProgramName,
 		institution.name,
@@ -258,7 +259,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Welcome</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Welcome</title>
 			</Helmet>
 
 			{intakePhoneModal}

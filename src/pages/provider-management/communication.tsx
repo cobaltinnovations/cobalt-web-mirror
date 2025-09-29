@@ -5,9 +5,11 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import InputHelper from '@/components/input-helper';
+import useAccount from '@/hooks/use-account';
 
 export const ProviderManagementCommunication = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [primaryEmail, setPrimaryEmail] = useState('');
 	const [additionalEmails, setAdditionalEmails] = useState<string[]>(['']);
@@ -22,7 +24,7 @@ export const ProviderManagementCommunication = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Communication</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Communication</title>
 			</Helmet>
 
 			<Container className="py-8">

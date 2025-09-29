@@ -46,7 +46,7 @@ const requiredFields = getRequiredYupFields<GroupSessionByRequestFormData>(group
 const GroupSessionsByRequestCreate: FC = () => {
 	const handleError = useHandleError();
 	const { fonts } = useCobaltTheme();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const { groupSessionId } = useParams<{ groupSessionId?: string }>();
 	const { addFlag } = useFlags();
 
@@ -161,7 +161,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions - Create Group Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Sessions - Create Group Session</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

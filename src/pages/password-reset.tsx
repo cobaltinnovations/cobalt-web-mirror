@@ -12,7 +12,7 @@ import InputHelper from '@/components/input-helper';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 const PasswordReset: FC = () => {
-	const { account, signOutAndClearContext } = useAccount();
+	const { account, institution, signOutAndClearContext } = useAccount();
 	const { addFlag } = useFlags();
 	const { passwordResetToken } = useParams<{ passwordResetToken?: string }>();
 	const handleError = useHandleError();
@@ -62,7 +62,7 @@ const PasswordReset: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Reset Password</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Reset Password</title>
 			</Helmet>
 
 			<HalfLayout

@@ -122,6 +122,7 @@ export interface Institution {
 	signInQuoteDetail?: string;
 
 	aboutPageEnabled: boolean;
+	platformName: string;
 }
 
 export interface InstitutionFeature {

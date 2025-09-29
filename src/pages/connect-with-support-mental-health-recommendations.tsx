@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { FeatureId, InstitutionFeature } from '@/lib/models';
@@ -69,7 +69,9 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Connect with Support - Mental Health Recommendations</title>
+				<title>
+					{institution.platformName ?? 'Cobalt'} | Connect with Support - Mental Health Recommendations
+				</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

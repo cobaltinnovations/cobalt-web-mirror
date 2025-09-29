@@ -14,6 +14,7 @@ import InputHelper from '@/components/input-helper';
 import FeedbackSupplement from '@/components/feedback-supplement';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
 
 const Feedback: FC = () => {
 	const navigate = useNavigate();
@@ -21,6 +22,7 @@ const Feedback: FC = () => {
 	const { openInCrisisModal } = useInCrisisModal();
 	const { trackEvent } = useAnalytics();
 	const { addFlag } = useFlags();
+	const { institution } = useAccount();
 	const [formValues, setFormValues] = useState({ emailAddress: '', feedbackTypeId: '', feedback: '' });
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,7 +57,7 @@ const Feedback: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Feedback</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Feedback</title>
 			</Helmet>
 
 			<HeroContainer>

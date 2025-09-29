@@ -2,9 +2,11 @@ import React, { ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
+import useAccount from '@/hooks/use-account';
 
 export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -13,7 +15,7 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Payment Types</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Payment Types</title>
 			</Helmet>
 
 			<Container className="py-8">

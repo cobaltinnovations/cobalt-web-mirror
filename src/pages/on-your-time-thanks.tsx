@@ -1,3 +1,4 @@
+import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
@@ -15,11 +16,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const OnYourTimeThanks: FC = () => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | On Your Time - Thank You</title>
+				<title>{institution.platformName ?? 'Cobalt'} | On Your Time - Thank You</title>
 			</Helmet>
 
 			<Container className="py-20">

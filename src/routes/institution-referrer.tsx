@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { institutionReferrersService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { urlName } = params;
@@ -23,6 +24,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { institutionReferrer } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { institution } = useAccount();
 	const featuresScreeningFlow = useScreeningFlow({
 		screeningFlowId: institutionReferrer.intakeScreeningFlowId,
 		instantiateOnLoad: false,
@@ -38,7 +40,7 @@ export const Component = () => {
 			{renderedCollectPhoneModal}
 
 			<Helmet>
-				<title>Cobalt | Referral</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Referral</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

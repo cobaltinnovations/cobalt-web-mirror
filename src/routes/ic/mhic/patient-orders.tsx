@@ -92,7 +92,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -238,7 +238,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Patient Orders</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Patient Orders</title>
 			</Helmet>
 
 			<MhicGenerateOrdersModal

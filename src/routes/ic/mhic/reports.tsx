@@ -11,6 +11,7 @@ import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { buildBackendDownloadUrl } from '@/lib/utils';
 import moment from 'moment';
+import useAccount from '@/hooks/use-account';
 
 enum REPORT_TYPE_ID {
 	IC_PIPELINE = 'IC_PIPELINE',
@@ -48,6 +49,7 @@ export const loader = async () => {
 };
 
 export const Component = () => {
+	const { institution } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const { panelAccounts } = useMhicLayoutLoaderData();
 	const [formValues, setFormValues] = useState({
@@ -117,7 +119,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Reports</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Reports</title>
 			</Helmet>
 
 			<Container className="py-16">
