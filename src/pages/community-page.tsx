@@ -21,18 +21,20 @@ import { resourceLibraryCarouselConfig } from './resource-library';
 import classNames from 'classnames';
 import { analyticsService } from '@/lib/services';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
 
 const CommunityPage = () => {
 	const { mixpanel, trackEvent } = useAnalytics();
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { institution } = useAccount();
 	const { topicCenterId } = useParams<{ topicCenterId: string }>();
 	const { fetchData, topicCenter, trackContentEvent } = useTopicCenterState(topicCenterId);
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Topic Center</title>
+				<title>{institution.name ?? 'Cobalt'} | Topic Center</title>
 			</Helmet>
 
 			<IneligibleBookingModal uiType="group-session" />

@@ -158,7 +158,7 @@ const GroupSessions = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Sessions</title>
+				<title>{institution.name ?? 'Cobalt'} | Group Sessions</title>
 			</Helmet>
 
 			<IneligibleBookingModal uiType="group-session" />

@@ -6,11 +6,13 @@ import { Helmet } from 'react-helmet';
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import HalfLayout from '@/components/half-layout';
+import useAccount from '@/hooks/use-account';
 
 const SignUpVerify: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const locationState = (location.state as { emailAddress?: string; accountInviteId?: string }) || {};
 
@@ -36,7 +38,7 @@ const SignUpVerify: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Verify Account</title>
+				<title>{institution.name ?? 'Cobalt'} | Verify Account</title>
 			</Helmet>
 
 			<HalfLayout

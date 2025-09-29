@@ -9,6 +9,7 @@ import { PatientOrdersListResponse, analyticsService, integratedCareService } fr
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 import { safeIntegerValue } from '@/lib/utils/form-utils';
+import useAccount from '@/hooks/use-account';
 
 interface MhicSearchResultsLoaderData {
 	getResponseChecksum: () => Promise<string | undefined>;
@@ -57,6 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const Component = () => {
+	const { institution } = useAccount();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const shelfData = useMhicPatientOrdereShelfLoaderData();
 	const pollingFn = useCallback(() => {
@@ -103,7 +105,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Search Results</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Search Results</title>
 			</Helmet>
 
 			<Container fluid className="px-8 py-8">

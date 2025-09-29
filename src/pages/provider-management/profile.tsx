@@ -11,7 +11,7 @@ import { Helmet } from 'react-helmet';
 
 export const ProviderManagementProfile = (): ReactElement => {
 	const navigate = useNavigate();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const [provider, setProvider] = useState<Provider>();
 
 	const fetchData = useCallback(async () => {
@@ -30,7 +30,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Profile</title>
+				<title>{institution.name ?? 'Cobalt'} | Provider Details - Profile</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

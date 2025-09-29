@@ -12,6 +12,7 @@ import { CareResourceLocationModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
 import { PreviewCanvasInternalShelf } from '@/components/preview-canvas-internal-shelf';
 import SvgIcon from '@/components/svg-icon';
+import useAccount from '@/hooks/use-account';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const { careResourceId } = params;
@@ -33,6 +34,7 @@ export const Component = () => {
 	const navigate = useNavigate();
 	const revalidator = useRevalidator();
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const [showFormModal, setShowFormModal] = useState(false);
 	const [careResourceLocationToDelete, setCareResourceLocationToDelete] = useState<CareResourceLocationModel>();
 	const [showResourceLocation, setShowResourceLocation] = useState<string | undefined>(undefined);
@@ -54,7 +56,9 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Resource - {careResource.name}</title>
+				<title>
+					{institution.name ?? 'Cobalt'} | Integrated Care - Resource - {careResource.name}
+				</title>
 			</Helmet>
 
 			<MhicCareResourceFormModal

@@ -112,7 +112,7 @@ const PatientDemographics = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Demographics</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Demographics</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

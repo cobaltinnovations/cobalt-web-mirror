@@ -4,9 +4,11 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
 import { Helmet } from 'react-helmet';
+import useAccount from '@/hooks/use-account';
 
 export const ProviderManagementCobaltBio = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const [bio, setBio] = useState('');
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -16,7 +18,7 @@ export const ProviderManagementCobaltBio = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Bio</title>
+				<title>{institution.name ?? 'Cobalt'} | Provider Details - Bio</title>
 			</Helmet>
 
 			<Container className="py-8">

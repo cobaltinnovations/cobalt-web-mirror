@@ -10,6 +10,7 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import HeroContainer from '@/components/hero-container';
 import { Loader } from 'react-bootstrap-typeahead';
 import { createUseThemedStyles } from '@/jss/theme';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
@@ -61,6 +62,7 @@ export const Component = () => {
 	const { pathname, search } = useLocation();
 	const [searchParams] = useSearchParams();
 	const { deferredData } = useProviderDetailLoaderData();
+	const { institution } = useAccount();
 	const { isEligible, setIsEligible, setAppointmentTypes, setEpicDepartments } = useContext(BookingContext);
 	const bookingRef = useRef<BookingRefHandle>(null);
 	const patientOrderId = useMemo(() => searchParams.get('patientOrderId') ?? undefined, [searchParams]);
@@ -79,7 +81,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider</title>
+				<title>{institution.name ?? 'Cobalt'} | Provider</title>
 			</Helmet>
 
 			<BookingModals ref={bookingRef} />

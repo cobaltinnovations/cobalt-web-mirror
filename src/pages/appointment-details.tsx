@@ -8,11 +8,13 @@ import AsyncPage from '@/components/async-page';
 import { appointmentService } from '@/lib/services';
 import { AppointmentModel, VideoconferencePlatformId } from '@/lib/models';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
 
 const AppointmentDetails: FC = () => {
 	const navigate = useNavigate();
 	const [details, setDetails] = useState<AppointmentModel>();
 	const { appointmentId } = useParams<{ appointmentId?: string }>();
+	const { institution } = useAccount();
 
 	const fetchData = useCallback(async () => {
 		const { appointment } = await appointmentService.getAppointment(appointmentId).fetch();
@@ -25,7 +27,7 @@ const AppointmentDetails: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Appointment</title>
+				<title>{institution.name ?? 'Cobalt'} | Appointment</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

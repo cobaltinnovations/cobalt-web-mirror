@@ -8,10 +8,12 @@ import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import InlineAlert from '@/components/inline-alert';
+import useAccount from '@/hooks/use-account';
 
 const PatientCheckIn = () => {
 	const handleError = useHandleError();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 	const [isSaving, setIsSaving] = useState(false);
@@ -52,7 +54,7 @@ const PatientCheckIn = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Check In</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Check In</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

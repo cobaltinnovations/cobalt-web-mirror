@@ -5,12 +5,15 @@ import { Helmet } from 'react-helmet';
 import HeroContainer from '@/components/hero-container';
 
 import { COVID_19_RESOURCES } from '@/covid-19-resources';
+import useAccount from '@/hooks/use-account';
 
 const Covid19Resources: FC = () => {
+	const { institution } = useAccount();
+
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Covid-19 Resources</title>
+				<title>{institution.name ?? 'Cobalt'} | Covid-19 Resources</title>
 			</Helmet>
 
 			<HeroContainer>

@@ -19,6 +19,7 @@ import { TypeaheadHelper } from '@/components/typeahead-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import ToggledInput from '@/components/toggled-input';
 import { CobaltError } from '@/lib/http-client';
+import useAccount from '@/hooks/use-account';
 
 interface FormValues {
 	careResourceId: string;
@@ -148,6 +149,7 @@ export const Component = () => {
 		careResourceLocation,
 	} = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
@@ -282,7 +284,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Add Resource Location</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Add Resource Location</title>
 			</Helmet>
 
 			{/* path matching logic in mhic-header.tsx hides the default header */}

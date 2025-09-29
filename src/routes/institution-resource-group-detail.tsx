@@ -70,7 +70,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Institution Resources</title>
+				<title>{institution.name ?? 'Cobalt'} | Institution Resources</title>
 			</Helmet>
 			<Suspense fallback={<Loader />}>
 				<Await resolve={deferredData}>

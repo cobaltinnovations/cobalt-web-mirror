@@ -11,6 +11,7 @@ import useDebouncedState from '@/hooks/use-debounced-state';
 import { MhicDepartmentAvailabilityStatusModal } from '@/components/integrated-care/mhic';
 import { cloneDeep } from 'lodash';
 import NoData from '@/components/no-data';
+import useAccount from '@/hooks/use-account';
 
 export const loader = async () => {
 	const { epicDepartments } = await integratedCareService.getEpicDepartments().fetch();
@@ -23,6 +24,7 @@ export const loader = async () => {
 export const Component = () => {
 	const { epicDepartmentsResponse } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const [epicDepartments, setEpicDepartments] = useState(epicDepartmentsResponse);
+	const { institution } = useAccount();
 
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [debouncedSearchQuery] = useDebouncedState(searchInputValue);
@@ -83,7 +85,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Department Availability</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Department Availability</title>
 			</Helmet>
 
 			{epicDepartmentToUpdate && (

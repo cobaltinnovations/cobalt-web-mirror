@@ -31,7 +31,7 @@ const Consent = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Consent</title>
+				<title>{institution.name ?? 'Cobalt'} | Consent</title>
 			</Helmet>
 
 			<ConsentContent />

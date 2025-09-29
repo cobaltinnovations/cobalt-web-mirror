@@ -109,7 +109,7 @@ export const PatientAssessmentResults = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Assessment Results</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Assessment Results</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

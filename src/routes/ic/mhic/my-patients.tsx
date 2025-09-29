@@ -34,6 +34,7 @@ import classNames from 'classnames';
 import { usePolledLoaderData } from '@/hooks/use-polled-loader-data';
 import { useMhicPatientOrdereShelfLoaderData } from './patient-order-shelf';
 import { decodeAccessToken } from '@/routes/auth';
+import useAccount from '@/hooks/use-account';
 
 export enum MhicMyPatientView {
 	All = 'all',
@@ -308,6 +309,7 @@ export const Component = () => {
 		pollingFn,
 	});
 	const { viewTypeId, pageTitle, pageDescription, columnConfig, patientOrdersListPromise } = data;
+	const { institution } = useAccount();
 
 	const [showCustomizeTableModal, setShowCustomizeTableModal] = useState(false);
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
@@ -456,7 +458,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - My Patients</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - My Patients</title>
 			</Helmet>
 
 			<MhicCustomizeTableModal

@@ -8,6 +8,7 @@ import Loader from '@/components/loader';
 import { analyticsService, GetInstitutionResourceGroupsResponse, institutionService } from '@/lib/services';
 import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
 
 interface InstitutionResourceGroupsLoaderData {
 	institutionResourceGroupsResponse: Promise<GetInstitutionResourceGroupsResponse[]>;
@@ -31,6 +32,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { institutionResourceGroupsResponse } = useInstitutionResourceGroupsLoaderData();
+	const { institution } = useAccount();
 
 	useEffect(() => {
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_INSTITUTION_RESOURCES);
@@ -39,7 +41,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Institution Resources</title>
+				<title>{institution.name ?? 'Cobalt'} | Institution Resources</title>
 			</Helmet>
 
 			<Suspense fallback={<Loader />}>

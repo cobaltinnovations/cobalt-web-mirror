@@ -13,6 +13,7 @@ import TabBar from '@/components/tab-bar';
 
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
 import SvgIcon from '@/components/svg-icon';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
 	scrollAnchor: {
@@ -30,6 +31,7 @@ export const loader = async () => {
 
 export const Component = () => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const { faqTopics, faqsByFaqTopicId } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const { pathname, hash } = useLocation();
 	const navigate = useNavigate();
@@ -41,7 +43,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | FAQ</title>
+				<title>{institution.name ?? 'Cobalt'} | FAQ</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

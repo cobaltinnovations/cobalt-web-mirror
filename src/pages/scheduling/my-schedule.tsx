@@ -35,7 +35,7 @@ export interface MyScheduleOutletContext {
 export const MySchedule: FC = () => {
 	const theme = useCobaltTheme();
 	const classes = useContainerStyles();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 
 	// const [followupPatientList, setFollowupPatientList] = useState<any[]>([]);
@@ -145,7 +145,7 @@ export const MySchedule: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Patient Scheduling</title>
+				<title>{institution.name ?? 'Cobalt'} | Patient Scheduling</title>
 			</Helmet>
 
 			<div className={classes.wrapper}>

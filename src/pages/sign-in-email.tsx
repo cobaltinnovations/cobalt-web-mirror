@@ -69,7 +69,7 @@ const SignInEmail = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Sign In</title>
+				<title>{institution.name ?? 'Cobalt'} | Sign In</title>
 			</Helmet>
 
 			<HalfLayout

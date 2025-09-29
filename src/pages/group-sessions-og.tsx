@@ -169,7 +169,7 @@ const GroupSessionsOg = () => {
 			/>
 
 			<Helmet>
-				<title>Cobalt | Group Sessions</title>
+				<title>{institution.name ?? 'Cobalt'} | Group Sessions</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

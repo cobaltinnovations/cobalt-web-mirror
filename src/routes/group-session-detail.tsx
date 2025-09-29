@@ -11,6 +11,7 @@ import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import moment from 'moment';
 import Cookies from 'js-cookie';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
 
 export enum GroupSessionDetailNavigationSource {
 	HOME_PAGE = 'HOME_PAGE',
@@ -43,6 +44,7 @@ export const Component = () => {
 	const handleError = useHandleError();
 	const revalidator = useRevalidator();
 	const location = useLocation();
+	const { institution } = useAccount();
 
 	const navigationSource =
 		(location.state?.navigationSource as GroupSessionDetailNavigationSource) ??
@@ -150,7 +152,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Group Session Detail</title>
+				<title>{institution.name ?? 'Cobalt'} | Group Session Detail</title>
 			</Helmet>
 
 			{renderedCollectPhoneModal}

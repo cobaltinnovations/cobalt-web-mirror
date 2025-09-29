@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
 import { cloneDeep } from 'lodash';
+import useAccount from '@/hooks/use-account';
 
 interface DegreeModel {
 	degree: string;
@@ -35,6 +36,7 @@ interface InTheModel {
 
 export const ProviderManagementClinicalBackground = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [degrees, setDegrees] = useState<DegreeModel[]>([
 		{
@@ -115,7 +117,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - Clinical Background</title>
+				<title>{institution.name ?? 'Cobalt'} | Provider Details - Clinical Background</title>
 			</Helmet>
 
 			<Container className="py-8">

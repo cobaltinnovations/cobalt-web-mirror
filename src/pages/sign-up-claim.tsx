@@ -6,9 +6,11 @@ import { Helmet } from 'react-helmet';
 import { accountService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';
 import HalfLayout from '@/components/half-layout';
+import useAccount from '@/hooks/use-account';
 
 const SignUpClaim: FC = () => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const { accountInviteId } = useParams<{ accountInviteId?: string }>();
 	const [inviteExpired, setInviteExpired] = useState(false);
 
@@ -24,7 +26,7 @@ const SignUpClaim: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Claim Account</title>
+				<title>{institution.name ?? 'Cobalt'} | Claim Account</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

@@ -55,7 +55,7 @@ const PasswordForgot: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Forgot Password</title>
+				<title>{institution.name ?? 'Cobalt'} | Forgot Password</title>
 			</Helmet>
 
 			<HalfLayout

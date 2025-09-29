@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
 import { Helmet } from 'react-helmet';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	card: {
@@ -17,11 +18,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 const SessionRequestThankYou: FC = () => {
 	const classes = useStyles();
 	const location = useLocation();
+	const { institution } = useAccount();
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Request Group Session - Thank You</title>
+				<title>{institution.name ?? 'Cobalt'} | Request Group Session - Thank You</title>
 			</Helmet>
 
 			<HeroContainer>

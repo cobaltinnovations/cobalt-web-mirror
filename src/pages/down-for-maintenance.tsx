@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 import InCrisisTemplate from '@/components/in-crisis-template';
 import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	logoIconText: {
@@ -16,11 +17,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 const DownForMaintenance = (): ReactElement => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Maintenance</title>
+				<title>{institution.name ?? 'Cobalt'} | Maintenance</title>
 			</Helmet>
 
 			<Container className="pt-20">

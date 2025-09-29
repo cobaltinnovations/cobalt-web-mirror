@@ -19,7 +19,7 @@ const Profile: FC = () => {
 	const navigate = useNavigate();
 	const classes = useProfileStyles();
 	const location = useLocation();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 
 	function handleUpdateMyProfileButtonClick() {
 		navigate('/intro-assessment', {
@@ -30,7 +30,7 @@ const Profile: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Your Profile</title>
+				<title>{institution.name ?? 'Cobalt'} | Your Profile</title>
 			</Helmet>
 
 			<HeroContainer>

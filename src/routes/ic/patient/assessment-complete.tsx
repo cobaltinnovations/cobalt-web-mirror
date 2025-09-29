@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import Loader from '@/components/loader';
+import useAccount from '@/hooks/use-account';
 
 export const PatientAssessmentComplete = () => {
+	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -25,7 +27,7 @@ export const PatientAssessmentComplete = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Integrated Care - Assessment Complete</title>
+				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Assessment Complete</title>
 			</Helmet>
 
 			<Container className="py-20">

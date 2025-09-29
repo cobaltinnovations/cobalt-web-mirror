@@ -200,7 +200,9 @@ const Index: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Employee Mental Health & Wellness @ {institution.name}</title>
+				<title>
+					{institution.name ?? 'Cobalt'} | Employee Mental Health & Wellness @ {institution.name}
+				</title>
 			</Helmet>
 
 			<PreviewCanvas title={institution.name} show={showOnboardingModal}>

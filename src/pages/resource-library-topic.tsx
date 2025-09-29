@@ -197,7 +197,7 @@ const ResourceLibraryTopic = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Resource Library</title>
+				<title>{institution.name ?? 'Cobalt'} | Resource Library</title>
 			</Helmet>
 
 			<AsyncPage

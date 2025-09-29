@@ -12,11 +12,13 @@ import ProgressBar from '@/components/progress-bar';
 import { BookingContext } from '@/contexts/booking-context';
 import useHandleError from '@/hooks/use-handle-error';
 import HeroContainer from '@/components/hero-container';
+import useAccount from '@/hooks/use-account';
 
 const IntakeAssessment: FC = () => {
 	const handleError = useHandleError();
 	const location = useLocation();
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const [searchParams] = useSearchParams();
 	const providerId = searchParams.get('providerId') || '';
 	const questionId = searchParams.get('questionId') || '';
@@ -115,7 +117,7 @@ const IntakeAssessment: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Assessment</title>
+				<title>{institution.name ?? 'Cobalt'} | Assessment</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

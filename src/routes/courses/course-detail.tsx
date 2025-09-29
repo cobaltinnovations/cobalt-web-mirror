@@ -26,6 +26,7 @@ import {
 import ConfirmDialog from '@/components/confirm-dialog';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import SvgIcon from '@/components/svg-icon';
+import useAccount from '@/hooks/use-account';
 
 export async function loader() {
 	return null;
@@ -40,6 +41,7 @@ export const Component = () => {
 	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const mode = useMemo(() => searchParams.get('mode') ?? MODE.OVERVIEW, [searchParams]);
+	const { institution } = useAccount();
 
 	const navigate = useNavigate();
 	const handleError = useHandleError();
@@ -148,7 +150,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Courses - Detail</title>
+				<title>{institution.name ?? 'Cobalt'} | Courses - Detail</title>
 			</Helmet>
 
 			<ConfirmDialog

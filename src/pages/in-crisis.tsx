@@ -6,8 +6,11 @@ import HeroContainer from '@/components/hero-container';
 import InCrisisTemplate from '@/components/in-crisis-template';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
+import useAccount from '@/hooks/use-account';
 
 const InCrisis = () => {
+	const { institution } = useAccount();
+
 	useEffect(() => {
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_IN_CRISIS);
 	}, []);
@@ -15,7 +18,7 @@ const InCrisis = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Crisis Support</title>
+				<title>{institution.name ?? 'Cobalt'} | Crisis Support</title>
 			</Helmet>
 
 			<HeroContainer>

@@ -8,6 +8,7 @@ import TabBar from '@/components/tab-bar';
 import { HEADER_HEIGHT } from '@/components/header-v2';
 import { createUseStyles } from 'react-jss';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseStyles({
 	scrollAnchor: {
@@ -25,6 +26,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const { faq } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const { pathname, hash } = useLocation();
 	const navigate = useNavigate();
@@ -38,7 +40,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | FAQ</title>
+				<title>{institution.name ?? 'Cobalt'} | FAQ</title>
 			</Helmet>
 
 			<Container className="py-14">

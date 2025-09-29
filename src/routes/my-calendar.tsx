@@ -90,7 +90,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | My Events</title>
+				<title>{institution.name ?? 'Cobalt'} | My Events</title>
 			</Helmet>
 
 			<ConfirmCancelBookingModal

@@ -24,7 +24,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Resource Navigator</title>
+				<title>{institution.name ?? 'Cobalt'} | Resource Navigator</title>
 			</Helmet>
 
 			<HeroContainer>

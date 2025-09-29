@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 
 import InputHelper from '@/components/input-helper';
 import { TypeaheadHelper } from '@/components/typeahead-helper';
+import useAccount from '@/hooks/use-account';
 
 interface RoleModel {
 	roleId: string;
@@ -13,6 +14,7 @@ interface RoleModel {
 
 export const ProviderManagementBasics = (): ReactElement => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
@@ -41,7 +43,7 @@ export const ProviderManagementBasics = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>Cobalt | Provider Details - The Basics</title>
+				<title>{institution.name ?? 'Cobalt'} | Provider Details - The Basics</title>
 			</Helmet>
 
 			<Container className="py-8">
