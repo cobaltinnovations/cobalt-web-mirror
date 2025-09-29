@@ -23,7 +23,7 @@ const ConnectWithSupportMedicationPrescriber = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Connect with Support - Medication Prescriber</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Connect with Support - Medication Prescriber</title>
 			</Helmet>
 
 			{featureDetails && (

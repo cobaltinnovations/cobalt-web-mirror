@@ -38,7 +38,7 @@ const SignUpVerify: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Verify Account</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Verify Account</title>
 			</Helmet>
 
 			<HalfLayout

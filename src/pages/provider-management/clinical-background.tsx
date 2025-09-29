@@ -117,7 +117,7 @@ export const ProviderManagementClinicalBackground = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Provider Details - Clinical Background</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Clinical Background</title>
 			</Helmet>
 
 			<Container className="py-8">

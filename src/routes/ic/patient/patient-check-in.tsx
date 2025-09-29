@@ -54,7 +54,7 @@ const PatientCheckIn = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Check In</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Check In</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

@@ -119,7 +119,7 @@ const InTheStudioGroupSessionByRequest: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | In the Studio - Group Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | In the Studio - Group Session</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

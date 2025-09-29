@@ -43,7 +43,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | FAQ</title>
+				<title>{institution.platformName ?? 'Cobalt'} | FAQ</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

@@ -41,7 +41,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Institution Resources</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Institution Resources</title>
 			</Helmet>
 
 			<Suspense fallback={<Loader />}>

@@ -8,7 +8,7 @@ const NoMatch: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | 404</title>
+				<title>{institution.platformName ?? 'Cobalt'} | 404</title>
 			</Helmet>
 
 			<Container>

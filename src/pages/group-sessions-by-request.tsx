@@ -121,7 +121,7 @@ const GroupSessionsByRequest: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Group Sessions - By Request</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Sessions - By Request</title>
 			</Helmet>
 
 			<HeroContainer>

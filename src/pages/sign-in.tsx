@@ -10,7 +10,7 @@ const SignIn: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Sign In</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Sign In</title>
 			</Helmet>
 
 			<SignInShell defaultView={(signInProps) => <SignInCobalt {...signInProps} />} />

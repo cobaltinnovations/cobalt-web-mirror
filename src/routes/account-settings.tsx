@@ -81,7 +81,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Account Settings</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Account Settings</title>
 			</Helmet>
 
 			<ConsentModal

@@ -40,7 +40,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | FAQ</title>
+				<title>{institution.platformName ?? 'Cobalt'} | FAQ</title>
 			</Helmet>
 
 			<Container className="py-14">

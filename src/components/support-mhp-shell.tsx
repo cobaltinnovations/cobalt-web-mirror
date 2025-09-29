@@ -94,7 +94,7 @@ export const SupportMentalHealthProvidersShell = ({
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Connect with Support - Mental Health Providers</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Connect with Support - Mental Health Providers</title>
 			</Helmet>
 
 			{featureDetails && (

@@ -18,7 +18,7 @@ const InCrisis = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Crisis Support</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Crisis Support</title>
 			</Helmet>
 
 			<HeroContainer>

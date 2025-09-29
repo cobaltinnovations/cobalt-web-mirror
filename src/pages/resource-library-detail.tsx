@@ -34,7 +34,7 @@ const ResourceLibraryDetail: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Resource Library</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Resource Library</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData} loadingComponent={<ResourceDisplaySkeleton />}>

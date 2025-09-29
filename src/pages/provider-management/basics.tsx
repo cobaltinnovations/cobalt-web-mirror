@@ -43,7 +43,7 @@ export const ProviderManagementBasics = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Provider Details - The Basics</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - The Basics</title>
 			</Helmet>
 
 			<Container className="py-8">

@@ -21,7 +21,7 @@ const Onboarding = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Onboarding</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Onboarding</title>
 			</Helmet>
 
 			<div />

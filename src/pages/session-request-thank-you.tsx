@@ -23,7 +23,7 @@ const SessionRequestThankYou: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Request Group Session - Thank You</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Request Group Session - Thank You</title>
 			</Helmet>
 
 			<HeroContainer>

@@ -169,7 +169,7 @@ const GroupSessionsOg = () => {
 			/>
 
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Group Sessions</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Sessions</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

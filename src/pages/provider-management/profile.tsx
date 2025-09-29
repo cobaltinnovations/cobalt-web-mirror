@@ -30,7 +30,7 @@ export const ProviderManagementProfile = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Provider Details - Profile</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Profile</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

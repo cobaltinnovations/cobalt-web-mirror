@@ -69,7 +69,9 @@ const ConnectWithSupportMentalHealthRecommendations = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Connect with Support - Mental Health Recommendations</title>
+				<title>
+					{institution.platformName ?? 'Cobalt'} | Connect with Support - Mental Health Recommendations
+				</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

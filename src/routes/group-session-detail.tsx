@@ -152,7 +152,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Group Session Detail</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Session Detail</title>
 			</Helmet>
 
 			{renderedCollectPhoneModal}

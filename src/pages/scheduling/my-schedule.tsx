@@ -145,7 +145,7 @@ export const MySchedule: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Patient Scheduling</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Patient Scheduling</title>
 			</Helmet>
 
 			<div className={classes.wrapper}>

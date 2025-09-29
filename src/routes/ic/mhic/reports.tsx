@@ -119,7 +119,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Reports</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Reports</title>
 			</Helmet>
 
 			<Container className="py-16">

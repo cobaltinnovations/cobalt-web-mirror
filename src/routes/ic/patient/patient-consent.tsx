@@ -80,7 +80,7 @@ const PatientConsent = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Consent</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Consent</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

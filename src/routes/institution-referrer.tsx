@@ -40,7 +40,7 @@ export const Component = () => {
 			{renderedCollectPhoneModal}
 
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Referral</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Referral</title>
 			</Helmet>
 
 			<HeroContainer className="bg-n75">

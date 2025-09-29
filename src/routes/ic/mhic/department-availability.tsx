@@ -85,7 +85,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Department Availability</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Department Availability</title>
 			</Helmet>
 
 			{epicDepartmentToUpdate && (

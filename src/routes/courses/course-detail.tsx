@@ -150,7 +150,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Courses - Detail</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Courses - Detail</title>
 			</Helmet>
 
 			<ConfirmDialog

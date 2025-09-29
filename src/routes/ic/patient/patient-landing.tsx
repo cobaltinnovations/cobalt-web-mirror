@@ -259,7 +259,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Welcome</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Welcome</title>
 			</Helmet>
 
 			{intakePhoneModal}

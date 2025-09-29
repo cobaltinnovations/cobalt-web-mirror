@@ -62,7 +62,7 @@ const PasswordReset: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Reset Password</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Reset Password</title>
 			</Helmet>
 
 			<HalfLayout

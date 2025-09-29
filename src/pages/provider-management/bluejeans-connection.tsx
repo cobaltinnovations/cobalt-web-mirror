@@ -21,7 +21,7 @@ export const ProviderManagementBluejeansConnection = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Provider Details - Bluejeans Connection</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Bluejeans Connection</title>
 			</Helmet>
 
 			<Container className="py-8">

@@ -59,7 +59,7 @@ const InteractionInstances: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Interaction</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Interaction</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

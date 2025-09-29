@@ -38,7 +38,7 @@ const PatientDemographicsThanks = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Thank You</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Thank You</title>
 			</Helmet>
 
 			{renderedCollectPhoneModal}

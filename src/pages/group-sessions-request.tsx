@@ -153,7 +153,7 @@ const GroupSessionsRequest = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Group Sessions - Request a Group Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Group Sessions - Request a Group Session</title>
 			</Helmet>
 
 			<AsyncWrapper fetchData={fetchData}>

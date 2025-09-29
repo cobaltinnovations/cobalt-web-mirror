@@ -81,7 +81,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Provider</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider</title>
 			</Helmet>
 
 			<BookingModals ref={bookingRef} />

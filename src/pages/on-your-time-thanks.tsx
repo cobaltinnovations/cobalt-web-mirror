@@ -21,7 +21,7 @@ const OnYourTimeThanks: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | On Your Time - Thank You</title>
+				<title>{institution.platformName ?? 'Cobalt'} | On Your Time - Thank You</title>
 			</Helmet>
 
 			<Container className="py-20">

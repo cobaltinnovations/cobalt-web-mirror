@@ -458,7 +458,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - My Patients</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - My Patients</title>
 			</Helmet>
 
 			<MhicCustomizeTableModal

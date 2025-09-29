@@ -255,7 +255,7 @@ const ConfirmAppointment = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Confirm Appointment</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Confirm Appointment</title>
 			</Helmet>
 
 			<AppointmentUnavailableModal

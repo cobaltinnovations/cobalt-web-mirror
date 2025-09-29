@@ -44,7 +44,7 @@ const SignUp: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Create Account</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Create Account</title>
 			</Helmet>
 
 			<HalfLayout

@@ -13,7 +13,7 @@ const Covid19Resources: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Covid-19 Resources</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Covid-19 Resources</title>
 			</Helmet>
 
 			<HeroContainer>

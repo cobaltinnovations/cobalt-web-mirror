@@ -174,7 +174,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Assessment Results</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Assessment Results</title>
 			</Helmet>
 
 			<MhicResetAssessmentModel

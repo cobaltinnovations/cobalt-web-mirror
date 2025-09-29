@@ -30,7 +30,7 @@ const Profile: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Your Profile</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Your Profile</title>
 			</Helmet>
 
 			<HeroContainer>

@@ -27,7 +27,7 @@ export const PatientAssessmentComplete = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Assessment Complete</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Assessment Complete</title>
 			</Helmet>
 
 			<Container className="py-20">

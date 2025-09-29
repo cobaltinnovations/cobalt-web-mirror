@@ -34,7 +34,7 @@ const CommunityPage = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Topic Center</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Topic Center</title>
 			</Helmet>
 
 			<IneligibleBookingModal uiType="group-session" />

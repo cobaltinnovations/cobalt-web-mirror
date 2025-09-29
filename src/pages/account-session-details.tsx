@@ -29,7 +29,7 @@ const AccountSessionDetails = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Session Details</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Session Details</title>
 			</Helmet>
 
 			<div

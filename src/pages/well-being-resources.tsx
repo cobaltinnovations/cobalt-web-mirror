@@ -12,7 +12,7 @@ const WellBeingResources: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Well-Being Resources</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Well-Being Resources</title>
 			</Helmet>
 
 			<HeroContainer>

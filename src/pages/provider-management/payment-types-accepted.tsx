@@ -15,7 +15,7 @@ export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Provider Details - Payment Types</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Provider Details - Payment Types</title>
 			</Helmet>
 
 			<Container className="py-8">

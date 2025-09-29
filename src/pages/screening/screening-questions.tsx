@@ -472,7 +472,7 @@ const ScreeningQuestionsPage = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Screening</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Screening</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

@@ -284,7 +284,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Add Resource Location</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Add Resource Location</title>
 			</Helmet>
 
 			{/* path matching logic in mhic-header.tsx hides the default header */}

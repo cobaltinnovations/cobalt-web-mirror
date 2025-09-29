@@ -117,7 +117,7 @@ const IntakeAssessment: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Assessment</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Assessment</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

@@ -240,7 +240,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Courses - Session</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Courses - Session</title>
 			</Helmet>
 
 			<CourseUnitLayout

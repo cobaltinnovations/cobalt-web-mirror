@@ -26,7 +26,7 @@ const SignUpClaim: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Claim Account</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Claim Account</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

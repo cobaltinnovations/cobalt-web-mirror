@@ -21,7 +21,7 @@ const InTheStudioThanks: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | In the Studio - Thank You</title>
+				<title>{institution.platformName ?? 'Cobalt'} | In the Studio - Thank You</title>
 			</Helmet>
 
 			<Container className="py-20">

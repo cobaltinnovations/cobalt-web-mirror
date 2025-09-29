@@ -10,7 +10,7 @@ const Privacy: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Privacy Policy</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Privacy Policy</title>
 			</Helmet>
 
 			<PrivacyContent />

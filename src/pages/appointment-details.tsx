@@ -27,7 +27,7 @@ const AppointmentDetails: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Appointment</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Appointment</title>
 			</Helmet>
 
 			<AsyncPage fetchData={fetchData}>

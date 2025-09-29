@@ -105,7 +105,7 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Integrated Care - Search Results</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Integrated Care - Search Results</title>
 			</Helmet>
 
 			<Container fluid className="px-8 py-8">

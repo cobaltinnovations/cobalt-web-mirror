@@ -22,7 +22,7 @@ const DownForMaintenance = (): ReactElement => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Maintenance</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Maintenance</title>
 			</Helmet>
 
 			<Container className="pt-20">

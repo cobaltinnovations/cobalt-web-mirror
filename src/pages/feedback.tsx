@@ -57,7 +57,7 @@ const Feedback: FC = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.name ?? 'Cobalt'} | Feedback</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Feedback</title>
 			</Helmet>
 
 			<HeroContainer>
