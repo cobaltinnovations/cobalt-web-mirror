@@ -48,6 +48,7 @@ interface CourseUnitAvailableProps {
 	onNextButtonClick(): void;
 	onView?(courseUnit: CourseUnitModel): void;
 	onCompletionThresholdPassed(courseUnit: CourseUnitModel): void;
+	nextButtonTitle?: string;
 }
 
 export const CourseUnitAvailable = ({
@@ -61,6 +62,7 @@ export const CourseUnitAvailable = ({
 	onNextButtonClick,
 	onView,
 	onCompletionThresholdPassed,
+	nextButtonTitle = 'Next',
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
 	const screeningFlowParams = useMemo(
@@ -216,7 +218,7 @@ export const CourseUnitAvailable = ({
 						className="d-flex align-items-center text-decoration-none pe-3"
 						onClick={onNextButtonClick}
 					>
-						Next
+						{nextButtonTitle}
 						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 					</Button>
 				) : (

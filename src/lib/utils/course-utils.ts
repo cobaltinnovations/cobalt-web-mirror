@@ -54,7 +54,17 @@ export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	return nextCourseUnit?.courseUnitId;
 };
 
-export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = (
+export const isLastUnit = (
+	courseUnit: CourseUnitModel,
+	courseModules: CourseModuleModel[],
+	courseSession: CourseSessionModel
+) => {
+	const courseUnitsOrdered = getOrderedCourseUnits(courseModules, courseSession.optionalCourseModuleIds);
+	const isLastUnit = courseUnit.courseUnitId === courseUnitsOrdered[courseUnitsOrdered.length - 1].courseUnitId;
+	return isLastUnit;
+};
+
+export const getNextUnit = (
 	courseUnit: CourseUnitModel,
 	courseModules: CourseModuleModel[],
 	courseSession: CourseSessionModel
@@ -67,15 +77,8 @@ export const getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession = 
 	const preCurrentCourseUnits = courseUnitsOrdered.slice(0, currentCourseUnitIndex);
 	const postCurrentCourseUnits = courseUnitsOrdered.slice(currentCourseUnitIndex + 1);
 	const desiredUnits = postCurrentCourseUnits.length > 0 ? postCurrentCourseUnits : preCurrentCourseUnits;
-	const unlockedCourseUnitIds = Object.entries(courseSession.courseUnitLockStatusesByCourseUnitId)
-		.filter(([, { courseUnitLockTypeId }]) => courseUnitLockTypeId !== CourseUnitLockTypeId.STRONGLY_LOCKED)
-		.map(([courseUnitId]) => courseUnitId);
-	const completedCourseUnitIds = getCompletedCourseUnitIds(courseSession);
 
-	const nextCourseUnit = desiredUnits.find(
-		(u) => unlockedCourseUnitIds.includes(u.courseUnitId) && !completedCourseUnitIds.includes(u.courseUnitId)
-	);
-
+	const nextCourseUnit = desiredUnits[0];
 	return nextCourseUnit?.courseUnitId;
 };
 
