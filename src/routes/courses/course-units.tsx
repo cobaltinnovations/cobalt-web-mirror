@@ -2,11 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import {
-	getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession,
-	getOptionalCourseModules,
-	getRequiredCourseModules,
-} from '@/lib/utils';
+import { getNextUnit, getOptionalCourseModules, getRequiredCourseModules, isLastUnit } from '@/lib/utils';
 import {
 	AnalyticsNativeEventTypeId,
 	CourseModel,
@@ -101,7 +97,7 @@ export const Component = () => {
 		});
 	}, [courseIdentifier, navigate, unitId]);
 
-	const navigateToNextAvailableUnit = useCallback(
+	const navigateToNextUnit = useCallback(
 		(currentCourse: CourseModel) => {
 			if (!currentCourse.currentCourseSession) {
 				navigate(`/courses/${currentCourse.urlName}`);
@@ -112,7 +108,7 @@ export const Component = () => {
 				throw new Error('courseUnit is undefined.');
 			}
 
-			const desiredUnitId = getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession(
+			const desiredUnitId = getNextUnit(
 				courseUnit,
 				currentCourse.courseModules,
 				currentCourse.currentCourseSession
@@ -138,6 +134,20 @@ export const Component = () => {
 		fetchData();
 	}, [courseUnit?.courseUnitTypeId, fetchData]);
 
+	const getIsLastUnit = useCallback(() => {
+		if (!course) {
+			return false;
+		}
+
+		const { courseModules, currentCourseSession } = course;
+
+		if (!courseModules || !courseUnit || !currentCourseSession) {
+			return false;
+		}
+
+		return isLastUnit(courseUnit, course.courseModules, currentCourseSession);
+	}, [course, courseUnit]);
+
 	const handleSkipActivityButtonClick = useCallback(() => {
 		try {
 			if (!course) {
@@ -152,17 +162,12 @@ export const Component = () => {
 				throw new Error('course.currentCourseSession is undefined.');
 			}
 
-			const { courseModules, currentCourseSession, urlName, courseId } = course;
-			const desiredUnitId = getNextIncompleteAndNotStronglyLockedCourseUnitIdByCourseSession(
-				courseUnit,
-				courseModules,
-				currentCourseSession
-			);
+			const { currentCourseSession, urlName, courseId } = course;
 
-			if (desiredUnitId) {
-				navigate(`/courses/${urlName}/course-units/${desiredUnitId}`);
-			} else {
+			if (getIsLastUnit()) {
 				navigate(`/courses/${urlName}`);
+			} else {
+				navigateToNextUnit(course);
 			}
 
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_SKIP, {
@@ -175,15 +180,21 @@ export const Component = () => {
 		} catch (error) {
 			handleError(error);
 		}
-	}, [course, courseUnit, handleError, navigate]);
+	}, [course, courseUnit, getIsLastUnit, handleError, navigate, navigateToNextUnit]);
 
 	const handleCompletedUnitNextButtonClick = useCallback(() => {
 		if (!course) {
 			throw new Error('course is undefined.');
 		}
 
-		navigateToNextAvailableUnit(course);
-	}, [course, navigateToNextAvailableUnit]);
+		const { urlName } = course;
+
+		if (getIsLastUnit()) {
+			navigate(`/courses/${urlName}`);
+		} else {
+			navigateToNextUnit(course);
+		}
+	}, [course, getIsLastUnit, navigate, navigateToNextUnit]);
 
 	const handleCourseUnitView = useCallback(
 		async (viewedCourseUnit: CourseUnitModel) => {
@@ -386,6 +397,7 @@ export const Component = () => {
 												setCourseUnitCompleted(false);
 											}}
 											onNextButtonClick={handleCompletedUnitNextButtonClick}
+											nextButtonTitle={getIsLastUnit() ? 'Go to course home' : 'Next'}
 										/>
 									) : (
 										<>
@@ -412,6 +424,9 @@ export const Component = () => {
 															onView={handleCourseUnitView}
 															onCompletionThresholdPassed={
 																handleCompletionThresholdPassed
+															}
+															nextButtonTitle={
+																getIsLastUnit() ? 'Go to course home' : 'Next'
 															}
 														/>
 													)}

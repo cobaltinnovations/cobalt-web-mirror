@@ -10,6 +10,7 @@ interface CourseUnitCompleteProps {
 	completionMessages: Record<string, string>;
 	onRestartActivityButtonClick(): void;
 	onNextButtonClick(): void;
+	nextButtonTitle?: string;
 }
 
 export const CourseUnitComplete = ({
@@ -17,6 +18,7 @@ export const CourseUnitComplete = ({
 	completionMessages,
 	onRestartActivityButtonClick,
 	onNextButtonClick,
+	nextButtonTitle = 'Next',
 }: CourseUnitCompleteProps) => {
 	const completionMessage = useMemo(
 		() => completionMessages[courseUnit.courseUnitId] ?? '',
@@ -48,7 +50,7 @@ export const CourseUnitComplete = ({
 					className="d-flex align-items-center text-decoration-none pe-3"
 					onClick={onNextButtonClick}
 				>
-					Next
+					{nextButtonTitle}
 					<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 				</Button>
 			</div>
