@@ -316,7 +316,7 @@ export const Component = () => {
 												<h3 className="pt-6 mb-4">Course Focus</h3>
 												<WysiwygDisplay className="mb-10" html={course?.focus ?? ''} />
 												<hr />
-												<h3 className="pt-6 mb-4">Need Help?</h3>
+												<h3 className="pt-6 mb-4">Contact Us</h3>
 												<Link to="/feedback">Reach out to us here</Link>
 											</Col>
 										</Row>

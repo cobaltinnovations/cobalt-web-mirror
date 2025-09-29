@@ -229,11 +229,11 @@ export const CourseUnitLayout = ({
 				<Button
 					type="button"
 					variant="link"
-					className="d-none d-lg-inline d-flex align-items-center text-decoration-none text-nowrap"
+					className="d-none d-lg-inline-flex d-flex align-items-center text-decoration-none text-nowrap"
 					onClick={onNeedHelpButtonClick}
 				>
 					<SvgIcon kit="fas" icon="circle-question" size={20} className="flex-shrink-0 me-1" />
-					Need Help?
+					Contact Us
 				</Button>
 			</div>
 			<div
