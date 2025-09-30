@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 
 import {
@@ -16,7 +17,8 @@ import AsyncWrapper from '@/components/async-page';
 import Blurb from '@/components/blurb';
 import HalfLayout from '@/components/half-layout';
 import InlineAlert from '@/components/inline-alert';
-import { useNavigate } from 'react-router-dom';
+import SvgIcon from '@/components/svg-icon';
+import SignInVideoModal from '@/components/sign-in-video-modal';
 
 export interface SignInCobaltProps {
 	onAccountSourceClick: (accountSource: AccountSource) => Promise<void>;
@@ -33,6 +35,7 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 	const { institution, accountSources } = useAccount();
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 	const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+	const [showVideoModal, setShowVideoModal] = useState(false);
 
 	const fetchData = useCallback(async () => {
 		try {
@@ -85,6 +88,16 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 				</Modal.Body>
 			</Modal>
 
+			{institution.signInVideoId && (
+				<SignInVideoModal
+					videoId={institution.signInVideoId}
+					show={showVideoModal}
+					onHide={() => {
+						setShowVideoModal(false);
+					}}
+				/>
+			)}
+
 			<HalfLayout
 				leftColChildren={(className) => (
 					<div className={className}>
@@ -93,6 +106,19 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 							{institution.signInDescription ??
 								`Cobalt is a mental health and wellness platform created by and for ${institution?.name} employees.`}
 						</p>
+						{institution.signInVideoId && (
+							<Button
+								size="lg"
+								variant="outline-primary"
+								className="d-flex align-items-center justify-content-center mb-6 mb-lg-8 d-block w-100"
+								onClick={() => {
+									setShowVideoModal(true);
+								}}
+							>
+								<SvgIcon kit="fas" icon="play" size={16} className="me-2" />
+								{institution.signInVideoCta ?? 'Watch our video'}
+							</Button>
+						)}
 						<hr className="mb-6 mb-lg-8" />
 						<p className="mb-6 text-center">
 							{institution.signInDirection ?? 'Select your sign in method to continue.'}

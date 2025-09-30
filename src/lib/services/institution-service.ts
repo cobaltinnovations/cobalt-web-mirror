@@ -7,7 +7,7 @@ import {
 	InstitutionResourceGroup,
 } from '@/lib/models/institution';
 import { buildQueryParamUrl } from '@/lib/utils/url-utils';
-import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID } from '@/lib/models';
+import { InstitutionBlurb, INSTITUTION_BLURB_TYPE_ID, CourseVideoModel } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
 
 interface GetAccountSourcesResponse {
@@ -133,6 +133,12 @@ export const institutionService = {
 		}>({
 			method: 'GET',
 			url: `/institutions/${institutionId}/google-maps-platform-api-key`,
+		});
+	},
+	getVideo(videoId: string) {
+		return httpSingleton.orchestrateRequest<{ video: CourseVideoModel }>({
+			method: 'GET',
+			url: `/videos/${videoId}`,
 		});
 	},
 };
