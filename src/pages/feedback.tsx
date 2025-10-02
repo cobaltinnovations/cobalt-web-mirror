@@ -70,7 +70,8 @@ const Feedback: FC = () => {
 						<FeedbackSupplement />
 						<h4 className="mb-4">This form is not for clinical concerns.</h4>
 						<p className="mb-8">
-							If you are in immediate crisis,{' '}
+							This form is only for general questions about the platform. Do not include personal
+							information. If you are in crisis or any other person may be in danger -{' '}
 							<span
 								className="text-primary text-decoration-underline cursor-pointer"
 								tabIndex={0}
@@ -84,8 +85,9 @@ const Feedback: FC = () => {
 									openInCrisisModal();
 								}}
 							>
-								contact these resources.
-							</span>
+								contact these resources
+							</span>{' '}
+							or go to your nearest emergency room.
 						</p>
 						<hr className="mb-6" />
 						<Form onSubmit={handleFormSubmit}>
@@ -102,8 +104,7 @@ const Feedback: FC = () => {
 										}));
 									}}
 									label="Your email address"
-									helperText="Enter your email address if you would like our team to follow up (Avg response time is two
-							business days)."
+									helperText="Enter your email address if you would like our team to follow up. Most inquiries receive a response within a week."
 								/>
 								<InputHelper
 									className="mb-6"
