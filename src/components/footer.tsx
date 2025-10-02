@@ -243,7 +243,7 @@ const Footer: FC = () => {
 							<Row>
 								<Col xs={12} md={8}>
 									<FooterLogo />
-									<FooterContent />
+									<FooterContent platformName={institution?.platformName ?? 'Cobalt'} />
 								</Col>
 								<Col xs={12} sm={12} md={4} lg={{ span: 3, offset: 1 }}>
 									<FooterNav />
