@@ -131,7 +131,7 @@ const Footer: FC = () => {
 							<Row>
 								<Col xs={12} lg={6}>
 									<FooterLogo />
-									<FooterContent />
+									<FooterContent platformName={institution?.platformName ?? 'Cobalt'} />
 								</Col>
 								<Col xs={6} lg={2} className="mb-8">
 									<p className="mb-3 fs-large fw-semibold text-n500">Support</p>
