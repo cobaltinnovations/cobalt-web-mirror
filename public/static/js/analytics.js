@@ -400,8 +400,11 @@
 
 			const hasData = data && Object.keys(data).length > 0;
 
-			if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
-			else _log(`Persisting event ${analyticsNativeEventTypeId}`);
+			// Don't log heartbeats to the console; too noisy
+			if (analyticsNativeEventTypeId !== 'HEARTBEAT') {
+				if (hasData) _log(`Persisting event ${analyticsNativeEventTypeId} with data`, data);
+				else _log(`Persisting event ${analyticsNativeEventTypeId}`);
+			}
 
 			// Enable keepalive only when payload is relatively small.
 			// For larger payloads, some browsers can choose to have fetch operations fail if keepalive is set.
