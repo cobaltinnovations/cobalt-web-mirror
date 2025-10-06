@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Row, Tab } from 'react-bootstrap';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import {
@@ -14,7 +14,6 @@ import { analyticsService, coursesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import PageHeader from '@/components/page-header';
-import TabBar from '@/components/tab-bar';
 import { CourseModule } from '@/components/courses';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import {
@@ -24,7 +23,6 @@ import {
 	getRequiredCourseModules,
 } from '@/lib/utils';
 import ConfirmDialog from '@/components/confirm-dialog';
-import ResourceLibraryCard from '@/components/resource-library-card';
 import SvgIcon from '@/components/svg-icon';
 import useAccount from '@/hooks/use-account';
 
@@ -32,15 +30,8 @@ export async function loader() {
 	return null;
 }
 
-enum MODE {
-	OVERVIEW = 'OVERVIEW',
-	ADDITIONAL_RESOURCES = 'ADDITIONAL_RESOURCES',
-}
-
 export const Component = () => {
 	const { courseIdentifier } = useParams<{ courseIdentifier: string }>();
-	const [searchParams, setSearchParams] = useSearchParams();
-	const mode = useMemo(() => searchParams.get('mode') ?? MODE.OVERVIEW, [searchParams]);
 	const { institution } = useAccount();
 
 	const navigate = useNavigate();
@@ -81,9 +72,8 @@ export const Component = () => {
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_DETAIL, {
 			courseId,
 			...(currentCourseSession && { courseSessionId: currentCourseSession.courseSessionId }),
-			mode,
 		});
-	}, [course, mode]);
+	}, [course]);
 
 	const handleStartCourseButtonClick = useCallback(async () => {
 		try {
@@ -174,212 +164,127 @@ export const Component = () => {
 					imageUrl={course?.imageUrl}
 					imageAlt=""
 				/>
-				<Container>
+				<Container className="my-11">
 					<Row className="mb-24">
 						<Col>
-							<Tab.Container id="course-tabs" defaultActiveKey={MODE.OVERVIEW} activeKey={mode}>
-								<TabBar
-									value={mode}
-									tabs={[
-										{
-											title: 'Course Overview',
-											value: MODE.OVERVIEW,
-										},
-										{
-											title: 'Additional Resources',
-											value: MODE.ADDITIONAL_RESOURCES,
-										},
-									]}
-									onTabClick={(tabValue) => {
-										searchParams.set('mode', tabValue);
-										setSearchParams(searchParams);
-									}}
-								/>
-								<Tab.Content>
-									<Tab.Pane eventKey={MODE.OVERVIEW} mountOnEnter unmountOnExit>
-										<Row>
-											<Col md={12} lg={7}>
-												<div className="pt-8 mb-11  d-xl-flex align-items-center justify-content-between">
-													<h2 className="mb-4 mb-xl-0">Course Content</h2>
-													{course?.currentCourseSession ? (
-														<div className="d-flex align-items-center">
-															{showResumeButton && (
-																<Button
-																	type="button"
-																	onClick={handleResumeCourseButtonClick}
-																>
-																	Resume Course
-																</Button>
-															)}
-															<Button
-																type="button"
-																variant="link"
-																className="d-flex align-items-center text-decoration-none"
-																onClick={() => {
-																	setShowRestartCourseModal(true);
-																}}
-															>
-																<SvgIcon
-																	kit="far"
-																	icon="arrow-rotate-left"
-																	size={16}
-																	className="me-2"
-																/>
-																Restart
-															</Button>
-														</div>
-													) : (
-														<Button type="button" onClick={handleStartCourseButtonClick}>
-															Start Course
-														</Button>
-													)}
-												</div>
-												{course &&
-													requiredModules.map((courseModule, courseModuleIndex) => {
-														const isLast = requiredModules.length - 1 === courseModuleIndex;
-
-														return (
-															<CourseModule
-																className={classNames({
-																	'mb-4': !isLast,
-																})}
-																key={courseModule.courseModuleId}
-																courseModule={courseModule}
-																courseSessionUnitStatusIdsByCourseUnitId={
-																	course.currentCourseSession
-																		? course.currentCourseSession
-																				.courseSessionUnitStatusIdsByCourseUnitId
-																		: {}
-																}
-																courseUnitLockStatusesByCourseUnitId={
-																	course.currentCourseSession
-																		? course.currentCourseSession
-																				.courseUnitLockStatusesByCourseUnitId
-																		: course.defaultCourseUnitLockStatusesByCourseUnitId
-																}
-																onCourseUnitClick={handleCourseUnitClick}
-																initialShow={
-																	getCurrentCourseModule(
-																		requiredModules,
-																		course.currentCourseSession
-																	)?.courseModuleId === courseModule.courseModuleId
-																}
-															/>
-														);
-													})}
-												{optionalModules.length > 0 && (
-													<>
-														<h2 className="pt-14 mb-2">Optional Modules</h2>
-														<p className="mb-6">
-															These modules do not count towards course completion, but
-															may have useful information.
-														</p>
-														{course &&
-															optionalModules.map((courseModule, courseModuleIndex) => {
-																const isLast =
-																	optionalModules.length - 1 === courseModuleIndex;
-
-																return (
-																	<CourseModule
-																		className={classNames({
-																			'mb-4': !isLast,
-																		})}
-																		key={courseModule.courseModuleId}
-																		courseModule={courseModule}
-																		courseSessionUnitStatusIdsByCourseUnitId={
-																			course.currentCourseSession
-																				? course.currentCourseSession
-																						.courseSessionUnitStatusIdsByCourseUnitId
-																				: {}
-																		}
-																		courseUnitLockStatusesByCourseUnitId={
-																			course.currentCourseSession
-																				? course.currentCourseSession
-																						.courseUnitLockStatusesByCourseUnitId
-																				: course.defaultCourseUnitLockStatusesByCourseUnitId
-																		}
-																		onCourseUnitClick={handleCourseUnitClick}
-																		initialShow={
-																			getCurrentCourseModule(
-																				requiredModules,
-																				course.currentCourseSession
-																			)?.courseModuleId ===
-																			courseModule.courseModuleId
-																		}
-																	/>
-																);
-															})}
-													</>
+							<Row>
+								<Col md={12} lg={7} className="mb-11 mb-lg-0">
+									<div className="mb-11 d-xl-flex align-items-center justify-content-between">
+										<h2 className="mb-4 mb-xl-0">Course Content</h2>
+										{course?.currentCourseSession ? (
+											<div className="d-flex align-items-center">
+												{showResumeButton && (
+													<Button type="button" onClick={handleResumeCourseButtonClick}>
+														Resume Course
+													</Button>
 												)}
-											</Col>
-											<Col md={12} lg={5}>
-												<h3 className="pt-6 mb-4">Course Focus</h3>
-												<WysiwygDisplay className="mb-10" html={course?.focus ?? ''} />
-												<hr />
-												<h3 className="pt-6 mb-4">Contact Us</h3>
-												<Link to="/feedback">Reach out to us here</Link>
-											</Col>
-										</Row>
-									</Tab.Pane>
-									<Tab.Pane eventKey={MODE.ADDITIONAL_RESOURCES} mountOnEnter unmountOnExit>
-										<Row className="pt-10 mb-10">
-											<Col>
-												<h3 className="mb-1">Additional Resources</h3>
-												<p className="mb-0">
-													The following resources are not used throughout the course but may
-													be helpful once you've finished with the course activities.
-												</p>
-											</Col>
-										</Row>
-										<Row>
-											{(course?.contents ?? []).map((content) => (
-												<Col
-													xs={12}
-													sm={12}
-													md={6}
-													lg={4}
-													key={content.contentId}
-													className="mb-8"
+												<Button
+													type="button"
+													variant="link"
+													className="d-flex align-items-center text-decoration-none"
+													onClick={() => {
+														setShowRestartCourseModal(true);
+													}}
 												>
-													<ResourceLibraryCard
-														key={content.contentId}
-														linkTo={`/resource-library/${content.contentId}`}
-														className="h-100"
-														imageUrl={content.imageUrl}
-														badgeTitle={content.newFlag ? 'New' : ''}
-														title={content.title}
-														author={content.author}
-														description={content.description}
-														tags={[]}
-														contentTypeId={content.contentTypeId}
-														duration={content.durationInMinutesDescription}
-														trackEvent={() => {
-															if (!course) {
-																return;
-															}
-
-															analyticsService.persistEvent(
-																AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_CONTENT,
-																{
-																	courseId: course.courseId,
-																	...(course.currentCourseSession && {
-																		courseSessionId:
-																			course.currentCourseSession.courseSessionId,
-																	}),
-																	contentId: content.contentId,
-																}
-															);
-														}}
-														trackTagEvent={(_tag) => {
-															return;
-														}}
+													<SvgIcon
+														kit="far"
+														icon="arrow-rotate-left"
+														size={16}
+														className="me-2"
 													/>
-												</Col>
-											))}
-										</Row>
-									</Tab.Pane>
-								</Tab.Content>
-							</Tab.Container>
+													Restart
+												</Button>
+											</div>
+										) : (
+											<Button type="button" onClick={handleStartCourseButtonClick}>
+												Start Course
+											</Button>
+										)}
+									</div>
+									{course &&
+										requiredModules.map((courseModule, courseModuleIndex) => {
+											const isLast = requiredModules.length - 1 === courseModuleIndex;
+
+											return (
+												<CourseModule
+													className={classNames({
+														'mb-4': !isLast,
+													})}
+													key={courseModule.courseModuleId}
+													courseModule={courseModule}
+													courseSessionUnitStatusIdsByCourseUnitId={
+														course.currentCourseSession
+															? course.currentCourseSession
+																	.courseSessionUnitStatusIdsByCourseUnitId
+															: {}
+													}
+													courseUnitLockStatusesByCourseUnitId={
+														course.currentCourseSession
+															? course.currentCourseSession
+																	.courseUnitLockStatusesByCourseUnitId
+															: course.defaultCourseUnitLockStatusesByCourseUnitId
+													}
+													onCourseUnitClick={handleCourseUnitClick}
+													initialShow={
+														getCurrentCourseModule(
+															requiredModules,
+															course.currentCourseSession
+														)?.courseModuleId === courseModule.courseModuleId
+													}
+												/>
+											);
+										})}
+									{optionalModules.length > 0 && (
+										<>
+											<h2 className="pt-14 mb-2">Optional Modules</h2>
+											<p className="mb-6">
+												These modules do not count towards course completion, but may have
+												useful information.
+											</p>
+											{course &&
+												optionalModules.map((courseModule, courseModuleIndex) => {
+													const isLast = optionalModules.length - 1 === courseModuleIndex;
+
+													return (
+														<CourseModule
+															className={classNames({
+																'mb-4': !isLast,
+															})}
+															key={courseModule.courseModuleId}
+															courseModule={courseModule}
+															courseSessionUnitStatusIdsByCourseUnitId={
+																course.currentCourseSession
+																	? course.currentCourseSession
+																			.courseSessionUnitStatusIdsByCourseUnitId
+																	: {}
+															}
+															courseUnitLockStatusesByCourseUnitId={
+																course.currentCourseSession
+																	? course.currentCourseSession
+																			.courseUnitLockStatusesByCourseUnitId
+																	: course.defaultCourseUnitLockStatusesByCourseUnitId
+															}
+															onCourseUnitClick={handleCourseUnitClick}
+															initialShow={
+																getCurrentCourseModule(
+																	requiredModules,
+																	course.currentCourseSession
+																)?.courseModuleId === courseModule.courseModuleId
+															}
+														/>
+													);
+												})}
+										</>
+									)}
+								</Col>
+								<Col md={12} lg={5}>
+									<h3 className="mb-4">Course Focus</h3>
+									<WysiwygDisplay className="mb-10" html={course?.focus ?? ''} />
+									<hr />
+									<h3 className="pt-6 mb-4">Contact Us</h3>
+									<Link to="/feedback">Reach out to us here</Link>
+								</Col>
+							</Row>
 						</Col>
 					</Row>
 				</Container>
