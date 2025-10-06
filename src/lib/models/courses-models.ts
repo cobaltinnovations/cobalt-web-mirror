@@ -102,6 +102,7 @@ export enum CourseUnitTypeId {
 	QUIZ = 'QUIZ',
 	REORDER = 'REORDER',
 	THINGS_TO_SHARE = 'THINGS_TO_SHARE',
+	FINAL = 'FINAL',
 }
 
 export enum CourseSessionUnitStatusId {
