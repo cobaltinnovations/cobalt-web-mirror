@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Button } from 'react-bootstrap';
-import { CourseUnitModel } from '@/lib/models';
+import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import NoData from '@/components/no-data';
 import SvgIcon from '../svg-icon';
@@ -10,7 +10,6 @@ interface CourseUnitCompleteProps {
 	completionMessages: Record<string, string>;
 	onRestartActivityButtonClick(): void;
 	onNextButtonClick(): void;
-	nextButtonTitle?: string;
 }
 
 export const CourseUnitComplete = ({
@@ -18,7 +17,6 @@ export const CourseUnitComplete = ({
 	completionMessages,
 	onRestartActivityButtonClick,
 	onNextButtonClick,
-	nextButtonTitle = 'Next',
 }: CourseUnitCompleteProps) => {
 	const completionMessage = useMemo(
 		() => completionMessages[courseUnit.courseUnitId] ?? '',
@@ -50,7 +48,7 @@ export const CourseUnitComplete = ({
 					className="d-flex align-items-center text-decoration-none pe-3"
 					onClick={onNextButtonClick}
 				>
-					{nextButtonTitle}
+					{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL ? 'Go to course home' : 'Next'}
 					<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 				</Button>
 			</div>

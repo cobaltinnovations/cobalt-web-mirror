@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
+	Content,
 	CourseUnitModel,
 	CourseUnitTypeId,
 	CourseVideoModel,
@@ -15,8 +16,11 @@ import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
+import { Confetti } from '@/components/confetti';
+import SvgIcon from '@/components/svg-icon';
+import ResourceLibraryCard from '@/components/resource-library-card';
 import { createUseThemedStyles } from '@/jss/theme';
-import SvgIcon from '../svg-icon';
+
 import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -53,7 +57,7 @@ interface CourseUnitAvailableProps {
 	onNextButtonClick(): void;
 	onView?(courseUnit: CourseUnitModel): void;
 	onCompletionThresholdPassed(courseUnit: CourseUnitModel): void;
-	nextButtonTitle?: string;
+	courseUnitContent: Content[];
 }
 
 export const CourseUnitAvailable = ({
@@ -67,7 +71,7 @@ export const CourseUnitAvailable = ({
 	onNextButtonClick,
 	onView,
 	onCompletionThresholdPassed,
-	nextButtonTitle = 'Next',
+	courseUnitContent,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
 	const screeningFlowParams = useMemo(
@@ -173,7 +177,8 @@ export const CourseUnitAvailable = ({
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK ||
-				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE) && (
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL) && (
 				<>
 					{courseUnit.imageUrl && (
 						<div
@@ -220,6 +225,66 @@ export const CourseUnitAvailable = ({
 				</div>
 			)}
 
+			{courseUnitContent.length > 0 && (
+				<Row>
+					{courseUnitContent.map((content) => {
+						return (
+							<Col xs={12} sm={12} md={6} lg={6} key={content.contentId} className="mb-8">
+								<ResourceLibraryCard
+									key={content.contentId}
+									linkTo={`/resource-library/${content.contentId}`}
+									className="h-100"
+									imageUrl={content.imageUrl}
+									badgeTitle={content.newFlag ? 'New' : ''}
+									title={content.title}
+									author={content.author}
+									description={content.description}
+									tags={[]}
+									contentTypeId={content.contentTypeId}
+									duration={content.durationInMinutesDescription}
+									trackEvent={() => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_CONTENT,
+											{
+												courseSessionId: courseSessionId,
+												courseUnitId: courseUnit.courseUnitId,
+												contentId: content.contentId,
+											}
+										);
+									}}
+									trackTagEvent={(_tag) => {
+										return;
+									}}
+								/>
+							</Col>
+						);
+					})}
+				</Row>
+			)}
+
+			{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL && (
+				<>
+					<Confetti
+						particleCount={40}
+						launchSpeed={2.5}
+						deg={-70}
+						x={0}
+						y={1}
+						spreadDeg={20}
+						shapeSize={20}
+					/>
+					<Confetti
+						particleCount={40}
+						launchSpeed={2.5}
+						deg={-110}
+						x={1}
+						y={1}
+						spreadDeg={20}
+						shapeSize={20}
+					/>
+				</>
+			)}
+
 			<div className="pt-10 d-flex justify-content-end">
 				{showNextButton ? (
 					<Button
@@ -228,7 +293,7 @@ export const CourseUnitAvailable = ({
 						className="d-flex align-items-center text-decoration-none pe-3"
 						onClick={onNextButtonClick}
 					>
-						{nextButtonTitle}
+						{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL ? 'Go to course home' : 'Next'}
 						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 					</Button>
 				) : (

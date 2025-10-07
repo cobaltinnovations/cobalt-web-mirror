@@ -23,6 +23,7 @@ const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number, className
 		<SvgIcon kit="far" icon="download" size={size} className={className} />
 	),
 	VIDEO: (size, className?: string) => <SvgIcon kit="fak" icon="video" size={size} className={className} />,
+	FINAL: (size, className?: string) => <SvgIcon kit="far" icon="newspaper" size={size} className={className} />,
 };
 
 interface UseStylesProps {

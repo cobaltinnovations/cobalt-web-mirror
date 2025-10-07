@@ -54,16 +54,6 @@ export const getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession = (
 	return nextCourseUnit?.courseUnitId;
 };
 
-export const isLastUnit = (
-	courseUnit: CourseUnitModel,
-	courseModules: CourseModuleModel[],
-	courseSession: CourseSessionModel
-) => {
-	const courseUnitsOrdered = getOrderedCourseUnits(courseModules, courseSession.optionalCourseModuleIds);
-	const isLastUnit = courseUnit.courseUnitId === courseUnitsOrdered[courseUnitsOrdered.length - 1].courseUnitId;
-	return isLastUnit;
-};
-
 export const getNextUnit = (
 	courseUnit: CourseUnitModel,
 	courseModules: CourseModuleModel[],
