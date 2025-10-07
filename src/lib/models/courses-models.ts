@@ -11,7 +11,7 @@ export interface CourseModel {
 	videos: CourseVideoModel[];
 	defaultCourseUnitLockStatusesByCourseUnitId: CourseUnitLockStatusesByCourseUnitId;
 	currentCourseSession?: CourseSessionModel;
-	contents: Content[];
+	contentsByCourseUnitId?: Record<string, Content[]>;
 	completionPercentage: number;
 }
 

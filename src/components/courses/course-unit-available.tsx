@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
+	Content,
 	CourseUnitModel,
 	CourseUnitTypeId,
 	CourseVideoModel,
@@ -15,10 +16,12 @@ import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { ScreeningFlow } from '@/components/screening-v2';
 import { CourseVideo } from '@/components/courses/course-video';
 import { CourseDownloadable } from '@/components/courses/course-downloadable';
+import { Confetti } from '@/components/confetti';
+import SvgIcon from '@/components/svg-icon';
+import ResourceLibraryCard from '@/components/resource-library-card';
 import { createUseThemedStyles } from '@/jss/theme';
-import SvgIcon from '../svg-icon';
+
 import mediaQueries from '@/jss/media-queries';
-import { Confetti } from '../confetti';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	screeningFlowOuter: {
@@ -54,6 +57,7 @@ interface CourseUnitAvailableProps {
 	onNextButtonClick(): void;
 	onView?(courseUnit: CourseUnitModel): void;
 	onCompletionThresholdPassed(courseUnit: CourseUnitModel): void;
+	courseUnitContent: Content[];
 }
 
 export const CourseUnitAvailable = ({
@@ -67,6 +71,7 @@ export const CourseUnitAvailable = ({
 	onNextButtonClick,
 	onView,
 	onCompletionThresholdPassed,
+	courseUnitContent,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
 	const screeningFlowParams = useMemo(
@@ -218,6 +223,43 @@ export const CourseUnitAvailable = ({
 						}
 					)}
 				</div>
+			)}
+
+			{courseUnitContent.length > 0 && (
+				<Row>
+					{courseUnitContent.map((content) => {
+						return (
+							<Col xs={12} sm={12} md={6} lg={6} key={content.contentId} className="mb-8">
+								<ResourceLibraryCard
+									key={content.contentId}
+									linkTo={`/resource-library/${content.contentId}`}
+									className="h-100"
+									imageUrl={content.imageUrl}
+									badgeTitle={content.newFlag ? 'New' : ''}
+									title={content.title}
+									author={content.author}
+									description={content.description}
+									tags={[]}
+									contentTypeId={content.contentTypeId}
+									duration={content.durationInMinutesDescription}
+									trackEvent={() => {
+										analyticsService.persistEvent(
+											AnalyticsNativeEventTypeId.CLICKTHROUGH_COURSE_UNIT_CONTENT,
+											{
+												courseSessionId: courseSessionId,
+												courseUnitId: courseUnit.courseUnitId,
+												contentId: content.contentId,
+											}
+										);
+									}}
+									trackTagEvent={(_tag) => {
+										return;
+									}}
+								/>
+							</Col>
+						);
+					})}
+				</Row>
 			)}
 
 			{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL && (

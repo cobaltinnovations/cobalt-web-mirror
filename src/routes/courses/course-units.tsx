@@ -242,6 +242,14 @@ export const Component = () => {
 		[courseUnitByCourseUnitId, courseUnitLockStatus?.determinantCourseUnitIdsByDependencyTypeIds]
 	);
 
+	const courseUnitContent = useMemo(() => {
+		if (!courseUnit) {
+			return [];
+		}
+
+		return course?.contentsByCourseUnitId?.[courseUnit?.courseUnitId] ?? [];
+	}, [course?.contentsByCourseUnitId, courseUnit]);
+
 	return (
 		<>
 			<Helmet>
@@ -418,6 +426,7 @@ export const Component = () => {
 															onCompletionThresholdPassed={
 																handleCompletionThresholdPassed
 															}
+															courseUnitContent={courseUnitContent}
 														/>
 													)}
 												</>
