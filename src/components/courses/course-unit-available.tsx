@@ -53,7 +53,6 @@ interface CourseUnitAvailableProps {
 	onNextButtonClick(): void;
 	onView?(courseUnit: CourseUnitModel): void;
 	onCompletionThresholdPassed(courseUnit: CourseUnitModel): void;
-	nextButtonTitle?: string;
 }
 
 export const CourseUnitAvailable = ({
@@ -67,7 +66,6 @@ export const CourseUnitAvailable = ({
 	onNextButtonClick,
 	onView,
 	onCompletionThresholdPassed,
-	nextButtonTitle = 'Next',
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
 	const screeningFlowParams = useMemo(
@@ -173,7 +171,8 @@ export const CourseUnitAvailable = ({
 
 			{(courseUnit.courseUnitTypeId === CourseUnitTypeId.INFOGRAPHIC ||
 				courseUnit.courseUnitTypeId === CourseUnitTypeId.HOMEWORK ||
-				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE) && (
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.THINGS_TO_SHARE ||
+				courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL) && (
 				<>
 					{courseUnit.imageUrl && (
 						<div
@@ -228,7 +227,7 @@ export const CourseUnitAvailable = ({
 						className="d-flex align-items-center text-decoration-none pe-3"
 						onClick={onNextButtonClick}
 					>
-						{nextButtonTitle}
+						{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL ? 'Go to course home' : 'Next'}
 						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
 					</Button>
 				) : (

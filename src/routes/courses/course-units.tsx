@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { getNextUnit, getOptionalCourseModules, getRequiredCourseModules, isLastUnit } from '@/lib/utils';
+import { getNextUnit, getOptionalCourseModules, getRequiredCourseModules } from '@/lib/utils';
 import {
 	AnalyticsNativeEventTypeId,
 	CourseModel,
@@ -135,18 +135,12 @@ export const Component = () => {
 	}, [courseUnit?.courseUnitTypeId, fetchData]);
 
 	const getIsLastUnit = useCallback(() => {
-		if (!course) {
+		if (!courseUnit) {
 			return false;
 		}
 
-		const { courseModules, currentCourseSession } = course;
-
-		if (!courseModules || !courseUnit || !currentCourseSession) {
-			return false;
-		}
-
-		return isLastUnit(courseUnit, course.courseModules, currentCourseSession);
-	}, [course, courseUnit]);
+		return courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL;
+	}, [courseUnit]);
 
 	const handleSkipActivityButtonClick = useCallback(() => {
 		try {
@@ -397,7 +391,6 @@ export const Component = () => {
 												setCourseUnitCompleted(false);
 											}}
 											onNextButtonClick={handleCompletedUnitNextButtonClick}
-											nextButtonTitle={getIsLastUnit() ? 'Go to course home' : 'Next'}
 										/>
 									) : (
 										<>
@@ -424,9 +417,6 @@ export const Component = () => {
 															onView={handleCourseUnitView}
 															onCompletionThresholdPassed={
 																handleCompletionThresholdPassed
-															}
-															nextButtonTitle={
-																getIsLastUnit() ? 'Go to course home' : 'Next'
 															}
 														/>
 													)}
