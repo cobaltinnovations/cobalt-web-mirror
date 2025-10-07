@@ -18,6 +18,7 @@ import { CourseDownloadable } from '@/components/courses/course-downloadable';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '../svg-icon';
 import mediaQueries from '@/jss/media-queries';
+import { Confetti } from '../confetti';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	screeningFlowOuter: {
@@ -217,6 +218,29 @@ export const CourseUnitAvailable = ({
 						}
 					)}
 				</div>
+			)}
+
+			{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL && (
+				<>
+					<Confetti
+						particleCount={40}
+						launchSpeed={2.5}
+						deg={-70}
+						x={0}
+						y={1}
+						spreadDeg={20}
+						shapeSize={20}
+					/>
+					<Confetti
+						particleCount={40}
+						launchSpeed={2.5}
+						deg={-110}
+						x={1}
+						y={1}
+						spreadDeg={20}
+						shapeSize={20}
+					/>
+				</>
 			)}
 
 			<div className="pt-10 d-flex justify-content-end">
