@@ -11,6 +11,9 @@ import { createUseThemedStyles } from '@/jss/theme';
 import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
+	signInVideoModal: {
+		maxWidth: 720,
+	},
 	videoPlayerSupplementsOuter: {
 		position: 'relative',
 	},
@@ -108,7 +111,13 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 	}, []);
 
 	return (
-		<Modal centered {...props} onEntering={handleOnEnter} onExited={handleOnExit}>
+		<Modal
+			centered
+			{...props}
+			onEntering={handleOnEnter}
+			onExited={handleOnExit}
+			dialogClassName={classes.signInVideoModal}
+		>
 			<Modal.Header closeButton>
 				<Modal.Title>Welcome to {institution.platformName}</Modal.Title>
 			</Modal.Header>

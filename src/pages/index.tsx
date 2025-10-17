@@ -205,7 +205,7 @@ const Index: FC = () => {
 
 			<PreviewCanvas title={institution.name} show={showOnboardingModal}>
 				{institution.onboardingScreeningFlowId && (
-					<Container>
+					<Container className="pb-8">
 						<Row>
 							<Col md={12} lg={{ span: 6, offset: 3 }}>
 								<ScreeningFlow
