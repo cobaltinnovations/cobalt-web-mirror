@@ -150,7 +150,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 
 			<Row className="justify-content-center">
 				<Col md={10} lg={8} xl={8}>
-					<WysiwygDisplay html={content?.description ?? ''} />
+					<WysiwygDisplay className="fs-large" html={content?.description ?? ''} />
 
 					{(content?.neverEmbed || !canEmbed) && content?.url && (
 						<div className="mt-10 text-center">

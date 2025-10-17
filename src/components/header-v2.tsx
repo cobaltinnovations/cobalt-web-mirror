@@ -202,7 +202,7 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 			margin: '0 auto',
 			listStyle: 'none',
 		},
-		'& a, & button': {
+		'& a, & button:not(.in-crisis-button)': {
 			borderRadius: 4,
 			display: 'block',
 			padding: '12px 16px',
@@ -346,7 +346,7 @@ const HeaderV2 = () => {
 			return;
 		}
 
-		const headerHeight = header.current.clientHeight;
+		const headerHeight = header.current.getBoundingClientRect().height;
 		document.body.style.paddingTop = `${headerHeight}px`;
 	}
 
@@ -826,6 +826,10 @@ const HeaderV2 = () => {
 							</MobileAccordianItem>
 						</li>
 					</ul>
+					<hr />
+					<div className="px-4">
+						<InCrisisHeaderButton className="in-crisis-button d-flex justify-content-center" />
+					</div>
 				</div>
 			</CSSTransition>
 

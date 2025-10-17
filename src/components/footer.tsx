@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef } from 'react';
+import React, { FC, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { Link, useMatches } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -40,7 +40,7 @@ const useFooterStyles = createUseThemedStyles((theme) => ({
 
 const Footer: FC = () => {
 	const classes = useFooterStyles();
-	const footer = useRef<HTMLElement | null>(null);
+	const footerRef = useRef<HTMLElement | null>(null);
 	const { account, institution, isIntegratedCarePatient } = useAccount();
 	const routeMatches = useMatches();
 
@@ -59,34 +59,36 @@ const Footer: FC = () => {
 		});
 	}, [routeMatches]);
 
-	useEffect(() => {
+	const setFooterHeight = useCallback(() => {
+		if (hideFooter || !footerRef.current) {
+			document.body.style.paddingBottom = '0px';
+			document.body.style.minBlockSize = '100%';
+			return;
+		}
+
+		const footerHeight = footerRef.current.getBoundingClientRect().height;
+		document.body.style.paddingBottom = `${footerHeight}px`;
+		document.body.style.minBlockSize = `calc(100% + ${footerHeight + 1}px)`;
+	}, [hideFooter]);
+
+	useLayoutEffect(() => {
 		if (hideFooter) {
 			return;
 		}
 
-		function handleResize() {
-			if (!footer.current) return;
-
-			const footerHeight = footer.current.clientHeight;
-			document.body.style.paddingBottom = `${footerHeight}px`;
-			document.body.style.minBlockSize = `calc(100% + ${footerHeight + 1}px)`;
-		}
-
-		handleResize();
-		window.addEventListener('resize', handleResize);
+		setFooterHeight();
+		window.addEventListener('resize', setFooterHeight);
 
 		return () => {
-			window.removeEventListener('resize', handleResize);
-			document.body.style.paddingBottom = '0';
-			document.body.style.minBlockSize = '100%';
+			window.removeEventListener('resize', setFooterHeight);
 		};
-	}, [hideFooter]);
+	}, [hideFooter, setFooterHeight]);
+
+	const showCommunityLinks = institution?.additionalNavigationItems?.length > 0;
 
 	if (hideFooter) {
 		return null;
 	}
-
-	const showCommunityLinks = institution?.additionalNavigationItems?.length > 0;
 
 	return (
 		<>
@@ -120,7 +122,7 @@ const Footer: FC = () => {
 			)}
 
 			<footer
-				ref={footer}
+				ref={footerRef}
 				className={classNames(classes.footer, {
 					[classes.footerBorderTop]: !isIntegratedCarePatient,
 				})}
