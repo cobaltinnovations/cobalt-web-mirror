@@ -201,7 +201,11 @@ export const Component = () => {
 					</Col>
 				</Row>
 				<AsyncWrapper fetchData={fetchWidgets}>
-					<AdminAnalyticsWidgetGroup widgets={widgets} />
+					<AdminAnalyticsWidgetGroup
+						widgets={widgets}
+						colConfig={{ xs: 12, className: 'mb-8' }}
+						showOptions={false}
+					/>
 				</AsyncWrapper>
 			</Container>
 		</>

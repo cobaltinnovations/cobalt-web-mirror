@@ -44,9 +44,10 @@ const useAnalyticsWidgetStyles = createUseThemedStyles((theme) => ({
 interface AnalyticsWidgetCardProps {
 	widget: AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget | AdminAnalyticsLineChartWidget;
 	chart?: ReactNode;
+	showOptions?: boolean;
 }
 
-export const AnalyticsWidgetCard = ({ widget, chart }: AnalyticsWidgetCardProps) => {
+export const AnalyticsWidgetCard = ({ widget, chart, showOptions = true }: AnalyticsWidgetCardProps) => {
 	const classes = useAnalyticsWidgetStyles();
 
 	return (
@@ -59,7 +60,7 @@ export const AnalyticsWidgetCard = ({ widget, chart }: AnalyticsWidgetCardProps)
 						{widget.widgetSubtitle && <p className="mb-0">{widget.widgetSubtitle}</p>}
 					</div>
 
-					<AdminAnalyticsWidgetOptions widget={widget} />
+					{showOptions && <AdminAnalyticsWidgetOptions widget={widget} />}
 				</div>
 			</Card.Header>
 
