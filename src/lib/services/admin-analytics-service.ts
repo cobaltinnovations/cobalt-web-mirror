@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
-import { InstitutionAlert } from '@/lib/models';
+import { AnalyticsReportGroup, InstitutionAlert } from '@/lib/models';
 
 export interface AdminAnalyticsWidgetChartData {
 	label: string;
@@ -197,6 +197,24 @@ export const adminAnalyticsService = {
 		return httpSingleton.orchestrateRequest<TableauResponse>({
 			method: 'GET',
 			url: '/analytics/tableau',
+		});
+	},
+
+	getReportGroups() {
+		return httpSingleton.orchestrateRequest<{
+			analyticsReportGroups: AnalyticsReportGroup[];
+		}>({
+			method: 'GET',
+			url: '/analytics-report-groups',
+		});
+	},
+
+	getAnalyticsReportGroupWidgetsById(analyticsReportGroupId: string, params: AdminAnalyticsWidgetsRequestParams) {
+		return httpSingleton.orchestrateRequest<{
+			widgets: AdminAnalyticsWidget[];
+		}>({
+			method: 'GET',
+			url: buildQueryParamUrl(`/analytics-report-groups/${analyticsReportGroupId}/widgets`, params),
 		});
 	},
 };
