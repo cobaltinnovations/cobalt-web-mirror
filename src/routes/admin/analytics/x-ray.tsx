@@ -99,13 +99,13 @@ export const Component = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{institution.platformName ?? 'Cobalt'} | X-ray</title>
+				<title>{institution.platformName ?? 'Cobalt'} | Analytics</title>
 			</Helmet>
 
 			<Container className="py-8">
 				<Row>
 					<Col className="d-flex flex-wrap align-items-center justify-content-between">
-						<h1>X-Ray</h1>
+						<h1>Analytics</h1>
 						<div className="d-flex">
 							<InputHelper
 								style={{ width: 200 }}
@@ -155,10 +155,9 @@ export const Component = () => {
 											return;
 										}
 
-										setSearchParams({
-											startDate: moment(date).format(DateFormats.API.Date),
-											endDate: moment(endDate).format(DateFormats.API.Date),
-										});
+										searchParams.set('startDate', moment(date).format(DateFormats.API.Date));
+										searchParams.set('endDate', moment(endDate).format(DateFormats.API.Date));
+										setSearchParams(searchParams);
 									}}
 									disabled={!!selectedDateOption}
 								/>
@@ -174,10 +173,9 @@ export const Component = () => {
 											return;
 										}
 
-										setSearchParams({
-											startDate: moment(startDate).format(DateFormats.API.Date),
-											endDate: moment(date).format(DateFormats.API.Date),
-										});
+										searchParams.set('startDate', moment(startDate).format(DateFormats.API.Date));
+										searchParams.set('endDate', moment(date).format(DateFormats.API.Date));
+										setSearchParams(searchParams);
 									}}
 									disabled={!!selectedDateOption}
 								/>
