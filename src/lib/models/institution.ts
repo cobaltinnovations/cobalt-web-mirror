@@ -28,6 +28,11 @@ export enum FeatureId {
 	MY_EVENTS = 'MY_EVENTS',
 }
 
+export enum AnalyticsProfileId {
+	LEGACY = 'LEGACY',
+	XRAY = 'XRAY',
+}
+
 export interface Institution {
 	additionalNavigationItems: AdditionalNavigationItem[];
 	alerts: InstitutionAlert[];
@@ -123,6 +128,8 @@ export interface Institution {
 
 	aboutPageEnabled: boolean;
 	platformName: string;
+
+	analyticsProfileId: AnalyticsProfileId;
 }
 
 export interface InstitutionFeature {

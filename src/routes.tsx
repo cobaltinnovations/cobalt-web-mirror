@@ -984,6 +984,11 @@ export const routes: RouteObject[] = [
 								],
 							},
 							{
+								id: 'admin-analytics-xray',
+								path: 'x-ray',
+								lazy: () => import('@/routes/admin/analytics/x-ray'),
+							},
+							{
 								id: 'admin-debug',
 								path: 'debug',
 								element: <ToggledOutlet isEnabled={() => config.showDebug} />,

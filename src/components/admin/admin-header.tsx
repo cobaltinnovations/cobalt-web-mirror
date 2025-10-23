@@ -10,7 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { config } from '@/config';
 
-import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import { AnalyticsNativeEventAccountSignedOutSource, AnalyticsProfileId } from '@/lib/models';
 import SvgIcon from '../svg-icon';
 
 export const ADMIN_HEADER_HEIGHT = 60;
@@ -109,7 +109,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 export const AdminHeader = () => {
 	const classes = useStyles();
 	const location = useLocation();
-	const { account, signOutAndClearContext } = useAccount();
+	const { account, institution, signOutAndClearContext } = useAccount();
 
 	const isResourcePreview = useMatch({
 		path: '/admin/resources/preview/*',
@@ -137,6 +137,9 @@ export const AdminHeader = () => {
 	});
 	const debugMatch = useMatch({
 		path: '/admin/debug/*',
+	});
+	const xRayMatch = useMatch({
+		path: '/admin/x-ray/*',
 	});
 
 	const navigationLinks = useMemo(
@@ -192,7 +195,8 @@ export const AdminHeader = () => {
 			// 	title: 'Scheduling',
 			// 	active: !!schedulingMatch,
 			// },
-			...(account?.accountCapabilityFlags.canViewAnalytics
+			...(account?.accountCapabilityFlags.canViewAnalytics &&
+			institution.analyticsProfileId === AnalyticsProfileId.LEGACY
 				? [
 						{
 							testId: '',
@@ -200,6 +204,18 @@ export const AdminHeader = () => {
 							to: '/admin/analytics',
 							title: 'Analytics',
 							active: !!analyticsMatch,
+						},
+				  ]
+				: []),
+			...(account?.accountCapabilityFlags.canViewAnalytics &&
+			institution.analyticsProfileId === AnalyticsProfileId.XRAY
+				? [
+						{
+							testId: '',
+							navigationItemId: 'ANALYTICS',
+							to: '/admin/x-ray',
+							title: 'X-Ray',
+							active: !!xRayMatch,
 						},
 				  ]
 				: []),
@@ -236,10 +252,12 @@ export const AdminHeader = () => {
 			analyticsMatch,
 			debugMatch,
 			groupSessionsMatch,
+			institution.analyticsProfileId,
 			pagesMatch,
 			reportsMatch,
 			resourcesMatch,
 			studyInsightsMatch,
+			xRayMatch,
 		]
 	);
 

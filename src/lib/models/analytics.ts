@@ -116,3 +116,14 @@ export enum AnalyticsNativeEventMhicOrderDetailSectionId {
 	CONTACT_HISTORY = 'CONTACT_HISTORY',
 	COMMENTS = 'COMMENTS',
 }
+
+export interface AnalyticsReportGroup {
+	analyticsReportGroupId: string;
+	name: string;
+	displayOrder: number;
+	displayOrderDescription: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+}
