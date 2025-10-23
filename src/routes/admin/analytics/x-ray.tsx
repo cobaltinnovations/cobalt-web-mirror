@@ -14,6 +14,30 @@ import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import DatePicker from '@/components/date-picker';
 
+import {
+	ArcElement,
+	BarElement,
+	CategoryScale,
+	Chart as ChartJS,
+	Legend,
+	LinearScale,
+	LineElement,
+	PointElement,
+	TimeScale,
+	Tooltip,
+} from 'chart.js';
+import 'chartjs-adapter-moment';
+ChartJS.register(
+	ArcElement,
+	Tooltip,
+	Legend,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	PointElement,
+	LineElement,
+	TimeScale
+);
 const dateOptions = adminAnalyticsService.getDateOptions();
 
 type AdminAnalyticsLayoutLoaderData = {
