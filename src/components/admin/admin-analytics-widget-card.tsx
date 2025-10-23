@@ -71,9 +71,10 @@ export const AnalyticsWidgetCard = ({ widget, chart, showOptions = true }: Analy
 
 interface AnalyticsWidgetTableCardProps {
 	widget: AdminAnalyticsTableWidget;
+	showOptions?: boolean;
 }
 
-export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardProps) => {
+export const AnalyticsWidgetTableCard = ({ widget, showOptions = true }: AnalyticsWidgetTableCardProps) => {
 	const classes = useAnalyticsWidgetStyles();
 	const [expandedTableRows, setExpandedTableRows] = useState<Record<string, boolean>>({});
 	const hasExpandableRows = widget.widgetData.rows.some((row) => row.nestedRows?.length);
@@ -91,7 +92,7 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 				<div className="d-flex align-items-center justify-content-between">
 					<p className="fs-large mb-0 text-n500">{widget.widgetTitle}</p>
 
-					<AdminAnalyticsWidgetOptions widget={widget} />
+					{showOptions && <AdminAnalyticsWidgetOptions widget={widget} />}
 				</div>
 			</Card.Header>
 

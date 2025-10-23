@@ -28,13 +28,13 @@ export const AdminAnalyticsWidgetGroup = ({
 			{widgets.map((widget, idx) => {
 				if (isCounterWidget(widget)) {
 					return (
-						<Col key={idx} xs={12} sm={6} {...colConfig}>
+						<Col key={idx} {...(colConfig ? colConfig : { xs: 12, sm: 6 })}>
 							<AnalyticsWidgetCard widget={widget} showOptions={showOptions} />
 						</Col>
 					);
 				} else if (isChartWidget(widget)) {
 					return (
-						<Col key={idx} xs={12} sm={6} md={4} {...colConfig}>
+						<Col key={idx} {...colConfig} {...(colConfig ? colConfig : { xs: 12, md: 4, sm: 6 })}>
 							<AnalyticsWidgetCard
 								widget={widget}
 								chart={
@@ -51,7 +51,7 @@ export const AdminAnalyticsWidgetGroup = ({
 				} else if (isTableWidget(widget)) {
 					return (
 						<Col key={idx} {...colConfig}>
-							<AnalyticsWidgetTableCard widget={widget} />
+							<AnalyticsWidgetTableCard widget={widget} showOptions={showOptions} />
 						</Col>
 					);
 				} else if (isLineChartWidget(widget)) {
