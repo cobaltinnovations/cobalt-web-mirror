@@ -46,7 +46,19 @@ export interface AdminAnalyticsTableWidget extends BaseAdminAnalyticsWidget {
 	widgetData: AdminAnalyticsWidgetTableData;
 }
 
-export type AdminAnalyticsWidget = AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget | AdminAnalyticsTableWidget;
+export interface AdminAnalyticsLineChartWidget extends BaseAdminAnalyticsWidget {
+	widgetTypeId: 'LINE_CHART';
+	widgetTotal: number;
+	widgetTotalDescription: string;
+	widgetChartLabel: string;
+	widgetData: AdminAnalyticsWidgetChartData[];
+}
+
+export type AdminAnalyticsWidget =
+	| AdminAnalyticsCounterWidget
+	| AdminAnalyticsChartWidget
+	| AdminAnalyticsTableWidget
+	| AdminAnalyticsLineChartWidget;
 
 export function isCounterWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsCounterWidget {
 	return widget.widgetTypeId === 'COUNTER';
@@ -58,6 +70,10 @@ export function isChartWidget(widget: AdminAnalyticsWidget): widget is AdminAnal
 
 export function isTableWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsTableWidget {
 	return widget.widgetTypeId === 'TABLE';
+}
+
+export function isLineChartWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsLineChartWidget {
+	return widget.widgetTypeId === 'LINE_CHART';
 }
 
 export interface AdminAnalyticsWidgetsRequestParams {

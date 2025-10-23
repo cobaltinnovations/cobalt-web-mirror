@@ -5,13 +5,35 @@ import Loader from '@/components/loader';
 import TabBar from '@/components/tab-bar';
 import { DATE_OPTION_KEYS, adminAnalyticsService } from '@/lib/services/admin-analytics-service';
 import { DateFormats } from '@/lib/utils';
-import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from 'chart.js';
+import {
+	ArcElement,
+	BarElement,
+	CategoryScale,
+	Chart as ChartJS,
+	Legend,
+	LinearScale,
+	LineElement,
+	PointElement,
+	TimeScale,
+	Tooltip,
+} from 'chart.js';
+import 'chartjs-adapter-moment';
 import React, { Suspense, useMemo } from 'react';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
 import { Outlet, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import useAccount from '@/hooks/use-account';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+ChartJS.register(
+	ArcElement,
+	Tooltip,
+	Legend,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	PointElement,
+	LineElement,
+	TimeScale
+);
 
 type AdminAnalyticsLayoutLoaderData = Awaited<ReturnType<typeof loader>>;
 
