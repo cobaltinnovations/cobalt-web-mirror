@@ -205,6 +205,8 @@ export const Component = () => {
 						widgets={widgets}
 						colConfig={{ xs: 12, className: 'mb-8' }}
 						showOptions={false}
+						showTableTotal={true}
+						showTableSubtitle={true}
 					/>
 				</AsyncWrapper>
 			</Container>

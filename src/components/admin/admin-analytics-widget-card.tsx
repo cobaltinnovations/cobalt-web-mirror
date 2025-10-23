@@ -72,9 +72,16 @@ export const AnalyticsWidgetCard = ({ widget, chart, showOptions = true }: Analy
 interface AnalyticsWidgetTableCardProps {
 	widget: AdminAnalyticsTableWidget;
 	showOptions?: boolean;
+	showTotal?: boolean;
+	showSubtitle?: boolean;
 }
 
-export const AnalyticsWidgetTableCard = ({ widget, showOptions = true }: AnalyticsWidgetTableCardProps) => {
+export const AnalyticsWidgetTableCard = ({
+	widget,
+	showOptions = true,
+	showTotal = false,
+	showSubtitle = false,
+}: AnalyticsWidgetTableCardProps) => {
 	const classes = useAnalyticsWidgetStyles();
 	const [expandedTableRows, setExpandedTableRows] = useState<Record<string, boolean>>({});
 	const hasExpandableRows = widget.widgetData.rows.some((row) => row.nestedRows?.length);
@@ -90,7 +97,21 @@ export const AnalyticsWidgetTableCard = ({ widget, showOptions = true }: Analyti
 		<Card bsPrefix="table-card">
 			<Card.Header>
 				<div className="d-flex align-items-center justify-content-between">
-					<p className="fs-large mb-0 text-n500">{widget.widgetTitle}</p>
+					<div>
+						<p className="fs-large mb-0 text-n500">{widget.widgetTitle}</p>
+						{showTotal && (
+							<>
+								{widget.widgetTotalDescription && (
+									<p className={classNames('my-4', classes.cardTotal)}>
+										{widget.widgetTotalDescription}
+									</p>
+								)}
+							</>
+						)}
+						{showSubtitle && (
+							<>{widget.widgetSubtitle && <p className="mb-0">{widget.widgetSubtitle}</p>}</>
+						)}
+					</div>
 
 					{showOptions && <AdminAnalyticsWidgetOptions widget={widget} />}
 				</div>

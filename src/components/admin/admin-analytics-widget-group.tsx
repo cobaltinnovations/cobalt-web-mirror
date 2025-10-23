@@ -15,12 +15,16 @@ interface AdminAnalyticsWidgetGroupProps extends RowProps {
 	widgets: AdminAnalyticsWidget[];
 	colConfig?: ColProps;
 	showOptions?: boolean;
+	showTableTotal?: boolean;
+	showTableSubtitle?: boolean;
 }
 
 export const AdminAnalyticsWidgetGroup = ({
 	widgets,
 	colConfig,
 	showOptions = true,
+	showTableTotal = false,
+	showTableSubtitle = false,
 	...rowProps
 }: AdminAnalyticsWidgetGroupProps) => {
 	return (
@@ -51,7 +55,12 @@ export const AdminAnalyticsWidgetGroup = ({
 				} else if (isTableWidget(widget)) {
 					return (
 						<Col key={idx} {...colConfig}>
-							<AnalyticsWidgetTableCard widget={widget} showOptions={showOptions} />
+							<AnalyticsWidgetTableCard
+								widget={widget}
+								showOptions={showOptions}
+								showTotal={showTableTotal}
+								showSubtitle={showTableSubtitle}
+							/>
 						</Col>
 					);
 				} else if (isLineChartWidget(widget)) {

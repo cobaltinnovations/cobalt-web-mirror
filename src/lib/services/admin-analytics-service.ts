@@ -44,6 +44,8 @@ export interface AdminAnalyticsChartWidget extends BaseAdminAnalyticsWidget {
 export interface AdminAnalyticsTableWidget extends BaseAdminAnalyticsWidget {
 	widgetTypeId: 'TABLE';
 	widgetData: AdminAnalyticsWidgetTableData;
+	widgetTotal?: number;
+	widgetTotalDescription?: string;
 }
 
 export interface AdminAnalyticsLineChartWidget extends BaseAdminAnalyticsWidget {
