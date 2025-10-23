@@ -93,6 +93,7 @@ export const Component = () => {
 				endDate,
 			})
 			.fetch();
+
 		setWidgets(response.widgets);
 	}, [analyticsReportGroupId, endDate, startDate]);
 

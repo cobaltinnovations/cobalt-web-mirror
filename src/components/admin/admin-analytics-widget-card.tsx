@@ -5,6 +5,7 @@ import {
 	AdminAnalyticsChartWidget,
 	AdminAnalyticsCounterWidget,
 	AdminAnalyticsLineChartWidget,
+	AdminAnalyticsMultiChartWidget,
 	AdminAnalyticsTableWidget,
 	AdminAnalyticsWidget,
 } from '@/lib/services/admin-analytics-service';
@@ -42,7 +43,11 @@ const useAnalyticsWidgetStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface AnalyticsWidgetCardProps {
-	widget: AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget | AdminAnalyticsLineChartWidget;
+	widget:
+		| AdminAnalyticsCounterWidget
+		| AdminAnalyticsChartWidget
+		| AdminAnalyticsLineChartWidget
+		| AdminAnalyticsMultiChartWidget;
 	chart?: ReactNode;
 	showOptions?: boolean;
 }

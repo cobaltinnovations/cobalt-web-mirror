@@ -56,11 +56,29 @@ export interface AdminAnalyticsLineChartWidget extends BaseAdminAnalyticsWidget 
 	widgetData: AdminAnalyticsWidgetChartData[];
 }
 
+export interface AdminAnalyticsMultiChartWidget extends BaseAdminAnalyticsWidget {
+	widgetTypeId: 'MULTI_CHART';
+	widgetTotal: number;
+	widgetTotalDescription: string;
+	widgetChartLabel: string;
+	widgetData: {
+		labels: string[];
+		datasets: {
+			type: 'line' | 'bar' | 'pie';
+			label: string;
+			data: number[];
+			backgroundColor: string[];
+			borderColor: string[];
+		}[];
+	};
+}
+
 export type AdminAnalyticsWidget =
 	| AdminAnalyticsCounterWidget
 	| AdminAnalyticsChartWidget
 	| AdminAnalyticsTableWidget
-	| AdminAnalyticsLineChartWidget;
+	| AdminAnalyticsLineChartWidget
+	| AdminAnalyticsMultiChartWidget;
 
 export function isCounterWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsCounterWidget {
 	return widget.widgetTypeId === 'COUNTER';
@@ -76,6 +94,10 @@ export function isTableWidget(widget: AdminAnalyticsWidget): widget is AdminAnal
 
 export function isLineChartWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsLineChartWidget {
 	return widget.widgetTypeId === 'LINE_CHART';
+}
+
+export function isMultiChartWidget(widget: AdminAnalyticsWidget): widget is AdminAnalyticsMultiChartWidget {
+	return widget.widgetTypeId === 'MULTI_CHART';
 }
 
 export interface AdminAnalyticsWidgetsRequestParams {

@@ -3,6 +3,7 @@ import {
 	isChartWidget,
 	isCounterWidget,
 	isLineChartWidget,
+	isMultiChartWidget,
 	isTableWidget,
 } from '@/lib/services/admin-analytics-service';
 
@@ -89,6 +90,16 @@ export const AdminAnalyticsWidgetGroup = ({
 										}
 									/>
 								}
+								showOptions={showOptions}
+							/>
+						</Col>
+					);
+				} else if (isMultiChartWidget(widget)) {
+					return (
+						<Col key={idx} {...colConfig}>
+							<AnalyticsWidgetCard
+								widget={widget}
+								chart={<Chart.Multi data={widget.widgetData} />}
 								showOptions={showOptions}
 							/>
 						</Col>
