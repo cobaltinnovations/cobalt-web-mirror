@@ -119,18 +119,19 @@ export const Component = () => {
 									});
 
 									if (!desiredOption) {
-										setSearchParams({
-											startDate: moment().format(DateFormats.API.Date),
-											endDate: moment().add(1, 'day').format(DateFormats.API.Date),
-										});
+										searchParams.set('startDate', moment().format(DateFormats.API.Date));
+										searchParams.set(
+											'endDate',
+											moment().add(1, 'day').format(DateFormats.API.Date)
+										);
+										setSearchParams(searchParams);
 
 										return;
 									}
 
-									setSearchParams({
-										startDate: desiredOption.startDate,
-										endDate: desiredOption.endDate,
-									});
+									searchParams.set('startDate', desiredOption.startDate);
+									searchParams.set('endDate', desiredOption.endDate);
+									setSearchParams(searchParams);
 								}}
 							>
 								{Object.values(dateOptions).map((dateOption) => {
