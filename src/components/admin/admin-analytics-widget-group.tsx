@@ -3,31 +3,43 @@ import {
 	isChartWidget,
 	isCounterWidget,
 	isLineChartWidget,
+	isMultiChartWidget,
 	isTableWidget,
 } from '@/lib/services/admin-analytics-service';
 
 import React from 'react';
-import { Col, Row, RowProps } from 'react-bootstrap';
+import { Col, ColProps, Row, RowProps } from 'react-bootstrap';
 import { Chart } from '../chart';
 import { AnalyticsWidgetCard, AnalyticsWidgetTableCard } from './admin-analytics-widget-card';
 
 interface AdminAnalyticsWidgetGroupProps extends RowProps {
 	widgets: AdminAnalyticsWidget[];
+	colConfig?: ColProps;
+	showOptions?: boolean;
+	showTableTotal?: boolean;
+	showTableSubtitle?: boolean;
 }
 
-export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyticsWidgetGroupProps) => {
+export const AdminAnalyticsWidgetGroup = ({
+	widgets,
+	colConfig,
+	showOptions = true,
+	showTableTotal = false,
+	showTableSubtitle = false,
+	...rowProps
+}: AdminAnalyticsWidgetGroupProps) => {
 	return (
 		<Row {...rowProps}>
 			{widgets.map((widget, idx) => {
 				if (isCounterWidget(widget)) {
 					return (
-						<Col key={idx} xs={12} sm={6}>
-							<AnalyticsWidgetCard widget={widget} />
+						<Col key={idx} {...(colConfig ? colConfig : { xs: 12, sm: 6 })}>
+							<AnalyticsWidgetCard widget={widget} showOptions={showOptions} />
 						</Col>
 					);
 				} else if (isChartWidget(widget)) {
 					return (
-						<Col key={idx} xs={12} sm={6} md={4}>
+						<Col key={idx} {...colConfig} {...(colConfig ? colConfig : { xs: 12, md: 4, sm: 6 })}>
 							<AnalyticsWidgetCard
 								widget={widget}
 								chart={
@@ -37,18 +49,24 @@ export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyti
 										<Chart.Bar label={widget.widgetChartLabel} data={widget.widgetData} />
 									) : null
 								}
+								showOptions={showOptions}
 							/>
 						</Col>
 					);
 				} else if (isTableWidget(widget)) {
 					return (
-						<Col key={idx}>
-							<AnalyticsWidgetTableCard widget={widget} />
+						<Col key={idx} {...colConfig}>
+							<AnalyticsWidgetTableCard
+								widget={widget}
+								showOptions={showOptions}
+								showTotal={showTableTotal}
+								showSubtitle={showTableSubtitle}
+							/>
 						</Col>
 					);
 				} else if (isLineChartWidget(widget)) {
 					return (
-						<Col key={idx}>
+						<Col key={idx} {...colConfig}>
 							<AnalyticsWidgetCard
 								widget={widget}
 								chart={
@@ -62,7 +80,8 @@ export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyti
 															x: {
 																type: 'time',
 																time: {
-																	unit: 'month',
+																	unit:
+																		widget.widgetData.length > 31 ? 'month' : 'day',
 																},
 															},
 														},
@@ -71,6 +90,17 @@ export const AdminAnalyticsWidgetGroup = ({ widgets, ...rowProps }: AdminAnalyti
 										}
 									/>
 								}
+								showOptions={showOptions}
+							/>
+						</Col>
+					);
+				} else if (isMultiChartWidget(widget)) {
+					return (
+						<Col key={idx} {...colConfig}>
+							<AnalyticsWidgetCard
+								widget={widget}
+								chart={<Chart.Multi data={widget.widgetData} />}
+								showOptions={showOptions}
 							/>
 						</Col>
 					);

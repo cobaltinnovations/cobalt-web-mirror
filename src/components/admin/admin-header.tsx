@@ -214,7 +214,7 @@ export const AdminHeader = () => {
 							testId: '',
 							navigationItemId: 'ANALYTICS',
 							to: '/admin/x-ray',
-							title: 'X-Ray',
+							title: 'Analytics',
 							active: !!xRayMatch,
 						},
 				  ]

@@ -1,5 +1,5 @@
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
-import { AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-service';
+import { AdminAnalyticsMultiChartWidget, AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-service';
 import {
 	ChartDataset,
 	ChartTypeRegistry,
@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import Color from 'color';
 import React, { useMemo } from 'react';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import { Chart as CJS2, Bar, Pie, Line } from 'react-chartjs-2';
 import { Table, TableBody, TableCell, TableHead, TableRow } from './table';
 import { _DeepPartialObject, DeepPartial } from 'chart.js/dist/types/utils';
 
@@ -208,8 +208,13 @@ const LineChart = ({ label, data, options }: ChartProps<'line'>) => {
 	return <Line data={chartData} options={options} />;
 };
 
+const MultiChart = ({ data }: { data: AdminAnalyticsMultiChartWidget['widgetData'] }) => {
+	return <CJS2 type="line" data={data} />;
+};
+
 export const Chart = {
 	Bar: BarChart,
 	Pie: PieChart,
 	Line: LineChart,
+	Multi: MultiChart,
 } as const;

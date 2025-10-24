@@ -5,6 +5,7 @@ import {
 	AdminAnalyticsChartWidget,
 	AdminAnalyticsCounterWidget,
 	AdminAnalyticsLineChartWidget,
+	AdminAnalyticsMultiChartWidget,
 	AdminAnalyticsTableWidget,
 	AdminAnalyticsWidget,
 } from '@/lib/services/admin-analytics-service';
@@ -42,11 +43,16 @@ const useAnalyticsWidgetStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface AnalyticsWidgetCardProps {
-	widget: AdminAnalyticsCounterWidget | AdminAnalyticsChartWidget | AdminAnalyticsLineChartWidget;
+	widget:
+		| AdminAnalyticsCounterWidget
+		| AdminAnalyticsChartWidget
+		| AdminAnalyticsLineChartWidget
+		| AdminAnalyticsMultiChartWidget;
 	chart?: ReactNode;
+	showOptions?: boolean;
 }
 
-export const AnalyticsWidgetCard = ({ widget, chart }: AnalyticsWidgetCardProps) => {
+export const AnalyticsWidgetCard = ({ widget, chart, showOptions = true }: AnalyticsWidgetCardProps) => {
 	const classes = useAnalyticsWidgetStyles();
 
 	return (
@@ -59,7 +65,7 @@ export const AnalyticsWidgetCard = ({ widget, chart }: AnalyticsWidgetCardProps)
 						{widget.widgetSubtitle && <p className="mb-0">{widget.widgetSubtitle}</p>}
 					</div>
 
-					<AdminAnalyticsWidgetOptions widget={widget} />
+					{showOptions && <AdminAnalyticsWidgetOptions widget={widget} />}
 				</div>
 			</Card.Header>
 
@@ -70,9 +76,17 @@ export const AnalyticsWidgetCard = ({ widget, chart }: AnalyticsWidgetCardProps)
 
 interface AnalyticsWidgetTableCardProps {
 	widget: AdminAnalyticsTableWidget;
+	showOptions?: boolean;
+	showTotal?: boolean;
+	showSubtitle?: boolean;
 }
 
-export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardProps) => {
+export const AnalyticsWidgetTableCard = ({
+	widget,
+	showOptions = true,
+	showTotal = false,
+	showSubtitle = false,
+}: AnalyticsWidgetTableCardProps) => {
 	const classes = useAnalyticsWidgetStyles();
 	const [expandedTableRows, setExpandedTableRows] = useState<Record<string, boolean>>({});
 	const hasExpandableRows = widget.widgetData.rows.some((row) => row.nestedRows?.length);
@@ -88,9 +102,23 @@ export const AnalyticsWidgetTableCard = ({ widget }: AnalyticsWidgetTableCardPro
 		<Card bsPrefix="table-card">
 			<Card.Header>
 				<div className="d-flex align-items-center justify-content-between">
-					<p className="fs-large mb-0 text-n500">{widget.widgetTitle}</p>
+					<div>
+						<p className="fs-large mb-0 text-n500">{widget.widgetTitle}</p>
+						{showTotal && (
+							<>
+								{widget.widgetTotalDescription && (
+									<p className={classNames('my-4', classes.cardTotal)}>
+										{widget.widgetTotalDescription}
+									</p>
+								)}
+							</>
+						)}
+						{showSubtitle && (
+							<>{widget.widgetSubtitle && <p className="mb-0">{widget.widgetSubtitle}</p>}</>
+						)}
+					</div>
 
-					<AdminAnalyticsWidgetOptions widget={widget} />
+					{showOptions && <AdminAnalyticsWidgetOptions widget={widget} />}
 				</div>
 			</Card.Header>
 
