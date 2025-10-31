@@ -5,6 +5,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
+import { PageDetailModel } from '@/lib/models';
 
 export const HERO_SECTION_ID = 'HERO';
 
@@ -33,16 +34,12 @@ export const SectionHeroSettingsForm = () => {
 		});
 	}, [page]);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
+	const debouncedSubmission = useDebouncedAsyncFunction(async (p: PageDetailModel, fv: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
-			if (!page) {
-				throw new Error('page is undefined');
-			}
-
 			const response = await pagesService
-				.updatePageHero(page.pageId, {
+				.updatePageHero(p.pageId, {
 					headline: fv.headline,
 					description: fv.description,
 					imageFileUploadId: fv.imageFileUploadId,
@@ -66,11 +63,14 @@ export const SectionHeroSettingsForm = () => {
 					[currentTarget.name]: currentTarget.value,
 				};
 
-				debouncedSubmission(newValue);
+				if (page) {
+					debouncedSubmission(page, newValue);
+				}
+
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[debouncedSubmission, page]
 	);
 
 	const handleUploadComplete = useCallback(

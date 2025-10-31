@@ -58,6 +58,12 @@ export const pagesService = {
 			url: buildQueryParamUrl('/pages', searchParameters),
 		});
 	},
+	getPageEditId(pageId: string) {
+		return httpSingleton.orchestrateRequest<{ pageId: string }>({
+			method: 'POST',
+			url: `/pages/${pageId}/edit`,
+		});
+	},
 	getPage(pageId: string) {
 		return httpSingleton.orchestrateRequest<{ page: PageDetailModel }>({
 			method: 'GET',

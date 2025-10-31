@@ -50,29 +50,31 @@ export const RowSettingsThreeColumns = () => {
 		});
 	}, [threeColumnImageRow]);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
-		setIsSaving(true);
+	const debouncedSubmission = useDebouncedAsyncFunction(
+		async (tcir: ThreeColumnImageRowModel, fv: typeof formValues) => {
+			setIsSaving(true);
 
-		try {
-			if (!currentPageRow) {
-				throw new Error('currentPageRow is undefined.');
+			try {
+				if (!tcir) {
+					throw new Error('currentPageRow is undefined.');
+				}
+
+				const response = await pagesService
+					.updateThreeColumnRow(tcir.pageRowId, {
+						columnOne: fv.columnOne,
+						columnTwo: fv.columnTwo,
+						columnThree: fv.columnThree,
+					})
+					.fetch();
+
+				updatePageRow(response.pageRow);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSaving(false);
 			}
-
-			const response = await pagesService
-				.updateThreeColumnRow(currentPageRow.pageRowId, {
-					columnOne: fv.columnOne,
-					columnTwo: fv.columnTwo,
-					columnThree: fv.columnThree,
-				})
-				.fetch();
-
-			updatePageRow(response.pageRow);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
 		}
-	});
+	);
 
 	const handleInputChange = useCallback(
 		(
@@ -88,11 +90,14 @@ export const RowSettingsThreeColumns = () => {
 					},
 				};
 
-				debouncedSubmission(newValue);
+				if (threeColumnImageRow) {
+					debouncedSubmission(threeColumnImageRow, newValue);
+				}
+
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[debouncedSubmission, threeColumnImageRow]
 	);
 
 	const handleQuillChange = useCallback(
@@ -106,11 +111,13 @@ export const RowSettingsThreeColumns = () => {
 					},
 				};
 
-				debouncedSubmission(newValue);
+				if (threeColumnImageRow) {
+					debouncedSubmission(threeColumnImageRow, newValue);
+				}
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[debouncedSubmission, threeColumnImageRow]
 	);
 
 	const handleUploadComplete = useCallback(

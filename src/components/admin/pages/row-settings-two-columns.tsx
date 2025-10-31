@@ -42,28 +42,26 @@ export const RowSettingsTwoColumns = () => {
 		});
 	}, [twoColumnImageRow]);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
-		setIsSaving(true);
+	const debouncedSubmission = useDebouncedAsyncFunction(
+		async (tcir: TwoColumnImageRowModel, fv: typeof formValues) => {
+			setIsSaving(true);
 
-		try {
-			if (!currentPageRow) {
-				throw new Error('currentPageRow is undefined.');
+			try {
+				const response = await pagesService
+					.updateTwoColumnRow(tcir.pageRowId, {
+						columnOne: fv.columnOne,
+						columnTwo: fv.columnTwo,
+					})
+					.fetch();
+
+				updatePageRow(response.pageRow);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSaving(false);
 			}
-
-			const response = await pagesService
-				.updateTwoColumnRow(currentPageRow.pageRowId, {
-					columnOne: fv.columnOne,
-					columnTwo: fv.columnTwo,
-				})
-				.fetch();
-
-			updatePageRow(response.pageRow);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
 		}
-	});
+	);
 
 	const handleInputChange = useCallback(
 		(
@@ -79,11 +77,14 @@ export const RowSettingsTwoColumns = () => {
 					},
 				};
 
-				debouncedSubmission(newValue);
+				if (twoColumnImageRow) {
+					debouncedSubmission(twoColumnImageRow, newValue);
+				}
+
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[debouncedSubmission, twoColumnImageRow]
 	);
 
 	const handleQuillChange = useCallback(
@@ -97,11 +98,13 @@ export const RowSettingsTwoColumns = () => {
 					},
 				};
 
-				debouncedSubmission(newValue);
+				if (twoColumnImageRow) {
+					debouncedSubmission(twoColumnImageRow, newValue);
+				}
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[debouncedSubmission, twoColumnImageRow]
 	);
 
 	const handleUploadComplete = useCallback(

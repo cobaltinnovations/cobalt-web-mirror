@@ -7,6 +7,7 @@ import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import InputHelper from '@/components/input-helper';
 import { EditUrlModal } from '@/components/admin/pages';
 import SvgIcon from '@/components/svg-icon';
+import { PageDetailModel } from '@/lib/models';
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
@@ -28,16 +29,12 @@ export const SettingsTab = () => {
 		});
 	}, [page]);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
+	const debouncedSubmission = useDebouncedAsyncFunction(async (p: PageDetailModel, fv: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
-			if (!page) {
-				throw new Error('page is undefined');
-			}
-
 			const response = await pagesService
-				.updatePageSettings(page.pageId, {
+				.updatePageSettings(p.pageId, {
 					name: fv.pageName,
 					urlName: fv.friendlyUrl,
 				})
@@ -59,11 +56,14 @@ export const SettingsTab = () => {
 					[currentTarget.name]: currentTarget.value,
 				};
 
-				debouncedSubmission(newValue);
+				if (page) {
+					debouncedSubmission(page, newValue);
+				}
+
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[debouncedSubmission, page]
 	);
 
 	return (

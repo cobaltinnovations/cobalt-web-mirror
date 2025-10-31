@@ -15,6 +15,7 @@ import {
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
 	PageRowUnionModel,
+	PageSectionDetailModel,
 	ResourcesRowModel,
 	TagGroupRowModel,
 	TagRowModel,
@@ -102,21 +103,17 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 		return '';
 	};
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (fv: typeof formValues) => {
+	const debouncedSubmission = useDebouncedAsyncFunction(async (ps: PageSectionDetailModel, fv: typeof formValues) => {
 		setIsSaving(true);
 
 		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined');
-			}
-
 			const response = await pagesService
-				.updatePageSection(currentPageSection.pageSectionId, {
-					name: currentPageSection.name,
+				.updatePageSection(ps.pageSectionId, {
+					name: ps.name,
 					headline: fv.headline,
 					description: fv.description,
 					backgroundColorId: fv.backgroundColor,
-					displayOrder: currentPageSection.displayOrder,
+					displayOrder: ps.displayOrder,
 				})
 				.fetch();
 
@@ -168,11 +165,14 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					[currentTarget.name]: currentTarget.value,
 				};
 
-				debouncedSubmission(newValue);
+				if (currentPageSection) {
+					debouncedSubmission(currentPageSection, newValue);
+				}
+
 				return newValue;
 			});
 		},
-		[debouncedSubmission]
+		[currentPageSection, debouncedSubmission]
 	);
 
 	return (

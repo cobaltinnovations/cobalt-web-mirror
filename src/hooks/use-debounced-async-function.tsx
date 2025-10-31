@@ -1,17 +1,13 @@
-import { debounce } from 'lodash';
+import { debounce, type DebouncedFunc } from 'lodash';
 import { useRef } from 'react';
 
-function useDebouncedAsyncFunction(
-	asyncFunction: (...args: any[]) => Promise<void>,
+function useDebouncedAsyncFunction<TArgs extends unknown[], TResult>(
+	asyncFunction: (...args: TArgs) => Promise<TResult>,
 	wait = 500
-): (...args: any[]) => void {
-	const debouncedFunction = useRef(
-		debounce(async (...args: any[]) => {
-			try {
-				await asyncFunction(...args);
-			} catch (error) {
-				throw error;
-			}
+): DebouncedFunc<(...args: TArgs) => Promise<TResult>> {
+	const debouncedFunction = useRef<DebouncedFunc<(...args: TArgs) => Promise<TResult>>>(
+		debounce(async (...args: TArgs) => {
+			return asyncFunction(...args);
 		}, wait)
 	);
 
