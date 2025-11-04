@@ -6,7 +6,7 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { AddPageModal, PageActionsDropdown } from '@/components/admin/pages';
+import { AddPageModal, MailingListActionsDropdown, PageActionsDropdown } from '@/components/admin/pages';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import SvgIcon from '@/components/svg-icon';
@@ -124,6 +124,19 @@ export const Component = () => {
 		setSearchParams(searchParams);
 	};
 
+	const handleMailingListCopy = async (page: PageDetailModel) => {
+		try {
+			const response = await pagesService.getMailingListForPageById(page.pageId).fetch();
+			console.log(response);
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleMailingListDownload = async (page: PageDetailModel) => {
+		console.log('Download mailing lists for page by id:', page.pageId);
+	};
+
 	return (
 		<>
 			<AddPageModal
@@ -204,6 +217,9 @@ export const Component = () => {
 									<TableCell header>Created</TableCell>
 									<TableCell header>Modified</TableCell>
 									<TableCell header>Published</TableCell>
+									<TableCell header className="text-right">
+										Subscribers
+									</TableCell>
 									<TableCell header />
 								</TableRow>
 							</TableHead>
@@ -248,7 +264,17 @@ export const Component = () => {
 											<TableCell className="text-nowrap">
 												{page.publishedDateDescription}
 											</TableCell>
-											<TableCell className="text-right">
+											<TableCell className="text-nowrap text-right">
+												{page.mailingListEntryCountDescription}
+											</TableCell>
+											<TableCell className="align-items-center justify-content-end flex-row">
+												{!!(page.mailingListEntryCount && page.mailingListEntryCount > 0) && (
+													<MailingListActionsDropdown
+														page={page}
+														onCopy={handleMailingListCopy}
+														onDownload={handleMailingListDownload}
+													/>
+												)}
 												<PageActionsDropdown
 													page={page}
 													onDuplicate={() => {

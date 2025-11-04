@@ -3,6 +3,7 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
 	GroupSessionsRowModel,
+	MailingListRowModel,
 	OneColumnImageRowModel,
 	PAGE_STATUS_ID,
 	PageDetailModel,
@@ -350,6 +351,24 @@ export const pagesService = {
 			data,
 		});
 	},
+	createMailingListRow(pageSectionId: string, data: { pageSectionId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: MailingListRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/mailing-list`,
+			data,
+		});
+	},
+	updateMailingListRow(pageRowId: string, data: { pageRowId: string; mailingListId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: MailingListRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/mailing-list`,
+			data,
+		});
+	},
 	deletePageRow(pageRowId: string) {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'DELETE',
@@ -420,6 +439,12 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<{ pageSiteLocations: PageSiteLocationModel[] }>({
 			method: 'GET',
 			url: `/page-site-locations/${siteLocationId}`,
+		});
+	},
+	getMailingListForPageById(pageId: string) {
+		return httpSingleton.orchestrateRequest<{ mailingLists: void }>({
+			method: 'GET',
+			url: `/pages/${pageId}/mailing-lists`,
 		});
 	},
 };

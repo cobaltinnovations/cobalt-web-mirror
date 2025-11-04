@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import {
 	CollapseButton,
 	CustomRowButton,
+	PremadeComponentRowButton,
 	SelectGroupSessionsModal,
 	SelectResourcesModal,
 	SelectTagModal,
@@ -10,6 +11,8 @@ import {
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
+
+import subscribeImg from '@/assets/images/subscribe.png';
 
 export const RowSelectionForm = () => {
 	const handleError = useHandleError();
@@ -132,6 +135,29 @@ export const RowSelectionForm = () => {
 		}
 	};
 
+	const handleMailingListButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createMailingListRow(currentPageSection.pageSectionId, {
+					pageSectionId: currentPageSection.pageSectionId,
+				})
+				.fetch();
+
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	return (
 		<>
 			<SelectResourcesModal
@@ -195,7 +221,7 @@ export const RowSelectionForm = () => {
 			<hr />
 			<CollapseButton title="Custom Row" initialShow>
 				<p className="mb-4">Custom rows are blank layouts. You will need to add your own images and text.</p>
-				<div>
+				<div className="pb-6">
 					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnButtonClick} />
 					<CustomRowButton
 						className="mb-4"
@@ -205,6 +231,12 @@ export const RowSelectionForm = () => {
 					/>
 					<CustomRowButton cols={3} title="Select Layout" onClick={handleThreeColumnButtonClick} />
 				</div>
+			</CollapseButton>
+			<hr />
+			<CollapseButton title="Subscribe" initialShow>
+				<PremadeComponentRowButton title="Select Layout" onClick={handleMailingListButtonClick}>
+					<img src={subscribeImg} alt="Subscribe" />
+				</PremadeComponentRowButton>
 			</CollapseButton>
 		</>
 	);

@@ -8,12 +8,14 @@ import {
 	BACKGROUND_COLOR_ID,
 	GroupSessionsRowModel,
 	isGroupSessionsRow,
+	isMailingListRow,
 	isOneColumnImageRow,
 	isResourcesRow,
 	isTagGroupRow,
 	isTagRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
+	MailingListRowModel,
 	PageRowUnionModel,
 	PageSectionDetailModel,
 	ResourcesRowModel,
@@ -64,6 +66,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					isOneColumnImageRow(row) || isTwoColumnImageRow(row) || isThreeColumnImageRow(row),
 				title: 'Custom Row',
 			},
+			{ check: isMailingListRow, title: 'Subscribe' },
 		];
 
 		for (const { check, title } of rowTypeMap) {
@@ -92,6 +95,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
+			{ check: isMailingListRow, getSubtitle: (row: MailingListRowModel) => row.mailingListId },
 		];
 
 		for (const { check, getSubtitle } of rowTypeMap) {
