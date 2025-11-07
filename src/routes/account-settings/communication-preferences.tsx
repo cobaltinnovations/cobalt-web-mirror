@@ -21,33 +21,10 @@ export const Component = () => {
 					<Card.Title>Email Notifications</Card.Title>
 				</Card.Header>
 				<Card.Body>
-					<h5 className="mb-4">Communication from Cobalt</h5>
-					<div className="mb-6">
-						<Form.Check
-							type="checkbox"
-							name="platformAnnouncments"
-							id="platform-announcments"
-							value="PLATFORM_ANNOUNCEMENTS"
-							label="Occasional platform announcements"
-							checked={false}
-							onChange={() => {
-								return;
-							}}
-						/>
-						<Form.Check
-							type="checkbox"
-							name="surveys"
-							id="surveys"
-							value="SURVEYS"
-							label="Surveys and invitations to help us improve Cobalt content and your experience"
-							checked={false}
-							onChange={() => {
-								return;
-							}}
-						/>
-					</div>
-					<hr className="mb-6" />
-					<h5 className="mb-4">Page Updates</h5>
+					<h5 className="mb-4">Page Subscriptions</h5>
+					<p className="mb-0">
+						To stop receiving emails from pages you follow, click Unsubscribe at the bottom of any email.
+					</p>
 				</Card.Body>
 			</Card>
 		</>

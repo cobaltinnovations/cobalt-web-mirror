@@ -13,11 +13,13 @@ import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 import subscribeImg from '@/assets/images/subscribe.png';
+import { ROW_TYPE_ID } from '@/lib/models';
+import InlineAlert from '@/components/inline-alert';
 
 export const RowSelectionForm = () => {
 	const handleError = useHandleError();
 
-	const { currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
+	const { page, currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
 		usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
@@ -158,6 +160,9 @@ export const RowSelectionForm = () => {
 		}
 	};
 
+	const pageContainsSubscribeRow =
+		page?.pageSections.some((ps) => ps.pageRows.some((pr) => pr.rowTypeId === ROW_TYPE_ID.MAILING_LIST)) ?? false;
+
 	return (
 		<>
 			<SelectResourcesModal
@@ -233,10 +238,14 @@ export const RowSelectionForm = () => {
 				</div>
 			</CollapseButton>
 			<hr />
-			<CollapseButton title="Subscribe" initialShow>
-				<PremadeComponentRowButton title="Select Layout" onClick={handleMailingListButtonClick}>
-					<img src={subscribeImg} alt="Subscribe" />
-				</PremadeComponentRowButton>
+			<CollapseButton title="Subscribe (maximum 1 per page)" initialShow>
+				{pageContainsSubscribeRow ? (
+					<InlineAlert title="Maximum reached" description="You can only add one subscribe row to a page." />
+				) : (
+					<PremadeComponentRowButton title="Select Layout" onClick={handleMailingListButtonClick}>
+						<img src={subscribeImg} alt="Subscribe" />
+					</PremadeComponentRowButton>
+				)}
 			</CollapseButton>
 		</>
 	);

@@ -7,3 +7,5 @@ export enum MailingListEntryStatusId {
 	ACTIVE = 'ACTIVE',
 	INACTIVE = 'INACTIVE',
 }
+
+export interface MailingListModel {}
