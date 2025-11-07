@@ -4,8 +4,21 @@ export enum MailingListEntryTypeId {
 }
 
 export enum MailingListEntryStatusId {
-	ACTIVE = 'ACTIVE',
-	INACTIVE = 'INACTIVE',
+	SUBSCRIBED = 'SUBSCRIBED',
+	UNSUBSCRIBED = 'UNSUBSCRIBED',
 }
 
 export interface MailingListModel {}
+
+export interface MailingListEntryModel {
+	mailingListEntryId: string;
+	mailingListEntryTypeId: MailingListEntryTypeId;
+	mailingListId: string;
+	accountId: string;
+	createdByAccountId: string;
+	value: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+}

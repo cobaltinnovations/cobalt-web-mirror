@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { MailingListEntryTypeId, MailingListModel } from '@/lib/models';
+import { MailingListEntryModel, MailingListEntryTypeId, MailingListModel, PageDetailModel } from '@/lib/models';
 
 export const mailingListsService = {
 	addEntry(data: { mailingListId: string; mailingListEntryTypeId: MailingListEntryTypeId; value: string }) {
@@ -9,6 +9,15 @@ export const mailingListsService = {
 			method: 'POST',
 			url: `/mailing-list-entries`,
 			data,
+		});
+	},
+	getEntries(mailingListEntryId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pages: PageDetailModel[];
+			mailinglistEntry: MailingListEntryModel;
+		}>({
+			method: 'GET',
+			url: `/mailing-list-entries/${mailingListEntryId}`,
 		});
 	},
 };

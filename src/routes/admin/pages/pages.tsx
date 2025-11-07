@@ -277,6 +277,9 @@ export const Component = () => {
 												)}
 												<PageActionsDropdown
 													page={page}
+													onEdit={({ pageId }) => {
+														handlePageButtonClick(pageId);
+													}}
 													onDuplicate={() => {
 														setSelectedPage(page);
 														setShowAddPageModal(true);

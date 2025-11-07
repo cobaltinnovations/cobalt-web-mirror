@@ -396,6 +396,10 @@ export const routes: RouteObject[] = [
 							hideFooter: true,
 						} as RouteHandle,
 					},
+					{
+						path: 'mailing-list-entries/:mailingListEntryId/unsubscribe',
+						lazy: () => import('@/routes/unsubscribe'),
+					},
 				],
 			},
 

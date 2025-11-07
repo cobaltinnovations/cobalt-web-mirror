@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 
 import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
@@ -8,14 +7,13 @@ import SvgIcon from '@/components/svg-icon';
 
 interface PageActionsDropdownProps {
 	page: PageDetailModel;
+	onEdit(page: PageDetailModel): void;
 	onDuplicate(page: PageDetailModel): void;
 	onDelete(page: PageDetailModel): void;
 	onUnpublish(page: PageDetailModel): void;
 }
 
-export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }: PageActionsDropdownProps) => {
-	const navigate = useNavigate();
-
+export const PageActionsDropdown = ({ page, onEdit, onDuplicate, onDelete, onUnpublish }: PageActionsDropdownProps) => {
 	return (
 		<Dropdown>
 			<Dropdown.Toggle as={DropdownToggle} id={`dropdown--${page.pageId}`} className="p-2 border-0">
@@ -25,7 +23,7 @@ export const PageActionsDropdown = ({ page, onDuplicate, onDelete, onUnpublish }
 				<Dropdown.Item
 					className="d-flex align-items-center"
 					onClick={() => {
-						navigate(`/admin/pages/${page.pageId}`);
+						onEdit(page);
 					}}
 				>
 					<SvgIcon kit="far" icon="pen" size={16} className="me-2 text-n500" />
