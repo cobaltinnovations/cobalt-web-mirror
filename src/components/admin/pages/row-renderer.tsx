@@ -596,7 +596,8 @@ const MailingListRowRenderer = ({
 
 		try {
 			await mailingListsService
-				.addEntry(pageRow.mailingListId, {
+				.addEntry({
+					mailingListId: pageRow.mailingListId,
 					mailingListEntryTypeId: MailingListEntryTypeId.EMAIL_ADDRESS,
 					value: inputValue,
 				})
@@ -615,19 +616,22 @@ const MailingListRowRenderer = ({
 			<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
 				{hasSubmitted ? (
 					<>
-						<h1 className="mb-2 text-center">Thank You for Subscribing</h1>
-						<p className="mb-4 text-center">Updates for this page will be sent to {inputValue}.</p>
+						<h1 className="mb-6 text-center">You're subscribed!</h1>
+						<p className="mb-0 text-center">
+							You can update your page subscriptions in your{' '}
+							<Link to="/account-settings">account settings</Link>.
+						</p>
 					</>
 				) : (
 					<>
-						<h1 className="mb-2 text-center">Subscribe</h1>
-						<p className="mb-4 text-center">Subscribe to receive updates from this page.</p>
+						<h2 className="mb-6 text-center">{pageRow.title}</h2>
+						<p className="mb-8 text-center">{pageRow.description}</p>
 						<Form onSubmit={handleFormSubmit}>
 							<fieldset disabled={isLoading || !enableAnalytics}>
 								<InputHelper
 									className="mb-4"
 									type="email"
-									label="Email"
+									label="Email address"
 									value={inputValue}
 									onChange={({ currentTarget }) => {
 										setInputValue(currentTarget.value);

@@ -16,6 +16,7 @@ import {
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
 	MailingListRowModel,
+	OneColumnImageRowModel,
 	PageRowUnionModel,
 	PageSectionDetailModel,
 	ResourcesRowModel,
@@ -57,21 +58,26 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 
 	const getTitleForPageRow = (pageRow: PageRowUnionModel) => {
 		const rowTypeMap = [
-			{ check: isResourcesRow, title: 'Resources' },
-			{ check: isGroupSessionsRow, title: 'Group Sessions' },
-			{ check: isTagGroupRow, title: 'Tag Group' },
-			{ check: isTagRow, title: 'Tag' },
+			{ check: isResourcesRow, title: () => 'Resources' },
+			{ check: isGroupSessionsRow, title: () => 'Group Sessions' },
+			{ check: isTagGroupRow, title: () => 'Tag Group' },
+			{ check: isTagRow, title: () => 'Tag' },
 			{
 				check: (row: PageRowUnionModel) =>
 					isOneColumnImageRow(row) || isTwoColumnImageRow(row) || isThreeColumnImageRow(row),
-				title: 'Custom Row',
+				title: (row: OneColumnImageRowModel) => row.columnOne.headline ?? 'Custom Row',
 			},
-			{ check: isMailingListRow, title: 'Subscribe' },
+			{
+				check: isMailingListRow,
+				title: (row: MailingListRowModel) => {
+					return row.title ?? 'Subscribe';
+				},
+			},
 		];
 
 		for (const { check, title } of rowTypeMap) {
 			if (check(pageRow)) {
-				return title;
+				return title(pageRow as any);
 			}
 		}
 
@@ -95,7 +101,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
-			{ check: isMailingListRow, getSubtitle: (row: MailingListRowModel) => row.mailingListId },
+			{ check: isMailingListRow, getSubtitle: () => 'Subscribe' },
 		];
 
 		for (const { check, getSubtitle } of rowTypeMap) {

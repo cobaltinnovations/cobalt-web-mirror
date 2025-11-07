@@ -170,11 +170,13 @@ interface ColumnImageModel {
 }
 
 export interface MailingListRowModel {
+	description: string;
+	displayOrder: number;
+	mailingListId: string;
 	pageRowId: string;
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
-	mailingListId: string;
+	title: string;
 }
 
 export const isResourcesRow = (x: PageRowUnionModel): x is ResourcesRowModel => {

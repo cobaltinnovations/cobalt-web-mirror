@@ -360,7 +360,10 @@ export const pagesService = {
 			data,
 		});
 	},
-	updateMailingListRow(pageRowId: string, data: { pageRowId: string; mailingListId: string }) {
+	updateMailingListRow(
+		pageRowId: string,
+		data: { pageRowId: string; mailingListId: string; title: string; description: string }
+	) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: MailingListRowModel;
 		}>({

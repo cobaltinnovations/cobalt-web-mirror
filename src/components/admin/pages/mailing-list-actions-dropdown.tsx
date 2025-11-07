@@ -15,7 +15,7 @@ export const MailingListActionsDropdown = ({ page, onCopy, onDownload }: Mailing
 	return (
 		<Dropdown>
 			<Dropdown.Toggle as={DropdownToggle} id={`dropdown--${page.pageId}`} className="p-2 border-0">
-				<SvgIcon kit="far" icon="gear" size={20} className="d-flex" />
+				<SvgIcon kit="far" icon="envelope" size={20} className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
 				<Dropdown.Item
