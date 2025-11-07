@@ -118,8 +118,10 @@ function requireAuthLoader({ request }: LoaderFunctionArgs) {
 }
 
 function requireUnauthLoader({ request }: LoaderFunctionArgs) {
+	const allowedPartialPaths = ['reset-password', 'unsubscribe'];
 	const { pathname } = new URL(request.url);
-	if (pathname.includes('reset-password')) {
+
+	if (allowedPartialPaths.some((s) => pathname.includes(s))) {
 		return null;
 	}
 

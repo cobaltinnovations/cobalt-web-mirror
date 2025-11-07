@@ -14,10 +14,16 @@ export const mailingListsService = {
 	getEntries(mailingListEntryId: string) {
 		return httpSingleton.orchestrateRequest<{
 			pages: PageDetailModel[];
-			mailinglistEntry: MailingListEntryModel;
+			mailingListEntry: MailingListEntryModel;
 		}>({
 			method: 'GET',
 			url: `/mailing-list-entries/${mailingListEntryId}`,
+		});
+	},
+	unsubscribeFromMailingListEntry(mailingListEntryId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'PUT',
+			url: `/mailing-list-entries/${mailingListEntryId}/unsubscribe`,
 		});
 	},
 };
