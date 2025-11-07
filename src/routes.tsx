@@ -410,7 +410,23 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'account-settings',
-						lazy: () => import('@/routes/account-settings'),
+						lazy: () => import('@/routes/account-settings/account-settings'),
+						children: [
+							{
+								index: true,
+								element: <Navigate to="account" />,
+							},
+							{
+								id: 'account-settings-account',
+								path: 'account',
+								lazy: () => import('@/routes/account-settings/account'),
+							},
+							{
+								id: 'account-settings-communication-preferences',
+								path: 'communication-preferences',
+								lazy: () => import('@/routes/account-settings/communication-preferences'),
+							},
+						],
 					},
 					{
 						// legacy/backwards compatibility
