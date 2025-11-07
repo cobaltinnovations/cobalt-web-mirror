@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { MailingListRowModel } from '@/lib/models';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -12,6 +12,17 @@ export const RowSettingsMailingList = () => {
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const mailingListRow = useMemo(() => currentPageRow as MailingListRowModel | undefined, [currentPageRow]);
 	const [formValues, setFormValues] = useState({ title: '', description: '' });
+
+	useEffect(() => {
+		if (!mailingListRow) {
+			return;
+		}
+
+		setFormValues({
+			title: mailingListRow.title,
+			description: mailingListRow.description,
+		});
+	}, [mailingListRow]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(async (pr: MailingListRowModel, fv: typeof formValues) => {
 		setIsSaving(true);
