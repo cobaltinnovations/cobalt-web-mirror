@@ -618,8 +618,7 @@ const MailingListRowRenderer = ({
 					<>
 						<h1 className="mb-6 text-center">You're subscribed!</h1>
 						<p className="mb-0 text-center">
-							You can update your page subscriptions in your{' '}
-							<Link to="/account-settings/communication-preferences">account settings</Link>.
+							The email address you entered will receive updates from this page.
 						</p>
 					</>
 				) : (
