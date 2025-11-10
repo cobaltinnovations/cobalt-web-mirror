@@ -8,6 +8,7 @@ import {
 	PAGE_STATUS_ID,
 	PageDetailModel,
 	PageFriendlyUrlValidationResult,
+	PageRowMailingListModel,
 	PageRowUnionModel,
 	PageSectionDetailModel,
 	PageSectionModel,
@@ -444,10 +445,10 @@ export const pagesService = {
 			url: `/page-site-locations/${siteLocationId}`,
 		});
 	},
-	getMailingListForPageById(pageId: string) {
-		return httpSingleton.orchestrateRequest<{ mailingLists: void }>({
+	getPageRowMailingListsForPageById(pageId: string) {
+		return httpSingleton.orchestrateRequest<{ pageRowMailingLists: PageRowMailingListModel[] }>({
 			method: 'GET',
-			url: `/pages/${pageId}/mailing-lists`,
+			url: `/pages/${pageId}/page-row-mailing-lists`,
 		});
 	},
 };

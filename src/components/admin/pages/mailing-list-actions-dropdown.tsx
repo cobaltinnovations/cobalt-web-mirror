@@ -32,7 +32,7 @@ export const MailingListActionsDropdown = ({ page, onCopy, onDownload }: Mailing
 						onDownload(page);
 					}}
 				>
-					Download subscriber emails addresses
+					Download subscriber email addresses
 				</Dropdown.Item>
 			</Dropdown.Menu>
 		</Dropdown>
