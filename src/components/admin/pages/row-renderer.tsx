@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
@@ -9,12 +9,15 @@ import {
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
 	isGroupSessionsRow,
+	isMailingListRow,
 	isOneColumnImageRow,
 	isResourcesRow,
 	isTagGroupRow,
 	isTagRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
+	MailingListEntryTypeId,
+	MailingListRowModel,
 	OneColumnImageRowModel,
 	PageRowUnionModel,
 	PageSiteLocationModel,
@@ -25,15 +28,18 @@ import {
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
 } from '@/lib/models';
+import useHandleError from '@/hooks/use-handle-error';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import StudioEvent from '@/components/studio-event';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
 import Carousel from '@/components/carousel';
 import { resourceLibraryCarouselConfig } from '@/pages/resource-library';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
-import { analyticsService, resourceLibraryService } from '@/lib/services';
+import { analyticsService, mailingListsService, resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
+import InputHelper from '@/components/input-helper';
+import LoadingButton from '@/components/loading-button';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageId: string;
@@ -567,6 +573,84 @@ const ThreeColRowRenderer = ({
 	);
 };
 
+const MailingListRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+}: RowRendererProps<MailingListRowModel>) => {
+	const handleError = useHandleError();
+	const [isLoading, setIsLoading] = useState(false);
+	const [inputValue, setInputValue] = useState('');
+	const [hasSubmitted, setHasSubmitted] = useState(false);
+
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (!enableAnalytics) {
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await mailingListsService
+				.addEntry({
+					mailingListId: pageRow.mailingListId,
+					mailingListEntryTypeId: MailingListEntryTypeId.EMAIL_ADDRESS,
+					value: inputValue,
+				})
+				.fetch();
+
+			setHasSubmitted(true);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	return (
+		<Row className={className}>
+			<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
+				{hasSubmitted ? (
+					<>
+						<h1 className="mb-6 text-center">You're subscribed!</h1>
+						<p className="mb-0 text-center">
+							The email address you entered will receive updates from this page.
+						</p>
+					</>
+				) : (
+					<>
+						<h2 className="mb-6 text-center">{pageRow.title}</h2>
+						<p className="mb-8 text-center">{pageRow.description}</p>
+						<Form onSubmit={handleFormSubmit}>
+							<fieldset disabled={isLoading || !enableAnalytics}>
+								<InputHelper
+									className="mb-4"
+									type="email"
+									label="Email address"
+									value={inputValue}
+									onChange={({ currentTarget }) => {
+										setInputValue(currentTarget.value);
+									}}
+									required
+								/>
+								<div className="text-center">
+									<LoadingButton isLoading={isLoading} size="lg" type="submit">
+										Subscribe
+									</LoadingButton>
+								</div>
+							</fieldset>
+						</Form>
+					</>
+				)}
+			</Col>
+		</Row>
+	);
+};
+
 export const getRendererForPageRow = ({
 	pageId,
 	pageRow,
@@ -673,6 +757,20 @@ export const getRendererForPageRow = ({
 			check: isThreeColumnImageRow,
 			getRow: (row: any) => (
 				<ThreeColRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
+		},
+		{
+			check: isMailingListRow,
+			getRow: (row: any) => (
+				<MailingListRowRenderer
 					pageId={pageId}
 					pageRow={row}
 					contentsByTagGroupId={contentsByTagGroupId}

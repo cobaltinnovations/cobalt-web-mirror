@@ -1,15 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
+import { PAGE_STATUS_ID, PageDetailModel, PageRowMailingListModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
+import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import useFlags from '@/hooks/use-flags';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { AddPageModal, PageActionsDropdown } from '@/components/admin/pages';
+import { AddPageModal, MailingListActionsDropdown, PageActionsDropdown } from '@/components/admin/pages';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import SvgIcon from '@/components/svg-icon';
+import { buildBackendDownloadUrl } from '@/lib/utils';
 
 export async function loader() {
 	return null;
@@ -33,6 +35,8 @@ export const Component = () => {
 	const [showAddPageModal, setShowAddPageModal] = useState(false);
 	const [showDeletePageModal, setShowDeletePageModal] = useState(false);
 	const [showUnpublishPageModal, setShowUnpublishPageModal] = useState(false);
+
+	const copyTextToClipboard = useCopyTextToClipboard();
 
 	const fetchPages = useCallback(async () => {
 		setIsLoading(true);
@@ -124,6 +128,37 @@ export const Component = () => {
 		setSearchParams(searchParams);
 	};
 
+	const handleMailingListCopy = async (page: PageDetailModel) => {
+		try {
+			const response = await pagesService.getPageRowMailingListsForPageById(page.pageId).fetch();
+			const pageRowMailingLists: PageRowMailingListModel[] = response.pageRowMailingLists ?? [];
+
+			// Pick out only email addresses across all subscribe rows for now.
+			// Revisit later when UI supports more types (e.g. phone number) and/or multiple subscribe rows
+			const emailValues = pageRowMailingLists.flatMap((list) =>
+				(list.mailingListEntries ?? [])
+					.filter((entry) => entry.mailingListEntryTypeId === 'EMAIL_ADDRESS')
+					.map((entry) => entry.value)
+			);
+
+			copyTextToClipboard(emailValues.join(', '), {
+				successTitle: 'Email addresses copied to clipboard',
+				successDescription:
+					'The subscribed email addresses were to your clipboard. Paste them into the "BCC" field of your email client.',
+				errorTitle: 'Failed to copy email addresses',
+				errorDesctiption: 'Please try again.',
+			});
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	const handleMailingListDownload = async (page: PageDetailModel) => {
+		window.location.href = buildBackendDownloadUrl('/page-row-mailing-lists/csv', {
+			pageId: page.pageId,
+		});
+	};
+
 	return (
 		<>
 			<AddPageModal
@@ -204,6 +239,9 @@ export const Component = () => {
 									<TableCell header>Created</TableCell>
 									<TableCell header>Modified</TableCell>
 									<TableCell header>Published</TableCell>
+									<TableCell header className="text-right">
+										Subscribers
+									</TableCell>
 									<TableCell header />
 								</TableRow>
 							</TableHead>
@@ -248,9 +286,22 @@ export const Component = () => {
 											<TableCell className="text-nowrap">
 												{page.publishedDateDescription}
 											</TableCell>
-											<TableCell className="text-right">
+											<TableCell className="text-nowrap text-right">
+												{page.mailingListEntryCountDescription}
+											</TableCell>
+											<TableCell className="align-items-center justify-content-end flex-row">
+												{!!(page.mailingListEntryCount && page.mailingListEntryCount > 0) && (
+													<MailingListActionsDropdown
+														page={page}
+														onCopy={handleMailingListCopy}
+														onDownload={handleMailingListDownload}
+													/>
+												)}
 												<PageActionsDropdown
 													page={page}
+													onEdit={({ pageId }) => {
+														handlePageButtonClick(pageId);
+													}}
 													onDuplicate={() => {
 														setSelectedPage(page);
 														setShowAddPageModal(true);

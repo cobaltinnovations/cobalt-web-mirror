@@ -3,10 +3,12 @@ import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
 	GroupSessionsRowModel,
+	MailingListRowModel,
 	OneColumnImageRowModel,
 	PAGE_STATUS_ID,
 	PageDetailModel,
 	PageFriendlyUrlValidationResult,
+	PageRowMailingListModel,
 	PageRowUnionModel,
 	PageSectionDetailModel,
 	PageSectionModel,
@@ -350,6 +352,27 @@ export const pagesService = {
 			data,
 		});
 	},
+	createMailingListRow(pageSectionId: string, data: { pageSectionId: string }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: MailingListRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/mailing-list`,
+			data,
+		});
+	},
+	updateMailingListRow(
+		pageRowId: string,
+		data: { pageRowId: string; mailingListId: string; title: string; description: string }
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: MailingListRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/mailing-list`,
+			data,
+		});
+	},
 	deletePageRow(pageRowId: string) {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'DELETE',
@@ -420,6 +443,12 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<{ pageSiteLocations: PageSiteLocationModel[] }>({
 			method: 'GET',
 			url: `/page-site-locations/${siteLocationId}`,
+		});
+	},
+	getPageRowMailingListsForPageById(pageId: string) {
+		return httpSingleton.orchestrateRequest<{ pageRowMailingLists: PageRowMailingListModel[] }>({
+			method: 'GET',
+			url: `/pages/${pageId}/page-row-mailing-lists`,
 		});
 	},
 };

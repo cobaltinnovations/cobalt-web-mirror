@@ -78,6 +78,19 @@ app.get('/reporting/run-report', (req, res, next) => {
 	return proxy(proxyUrl)(req, res, next);
 });
 
+// Reporting CSV downloads can proxy through to backend and tack on access token.
+// This way FE does not have access token embedded in URL, preventing
+// unintentional "copy-paste" sharing
+app.get('/page-row-mailing-lists/csv', (req, res, next) => {
+	const baseUrl = settings.nodeApp.webApiBaseUrl;
+	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
+	const proxyUrl = `${baseUrl}${req.url}&X-Cobalt-Access-Token=${accessToken ? accessToken : ''}`;
+
+	req.url = proxyUrl;
+
+	return proxy(proxyUrl)(req, res, next);
+});
+
 // Patient order CSV downloads can proxy through to backend and tack on access token.
 // This way FE does not have access token embedded in URL, preventing
 // unintentional "copy-paste" sharing

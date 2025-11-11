@@ -35,6 +35,7 @@ export enum ROW_TYPE_ID {
 	ONE_COLUMN_IMAGE = 'ONE_COLUMN_IMAGE',
 	TWO_COLUMN_IMAGE = 'TWO_COLUMN_IMAGE',
 	THREE_COLUMN_IMAGE = 'THREE_COLUMN_IMAGE',
+	MAILING_LIST = 'MAILING_LIST',
 }
 
 export interface PageSectionModel {
@@ -72,6 +73,8 @@ export interface PageDetailModel {
 	relativeUrl: string;
 	editingLivePage: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
+	mailingListEntryCount?: number;
+	mailingListEntryCountDescription?: string;
 }
 
 export interface PageSectionDetailModel {
@@ -92,7 +95,8 @@ export type PageRowUnionModel =
 	| TagRowModel
 	| OneColumnImageRowModel
 	| TwoColumnImageRowModel
-	| ThreeColumnImageRowModel;
+	| ThreeColumnImageRowModel
+	| MailingListRowModel;
 
 export interface ResourcesRowModel {
 	pageRowId: string;
@@ -165,6 +169,16 @@ interface ColumnImageModel {
 	columnDisplayOrder: number;
 }
 
+export interface MailingListRowModel {
+	description: string;
+	displayOrder: number;
+	mailingListId: string;
+	pageRowId: string;
+	pageSectionId: string;
+	rowTypeId: ROW_TYPE_ID;
+	title: string;
+}
+
 export const isResourcesRow = (x: PageRowUnionModel): x is ResourcesRowModel => {
 	return x.hasOwnProperty('contents');
 };
@@ -191,4 +205,8 @@ export const isTwoColumnImageRow = (x: PageRowUnionModel): x is TwoColumnImageRo
 
 export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnImageRowModel => {
 	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
+};
+
+export const isMailingListRow = (x: PageRowUnionModel): x is ResourcesRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.MAILING_LIST;
 };

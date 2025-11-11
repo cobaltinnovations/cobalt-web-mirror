@@ -118,8 +118,10 @@ function requireAuthLoader({ request }: LoaderFunctionArgs) {
 }
 
 function requireUnauthLoader({ request }: LoaderFunctionArgs) {
+	const allowedPartialPaths = ['reset-password', 'unsubscribe'];
 	const { pathname } = new URL(request.url);
-	if (pathname.includes('reset-password')) {
+
+	if (allowedPartialPaths.some((s) => pathname.includes(s))) {
 		return null;
 	}
 
@@ -396,6 +398,10 @@ export const routes: RouteObject[] = [
 							hideFooter: true,
 						} as RouteHandle,
 					},
+					{
+						path: 'mailing-list-entries/:mailingListEntryId/unsubscribe',
+						lazy: () => import('@/routes/unsubscribe'),
+					},
 				],
 			},
 
@@ -410,7 +416,23 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'account-settings',
-						lazy: () => import('@/routes/account-settings'),
+						lazy: () => import('@/routes/account-settings/account-settings'),
+						children: [
+							{
+								index: true,
+								element: <Navigate to="account" />,
+							},
+							{
+								id: 'account-settings-account',
+								path: 'account',
+								lazy: () => import('@/routes/account-settings/account'),
+							},
+							{
+								id: 'account-settings-communication-preferences',
+								path: 'communication-preferences',
+								lazy: () => import('@/routes/account-settings/communication-preferences'),
+							},
+						],
 					},
 					{
 						// legacy/backwards compatibility

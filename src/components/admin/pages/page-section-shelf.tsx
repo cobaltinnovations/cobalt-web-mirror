@@ -6,6 +6,7 @@ import {
 	PageSectionShelfPage,
 	RowSelectionForm,
 	RowSettingsGroupSessions,
+	RowSettingsMailingList,
 	RowSettingsOneColumn,
 	RowSettingsResources,
 	RowSettingsTag,
@@ -307,6 +308,25 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 								bodyClassName="pt-0"
 							>
 								<RowSettingsThreeColumns />
+							</PageSectionShelfPage>
+						)}
+
+						{pageState === ROW_TYPE_ID.MAILING_LIST && (
+							<PageSectionShelfPage
+								showBackButton
+								onBackButtonClick={handleRowBack}
+								showDeleteButton
+								onDeleteButtonClick={() => {
+									setShowRowDeleteModal(true);
+								}}
+								showCloseButton
+								onCloseButtonButtonClick={() => {
+									setCurrentPageSectionId('');
+									setCurrentPageRowId('');
+								}}
+								title="Subscribe"
+							>
+								<RowSettingsMailingList />
 							</PageSectionShelfPage>
 						)}
 					</>

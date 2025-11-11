@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import {
 	CollapseButton,
 	CustomRowButton,
+	PremadeComponentRowButton,
 	SelectGroupSessionsModal,
 	SelectResourcesModal,
 	SelectTagModal,
@@ -11,10 +12,14 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
+import subscribeImg from '@/assets/images/subscribe.png';
+import { ROW_TYPE_ID } from '@/lib/models';
+import InlineAlert from '@/components/inline-alert';
+
 export const RowSelectionForm = () => {
 	const handleError = useHandleError();
 
-	const { currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
+	const { page, currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
 		usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
@@ -132,6 +137,32 @@ export const RowSelectionForm = () => {
 		}
 	};
 
+	const handleMailingListButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createMailingListRow(currentPageSection.pageSectionId, {
+					pageSectionId: currentPageSection.pageSectionId,
+				})
+				.fetch();
+
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const pageContainsSubscribeRow =
+		page?.pageSections.some((ps) => ps.pageRows.some((pr) => pr.rowTypeId === ROW_TYPE_ID.MAILING_LIST)) ?? false;
+
 	return (
 		<>
 			<SelectResourcesModal
@@ -195,7 +226,7 @@ export const RowSelectionForm = () => {
 			<hr />
 			<CollapseButton title="Custom Row" initialShow>
 				<p className="mb-4">Custom rows are blank layouts. You will need to add your own images and text.</p>
-				<div>
+				<div className="pb-6">
 					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnButtonClick} />
 					<CustomRowButton
 						className="mb-4"
@@ -205,6 +236,16 @@ export const RowSelectionForm = () => {
 					/>
 					<CustomRowButton cols={3} title="Select Layout" onClick={handleThreeColumnButtonClick} />
 				</div>
+			</CollapseButton>
+			<hr />
+			<CollapseButton title="Subscribe (maximum 1 per page)" initialShow>
+				{pageContainsSubscribeRow ? (
+					<InlineAlert title="Maximum reached" description="You can only add one subscribe row to a page." />
+				) : (
+					<PremadeComponentRowButton title="Select Layout" onClick={handleMailingListButtonClick}>
+						<img src={subscribeImg} alt="Subscribe" />
+					</PremadeComponentRowButton>
+				)}
 			</CollapseButton>
 		</>
 	);
