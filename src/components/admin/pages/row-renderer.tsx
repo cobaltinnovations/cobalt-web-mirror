@@ -506,8 +506,9 @@ const ThreeColRowRenderer = ({
 					src={pageRow.columnOne.imageUrl}
 					alt={pageRow.columnOne.imageAltText ?? ''}
 				/>
-				<h3 className="mb-6">{pageRow.columnOne.headline}</h3>
+				<h3 className="mb-6 text-center">{pageRow.columnOne.headline}</h3>
 				<WysiwygDisplay
+					className="text-center"
 					html={pageRow.columnOne.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
 						if (!enableAnalytics) {
@@ -529,8 +530,9 @@ const ThreeColRowRenderer = ({
 					src={pageRow.columnTwo.imageUrl}
 					alt={pageRow.columnTwo.imageAltText ?? ''}
 				/>
-				<h3 className="mb-6">{pageRow.columnTwo.headline}</h3>
+				<h3 className="mb-6 text-center">{pageRow.columnTwo.headline}</h3>
 				<WysiwygDisplay
+					className="text-center"
 					html={pageRow.columnTwo.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
 						if (!enableAnalytics) {
@@ -552,8 +554,9 @@ const ThreeColRowRenderer = ({
 					src={pageRow.columnThree.imageUrl}
 					alt={pageRow.columnThree.imageAltText ?? ''}
 				/>
-				<h3 className="mb-6">{pageRow.columnThree.headline}</h3>
+				<h3 className="mb-6 text-center">{pageRow.columnThree.headline}</h3>
 				<WysiwygDisplay
+					className="text-center"
 					html={pageRow.columnThree.description ?? ''}
 					onClick={({ linkUrl, linkText }) => {
 						if (!enableAnalytics) {
