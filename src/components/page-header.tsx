@@ -43,7 +43,7 @@ const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className, cta
 						{ctaButton && (
 							<div className="mt-10">
 								<Button variant="light" onClick={ctaButton.onClick}>
-									{ctaButton.title}
+									Subscribe to page updates
 								</Button>
 							</div>
 						)}
