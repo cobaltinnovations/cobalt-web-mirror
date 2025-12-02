@@ -17,7 +17,7 @@ import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { useSearchParams } from 'react-router-dom';
 
-const ALREADY_SHOWED_SUB_MODAL = 'ALREADY_SHOWED_SUB_MODAL';
+const cookieNameForPage = (pageId: string) => `ALREADY_SHOWED_SUB_MODAL_${pageId}`;
 
 interface PagePreviewProps {
 	page: PageDetailModel;
@@ -26,7 +26,13 @@ interface PagePreviewProps {
 
 export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
-	const alreadyShowedSubscribe = useMemo(() => Cookies.get(ALREADY_SHOWED_SUB_MODAL) === 'true', []);
+
+	// Use cookieName that includes the page ID
+	const cookieName = useMemo(() => cookieNameForPage(page.pageId), [page.pageId]);
+
+	// Whether the modal has already been shown on THIS page
+	const alreadyShowedSubscribe = useMemo(() => Cookies.get(cookieName) === 'true', [cookieName]);
+
 	const subscribeParam = useMemo(() => searchParams.get('subscribe'), [searchParams]);
 	const showSubscribeOnLoad = useMemo(
 		() => subscribeParam === 'true' && !alreadyShowedSubscribe,
@@ -79,7 +85,10 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 					onHide={() => {
 						setShowMailingListModal(false);
 					}}
-					onEnter={() => Cookies.set(ALREADY_SHOWED_SUB_MODAL, 'true')}
+					onEnter={() => {
+						// Session cookie (expires when browser tab closes)
+						Cookies.set(cookieName, 'true');
+					}}
 				/>
 			)}
 
