@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
@@ -19,6 +19,7 @@ import {
 	MailingListEntryTypeId,
 	MailingListRowModel,
 	OneColumnImageRowModel,
+	PageRowMailingListModel,
 	PageRowUnionModel,
 	PageSiteLocationModel,
 	ResourcesRowModel,
@@ -793,4 +794,101 @@ export const getRendererForPageRow = ({
 	}
 
 	return null;
+};
+
+interface MailingListModalProps extends ModalProps {
+	pageRowMailingList: PageRowMailingListModel;
+	enableAnalytics: boolean;
+	onEnter?(): void;
+}
+
+export const MailingListModal = ({ pageRowMailingList, enableAnalytics, onEnter, ...props }: MailingListModalProps) => {
+	const handleError = useHandleError();
+	const [isLoading, setIsLoading] = useState(false);
+	const [inputValue, setInputValue] = useState('');
+	const [hasSubmitted, setHasSubmitted] = useState(false);
+
+	const handleEntering = () => {
+		setIsLoading(false);
+		setInputValue('');
+		setHasSubmitted(false);
+		onEnter?.();
+	};
+
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (!enableAnalytics) {
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await mailingListsService
+				.addEntry({
+					mailingListId: pageRowMailingList.mailingListId,
+					mailingListEntryTypeId: MailingListEntryTypeId.EMAIL_ADDRESS,
+					value: inputValue,
+				})
+				.fetch();
+
+			setHasSubmitted(true);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	return (
+		<Modal centered {...props} onEntering={handleEntering}>
+			<Modal.Header closeButton>
+				<Modal.Title>{pageRowMailingList.title}</Modal.Title>
+			</Modal.Header>
+			<Form onSubmit={handleFormSubmit}>
+				<fieldset disabled={isLoading || !enableAnalytics}>
+					<Modal.Body>
+						{hasSubmitted ? (
+							<>
+								<h4 className="mb-2 text-center">You're subscribed!</h4>
+								<p className="mb-0 text-center">
+									The email address you entered will receive updates from this page.
+								</p>
+							</>
+						) : (
+							<>
+								<p>{pageRowMailingList.description}</p>
+								<InputHelper
+									type="email"
+									label="Email address"
+									value={inputValue}
+									onChange={({ currentTarget }) => {
+										setInputValue(currentTarget.value);
+									}}
+									required
+								/>
+							</>
+						)}
+					</Modal.Body>
+					<Modal.Footer className="text-right">
+						{hasSubmitted ? (
+							<Button variant="outline-primary" type="button" onClick={props.onHide}>
+								Close
+							</Button>
+						) : (
+							<>
+								<Button variant="outline-primary" type="button" onClick={props.onHide}>
+									Cancel
+								</Button>
+								<LoadingButton className="ms-2" variant="primary" isLoading={isLoading} type="submit">
+									Subscribe
+								</LoadingButton>
+							</>
+						)}
+					</Modal.Footer>
+				</fieldset>
+			</Form>
+		</Modal>
+	);
 };
