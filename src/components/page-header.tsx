@@ -1,7 +1,7 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { SkeletonImage, SkeletonText } from './skeleton-loaders';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -16,9 +16,13 @@ interface PageHeaderProps {
 	imageUrl?: string;
 	imageAlt?: string;
 	className?: string;
+	ctaButton?: {
+		title: string;
+		onClick(): void;
+	};
 }
 
-const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className }: PageHeaderProps) => {
+const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className, ctaButton }: PageHeaderProps) => {
 	const classes = useStyles();
 
 	return (
@@ -34,6 +38,14 @@ const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className }: P
 									__html: descriptionHtml,
 								}}
 							/>
+						)}
+
+						{ctaButton && (
+							<div className="mt-10">
+								<Button variant="light" onClick={ctaButton.onClick}>
+									{ctaButton.title}
+								</Button>
+							</div>
 						)}
 					</Col>
 
