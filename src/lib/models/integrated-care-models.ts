@@ -261,6 +261,8 @@ export interface PatientOrderModel {
 	resourcePacket?: ResourcePacketModel;
 
 	patientOrderReferralSourceId: PatientOrderReferralSourceId;
+
+	overrideSchedulingEpicDepartmentId?: string;
 }
 
 export enum PatientOrderIntakeScreeningStatusId {

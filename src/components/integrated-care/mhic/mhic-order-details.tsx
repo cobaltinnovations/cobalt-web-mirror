@@ -16,6 +16,7 @@ import {
 	MhicScheduleAssessmentModal,
 	MhicScheduleCallCompleteModal,
 	MhicScheduleCallModal,
+	MhicSchedulingDepartmentModal,
 	MhicSelectAssessmentTypeModal,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
@@ -73,6 +74,8 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [showScheduleCallCompleteModal, setShowScheduleCallCompleteModal] = useState(false);
 	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
 	const [showResetModel, setShowResetModel] = useState(false);
+	const [showSchedulingDepartmentModal, setShowSchedulingDepartmentModal] = useState(false);
+	const [epicDepartmentName, setEpicDepartmentName] = useState<string>('');
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -192,6 +195,28 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			handleError(error);
 		}
 	}, [addFlag, handleError, patientOrder.patientOrderId, revalidator]);
+
+	const fetchAndSetEpicDepartmentName = useCallback(async () => {
+		if (!patientOrder.overrideSchedulingEpicDepartmentId) {
+			setEpicDepartmentName('');
+			return;
+		}
+
+		try {
+			const { epicDepartments } = await integratedCareService.getEpicDepartments().fetch();
+			const epicDepartment = epicDepartments.find(
+				(i) => i.epicDepartmentId === patientOrder.overrideSchedulingEpicDepartmentId
+			);
+
+			setEpicDepartmentName(epicDepartment?.name ?? '');
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, patientOrder.overrideSchedulingEpicDepartmentId]);
+
+	useEffect(() => {
+		fetchAndSetEpicDepartmentName();
+	}, [fetchAndSetEpicDepartmentName]);
 
 	if (loadingIntakeScreening || loadingClinicalScreening) {
 		return loadingIntakeScreening || loadingClinicalScreening;
@@ -337,6 +362,18 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					}}
 				/>
 			)}
+
+			<MhicSchedulingDepartmentModal
+				show={showSchedulingDepartmentModal}
+				patientOrder={patientOrder}
+				onHide={() => {
+					setShowSchedulingDepartmentModal(false);
+				}}
+				onSave={() => {
+					revalidator.revalidate();
+					setShowSchedulingDepartmentModal(false);
+				}}
+			/>
 
 			{patientOrder.patientOrderScheduledOutreaches.length > 0 && (
 				<section>
@@ -575,17 +612,16 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							/>
 
 							<MhicTriageCard
-								className={classNames({
-									'mb-6': patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP,
-								})}
 								patientOrder={patientOrder}
 								disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
 							/>
 
-							<MhicNextStepsAppointment
-								patientOrder={patientOrder}
-								disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
-							/>
+							{patientOrder.patientOrderTriageStatusId !== PatientOrderTriageStatusId.MHP && (
+								<MhicNextStepsAppointment
+									patientOrder={patientOrder}
+									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+								/>
+							)}
 						</>
 					)}
 					{assessmentStatus === ASSESSMENT_STATUS.NO_ASSESSMENT && (
@@ -744,6 +780,36 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					)}
 				</Container>
 			</section>
+			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+				<section>
+					<Container fluid>
+						<Row className="mb-6">
+							<Col>
+								<div className="d-flex align-items-center justify-content-between">
+									<h4 className="mb-0">Appointment</h4>
+									<Button
+										type="button"
+										variant="light"
+										onClick={() => {
+											setShowSchedulingDepartmentModal(true);
+										}}
+									>
+										Change Scheduling Department
+									</Button>
+								</div>
+								<p>
+									Scheduling Department:{' '}
+									{patientOrder.overrideSchedulingEpicDepartmentId ? epicDepartmentName : 'Default'}
+								</p>
+							</Col>
+						</Row>
+						<MhicNextStepsAppointment
+							patientOrder={patientOrder}
+							disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+						/>
+					</Container>
+				</section>
+			)}
 			{assessmentStatus === ASSESSMENT_STATUS.COMPLETE && (
 				<section>
 					<Container fluid>
