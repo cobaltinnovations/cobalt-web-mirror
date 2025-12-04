@@ -596,4 +596,14 @@ export const integratedCareService = {
 			url: `/patient-orders/${patientOrderId}/reset`,
 		});
 	},
+	overrideSchedulingEpicDepartment(
+		patientOrderId: string,
+		data: { overrideSchedulingEpicDepartmentId: string | null }
+	) {
+		return httpSingleton.orchestrateRequest<{ patientOrder: PatientOrderModel }>({
+			method: 'PUT',
+			url: `/patient-orders/${patientOrderId}/override-scheduling-epic-department`,
+			data,
+		});
+	},
 };
