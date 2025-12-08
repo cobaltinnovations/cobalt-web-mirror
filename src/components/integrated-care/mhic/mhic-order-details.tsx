@@ -75,7 +75,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
 	const [showResetModel, setShowResetModel] = useState(false);
 	const [showSchedulingDepartmentModal, setShowSchedulingDepartmentModal] = useState(false);
-	const [epicDepartmentName, setEpicDepartmentName] = useState<string>('');
+	const [schedulingEpicDepartmentName, setSchedulingEpicDepartmentName] = useState<string>('');
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -196,9 +196,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		}
 	}, [addFlag, handleError, patientOrder.patientOrderId, revalidator]);
 
-	const fetchAndSetEpicDepartmentName = useCallback(async () => {
+	const fetchAndSetSchedulingEpicDepartmentName = useCallback(async () => {
 		if (!patientOrder.overrideSchedulingEpicDepartmentId) {
-			setEpicDepartmentName('');
+			setSchedulingEpicDepartmentName('');
 			return;
 		}
 
@@ -208,15 +208,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				(i) => i.epicDepartmentId === patientOrder.overrideSchedulingEpicDepartmentId
 			);
 
-			setEpicDepartmentName(epicDepartment?.name ?? '');
+			setSchedulingEpicDepartmentName(
+				epicDepartment ? `${epicDepartment.name} (${epicDepartment.departmentId})` : ''
+			);
 		} catch (error) {
 			handleError(error);
 		}
 	}, [handleError, patientOrder.overrideSchedulingEpicDepartmentId]);
 
 	useEffect(() => {
-		fetchAndSetEpicDepartmentName();
-	}, [fetchAndSetEpicDepartmentName]);
+		fetchAndSetSchedulingEpicDepartmentName();
+	}, [fetchAndSetSchedulingEpicDepartmentName]);
 
 	if (loadingIntakeScreening || loadingClinicalScreening) {
 		return loadingIntakeScreening || loadingClinicalScreening;
@@ -799,7 +801,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 								</div>
 								<p>
 									Scheduling Department:{' '}
-									{patientOrder.overrideSchedulingEpicDepartmentId ? epicDepartmentName : 'Default'}
+									{patientOrder.overrideSchedulingEpicDepartmentId
+										? schedulingEpicDepartmentName
+										: 'Default'}
 								</p>
 							</Col>
 						</Row>
