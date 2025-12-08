@@ -103,7 +103,7 @@ export const MhicSchedulingDepartmentModal: FC<Props> = ({ patientOrder, onSave,
 						<option value={DEFAULT}>Default</option>
 						{epicDepartmentOptions.map((edo) => (
 							<option key={edo.epicDepartmentId} value={edo.epicDepartmentId}>
-								{edo.name}
+								{edo.name} ({edo.departmentId})
 							</option>
 						))}
 					</InputHelper>
