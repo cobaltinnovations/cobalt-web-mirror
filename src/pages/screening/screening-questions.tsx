@@ -356,6 +356,12 @@ const ScreeningQuestionsPage = () => {
 					throw new Error('Unable to handle Supplements with Text questions');
 				}
 
+				const isEmailAddress =
+					screeningQuestionContextResponse.screeningQuestion.screeningAnswerContentHintId ===
+					ScreeningAnswerContentHintId.EMAIL_ADDRESS;
+				const prepopulatedEmailAddress =
+					screeningQuestionContextResponse.screeningQuestion.metadata?.prepopulatedEmailAddress;
+
 				return screeningQuestionContextResponse.screeningAnswerOptions.map((option) => (
 					<InputHelper
 						autoFocus
@@ -363,14 +369,15 @@ const ScreeningQuestionsPage = () => {
 						disabled={isSubmitting}
 						className="mb-2"
 						label={option.answerOptionText ?? ''}
-						type={
-							screeningQuestionContextResponse.screeningQuestion.screeningAnswerContentHintId ===
-							ScreeningAnswerContentHintId.EMAIL_ADDRESS
-								? 'email'
-								: 'text'
-						}
+						type={isEmailAddress ? 'email' : 'text'}
 						name={option.screeningAnswerOptionId}
-						value={answerText[option.screeningAnswerOptionId] ?? ''}
+						value={
+							answerText[option.screeningAnswerOptionId]
+								? answerText[option.screeningAnswerOptionId]
+								: isEmailAddress && prepopulatedEmailAddress
+								? prepopulatedEmailAddress
+								: ''
+						}
 						onChange={(e) => {
 							if (isSubmitting) {
 								return;
@@ -393,6 +400,7 @@ const ScreeningQuestionsPage = () => {
 		answerText,
 		isSubmitting,
 		screeningQuestionContextResponse?.screeningAnswerOptions,
+		screeningQuestionContextResponse?.screeningQuestion.metadata?.prepopulatedEmailAddress,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerContentHintId,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
