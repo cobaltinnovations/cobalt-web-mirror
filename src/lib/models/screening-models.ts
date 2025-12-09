@@ -133,6 +133,10 @@ export interface ScreeningQuestion {
 	displayOrder: number;
 	screeningQuestionSubmissionStyleId: ScreeningQuestionSubmissionStyleId;
 	supplementText?: string;
+	metadata?: {
+		prepopulatedEmailAddress?: string;
+		[key: string]: unknown;
+	};
 }
 
 export interface ScreeningAnswerOption {

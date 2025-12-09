@@ -185,6 +185,7 @@ const ScreeningQuestionsPage = () => {
 		setSelectedAnswers(
 			screeningQuestionContextResponse.screeningAnswers.map((answer) => answer.screeningAnswerOptionId)
 		);
+
 		const { texts, supplements } = screeningQuestionContextResponse.screeningAnswerOptions.reduce(
 			(acc, option) => {
 				const answer = screeningQuestionContextResponse.screeningAnswers.find(
@@ -194,7 +195,17 @@ const ScreeningQuestionsPage = () => {
 				if (option.freeformSupplement) {
 					acc.supplements[option.screeningAnswerOptionId] = answer?.text ?? '';
 				} else {
-					acc.texts[option.screeningAnswerOptionId] = answer?.text ?? '';
+					const isEmailAddress =
+						screeningQuestionContextResponse.screeningQuestion.screeningAnswerContentHintId ===
+						ScreeningAnswerContentHintId.EMAIL_ADDRESS;
+					const prepopulatedEmailAddress =
+						screeningQuestionContextResponse.screeningQuestion.metadata?.prepopulatedEmailAddress;
+
+					if (isEmailAddress && prepopulatedEmailAddress) {
+						acc.texts[option.screeningAnswerOptionId] = answer?.text ?? prepopulatedEmailAddress ?? '';
+					} else {
+						acc.texts[option.screeningAnswerOptionId] = answer?.text ?? '';
+					}
 				}
 
 				return acc;
@@ -204,9 +215,15 @@ const ScreeningQuestionsPage = () => {
 				supplements: {} as Record<string, string>,
 			}
 		);
+
 		setAnswerText(texts);
 		setSupplementText(supplements);
-	}, [screeningQuestionContextResponse?.screeningAnswerOptions, screeningQuestionContextResponse?.screeningAnswers]);
+	}, [
+		screeningQuestionContextResponse?.screeningAnswerOptions,
+		screeningQuestionContextResponse?.screeningAnswers,
+		screeningQuestionContextResponse?.screeningQuestion.metadata?.prepopulatedEmailAddress,
+		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerContentHintId,
+	]);
 
 	const renderedAnswerOptions = useMemo(() => {
 		switch (screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId) {
