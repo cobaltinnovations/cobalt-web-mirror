@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
 import {
+	AccountSourceId,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
 	InstitutionFeatureInstitutionReferrer,
@@ -94,11 +95,56 @@ const ConnectWithSupportV2 = () => {
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
 	/* --------------------------------------------------- */
+	const shouldPersistForAnonImplicit =
+		account &&
+		account.accountSourceId !== AccountSourceId.ANONYMOUS_IMPLICIT &&
+		!account.institutionLocationId &&
+		institutionLocationId;
+
+	const persistInstitutionLocationIdForAnonImplicit = useCallback(async () => {
+		if (
+			!account ||
+			account.accountSourceId !== AccountSourceId.ANONYMOUS_IMPLICIT ||
+			account.institutionLocationId ||
+			!institutionLocationId
+		) {
+			return;
+		}
+
+		try {
+			const response = await accountService
+				.setAccountLocation(account.accountId, {
+					accountId: account.accountId,
+					institutionLocationId,
+				})
+				.fetch();
+
+			if (response.account.institutionLocationId) {
+				window.location.replace(
+					`${pathname}?${SEARCH_PARAMS.INSTITUTION_LOCATION_ID}=${response.account.institutionLocationId}`
+				);
+			} else {
+				window.location.replace(pathname);
+			}
+		} catch (error) {
+			handleError(error);
+		}
+	}, [account, handleError, institutionLocationId, pathname]);
+
 	useEffect(() => {
+		if (shouldPersistForAnonImplicit) {
+			persistInstitutionLocationIdForAnonImplicit();
+			return;
+		}
+
 		if (featureDetails?.locationPromptRequired) {
 			setShowEmployerModal(true);
 		}
-	}, [featureDetails?.locationPromptRequired]);
+	}, [
+		featureDetails?.locationPromptRequired,
+		persistInstitutionLocationIdForAnonImplicit,
+		shouldPersistForAnonImplicit,
+	]);
 
 	/* --------------------------------------------------- */
 	/* Get available filters for feature  */
