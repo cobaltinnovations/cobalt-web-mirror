@@ -97,7 +97,7 @@ const ConnectWithSupportV2 = () => {
 	/* --------------------------------------------------- */
 	const shouldPersistForAnonImplicit =
 		account &&
-		account.accountSourceId !== AccountSourceId.ANONYMOUS_IMPLICIT &&
+		account.accountSourceId === AccountSourceId.ANONYMOUS_IMPLICIT &&
 		!account.institutionLocationId &&
 		institutionLocationId;
 
