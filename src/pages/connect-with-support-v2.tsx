@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
 import {
-	AccountSourceId,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
 	InstitutionFeatureInstitutionReferrer,
@@ -67,6 +66,10 @@ const ConnectWithSupportV2 = () => {
 		[searchParams]
 	);
 	const patientOrderId = useMemo(() => searchParams.get(SEARCH_PARAMS.PATIENT_ORDER_ID) ?? undefined, [searchParams]);
+	const forceLocation = useMemo(() => {
+		const v = searchParams.get('forceLocation');
+		return v?.toLowerCase() === 'true';
+	}, [searchParams]);
 
 	const [selectedStartDate, setSelectedStartDate] = useState<Date>(
 		startDate ? moment(startDate, 'YYYY-MM-DD').toDate() : new Date()
@@ -95,19 +98,10 @@ const ConnectWithSupportV2 = () => {
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
 	/* --------------------------------------------------- */
-	const shouldPersistForAnonImplicit =
-		account &&
-		account.accountSourceId === AccountSourceId.ANONYMOUS_IMPLICIT &&
-		!account.institutionLocationId &&
-		institutionLocationId;
+	const shouldPersistForcedLocation = account && forceLocation && institutionLocationId;
 
-	const persistInstitutionLocationIdForAnonImplicit = useCallback(async () => {
-		if (
-			!account ||
-			account.accountSourceId !== AccountSourceId.ANONYMOUS_IMPLICIT ||
-			account.institutionLocationId ||
-			!institutionLocationId
-		) {
+	const persistForcedLocation = useCallback(async () => {
+		if (!account || !institutionLocationId) {
 			return;
 		}
 
@@ -132,19 +126,15 @@ const ConnectWithSupportV2 = () => {
 	}, [account, handleError, institutionLocationId, pathname]);
 
 	useEffect(() => {
-		if (shouldPersistForAnonImplicit) {
-			persistInstitutionLocationIdForAnonImplicit();
+		if (shouldPersistForcedLocation) {
+			persistForcedLocation();
 			return;
 		}
 
 		if (featureDetails?.locationPromptRequired) {
 			setShowEmployerModal(true);
 		}
-	}, [
-		featureDetails?.locationPromptRequired,
-		persistInstitutionLocationIdForAnonImplicit,
-		shouldPersistForAnonImplicit,
-	]);
+	}, [featureDetails?.locationPromptRequired, persistForcedLocation, shouldPersistForcedLocation]);
 
 	/* --------------------------------------------------- */
 	/* Get available filters for feature  */
