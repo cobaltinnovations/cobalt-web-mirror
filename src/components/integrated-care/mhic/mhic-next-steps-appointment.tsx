@@ -1,11 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import { useRevalidator } from 'react-router-dom';
 
-import { PatientOrderModel, PatientOrderTriageStatusId } from '@/lib/models';
+import { PatientOrderModel } from '@/lib/models';
 import { appointmentService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
+import { shouldUseSchedulingWorkflow } from '@/lib/utils';
 
 interface Props {
 	patientOrder: PatientOrderModel;
@@ -17,6 +18,7 @@ export const MhicNextStepsAppointment = ({ patientOrder, disabled, className }: 
 	const handleError = useHandleError();
 	const revalidator = useRevalidator();
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+	const shouldShowAppointment = shouldUseSchedulingWorkflow(patientOrder);
 
 	const handleCancelAppointmentConfirm = useCallback(async () => {
 		try {
@@ -48,7 +50,7 @@ export const MhicNextStepsAppointment = ({ patientOrder, disabled, className }: 
 				displayButtonsBlock
 			/>
 
-			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+			{shouldShowAppointment && (
 				<div className={className}>
 					{patientOrder.appointmentId ? (
 						<NoData

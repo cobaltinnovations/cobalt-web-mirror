@@ -31,7 +31,6 @@ import {
 	PatientOrderScheduledOutreachReasonId,
 	PatientOrderScheduledOutreach,
 	PatientOrderScreeningStatusId,
-	PatientOrderTriageStatusId,
 	ScreeningSessionScreeningResult,
 	AnalyticsNativeEventTypeId,
 } from '@/lib/models';
@@ -40,6 +39,7 @@ import { analyticsService, integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { useIntegratedCareLoaderData } from '@/routes/ic/landing';
+import { getDepartmentTriageDefaultLabel, shouldUseSchedulingWorkflow } from '@/lib/utils';
 import { MhicVoicemailTaskModal } from './mhic-voicemail-task-modal';
 import { MhicResetAssessmentModel } from '@/components/integrated-care/mhic/mhic-reset-assessment-modal';
 import SvgIcon from '@/components/svg-icon';
@@ -57,7 +57,7 @@ enum ASSESSMENT_STATUS {
 }
 
 export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => {
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 	const { referenceDataResponse } = useIntegratedCareLoaderData();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
@@ -75,7 +75,14 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	const [scheduledOutreachToEdit, setScheduledOutreachToEdit] = useState<PatientOrderScheduledOutreach>();
 	const [showResetModel, setShowResetModel] = useState(false);
 	const [showSchedulingDepartmentModal, setShowSchedulingDepartmentModal] = useState(false);
-	const [schedulingEpicDepartmentName, setSchedulingEpicDepartmentName] = useState<string>('');
+	const [schedulingEpicDepartmentName, setSchedulingEpicDepartmentName] = useState<string>(
+		patientOrder.overrideSchedulingEpicDepartmentId ?? ''
+	);
+	const defaultDepartmentTriageLabel = getDepartmentTriageDefaultLabel(patientOrder);
+	const shouldShowAppointmentSection = shouldUseSchedulingWorkflow(patientOrder);
+	const departmentTriageDisplayLabel = patientOrder.overrideSchedulingEpicDepartmentId
+		? schedulingEpicDepartmentName
+		: defaultDepartmentTriageLabel;
 
 	const [screeningSessionScreeningResult, setScreeningSessionScreeningResult] =
 		useState<ScreeningSessionScreeningResult>();
@@ -209,7 +216,9 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 			);
 
 			setSchedulingEpicDepartmentName(
-				epicDepartment ? `${epicDepartment.name} (${epicDepartment.departmentId})` : ''
+				epicDepartment
+					? `${epicDepartment.name} (${epicDepartment.departmentId})`
+					: patientOrder.overrideSchedulingEpicDepartmentId ?? ''
 			);
 		} catch (error) {
 			handleError(error);
@@ -616,14 +625,41 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 							<MhicTriageCard
 								patientOrder={patientOrder}
 								disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
+								className="mb-6"
 							/>
-
-							{patientOrder.patientOrderTriageStatusId !== PatientOrderTriageStatusId.MHP && (
-								<MhicNextStepsAppointment
-									patientOrder={patientOrder}
-									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
-								/>
-							)}
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Department Triage</Card.Title>
+									<div className="button-container">
+										<Button
+											variant="light"
+											size="sm"
+											onClick={() => {
+												setShowSchedulingDepartmentModal(true);
+											}}
+											disabled={
+												patientOrder.patientOrderDispositionId !==
+													PatientOrderDispositionId.OPEN ||
+												!account?.accountCapabilityFlags.canEditIcTriages
+											}
+										>
+											Override
+										</Button>
+									</div>
+								</Card.Header>
+								<Card.Body>
+									<Container fluid>
+										<Row>
+											<Col xs={3}>
+												<p className="m-0 text-gray">Department</p>
+											</Col>
+											<Col xs={9}>
+												<p className="m-0">{departmentTriageDisplayLabel}</p>
+											</Col>
+										</Row>
+									</Container>
+								</Card.Body>
+							</Card>
 						</>
 					)}
 					{assessmentStatus === ASSESSMENT_STATUS.NO_ASSESSMENT && (
@@ -643,7 +679,6 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										}
 									/>
 									<NoData
-										className="mb-6"
 										title="No Assessment"
 										description="There is no assessment for the patient's most recent referral order"
 										actions={[
@@ -690,7 +725,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 										}
 									/>
 									<NoData
-										className="mb-6 bg-white"
+										className="bg-white"
 										title="Assessment is Scheduled"
 										description={
 											patientOrder.patientOrderScheduledScreeningScheduledDateTimeDescription
@@ -782,29 +817,12 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 					)}
 				</Container>
 			</section>
-			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+			{shouldShowAppointmentSection && (
 				<section>
 					<Container fluid>
 						<Row className="mb-6">
 							<Col>
-								<div className="d-flex align-items-center justify-content-between">
-									<h4 className="mb-0">Appointment</h4>
-									<Button
-										type="button"
-										variant="light"
-										onClick={() => {
-											setShowSchedulingDepartmentModal(true);
-										}}
-									>
-										Change Scheduling Department
-									</Button>
-								</div>
-								<p>
-									Scheduling Department:{' '}
-									{patientOrder.overrideSchedulingEpicDepartmentId
-										? schedulingEpicDepartmentName
-										: 'Default'}
-								</p>
+								<h4 className="mb-0">Appointment</h4>
 							</Col>
 						</Row>
 						<MhicNextStepsAppointment

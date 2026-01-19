@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import {
 	ScreeningFlowVersion,
@@ -27,7 +27,7 @@ export function useScreeningNavigation() {
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
-			const routeMatches = matches.reverse();
+			const routeMatches = [...matches].reverse();
 			const mhicRouteMatch = routeMatches.find((match) => {
 				return match.pathname.includes('/ic/mhic') && !!match.params['patientOrderId'];
 			});
@@ -229,6 +229,14 @@ export function useScreeningFlow({
 	const handleAccountSourceClick = useAccountSourceClickHandler();
 	const { account } = useAccount();
 	const [showAccountSourcesModal, setShowAccountSourcesModal] = useState(false);
+	const fetchKey = useMemo(
+		() =>
+			[screeningFlowId ?? '', patientOrderId ?? '', groupSessionId ?? '', checkCompletionState ? '1' : '0'].join(
+				'|'
+			),
+		[checkCompletionState, groupSessionId, patientOrderId, screeningFlowId]
+	);
+	const fetchStateRef = useRef<{ key: string | null; inFlight: boolean }>({ key: null, inFlight: false });
 
 	const incompleteSessions = useMemo(() => {
 		return screeningSessions.filter((session) => !session.completed);
@@ -389,41 +397,89 @@ export function useScreeningFlow({
 			return;
 		}
 
+		if (fetchStateRef.current.key === fetchKey) {
+			if (fetchStateRef.current.inFlight || didCheckScreeningSessions) {
+				return;
+			}
+		}
+
+		fetchStateRef.current = { key: fetchKey, inFlight: true };
+
 		const fetchScreeningsRequest = screeningService.getScreeningSessionsByFlowId({
 			screeningFlowId,
 			patientOrderId,
 		});
 		const fetchFlowVersionsRequest = screeningService.getScreeningFlowVersionsByFlowId({ screeningFlowId });
 
-		const fetchCheckCompletionRequest =
-			screeningService.getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId);
+		const fetchCheckCompletionRequest = checkCompletionState
+			? screeningService.getScreeningFlowCompletionStatusByScreeningFlowId(screeningFlowId)
+			: null;
+		let isMounted = true;
+		const fetchCompletionPromise = fetchCheckCompletionRequest
+			? fetchCheckCompletionRequest.fetch().then((response) => {
+					if (!isMounted) {
+						return;
+					}
+
+					setHasCompletedScreening(response.sessionFullyCompleted);
+			  })
+			: Promise.resolve();
 
 		Promise.all([
-			fetchScreeningsRequest.fetch().then((response) => setScreeningSessions(response.screeningSessions)),
+			fetchScreeningsRequest.fetch().then((response) => {
+				if (!isMounted) {
+					return;
+				}
+
+				setScreeningSessions(response.screeningSessions);
+			}),
 			fetchFlowVersionsRequest.fetch().then((response) => {
+				if (!isMounted) {
+					return;
+				}
+
 				const activeVersion = response.screeningFlowVersions.find(
 					(version) => version.screeningFlowVersionId === response.activeScreeningFlowVersionId
 				);
 
 				setActiveFlowVersion(activeVersion);
 			}),
-			checkCompletionState
-				? fetchCheckCompletionRequest
-						.fetch()
-						.then((response) => setHasCompletedScreening(response.sessionFullyCompleted))
-				: Promise.resolve(),
+			fetchCompletionPromise,
 		])
 			.then(() => {
+				if (!isMounted) {
+					return;
+				}
+
 				setDidCheckScreeningSessions(true);
 			})
 			.catch((e) => {
+				if (!isMounted) {
+					return;
+				}
+
 				handleError(e);
+			})
+			.finally(() => {
+				fetchStateRef.current.inFlight = false;
 			});
 
 		return () => {
+			isMounted = false;
 			fetchScreeningsRequest.abort();
+			fetchFlowVersionsRequest.abort();
+			fetchCheckCompletionRequest?.abort();
 		};
-	}, [checkCompletionState, disabled, handleError, isSkipped, patientOrderId, screeningFlowId]);
+	}, [
+		checkCompletionState,
+		didCheckScreeningSessions,
+		disabled,
+		fetchKey,
+		handleError,
+		isSkipped,
+		patientOrderId,
+		screeningFlowId,
+	]);
 
 	useEffect(() => {
 		if (disabled || !instantiateOnLoad || !activeFlowVersion) {

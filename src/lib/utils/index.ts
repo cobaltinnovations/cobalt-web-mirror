@@ -5,6 +5,7 @@ export * from './date-utils';
 export * from './device-utils';
 export * from './error-utils';
 export * from './form-utils';
+export * from './patient-order-utils';
 export * from './url-utils';
 
 // TODO: Figure out how to TS a yup schema so we dont need the ignores

@@ -20,6 +20,7 @@ import AsyncWrapper from '@/components/async-page';
 import ConfirmDialog from '@/components/confirm-dialog';
 import InlineAlert from '@/components/inline-alert';
 import NoData from '@/components/no-data';
+import { isSpecialtyCareWithSchedulingOverride, shouldUseSchedulingWorkflow } from '@/lib/utils';
 import {
 	CareResourceAccordion,
 	NextStepsItem,
@@ -41,6 +42,10 @@ export const NextStepsAssessmentComplete = ({
 	const [showInsuranceStatementModal, setShowInsuranceStatementModal] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [mapsKey, setMapsKey] = useState('');
+	const shouldShowSchedulingWorkflow = shouldUseSchedulingWorkflow(patientOrder);
+	const shouldShowSpecialtyCareWorkflow =
+		patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE &&
+		!isSpecialtyCareWithSchedulingOverride(patientOrder);
 
 	const fetchData = useCallback(async () => {
 		const response = await institutionService.getGoogleMapsApiKey(institution.institutionId).fetch();
@@ -87,7 +92,7 @@ export const NextStepsAssessmentComplete = ({
 				displayButtonsBlock
 			/>
 
-			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+			{shouldShowSchedulingWorkflow && (
 				<Card bsPrefix="ic-card" className="mb-10">
 					<Card.Header>
 						<Card.Title>Next Step</Card.Title>
@@ -129,7 +134,7 @@ export const NextStepsAssessmentComplete = ({
 				</Card>
 			)}
 
-			{patientOrder.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
+			{shouldShowSpecialtyCareWorkflow && (
 				<>
 					{institution.resourcePacketsEnabled ? (
 						<>
