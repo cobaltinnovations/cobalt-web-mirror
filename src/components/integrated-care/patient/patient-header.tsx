@@ -4,7 +4,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import LogoSmallText from '@/assets/logos/logo-cobalt-horizontal.svg?react';
 import InCrisisHeaderButton from '@/components/in-crisis-header-button';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import SvgIcon from '@/components/svg-icon';

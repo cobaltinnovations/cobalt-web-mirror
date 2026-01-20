@@ -1,4 +1,4 @@
-import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import LogoSmallText from '@/assets/logos/logo-cobalt-horizontal.svg?react';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -181,7 +181,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 									title: 'Resources',
 									active: false,
 								},
-						  ]
+							]
 						: []),
 					...(account?.accountCapabilityFlags.canAdministerIcDepartments
 						? [
@@ -192,7 +192,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 									title: 'Department Availability',
 									active: false,
 								},
-						  ]
+							]
 						: []),
 					...(account?.accountCapabilityFlags.canViewIcReports
 						? [
@@ -203,7 +203,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 									title: 'Reports',
 									active: false,
 								},
-						  ]
+							]
 						: []),
 				],
 			},

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { LoaderFunctionArgs, defer, useRouteLoaderData, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { LoaderFunctionArgs, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Helmet } from '@/components/helmet';
 
 import { MhicPageHeader, MhicPatientOrderTable, MhicShelfOutlet } from '@/components/integrated-care/mhic';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
@@ -54,7 +54,7 @@ function loadSearchResults({
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 
-	return defer(loadSearchResults({ searchParams: url.searchParams }));
+	return loadSearchResults({ searchParams: url.searchParams });
 }
 
 export const Component = () => {

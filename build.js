@@ -93,19 +93,18 @@ async function buildInstitutionTarget(institution) {
 		console.log(`==> Building '${institution}' Configuration ...`);
 
 		const buildEnvArgs = [
-			// this env variable is used in config-overrides.js to locate module replacements
+			// this env variable is used in Vite config to locate module replacements
 			`TARGET_INSTITUTION=${institution}`,
 
-			// these two are CRA configurations:
-			// https://create-react-app.dev/docs/advanced-configuration/
-			`PUBLIC_URL=${institution}`, // referenced in public/index.html & config-overrides
-			`BUILD_PATH=build/${institution}`, // modifies build ouputs
+			// used by Vite config for base path and output location
+			`PUBLIC_URL=${institution}`,
+			`BUILD_PATH=build/${institution}`,
 		];
 
 		buildEnvArgs.push(`COBALT_WEB_ENV=${argv.cobaltWebEnv}`);
 
 		if (argv.sentryDsnReact) {
-			// react-app variables
+			// web app variables
 			buildEnvArgs.push(`SENTRY_DSN=${argv.sentryDsnReact}`);
 			buildEnvArgs.push(`SENTRY_RELEASE=${argv.commitHash}-${institution}`);
 
@@ -118,10 +117,10 @@ async function buildInstitutionTarget(institution) {
 		}
 
 		// generate separate bundles per supported institution
-		const buildOutput = exec(`${buildEnvArgs.join(' ')} npx react-app-rewired build`);
+		const buildOutput = exec(`${buildEnvArgs.join(' ')} npx vite build`);
 
 		if (buildOutput.code !== 0) {
-			throw new Error('react-app build failed for ' + institution);
+			throw new Error('vite build failed for ' + institution);
 		}
 
 		const publicOverridesDir = path.join(__dirname, 'institution-overrides', institution, 'public');

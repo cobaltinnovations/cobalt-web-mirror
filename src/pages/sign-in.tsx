@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { SignInCobalt } from '@/components/auth/sign-in-cobalt';
 import { SignInShell } from '@/components/auth/sign-in-shell';

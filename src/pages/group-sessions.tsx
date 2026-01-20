@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import {
 	GROUP_SESSION_STATUS_ID,

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { defer, useRouteLoaderData } from 'react-router-dom';
+import { useRouteLoaderData } from 'react-router-dom';
 import { Col, Container, Row, Tab } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import {
 	MhicPanelTodayResponse,
@@ -93,7 +93,7 @@ function loadOverviewData(isPolling = false) {
 }
 
 export async function loader() {
-	return defer(loadOverviewData());
+	return loadOverviewData();
 }
 
 const INITIAL_COUNTS = {

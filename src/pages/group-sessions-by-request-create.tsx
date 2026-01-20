@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col, Form, Card } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Field, FieldProps, Formik } from 'formik';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import InputHelper from '@/components/input-helper';
 import SessionCropModal from '@/components/session-crop-modal';
@@ -87,7 +87,7 @@ const GroupSessionsByRequestCreate: FC = () => {
 
 	async function handleFormSubmit(values: GroupSessionByRequestFormData) {
 		const submissionValues: CreateGroupSessionRequestRequestBody = {
-			facilitatorAccountId: values.responsible ? account?.accountId ?? null : null,
+			facilitatorAccountId: values.responsible ? (account?.accountId ?? null) : null,
 			facilitatorName: values.managersName,
 			facilitatorEmailAddress: values.managersEmail,
 			title: values.title,

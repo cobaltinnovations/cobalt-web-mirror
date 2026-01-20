@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { interactionService } from '@/lib/services';
 import AsyncPage from '@/components/async-page';

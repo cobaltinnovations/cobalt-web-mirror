@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { analyticsService, faqsService } from '@/lib/services';
 import TabBar from '@/components/tab-bar';

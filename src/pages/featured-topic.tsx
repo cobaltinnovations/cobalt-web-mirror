@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import classNames from 'classnames';
 
@@ -355,7 +355,7 @@ const FeaturedTopic = () => {
 																					return topicCenter.tagsByTagId[
 																						tagId
 																					];
-																			  })
+																				})
 																			: []
 																	}
 																	contentTypeId={content.contentTypeId}
@@ -459,7 +459,7 @@ const FeaturedTopic = () => {
 																topicCenter.tagsByTagId
 																	? content.tagIds.map((tagId) => {
 																			return topicCenter.tagsByTagId[tagId];
-																	  })
+																		})
 																	: []
 															}
 															contentTypeId={content.contentTypeId}

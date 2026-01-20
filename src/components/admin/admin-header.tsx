@@ -7,7 +7,7 @@ import useAccount from '@/hooks/use-account';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
 import { createUseThemedStyles } from '@/jss/theme';
 
-import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import LogoSmallText from '@/assets/logos/logo-cobalt-horizontal.svg?react';
 import { config } from '@/config';
 
 import { AnalyticsNativeEventAccountSignedOutSource, AnalyticsProfileId } from '@/lib/models';
@@ -153,7 +153,7 @@ export const AdminHeader = () => {
 							title: 'Resources',
 							active: !!resourcesMatch,
 						},
-				  ]
+					]
 				: []),
 			...(account?.accountCapabilityFlags.canAdministerGroupSessions
 				? [
@@ -164,7 +164,7 @@ export const AdminHeader = () => {
 							title: 'Group Sessions',
 							active: !!groupSessionsMatch,
 						},
-				  ]
+					]
 				: []),
 			...(account?.accountCapabilityFlags.canCreatePages
 				? [
@@ -175,7 +175,7 @@ export const AdminHeader = () => {
 							to: '/admin/pages',
 							active: !!pagesMatch,
 						},
-				  ]
+					]
 				: []),
 			...(account?.accountCapabilityFlags.canViewProviderReports
 				? [
@@ -186,7 +186,7 @@ export const AdminHeader = () => {
 							to: '/admin/reports',
 							active: !!reportsMatch,
 						},
-				  ]
+					]
 				: []),
 			// {
 			// 	testId: '',
@@ -205,7 +205,7 @@ export const AdminHeader = () => {
 							title: 'Analytics',
 							active: !!analyticsMatch,
 						},
-				  ]
+					]
 				: []),
 			...(account?.accountCapabilityFlags.canViewAnalytics &&
 			institution.analyticsProfileId === AnalyticsProfileId.XRAY
@@ -217,7 +217,7 @@ export const AdminHeader = () => {
 							title: 'Analytics',
 							active: !!xRayMatch,
 						},
-				  ]
+					]
 				: []),
 			...(account?.accountCapabilityFlags.canViewStudyInsights
 				? [
@@ -228,7 +228,7 @@ export const AdminHeader = () => {
 							title: 'Study Insights',
 							active: !!studyInsightsMatch,
 						},
-				  ]
+					]
 				: []),
 			...(config.showDebug
 				? [
@@ -239,7 +239,7 @@ export const AdminHeader = () => {
 							title: 'Debug',
 							active: !!debugMatch,
 						},
-				  ]
+					]
 				: []),
 		],
 		[

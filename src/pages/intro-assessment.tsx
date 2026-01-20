@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import Cookies from 'js-cookie';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import useAccount from '@/hooks/use-account';
 

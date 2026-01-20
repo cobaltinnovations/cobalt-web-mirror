@@ -4,7 +4,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { accountService } from '@/lib/services';
 import React, { useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 

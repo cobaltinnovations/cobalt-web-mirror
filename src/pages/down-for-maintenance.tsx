@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import InCrisisTemplate from '@/components/in-crisis-template';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as LogoIconText } from '@/assets/logos/logo-icon-and-text.svg';
+import LogoIconText from '@/assets/logos/logo-icon-and-text.svg?react';
 import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({

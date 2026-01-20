@@ -2,7 +2,7 @@ module.exports = {
 	sentry: {
 		// The Sentry DSN for nodejs server errors
 		dsn: '',
-		// Passed-through as "react-app config" to all target bundles - controlling wheter Sentry Debug buttons should appear on UI.
+		// Passed-through as web app config to all target bundles - controlling wheter Sentry Debug buttons should appear on UI.
 		showDebug: false,
 	},
 	nodeApp: {

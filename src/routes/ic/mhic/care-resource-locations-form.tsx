@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { LoaderFunctionArgs, useLoaderData, useNavigate } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import {
 	CARE_RESOURCE_TAG_GROUP_ID,
 	CareResourceLocationModel,
@@ -175,7 +175,7 @@ export const Component = () => {
 			? {
 					placeId: careResourceLocation.address.googlePlaceId,
 					text: careResourceLocation.address.formattedAddress,
-			  }
+				}
 			: undefined,
 		address2: careResourceLocation?.address?.streetAddress2 ?? '',
 		wheelchairAccessible: careResourceLocation?.wheelchairAccess ?? false,

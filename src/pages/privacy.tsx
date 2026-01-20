@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { PrivacyContent } from '@/components/privacy-content';
 import useAccount from '@/hooks/use-account';

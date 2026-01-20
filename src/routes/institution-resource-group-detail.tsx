@@ -1,13 +1,13 @@
 import React, { Suspense, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import HeroContainer from '@/components/hero-container';
 import Loader from '@/components/loader';
 import useAccount from '@/hooks/use-account';
 import { AnalyticsNativeEventTypeId, InstitutionResource, InstitutionResourceGroup } from '@/lib/models';
 import { analyticsService, institutionService } from '@/lib/services';
-import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
+import { Await, LoaderFunctionArgs, useRouteLoaderData } from 'react-router-dom';
 import { createUseThemedStyles } from '@/jss/theme';
 
 interface InstitutionResourceGroupDetailLoaderData {
@@ -35,12 +35,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		institutionResourcesRequest.abort();
 	});
 
-	return defer({
+	return {
 		deferredData: Promise.all([
 			institutionResourceGroupRequest.fetch().then((response) => response.institutionResourceGroup),
 			institutionResourcesRequest.fetch().then((response) => response.institutionResources),
 		]),
-	});
+	};
 };
 
 const useStyles = createUseThemedStyles((theme) => ({

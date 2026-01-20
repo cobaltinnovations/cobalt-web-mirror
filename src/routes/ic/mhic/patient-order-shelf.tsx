@@ -1,16 +1,7 @@
-import {
-	LoaderFunctionArgs,
-	RouteObject,
-	defer,
-	useLoaderData,
-	useLocation,
-	useMatches,
-	useNavigate,
-} from 'react-router-dom';
+import { LoaderFunctionArgs, RouteObject, useLoaderData, useLocation, useMatches, useNavigate } from 'react-router-dom';
 
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Tab } from 'react-bootstrap';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
 
 import { PatientOrderResponse, analyticsService, integratedCareService } from '@/lib/services';
@@ -69,7 +60,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 		throw new Error('Unknown Patient Order');
 	}
 
-	return defer(loadShelfData(patientOrderId));
+	return loadShelfData(patientOrderId);
 }
 
 export const Component = () => {
@@ -208,6 +199,9 @@ const ShelfContent = ({
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { addFlag } = useFlags();
+	const patientMrn = patientOrderResponse?.patientOrder.patientMrn ?? '';
+	const canCopyMrn =
+		!!patientMrn && typeof navigator !== 'undefined' && typeof navigator.clipboard?.writeText === 'function';
 
 	if (!patientOrderResponse) {
 		return null;
@@ -243,21 +237,25 @@ const ShelfContent = ({
 					<p className="mb-0">
 						MRN: <span className="fw-bold">{patientOrderResponse.patientOrder.patientMrn}</span>
 					</p>
-					<CopyToClipboard
-						onCopy={() => {
-							addFlag({
-								variant: 'success',
-								title: 'Copied!',
-								description: 'The MRN was copied to your clipboard',
-								actions: [],
-							});
-						}}
-						text={patientOrderResponse.patientOrder.patientMrn ?? ''}
-					>
-						<Button variant="link" className="p-2">
+					{canCopyMrn && (
+						<Button
+							variant="link"
+							className="p-2"
+							onClick={async () => {
+								try {
+									await navigator.clipboard.writeText(patientMrn);
+									addFlag({
+										variant: 'success',
+										title: 'Copied!',
+										description: 'The MRN was copied to your clipboard',
+										actions: [],
+									});
+								} catch (error) {}
+							}}
+						>
 							<SvgIcon kit="far" icon="copy" size={16} />
 						</Button>
-					</CopyToClipboard>
+					)}
 					<span className="text-n300 me-2">|</span>
 					<p className="mb-0">
 						Phone:{' '}

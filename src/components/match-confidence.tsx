@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import classNames from 'classnames';
 
-import { ReactComponent as ConfidenceSearchIcon } from '@/assets/icons/confidence.svg';
+import ConfidenceSearchIcon from '@/assets/icons/confidence.svg?react';
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 
 interface UseStylesProps {

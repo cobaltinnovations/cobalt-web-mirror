@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const yn = require('yn');
 const Sentry = require('@sentry/node');
-const Tracing = require('@sentry/tracing');
 const proxy = require('express-http-proxy');
 
 let settings = {
@@ -57,12 +56,9 @@ app.use((_req, res, next) => {
 if (settings.sentry.dsn) {
 	Sentry.init({
 		dsn: settings.sentry.dsn,
-		integrations: [new Sentry.Integrations.Http({ tracing: true }), new Tracing.Integrations.Express({ app })],
+		integrations: [Sentry.httpIntegration(), Sentry.expressIntegration()],
 		tracesSampleRate: 0.2,
 	});
-
-	app.use(Sentry.Handlers.requestHandler());
-	app.use(Sentry.Handlers.tracingHandler());
 }
 
 // Reporting CSV downloads can proxy through to backend and tack on access token.
@@ -191,10 +187,10 @@ app.get('/news/:pdfName', (_req, res) => {
 	res.redirect(`https://cobaltplatform.s3.us-east-2.amazonaws.com/prod/newsletters/${_req.params.pdfName}.pdf`);
 });
 
-app.get('*', serveIndexFile);
+app.get('/*', serveIndexFile);
 
 if (settings.sentry.dsn) {
-	app.use(Sentry.Handlers.errorHandler());
+	Sentry.setupExpressErrorHandler(app);
 }
 
 app.listen(port, () => {

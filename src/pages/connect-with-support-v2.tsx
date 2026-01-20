@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } 
 import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import {
 	AnalyticsNativeEventTypeId,
@@ -708,7 +708,7 @@ const ConnectWithSupportV2 = () => {
 																			}
 																		},
 																	},
-															  ]
+																]
 															: provider.times.map((time) => ({
 																	title: time.timeDescription,
 																	disabled: time.status !== 'AVAILABLE',
@@ -722,7 +722,7 @@ const ConnectWithSupportV2 = () => {
 																			patientOrderId,
 																		});
 																	},
-															  }))
+																}))
 													}
 													showViewButton={!provider.displayPhoneNumberOnlyForBooking}
 													onModalTimeButtonClick={(sectionDate, availabilityTimeSlot) => {

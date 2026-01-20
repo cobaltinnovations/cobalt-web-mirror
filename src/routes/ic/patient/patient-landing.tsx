@@ -1,7 +1,7 @@
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-import { Await, defer, useNavigate, useRevalidator, useRouteLoaderData } from 'react-router-dom';
+import { Await, useNavigate, useRevalidator, useRouteLoaderData } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import {
 	PatientOrderDispositionId,
 	PatientOrderModel,
@@ -51,7 +51,7 @@ function loadLatestPatientOrder(isPolling = false) {
 }
 
 export async function loader() {
-	return defer(loadLatestPatientOrder());
+	return loadLatestPatientOrder();
 }
 
 interface PatientLandingLoaderData {
@@ -324,9 +324,9 @@ export const Component = () => {
 														patientOrder?.patientDemographicsConfirmed
 															? `Completed ${patientOrder?.patientDemographicsConfirmedAtDescription}`
 															: patientOrder?.patientOrderReferralSourceId ===
-															  PatientOrderReferralSourceId.SELF
-															? 'Review the information we have on file and make sure it is correct.'
-															: 'Review the information provided by your primary care provider and make sure it is correct.'
+																  PatientOrderReferralSourceId.SELF
+																? 'Review the information we have on file and make sure it is correct.'
+																: 'Review the information provided by your primary care provider and make sure it is correct.'
 													}
 													button={{
 														variant: patientOrder?.patientDemographicsConfirmed
@@ -359,14 +359,14 @@ export const Component = () => {
 																	? `Completed ${
 																			patientOrder?.mostRecentScreeningSessionCompletedAtDescription ??
 																			patientOrder?.mostRecentIntakeScreeningSessionCompletedAtDescription
-																	  }`
+																		}`
 																	: homescreenState ===
-																	  PAGE_STATES.ASSESSMENT_IN_PROGRESS
-																	? ''
-																	: patientOrder.patientOrderReferralSourceId ===
-																	  PatientOrderReferralSourceId.SELF
-																	? 'There are two ways to complete the assessment. Performing the assessment yourself online can more quickly determine your eligibility and connect you to care.'
-																	: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
+																		  PAGE_STATES.ASSESSMENT_IN_PROGRESS
+																		? ''
+																		: patientOrder.patientOrderReferralSourceId ===
+																			  PatientOrderReferralSourceId.SELF
+																			? 'There are two ways to complete the assessment. Performing the assessment yourself online can more quickly determine your eligibility and connect you to care.'
+																			: 'There are two ways to complete the assessment. A Mental Health Intake Coordinator will be in touch if the assessment is not completed within the next few days.'
 															}
 															button={
 																homescreenState === PAGE_STATES.ASSESSMENT_COMPLETE
@@ -378,7 +378,7 @@ export const Component = () => {
 																					'/ic/patient/assessment-results'
 																				);
 																			},
-																	  }
+																		}
 																	: undefined
 															}
 														>

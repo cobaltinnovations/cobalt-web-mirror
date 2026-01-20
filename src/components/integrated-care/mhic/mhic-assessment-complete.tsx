@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import {
 	AnalyticsNativeEventTypeId,
@@ -361,7 +361,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 														title: 'Eligibility',
 														value: '#eligibility',
 													},
-											  ]
+												]
 											: []),
 										...eligilityResults.map((result) => ({
 											title: result.screeningName ?? '',
@@ -374,7 +374,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 														title: 'Completed Assessments',
 														value: '#completed-assessments',
 													},
-											  ]
+												]
 											: []),
 										...completedAssessmentsResults.map((result) => ({
 											title: result.screeningName ?? '',
@@ -387,7 +387,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 														title: 'Other Assessments',
 														value: '#other-assessments',
 													},
-											  ]
+												]
 											: []),
 										...notTakenScreeningTypes.map((result) => ({
 											title: result.description ?? '',

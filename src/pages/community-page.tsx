@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import AsyncPage from '@/components/async-page';
 import { SkeletonTopicCenterGroupSession, TopicCenterGroupSession } from '@/components/topic-center-group-session';
@@ -330,7 +330,7 @@ const CommunityPage = () => {
 																					return topicCenter.tagsByTagId[
 																						tagId
 																					];
-																			  })
+																				})
 																			: []
 																	}
 																	contentTypeId={content.contentTypeId}
@@ -428,7 +428,7 @@ const CommunityPage = () => {
 																topicCenter.tagsByTagId
 																	? content.tagIds.map((tagId) => {
 																			return topicCenter.tagsByTagId[tagId];
-																	  })
+																		})
 																	: []
 															}
 															contentTypeId={content.contentTypeId}

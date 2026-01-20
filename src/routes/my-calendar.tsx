@@ -1,7 +1,7 @@
 import React, { RefObject, Suspense, createRef, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
-import { Await, LoaderFunctionArgs, defer, useAsyncValue, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Helmet } from '@/components/helmet';
+import { Await, LoaderFunctionArgs, useAsyncValue, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 
 import CalendarAppointment from '@/components/calendar-appointment';
 import ConfirmCancelBookingModal from '@/components/confirm-cancel-booking-modal';
@@ -39,9 +39,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const upcomingCalendarEventsResponse = upcomingCalendarEventsRequest.fetch();
 
-	return defer({
+	return {
 		calendarEventGroupsPromise: upcomingCalendarEventsResponse.then((response) => response.calendarEventGroups),
-	});
+	};
 }
 
 export const Component = () => {
@@ -190,20 +190,23 @@ const CalendarEventGroups = ({ sourceEventId, onCancel }: CalendarEventGroupsPro
 
 	const eventRefs = useMemo(
 		() =>
-			calendarEventGroups.reduce((acc, calendarEventGroup) => {
-				calendarEventGroup.calendarEvents.forEach((calendarEvent) => {
-					const { appointment, groupSessionReservation } = calendarEvent;
+			calendarEventGroups.reduce(
+				(acc, calendarEventGroup) => {
+					calendarEventGroup.calendarEvents.forEach((calendarEvent) => {
+						const { appointment, groupSessionReservation } = calendarEvent;
 
-					if (appointment) {
-						acc[appointment.appointmentId] = createRef<HTMLDivElement>();
-					}
+						if (appointment) {
+							acc[appointment.appointmentId] = createRef<HTMLDivElement>();
+						}
 
-					if (groupSessionReservation) {
-						acc[groupSessionReservation.groupSessionReservationId] = createRef<HTMLDivElement>();
-					}
-				});
-				return acc;
-			}, {} as { [key: string]: RefObject<HTMLDivElement> }),
+						if (groupSessionReservation) {
+							acc[groupSessionReservation.groupSessionReservationId] = createRef<HTMLDivElement>();
+						}
+					});
+					return acc;
+				},
+				{} as { [key: string]: RefObject<HTMLDivElement> }
+			),
 		[calendarEventGroups]
 	);
 

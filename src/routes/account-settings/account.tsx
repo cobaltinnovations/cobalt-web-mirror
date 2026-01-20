@@ -7,7 +7,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import ConfirmDialog from '@/components/confirm-dialog';
 import ConsentModal from '@/components/consent-modal';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 export async function loader() {
 	return null;

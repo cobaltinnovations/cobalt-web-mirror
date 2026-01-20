@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
@@ -532,7 +532,7 @@ const Index: FC = () => {
 													tagsByTagId
 														? content.tagIds.map((tagId) => {
 																return tagsByTagId[tagId];
-														  })
+															})
 														: []
 												}
 												contentTypeId={content.contentTypeId}

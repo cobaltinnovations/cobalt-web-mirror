@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { InteractionInstance, InteractionOption, InteractionOptionAction } from '@/lib/models';
 import { interactionService } from '@/lib/services';

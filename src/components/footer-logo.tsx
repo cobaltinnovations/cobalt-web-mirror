@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-small-text.svg';
+import LogoSmallText from '@/assets/logos/logo-small-text.svg?react';
 import useAccount from '@/hooks/use-account';
 
 const FooterLogo = () => {

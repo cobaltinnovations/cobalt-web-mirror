@@ -1,7 +1,7 @@
 import React, { FC, useState, useCallback, useContext, useMemo, useEffect } from 'react';
 import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import AsyncPage from '@/components/async-page';
 import SurveyQuestion from '@/components/survey-question';

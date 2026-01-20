@@ -7,7 +7,7 @@ import InCrisisHeaderButton from '@/components/in-crisis-header-button';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import Logo from '@/assets/logos/logo-cobalt-horizontal.svg?react';
 
 const useHeaderStyles = createUseThemedStyles((theme) => ({
 	header: {

@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { accountService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';

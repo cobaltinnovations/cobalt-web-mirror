@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { accountService } from '@/lib/services';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 const AccountSessionDetails = () => {

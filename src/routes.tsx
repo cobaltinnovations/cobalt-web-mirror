@@ -39,6 +39,7 @@ import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
 
 import AsyncWrapper from './components/async-page';
+import Loader from './components/loader';
 
 export interface RouteHandle {
 	hideHeader?: boolean;
@@ -301,6 +302,7 @@ export const routes: RouteObject[] = [
 		id: 'root',
 		path: '/',
 		lazy: () => import('@/routes/root'),
+		hydrateFallbackElement: <Loader />,
 		children: [
 			{
 				path: 'auth',
@@ -776,7 +778,7 @@ export const routes: RouteObject[] = [
 									path: 'providers/:providerId/cobalt-bio',
 									element: <ProviderManagementCobaltBio />,
 								},
-						  ]
+							]
 						: []),
 					{
 						path: 'interaction/:interactionInstanceId/option/:interactionOptionId',

@@ -13,7 +13,7 @@ import { useContainerStyles } from './use-scheduling-styles';
 import { FetchProviderCalendarConfig, useProviderCalendar } from './use-provider-calendar';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useCobaltTheme } from '@/jss/theme';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 enum MainCalendarView {
 	Day = 'timeGridDay',

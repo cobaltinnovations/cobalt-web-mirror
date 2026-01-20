@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import AsyncWrapper from './async-page';
 import HeroContainer from './hero-container';
 import InlineAlert from './inline-alert';

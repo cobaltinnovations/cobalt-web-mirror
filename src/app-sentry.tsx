@@ -12,14 +12,14 @@ import { CobaltError } from './lib/http-client';
 export let appCreateBrowserRouter = createBrowserRouter;
 
 if (__SENTRY_DSN__ && __SENTRY_RELEASE__) {
-	appCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createBrowserRouter);
+	appCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV7(createBrowserRouter);
 
 	Sentry.init({
 		dsn: __SENTRY_DSN__, //'https://3c09aa7b1aed4dbf907387181df79b52@o1430936.ingest.sentry.io/6781979', //__SENTRY_DSN__,
 		release: __SENTRY_RELEASE__, //'local-data-router',
 		tracesSampleRate: __DEV__ ? 1.0 : 0.2,
 		integrations: [
-			Sentry.reactRouterV6BrowserTracingIntegration({
+			Sentry.reactRouterV7BrowserTracingIntegration({
 				useEffect: React.useEffect,
 				useLocation,
 				useNavigationType,

@@ -2,7 +2,7 @@ import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import React, { FC } from 'react';
 import { Card, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	thankYouCard: {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 import InputHelper from '@/components/input-helper';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 export const ProviderManagementCobaltBio = (): ReactElement => {

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { reportingSerive, ReportType } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Cobalt</title>
+		<base href="/" />
+
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="Cobalt" />
+
+		<link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="%BASE_URL%favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="%BASE_URL%favicon-16x16.png" />
+		<link rel="manifest" href="%BASE_URL%site.webmanifest" />
+		<link rel="shortcut icon" href="%BASE_URL%favicon.ico" />
+		<meta name="msapplication-config" content="%BASE_URL%browserconfig.xml" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet" />
+		<script
+			async
+			src="%BASE_URL%static/js/analytics.js"
+			data-objectName="cobaltAnalytics"
+			data-storageNamespace="cobaltAnalytics"
+			data-apiBaseUrl="%ANALYTICS_API_BASE_URL%"
+			data-appVersion="%ANALYTICS_APP_VERSION%"
+			data-debuggingEnabled="%ANALYTICS_DEBUGGING_ENABLED%"
+		></script>
+	</head>
+	<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root"></div>
+		<script type="module" src="/src/index.tsx"></script>
+	</body>
+</html>

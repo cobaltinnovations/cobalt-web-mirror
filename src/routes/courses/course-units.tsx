@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { getNextUnit, getOptionalCourseModules, getRequiredCourseModules } from '@/lib/utils';
 import {
 	AnalyticsNativeEventTypeId,

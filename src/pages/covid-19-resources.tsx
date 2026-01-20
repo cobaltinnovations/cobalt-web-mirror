@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import HeroContainer from '@/components/hero-container';
 

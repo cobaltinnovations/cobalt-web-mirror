@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import useHandleError from '@/hooks/use-handle-error';
 import { integratedCareService } from '@/lib/services';

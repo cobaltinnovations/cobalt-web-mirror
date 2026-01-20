@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { exploreLinks } from '@/menu-links';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as CobaltLogo } from '@/assets/logos/logo-icon.svg';
+import CobaltLogo from '@/assets/logos/logo-icon.svg?react';
 
 import FooterContent from './footer-content';
 import FooterLogo from './footer-logo';

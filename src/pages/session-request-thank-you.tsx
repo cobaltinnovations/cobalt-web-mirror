@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import HeroContainer from '@/components/hero-container';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({

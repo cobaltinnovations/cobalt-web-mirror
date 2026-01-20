@@ -2,8 +2,8 @@ import React, { FC, useState, useEffect } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import { ReactComponent as ReceptionistIllustration } from '@/assets/illustrations/receptionist.svg';
-import { ReactComponent as DoctorIllustration } from '@/assets/illustrations/doctor-with-chart.svg';
+import ReceptionistIllustration from '@/assets/illustrations/receptionist.svg?react';
+import DoctorIllustration from '@/assets/illustrations/doctor-with-chart.svg?react';
 import { createUseThemedStyles } from '@/jss/theme';
 import useTrackModalView from '@/hooks/use-track-modal-view';
 

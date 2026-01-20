@@ -1,14 +1,6 @@
 import { cloneDeep } from 'lodash';
 import React, { Suspense, useEffect, useState } from 'react';
-import {
-	Await,
-	Link,
-	LoaderFunctionArgs,
-	defer,
-	useNavigate,
-	useRouteLoaderData,
-	useSearchParams,
-} from 'react-router-dom';
+import { Await, Link, LoaderFunctionArgs, useNavigate, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
 import {
 	CONTENT_VISIBILITY_TYPE_ID,
@@ -77,9 +69,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const groupSessionCountsRequest = groupSessionsService.getGroupSessionCounts();
 	const groupSessionsPromise = Promise.all([groupSessionsrequest.fetch(), groupSessionCountsRequest.fetch()]);
 
-	return defer({
-		groupSessionsPromise,
-	});
+	return { groupSessionsPromise };
 }
 
 export const Component = () => {
@@ -277,7 +267,7 @@ export const Component = () => {
 																{groupSession.seatsReserved}
 															</Link>
 														) : (
-															groupSession.seatsReserved ?? 'N/A'
+															(groupSession.seatsReserved ?? 'N/A')
 														)}
 													</TableCell>
 													<TableCell>{groupSession.seats ?? 'N/A'}</TableCell>

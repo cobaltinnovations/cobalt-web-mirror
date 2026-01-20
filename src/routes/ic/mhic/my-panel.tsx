@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, defer, useMatch, useNavigate, useRouteLoaderData } from 'react-router-dom';
+import { Outlet, useMatch, useNavigate, useRouteLoaderData } from 'react-router-dom';
 
 import { MhicNavigation, MhicNavigationItemModel } from '@/components/integrated-care/mhic';
 
@@ -20,9 +20,7 @@ export async function loader() {
 
 	const patientOrderPanelCountsPromise = countsRequest.fetch();
 
-	return defer({
-		patientOrderPanelCountsPromise,
-	});
+	return { patientOrderPanelCountsPromise };
 }
 
 export const Component = () => {

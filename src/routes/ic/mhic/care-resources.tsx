@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { Form, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, Row } from 'react-bootstrap';
 import { CareResourceModel } from '@/lib/models';

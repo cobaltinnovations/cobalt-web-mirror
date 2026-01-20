@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { PatientOrderModel } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { createUseThemedStyles } from '@/jss/theme';
-import { ReactComponent as WomanWithCatIllustration } from '@/assets/illustrations/woman-with-cat.svg';
+import WomanWithCatIllustration from '@/assets/illustrations/woman-with-cat.svg?react';
 import AsyncWrapper from '@/components/async-page';
 
 const useStyles = createUseThemedStyles((theme) => ({

@@ -5,7 +5,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '@/components/svg-icon';
 import { IconName } from '@awesome.me/kit-c75e843088/icons';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({

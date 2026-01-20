@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { PatientOrderCarePreferenceId, PatientOrderModel, PatientOrderReferralSourceId } from '@/lib/models';
 import { integratedCareService } from '@/lib/services';
@@ -244,7 +244,8 @@ const PatientDemographics = () => {
 								<h4 className="mb-2">About You</h4>
 								{!institution.integratedCarePatientDemographicsRequired && (
 									<p className="mb-6">
-										This information is not required but can be helpful for your care team to know.{' '}
+										This information is not required but can be helpful for your care team to
+										know.{' '}
 									</p>
 								)}
 

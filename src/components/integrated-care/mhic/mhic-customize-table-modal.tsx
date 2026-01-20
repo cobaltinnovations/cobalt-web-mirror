@@ -10,7 +10,7 @@ import {
 	Droppable,
 	DropResult,
 	ResponderProvided,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';

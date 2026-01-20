@@ -7,7 +7,7 @@ import { providerService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncPage from '@/components/async-page';
 import BackgroundImageContainer from '@/components/background-image-container';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 export const ProviderManagementProfile = (): ReactElement => {
 	const navigate = useNavigate();

@@ -6,8 +6,8 @@ import useAccount from '@/hooks/use-account';
 import useInCrisisModal from '@/hooks/use-in-crisis-modal';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import { ReactComponent as Logo } from '@/assets/logos/logo-cobalt-horizontal.svg';
-import { ReactComponent as Illustration } from '@/assets/illustrations/sign-in.svg';
+import Logo from '@/assets/logos/logo-cobalt-horizontal.svg?react';
+import Illustration from '@/assets/illustrations/sign-in.svg?react';
 import SvgIcon from './svg-icon';
 
 interface UseStylesProps {

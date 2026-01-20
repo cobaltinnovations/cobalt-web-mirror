@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import InputHelperSearch from '@/components/input-helper-search';
 import { integratedCareService } from '@/lib/services';

@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { LoaderFunctionArgs, Navigate, redirect, useLoaderData, useRevalidator } from 'react-router-dom';
 
@@ -105,8 +105,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		let analyticsRedirectUrl = forceDestination
 			? forceDestination
 			: authRedirectUrl && authRedirectUrl !== '/'
-			? authRedirectUrl
-			: undefined;
+				? authRedirectUrl
+				: undefined;
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.ACCOUNT_SIGNED_IN, {
 			accountId: accountId,
 			redirectUrl: analyticsRedirectUrl,

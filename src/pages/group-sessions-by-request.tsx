@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import React, { FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { Table, TableHead, TableCell, TableBody, TableRow, TablePagination } from '@/components/table';
 import SessionRequestRow from '@/components/session-request-row';

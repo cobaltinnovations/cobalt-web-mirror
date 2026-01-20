@@ -21,8 +21,8 @@ import { useScreeningNavigation } from './screening.hooks';
 import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
 import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
-import { Helmet } from 'react-helmet';
-import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
+import { Helmet } from '@/components/helmet';
+import AppointmentIllustration from '@/assets/illustrations/appointment.svg?react';
 import SvgIcon from '@/components/svg-icon';
 
 const ScreeningQuestionsPage = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Form } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 export async function loader() {

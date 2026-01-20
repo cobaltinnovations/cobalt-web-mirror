@@ -2,7 +2,7 @@ import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { LoaderFunctionArgs, redirect, useLoaderData, useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { DateFormats } from '@/lib/utils';
 import { AnalyticsReportGroup } from '@/lib/models';

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
-import { LoaderFunctionArgs, defer, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { LoaderFunctionArgs, useRevalidator, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Helmet } from '@/components/helmet';
 
 import FileInputButton from '@/components/file-input-button';
 import {
@@ -84,11 +84,9 @@ function loadPatientOrders({
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 
-	return defer(
-		loadPatientOrders({
-			searchParams: url.searchParams,
-		})
-	);
+	return loadPatientOrders({
+		searchParams: url.searchParams,
+	});
 }
 
 export const Component = () => {

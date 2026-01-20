@@ -26,7 +26,7 @@ import { exploreLinks } from '@/menu-links';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
-import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import LogoSmallText from '@/assets/logos/logo-cobalt-horizontal.svg?react';
 import InCrisisHeaderButton from './in-crisis-header-button';
 import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
@@ -476,7 +476,7 @@ const HeaderV2 = () => {
 									},
 								})),
 						},
-				  ]
+					]
 				: []),
 			{
 				navigationItemId: 'BROWSE_RESOURCES',
@@ -551,7 +551,7 @@ const HeaderV2 = () => {
 								})
 							),
 						},
-				  ]
+					]
 				: []),
 		];
 	}, [
@@ -580,7 +580,7 @@ const HeaderV2 = () => {
 							title: 'Account Settings',
 							to: '/account-settings',
 						},
-				  ]
+					]
 				: []),
 			...(showMyEvents
 				? [
@@ -590,7 +590,7 @@ const HeaderV2 = () => {
 							title: 'My Events',
 							to: '/my-calendar',
 						},
-				  ]
+					]
 				: []),
 		],
 		[showAccountSettings, showMyEvents]
@@ -611,7 +611,7 @@ const HeaderV2 = () => {
 							title: 'Patient Scheduling',
 							to: '/scheduling',
 						},
-				  ]
+					]
 				: []),
 			...(isAdmin
 				? [
@@ -623,7 +623,7 @@ const HeaderV2 = () => {
 							title: 'Admin',
 							to: '/admin',
 						},
-				  ]
+					]
 				: []),
 		];
 	}, [isAdmin, isProvider]);
@@ -658,7 +658,7 @@ const HeaderV2 = () => {
 						linkTo: `/featured-topics/${legacyFeaturedTopicCenter.urlName}`,
 						topicCenterId: legacyFeaturedTopicCenter.topicCenterId,
 						pageId: '',
-				  }
+					}
 				: undefined;
 		}
 
@@ -673,7 +673,7 @@ const HeaderV2 = () => {
 					linkTo: featuredTopicCenter.relativeUrl,
 					topicCenterId: '',
 					pageId: featuredTopicCenter.pageId,
-			  }
+				}
 			: undefined;
 	}, [featuredTopicCenter, institution.preferLegacyTopicCenters, legacyFeaturedTopicCenter]);
 
@@ -750,7 +750,7 @@ const HeaderV2 = () => {
 																			featuredTopicCenterItem.topicCenterId,
 																		source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
 																	}
-															  )
+																)
 															: analyticsService.persistEvent(
 																	AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
 																	{
@@ -758,7 +758,7 @@ const HeaderV2 = () => {
 																		source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
 																		siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
 																	}
-															  );
+																);
 													}}
 												/>
 											)}
@@ -910,7 +910,7 @@ const HeaderV2 = () => {
 														? {
 																subtitle: navigationItem.subtitle,
 																featuredItem: featuredTopicCenterItem,
-														  }
+															}
 														: null)}
 													featuredItem={showFeaturedItem ? featuredTopicCenterItem : null}
 												>

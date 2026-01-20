@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { RefObject, useRef } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill-new';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.snow.css';
 
 interface UseWysiwygStylesProps {
 	height?: number;

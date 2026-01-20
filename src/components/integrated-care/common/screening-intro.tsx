@@ -1,4 +1,4 @@
-import { ReactComponent as WomanAtDeskIllustration } from '@/assets/illustrations/woman-at-desk.svg';
+import WomanAtDeskIllustration from '@/assets/illustrations/woman-at-desk.svg?react';
 import { createUseThemedStyles } from '@/jss/theme';
 import { PatientOrderModel } from '@/lib/models';
 import React from 'react';

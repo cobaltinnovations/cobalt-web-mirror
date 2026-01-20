@@ -2,7 +2,6 @@ import useAccount from '@/hooks/use-account';
 import { config } from '@/config';
 import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import React, { FC, PropsWithChildren, createContext, useCallback, useEffect, useMemo, useRef } from 'react';
-import ReactGA from 'react-ga';
 
 import {
 	AnalyticsEventCategory,
@@ -28,7 +27,10 @@ export class MainNavAnalyticsEvent {
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.LeftNav;
-	constructor(public action: MainNavEventActions, public label?: string) {}
+	constructor(
+		public action: MainNavEventActions,
+		public label?: string
+	) {}
 }
 
 /**
@@ -50,7 +52,10 @@ export class ScreeningAnalyticsEvent {
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.Screening;
-	constructor(public action: ScreeningEventActions, public label?: string) {}
+	constructor(
+		public action: ScreeningEventActions,
+		public label?: string
+	) {}
 }
 
 /**
@@ -69,7 +74,10 @@ export class ContentAnalyticsEvent {
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.Content;
-	constructor(public action: ContentEventActions, public label?: ContentFilterPill) {}
+	constructor(
+		public action: ContentEventActions,
+		public label?: ContentFilterPill
+	) {}
 }
 
 export class TopicCenterAnalyticsEvent {
@@ -94,7 +102,11 @@ export class TopicCenterAnalyticsEvent {
 	}
 
 	nonInteractive = false;
-	constructor(public action: TopicCenterEventActions, public category: string, public label?: string) {
+	constructor(
+		public action: TopicCenterEventActions,
+		public category: string,
+		public label?: string
+	) {
 		this.category = `${AnalyticsEventCategory.TopicCenter} - ${category}`;
 	}
 }
@@ -119,7 +131,10 @@ export class ProviderSearchAnalyticsEvent {
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.ProviderSearch;
-	constructor(public action: ProviderSearchEventActions, public label?: ProviderFilterPill) {}
+	constructor(
+		public action: ProviderSearchEventActions,
+		public label?: ProviderFilterPill
+	) {}
 }
 
 export class CrisisAnalyticsEvent {
@@ -168,7 +183,10 @@ export class CrisisAnalyticsEvent {
 
 	nonInteractive = false;
 	category = AnalyticsEventCategory.Crisis;
-	constructor(public action: CrisisEventActions, public label?: string) {}
+	constructor(
+		public action: CrisisEventActions,
+		public label?: string
+	) {}
 }
 
 export interface AnalyticsEvent extends Record<string, any> {
@@ -211,12 +229,13 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 
 	const enabledVersionsRef = useRef({
 		mixpanel: false,
-		reactGa: false,
+		gaTracking: false,
 		ga4: false,
 	});
-	const isReactGAEnabled = enabledVersionsRef.current.reactGa;
+	const isGaTrackingEnabled = enabledVersionsRef.current.gaTracking;
 	const isGA4Enabled = enabledVersionsRef.current.ga4;
 	const configuredMeasurementIdsRef = useRef<Record<string, boolean>>({});
+	const configuredTrackingIdsRef = useRef<Record<string, boolean>>({});
 
 	const accountId = account?.accountId;
 	const accountSourceId = account?.accountSourceId;
@@ -239,6 +258,32 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		return data;
 	}, [accountId, accountSourceId, jobTitle]);
 
+	const ensureGtagScript = useCallback((trackingId: string) => {
+		if (typeof window === 'undefined' || typeof document === 'undefined') {
+			return;
+		}
+
+		//@ts-expect-error
+		window.dataLayer = window.dataLayer || [];
+
+		if (document.getElementById('cobalt-gtag-script')) {
+			return;
+		}
+
+		const scriptSrc = trackingId.startsWith('GTM-')
+			? `https://www.googletagmanager.com/gtm.js?id=${trackingId}`
+			: `https://www.googletagmanager.com/gtag/js?id=${trackingId}`;
+
+		const script = document.createElement('script');
+		script.id = 'cobalt-gtag-script';
+		script.async = true;
+		script.type = 'text/javascript';
+		script.src = scriptSrc;
+
+		document.head.insertBefore(script, document.head.firstChild);
+		gtag('js', new Date());
+	}, []);
+
 	const configureMeasurementId = useCallback((measurementId: string) => {
 		if (!enabledVersionsRef.current.ga4 || configuredMeasurementIdsRef.current[measurementId]) {
 			return;
@@ -249,6 +294,18 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		});
 
 		configuredMeasurementIdsRef.current[measurementId] = true;
+	}, []);
+
+	const configureTrackingId = useCallback((trackingId: string) => {
+		if (!enabledVersionsRef.current.gaTracking || configuredTrackingIdsRef.current[trackingId]) {
+			return;
+		}
+
+		gtag('config', trackingId, {
+			send_page_view: false,
+		});
+
+		configuredTrackingIdsRef.current[trackingId] = true;
 	}, []);
 
 	const gtagPageView = useCallback(
@@ -282,24 +339,9 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		}
 
 		enabledVersionsRef.current.ga4 = true;
-		//@ts-expect-error
-		window.dataLayer = window.dataLayer || [];
-
-		// GTM URL is slightly different from GA4
-		const scriptSrc = initialMeasurementId.startsWith('GTM-')
-			? `https://www.googletagmanager.com/gtm.js?id=${initialMeasurementId}`
-			: `https://www.googletagmanager.com/gtag/js?id=${initialMeasurementId}`;
-
-		const script = document.createElement('script');
-		script.async = true;
-		script.type = 'text/javascript';
-		script.src = scriptSrc;
-
-		document.head.insertBefore(script, document.head.firstChild);
-
-		gtag('js', new Date());
+		ensureGtagScript(initialMeasurementId);
 		configureMeasurementId(initialMeasurementId);
-	}, [configureMeasurementId, initialMeasurementId]);
+	}, [configureMeasurementId, ensureGtagScript, initialMeasurementId]);
 
 	useEffect(() => {
 		if (!institution?.ga4MeasurementId) {
@@ -316,28 +358,17 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 			return;
 		}
 
-		enabledVersionsRef.current.reactGa = true;
-
-		ReactGA.initialize(config.gaTrackingId, {
-			testMode: __DEV__,
-		});
-
-		if (__DEV__) {
-			// exposing this to test/debug in browser console:
-			// access window.__REACT_GA__.testModeAPI.calls for results
-			//@ts-expect-error
-			window.__REACT_GA__ = ReactGA;
-		}
-	}, []);
+		enabledVersionsRef.current.gaTracking = true;
+		ensureGtagScript(config.gaTrackingId);
+		configureTrackingId(config.gaTrackingId);
+	}, [configureTrackingId, ensureGtagScript]);
 
 	useEffect(() => {
-		if (enabledVersionsRef.current.reactGa) {
-			if (Object.keys(commonData).length > 0) {
-				ReactGA.set({ ...commonData });
-			}
+		if (Object.keys(commonData).length === 0) {
+			return;
 		}
 
-		if (enabledVersionsRef.current.ga4) {
+		if (enabledVersionsRef.current.gaTracking || enabledVersionsRef.current.ga4) {
 			gtag('set', { ...commonData });
 		}
 	}, [commonData]);
@@ -364,60 +395,71 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 		: location.pathname + location.search;
 
 	useEffect(() => {
-		if (!isReactGAEnabled) {
+		if (!isGaTrackingEnabled && !isGA4Enabled) {
 			return;
 		}
 
-		ReactGA.set({ page, ...commonData });
-		ReactGA.pageview(page);
-	}, [commonData, isReactGAEnabled, page]);
+		gtag('set', { page, ...commonData });
+	}, [commonData, isGA4Enabled, isGaTrackingEnabled, page]);
+
+	useEffect(() => {
+		if (!isGaTrackingEnabled) {
+			return;
+		}
+
+		for (const trackingId of Object.keys(configuredTrackingIdsRef.current)) {
+			gtagPageView(trackingId, page);
+		}
+	}, [gtagPageView, isGaTrackingEnabled, page]);
 
 	useEffect(() => {
 		if (!isGA4Enabled) {
 			return;
 		}
 
-		gtag('set', { page, ...commonData });
 		for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
 			gtagPageView(measurementId, page);
 		}
-	}, [gtagPageView, isGA4Enabled, page, commonData]);
+	}, [gtagPageView, isGA4Enabled, page]);
 
 	const trackEvent = useCallback(
 		(event: AnalyticsEvent) => {
-			if (enabledVersionsRef.current.reactGa) {
-				if (event.category) {
-					ReactGA.event({
-						...event,
-						action: event.action,
-						category: event.category,
+			const { category, label, nonInteractive, ...rest } = event;
+			const customData: Record<string, unknown> = {
+				...rest,
+			};
+			if (category) {
+				customData.event_category = category;
+			}
+
+			if (label) {
+				customData.event_label = label;
+			}
+
+			if (typeof nonInteractive === 'boolean') {
+				customData.non_interaction = event.nonInteractive;
+			}
+
+			const payloadBase = {
+				timestamp: Date.now(),
+				...commonData,
+				...customData,
+			};
+
+			if (enabledVersionsRef.current.gaTracking && category) {
+				for (const trackingId of Object.keys(configuredTrackingIdsRef.current)) {
+					gtag('event', event.action, {
+						send_to: trackingId,
+						...payloadBase,
 					});
 				}
 			}
 
 			if (enabledVersionsRef.current.ga4) {
 				for (const measurementId of Object.keys(configuredMeasurementIdsRef.current)) {
-					const { category, label, nonInteractive, ...rest } = event;
-					const customData: Record<string, unknown> = {
-						...rest,
-					};
-					if (category) {
-						customData.event_category = category;
-					}
-
-					if (label) {
-						customData.event_label = label;
-					}
-
-					if (typeof nonInteractive === 'boolean') {
-						customData.non_interaction = event.nonInteractive;
-					}
-
 					gtag('event', event.action, {
 						send_to: measurementId,
-						timestamp: Date.now(),
-						...commonData,
-						...customData,
+						...payloadBase,
 					});
 				}
 			}
@@ -427,8 +469,10 @@ const AnalyticsProvider: FC<PropsWithChildren> = (props) => {
 
 	const trackModalView = useCallback(
 		(modalName: string) => {
-			if (enabledVersionsRef.current.reactGa) {
-				ReactGA.modalview(modalName);
+			if (enabledVersionsRef.current.gaTracking) {
+				for (const trackingId of Object.keys(configuredTrackingIdsRef.current)) {
+					gtagPageView(trackingId, `/modal/${modalName}`);
+				}
 			}
 
 			if (enabledVersionsRef.current.ga4) {

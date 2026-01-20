@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import useAccount from '@/hooks/use-account';
 

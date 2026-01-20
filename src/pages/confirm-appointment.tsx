@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { accountService, analyticsService, appointmentService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';

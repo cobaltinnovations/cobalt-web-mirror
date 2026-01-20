@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { GROUP_SESSION_STATUS_ID, GROUP_SESSION_SORT_ORDER } from '@/lib/models';
 import { groupSessionsService } from '@/lib/services';

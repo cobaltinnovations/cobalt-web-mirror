@@ -1,7 +1,7 @@
 import React from 'react';
 import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { institutionReferrersService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';

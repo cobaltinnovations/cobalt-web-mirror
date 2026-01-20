@@ -1,7 +1,7 @@
 import React, { Suspense, useContext, useEffect, useMemo, useRef } from 'react';
-import { Await, LoaderFunctionArgs, defer, useLocation, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { Await, LoaderFunctionArgs, useLocation, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { providerService } from '@/lib/services';
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
@@ -50,7 +50,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 		throw new Error('params.urlName is undefined');
 	}
 
-	return defer({ deferredData: loadProviderDetails(params.urlName) });
+	return { deferredData: loadProviderDetails(params.urlName) };
 };
 
 const useProviderDetailLoaderData = () => {

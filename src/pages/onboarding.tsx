@@ -1,7 +1,7 @@
 import useAccount from '@/hooks/use-account';
 import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Onboarding = () => {

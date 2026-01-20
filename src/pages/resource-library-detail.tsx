@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import AsyncPage from '@/components/async-page';
 

@@ -4,7 +4,7 @@ import { AnalyticsNativeEventTypeId } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
 import React, { useEffect, useMemo } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 export const loader = () => {
 	return null;

@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 export const ProviderManagementPaymentTypesAccepted = (): ReactElement => {

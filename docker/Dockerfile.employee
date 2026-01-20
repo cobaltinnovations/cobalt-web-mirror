@@ -10,7 +10,7 @@
 #
 # docker stop $(docker ps -q --filter ancestor=cobalt-web)
 
-FROM public.ecr.aws/bitnami/node:18.18.2
+FROM public.ecr.aws/bitnami/node:22.9.0
 
 ARG GIT_COMMIT_HASH
 ARG BUILD_FLAGS

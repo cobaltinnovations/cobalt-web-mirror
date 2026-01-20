@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import { createUseStyles } from 'react-jss';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';

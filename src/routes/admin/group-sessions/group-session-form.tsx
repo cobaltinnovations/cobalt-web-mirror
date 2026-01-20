@@ -53,7 +53,7 @@ import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/compon
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
 import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
-import ReactQuill from 'react-quill';
+import ReactQuill from 'react-quill-new';
 
 type AdminGroupSessionFormLoaderData = Awaited<ReturnType<typeof loader>>;
 
@@ -234,7 +234,7 @@ function getInitialGroupSessionFormValues({
 						startTime: '',
 						endDate: initialGroupSessionFormValues.endDate,
 						endTime: '',
-				  }
+					}
 				: mergedDateInputValues),
 		}
 	);
@@ -299,8 +299,8 @@ export const Component = () => {
 		params.action === 'add-external'
 			? GroupSessionSchedulingSystemId.EXTERNAL
 			: params.action === 'add-internal'
-			? GroupSessionSchedulingSystemId.COBALT
-			: loaderData?.groupSession?.groupSessionSchedulingSystemId ?? GroupSessionSchedulingSystemId.COBALT;
+				? GroupSessionSchedulingSystemId.COBALT
+				: (loaderData?.groupSession?.groupSessionSchedulingSystemId ?? GroupSessionSchedulingSystemId.COBALT);
 
 	const isExternal = groupSessionSchedulingSystemId === GroupSessionSchedulingSystemId.EXTERNAL;
 	const hasReservations = (loaderData?.groupSessionReservations ?? []).length > 0;
@@ -737,7 +737,7 @@ export const Component = () => {
 							updateFormValue('differentEmailAddressForNotifications', currentTarget.checked);
 							updateFormValue(
 								'targetEmailAddress',
-								currentTarget.checked ? loaderData?.groupSession?.targetEmailAddress ?? '' : ''
+								currentTarget.checked ? (loaderData?.groupSession?.targetEmailAddress ?? '') : ''
 							);
 						}}
 					>

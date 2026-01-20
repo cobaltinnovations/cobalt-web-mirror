@@ -53,7 +53,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
 import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
-import ReactQuill from 'react-quill';
+import ReactQuill from 'react-quill-new';
 import SvgIcon from '@/components/svg-icon';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -170,7 +170,7 @@ function getInitialResourceFormValues({
 		contentStatusId: adminContent?.contentStatusId ?? ContentStatusId.DRAFT,
 		durationInMinutes: adminContent?.durationInMinutes ? String(adminContent?.durationInMinutes) : '',
 		resourceType: adminContent?.fileUploadId ? RESOURCE_TYPE.FILE : RESOURCE_TYPE.URL,
-		resourceUrl: !adminContent?.fileUploadId ? adminContent?.url ?? '' : '',
+		resourceUrl: !adminContent?.fileUploadId ? (adminContent?.url ?? '') : '',
 		resourceFileName: adminContent?.filename ?? '',
 		resourceFileSize: adminContent?.filesize ?? 0,
 		resourceFileUploadId: adminContent?.fileUploadId ?? '',
@@ -516,7 +516,7 @@ export const Component = () => {
 						? 'Any changes will be published immediately'
 						: `This resource will become live on the Cobalt Resource Library on ${moment(
 								formValues.publishDate
-						  ).format('MM/DD/YY')}.`
+							).format('MM/DD/YY')}.`
 				}
 				dismissText="Cancel"
 				confirmText={isEdit ? 'Update' : 'Publish Resource'}

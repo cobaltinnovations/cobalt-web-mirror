@@ -1,9 +1,9 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project uses [Vite](https://vitejs.dev/) for the frontend build pipeline.
 
 ## Environment Versions
 
-[Node.js](https://nodejs.org/en/) `v18.12.1`<br/>
-[NPM](https://www.npmjs.com/) `v8.19.2`
+[Node.js](https://nodejs.org/en/) `v22.9+` (22.x)<br/>
+[NPM](https://www.npmjs.com/) `v10.x`
 
 ## Available Scripts
 
@@ -19,33 +19,20 @@ You must do this before running any other scripts.
 Runs the app in development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The browser will hot reload on save.<br />
-You will see any lint errors in the console.
-
-### `npm run storybook`
-
-Runs storybook for UI components.<br />
-Open [http://localhost:6006](http://localhost:6006) to view it in the browser.
-
-Read more about the storybook integration [here](./src/stories/helpers/README.md)
+The browser will hot reload on save.
 
 ### `npm run test`
 
-Launches jest in interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-Jest configuration can be found in the package.json.
+Launches Vitest in watch mode.
 
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br />
-Correctly bundles React in production mode and optimizes the build for performance.
+Vite bundles React in production mode and optimizes the build for performance.
 
 Build is minified and the filenames are hashed.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-Build script and Webpack config are modified from the default `react-scripts` behavior to support overriding modules and therefore generating separate bundles per institution.
+Build script uses Vite and supports overriding modules to generate separate bundles per institution.
 
 Read more [here](institution-overrides/README.md)
 
@@ -70,16 +57,6 @@ To enable Sentry reporting/monitoring in the generated react app bundles, pass t
 npm run build -- --sentry-dsn=https://dsn.sentry --sentry-token=authtoken --sentry-org=my-org --sentry-project=my-project
 ```
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
 ### `npm run start`
 
 Starts the node server.<br />
@@ -88,17 +65,17 @@ Check [here](config/README.md) for app configuration.
 
 The node server is currently used to:
 
--   Passthrough react-app configuration from server runtime (`process.env`) variables to the different pre-built app bundles.
--   Expose few ops endpoints (like `/health-check`)
--   Proxy for some api calls between react-app and backend
--   Serve static bundles.
+- Passthrough web app configuration from server runtime (`process.env`) variables to the different pre-built app bundles.
+- Expose few ops endpoints (like `/health-check`)
+- Proxy for some api calls between the web app and backend
+- Serve static bundles.
 
-It does not need to be running during local development because react-app configuration variables are provided by `.env.local` to the webpack dev server (which compiles/bundles/reloads typescript during development.)
+It does not need to be running during local development because the Vite dev server compiles/bundles/reloads TypeScript during development.
 
 If you ever need to test your code "in production mode":
 
--   create a production build of the react app using `npm run build`
--   start the node server (assuming you also have a local version of backend also running) and point your browser to [http://localhost:3000](http://localhost:3000) (or any `/etc/host` config you might have for testing the varios bundles that could've been generated based on your other local/gitignored config)
+- create a production build of the react app using `npm run build`
+- start the node server (assuming you also have a local version of backend also running) and point your browser to [http://localhost:3000](http://localhost:3000) (or any `/etc/host` config you might have for testing the varios bundles that could've been generated based on your other local/gitignored config)
 
     `COBALT_WEB_NAMESPACE=local COBALT_WEB_ENV=dev COBALT_WEB_API_BASE_URL=http://localhost:8080 npm run start`
 
@@ -123,6 +100,6 @@ If you ever need to test your code "in production mode":
 
 Copy `.env.local.example` to `.env.local` at the root of the repo
 
-All local development environment variables must start with `REACT_APP_`. This prefix can be ignored in production as it is only used by create-react-app's bundlers to set environment variables at build-time.
+Vite exposes only `VITE_`-prefixed environment variables to the client bundle; server/runtime values can remain unprefixed.
 
 In production, the variables are controlled by the node.js server run-time and this file is irrelevant (other than being a reference to what variables can be passed-through/controlled by nodejs server).

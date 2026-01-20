@@ -7,7 +7,7 @@ import { groupSessionsService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import useHandleError from '@/hooks/use-handle-error';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 
 enum ATTENDEE_COUNTS {

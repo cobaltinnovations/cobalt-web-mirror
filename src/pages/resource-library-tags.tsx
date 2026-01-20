@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Col, Container, Form, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { getBackgroundClassForColorId } from '@/lib/utils/color-utils';
 import {
@@ -361,7 +361,7 @@ const ResourceLibraryTags = () => {
 											tagsByTagId
 												? content.tagIds.map((tagId) => {
 														return tagsByTagId[tagId];
-												  })
+													})
 												: []
 										}
 										contentTypeId={content.contentTypeId}

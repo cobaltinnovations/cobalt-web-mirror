@@ -1,8 +1,8 @@
 import Cookies from 'js-cookie';
 import React, { useCallback, useMemo, useState } from 'react';
-import { LoaderFunctionArgs, defer, redirect, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import { LoaderFunctionArgs, redirect, useMatch, useRouteLoaderData, useSearchParams } from 'react-router-dom';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { safeIntegerValue } from '@/lib/utils/form-utils';
 
 import {
@@ -288,12 +288,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 	const url = new URL(request.url);
 
-	return defer(
-		loadMyPatients({
-			mhicView: params.mhicView as MhicMyPatientView,
-			searchParams: url.searchParams,
-		})
-	);
+	return loadMyPatients({
+		mhicView: params.mhicView as MhicMyPatientView,
+		searchParams: url.searchParams,
+	});
 }
 
 export const Component = () => {

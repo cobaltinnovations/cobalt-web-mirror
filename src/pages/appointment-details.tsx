@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import AsyncPage from '@/components/async-page';
 

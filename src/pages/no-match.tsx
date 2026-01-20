@@ -1,7 +1,7 @@
 import useAccount from '@/hooks/use-account';
 import React, { FC } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 const NoMatch: FC = () => {
 	const { institution } = useAccount();

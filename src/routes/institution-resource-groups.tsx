@@ -1,12 +1,12 @@
 import React, { Suspense, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import HeroContainer from '@/components/hero-container';
 import InstitutionResourceGroupTile from '@/components/institution-resource-group-tile';
 import Loader from '@/components/loader';
 import { analyticsService, GetInstitutionResourceGroupsResponse, institutionService } from '@/lib/services';
-import { Await, LoaderFunctionArgs, defer, useRouteLoaderData } from 'react-router-dom';
+import { Await, LoaderFunctionArgs, useRouteLoaderData } from 'react-router-dom';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 
@@ -25,9 +25,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		institutionResourceGroupsRequest.abort();
 	});
 
-	return defer({
-		institutionResourceGroupsResponse: institutionResourceGroupsRequest.fetch(),
-	});
+	return { institutionResourceGroupsResponse: institutionResourceGroupsRequest.fetch() };
 };
 
 export const Component = () => {

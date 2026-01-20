@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import { LoaderFunctionArgs, useLoaderData, useLocation, useNavigate, useRevalidator } from 'react-router-dom';
 
 import GroupSession from '@/components/group-session';

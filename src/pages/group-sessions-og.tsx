@@ -16,7 +16,7 @@ import HeroContainer from '@/components/hero-container';
 import InputHelperSearch from '@/components/input-helper-search';
 import StudioEvent, { StudioEventSkeleton } from '@/components/studio-event';
 import useHandleError from '@/hooks/use-handle-error';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 import GroupSessionsRequestFooter from '@/components/group-sessions-request-footer';
 import NoData from '@/components/no-data';
 import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import useAccount from '@/hooks/use-account';
 import HeroContainer from '@/components/hero-container';

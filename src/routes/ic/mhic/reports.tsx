@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
+import { Helmet } from '@/components/helmet';
 
 import { AccountModel, GenderIdentity, Race, ReferringPracticeModel } from '@/lib/models';
 import { useIntegratedCareLoaderData } from '../landing';
