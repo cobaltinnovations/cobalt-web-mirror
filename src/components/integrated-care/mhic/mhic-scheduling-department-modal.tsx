@@ -7,6 +7,7 @@ import { integratedCareService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import InputHelper from '@/components/input-helper';
+import { getDepartmentTriageDefaultLabel } from '@/lib/utils';
 
 const DEFAULT = 'DEFAULT';
 
@@ -29,6 +30,7 @@ export const MhicSchedulingDepartmentModal: FC<Props> = ({ patientOrder, onSave,
 
 	const [epicDepartmentOptions, setEpicDepartmentOptions] = useState<EpicDepartmentModel[]>([]);
 	const [formValues, setFormValues] = useState({ overrideSchedulingEpicDepartmentId: '' });
+	const defaultDepartmentLabel = getDepartmentTriageDefaultLabel(patientOrder);
 
 	const fetchEpicDepartments = useCallback(async () => {
 		try {
@@ -65,7 +67,7 @@ export const MhicSchedulingDepartmentModal: FC<Props> = ({ patientOrder, onSave,
 
 				addFlag({
 					variant: 'success',
-					title: 'Scheduling department changed.',
+					title: 'Department triage changed.',
 					actions: [],
 				});
 
@@ -82,15 +84,15 @@ export const MhicSchedulingDepartmentModal: FC<Props> = ({ patientOrder, onSave,
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEntering={handleOnEntering}>
 			<Modal.Header closeButton>
-				<Modal.Title>Change Scheduling Department</Modal.Title>
+				<Modal.Title>Change Department Triage</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={handleFormSubmit}>
 				<Modal.Body>
-					<p className="mb-4 fw-semibold">Select the scheduling department</p>
+					<p className="mb-4 fw-semibold">Select the triage department</p>
 					<InputHelper
 						className="mb-4"
 						as="select"
-						label="Scheduling Department"
+						label="Triage Department"
 						value={formValues.overrideSchedulingEpicDepartmentId}
 						onChange={({ currentTarget }) => {
 							setFormValues((previousValues) => ({
@@ -100,7 +102,7 @@ export const MhicSchedulingDepartmentModal: FC<Props> = ({ patientOrder, onSave,
 						}}
 						required
 					>
-						<option value={DEFAULT}>Default</option>
+						<option value={DEFAULT}>{defaultDepartmentLabel}</option>
 						{epicDepartmentOptions.map((edo) => (
 							<option key={edo.epicDepartmentId} value={edo.epicDepartmentId}>
 								{edo.name} ({edo.departmentId})

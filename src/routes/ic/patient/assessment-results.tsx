@@ -21,6 +21,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import AsyncWrapper from '@/components/async-page';
 import { PatientInsuranceStatementModal } from '@/components/integrated-care/patient';
 import InlineAlert from '@/components/inline-alert';
+import { isSpecialtyCareWithSchedulingOverride, shouldUseSchedulingWorkflow } from '@/lib/utils';
 
 export const PatientAssessmentResults = () => {
 	const navigate = useNavigate();
@@ -29,6 +30,11 @@ export const PatientAssessmentResults = () => {
 	const [patientOrder, setPatientOrder] = useState<PatientOrderModel>();
 	const [showInsuranceStatementModal, setShowInsuranceStatementModal] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
+	const shouldShowSchedulingWorkflow = patientOrder ? shouldUseSchedulingWorkflow(patientOrder) : false;
+	const shouldShowSpecialtyCareWorkflow =
+		patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE &&
+		!!patientOrder &&
+		!isSpecialtyCareWithSchedulingOverride(patientOrder);
 
 	const fetchData = useCallback(async () => {
 		const response = await integratedCareService.getLatestPatientOrder().fetch();
@@ -169,7 +175,7 @@ export const PatientAssessmentResults = () => {
 									</>
 								)}
 
-							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.MHP && (
+							{shouldShowSchedulingWorkflow && (
 								<>
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.PROVIDER && (
@@ -263,7 +269,7 @@ export const PatientAssessmentResults = () => {
 								</>
 							)}
 
-							{patientOrder?.patientOrderTriageStatusId === PatientOrderTriageStatusId.SPECIALTY_CARE && (
+							{shouldShowSpecialtyCareWorkflow && (
 								<>
 									{patientOrder.patientOrderReferralSourceId ===
 										PatientOrderReferralSourceId.PROVIDER && (

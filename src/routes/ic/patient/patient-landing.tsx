@@ -25,6 +25,7 @@ import { NextStepsAssessmentComplete, NextStepsItem } from '@/components/integra
 import Loader from '@/components/loader';
 import InlineAlert from '@/components/inline-alert';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
+import { isSpecialtyCareWithSchedulingOverride } from '@/lib/utils';
 
 enum PAGE_STATES {
 	TERMINAL = 'TERMINAL',
@@ -422,6 +423,8 @@ export const Component = () => {
 												)}
 												{patientOrder?.patientOrderTriageStatusId ===
 													PatientOrderTriageStatusId.SPECIALTY_CARE &&
+													patientOrder &&
+													!isSpecialtyCareWithSchedulingOverride(patientOrder) &&
 													!institution.resourcePacketsEnabled &&
 													patientOrder.resourcesSentFlag && (
 														<>

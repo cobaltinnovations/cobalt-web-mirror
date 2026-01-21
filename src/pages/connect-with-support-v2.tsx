@@ -80,6 +80,9 @@ const ConnectWithSupportV2 = () => {
 	const [findOptions, setFindOptions] = useState<FindOptionsResponse>();
 	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
 	const [providerSections, setProviderSections] = useState<ProviderSection[]>([]);
+	const [connectWithSupportDescriptionOverride, setConnectWithSupportDescriptionOverride] = useState<
+		string | undefined
+	>();
 
 	const [showEmployerModal, setShowEmployerModal] = useState(false);
 	const [selectedEmployerId, setSelectedEmployerId] = useState(account?.institutionLocationId ?? '');
@@ -89,6 +92,17 @@ const ConnectWithSupportV2 = () => {
 	const featureDetails = useMemo(() => {
 		return (institution?.features ?? []).find((feature) => pathname.includes(feature.urlName));
 	}, [institution?.features, pathname]);
+	const featureDescription = useMemo(() => {
+		if (!featureDetails) {
+			return '';
+		}
+
+		if (featureDetails.featureId !== FeatureId.MHP) {
+			return featureDetails.description ?? '';
+		}
+
+		return connectWithSupportDescriptionOverride ?? featureDetails.description ?? '';
+	}, [connectWithSupportDescriptionOverride, featureDetails]);
 
 	const [institutionReferrers, setInstitutionReferrers] = useState<InstitutionReferrer[]>([]);
 	const [institutionFeatureInstitutionReferrers, setInstitutionFeatureInstitutionReferrers] = useState<
@@ -206,6 +220,7 @@ const ConnectWithSupportV2 = () => {
 		setAppointmentTypes(response.appointmentTypes);
 		setEpicDepartments(response.epicDepartments);
 		setProviderSections(response.sections);
+		setConnectWithSupportDescriptionOverride(response.connectWithSupportDescriptionOverride);
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDERS, {
 			featureId: featureDetails.featureId,
@@ -375,10 +390,7 @@ const ConnectWithSupportV2 = () => {
 			{featureDetails && (
 				<HeroContainer className="bg-n75">
 					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
-					<p
-						className="mb-0 text-center fs-large"
-						dangerouslySetInnerHTML={{ __html: featureDetails.description ?? '' }}
-					/>
+					<p className="mb-0 text-center fs-large" dangerouslySetInnerHTML={{ __html: featureDescription }} />
 				</HeroContainer>
 			)}
 
