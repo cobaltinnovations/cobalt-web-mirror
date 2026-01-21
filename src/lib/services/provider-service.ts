@@ -89,6 +89,7 @@ export interface FindFilters {
 }
 
 export interface FindProvidersResponse {
+	connectWithSupportDescriptionOverride?: string;
 	appointmentTypes: AppointmentType[];
 	epicDepartments: EpicDepartment[];
 	sections: ProviderSection[];
