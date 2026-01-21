@@ -1,6 +1,6 @@
 export const exploreLinks: {
 	testId: string;
 	label: string;
-	icon: JSX.Element;
+	icon: React.ReactElement;
 	to: () => string;
 }[] = [];

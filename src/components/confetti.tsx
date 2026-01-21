@@ -45,7 +45,7 @@ export const Confetti = ({
 	const theme = useCobaltTheme();
 	const classes = useStyles();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const ctxRef = useRef<CanvasRenderingContext2D>();
+	const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 	const particlesRef = useRef<Particle[]>([]);
 	const animationFrameRef = useRef(0);
 

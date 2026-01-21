@@ -1,5 +1,5 @@
 import React, { FC, forwardRef } from 'react';
-import ReactDatePicker, { ReactDatePickerProps } from 'react-datepicker';
+import ReactDatePicker, { DatePickerProps as ReactDatePickerProps } from 'react-datepicker';
 
 import SvgIcon from './svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -59,14 +59,19 @@ const useDatePickerStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface DatePickerProps extends ReactDatePickerProps {
+type SingleDatePickerProps = Extract<
+	ReactDatePickerProps,
+	{ selectsRange?: false | undefined; selectsMultiple?: false | undefined }
+>;
+
+type DatePickerProps = Omit<SingleDatePickerProps, 'onChange' | 'selected' | 'inline' | 'className'> & {
 	testId?: string;
-	selected?: Date;
-	disabled?: boolean;
+	selected?: Date | null;
 	onChange: (value: Date | null) => void;
 	wrapperClass?: string;
 	labelText?: string;
-}
+	className?: string;
+};
 
 const CustomDateInput = forwardRef(
 	(
@@ -91,27 +96,33 @@ const CustomDateInput = forwardRef(
 	}
 );
 
+const ReactDatePickerSingle = ReactDatePicker as unknown as React.ComponentType<SingleDatePickerProps>;
+
 const DatePicker: FC<DatePickerProps> = ({
 	testId,
 	selected,
 	onChange,
 	wrapperClass,
 	labelText,
+	className,
 	...reactDatePickerProps
 }) => {
 	const classes = useDatePickerStyles({
 		value: !!selected,
 	});
+	const handleChange: NonNullable<SingleDatePickerProps['onChange']> = (date) => {
+		onChange(date ?? null);
+	};
 
 	return (
-		<ReactDatePicker
+		<ReactDatePickerSingle
 			renderDayContents={(dayOfMonth, date) => {
 				return <span data-testid={`${testId}-${moment(date).format('YYYY-MM-DD')}`}>{dayOfMonth}</span>;
 			}}
-			wrapperClassName={`${classes.datePickerWrapper} ${wrapperClass}`}
+			wrapperClassName={`${classes.datePickerWrapper} ${wrapperClass ?? ''} ${className ?? ''}`}
 			dateFormat="MMM d, yyyy"
 			selected={selected}
-			onChange={onChange}
+			onChange={handleChange}
 			customInput={
 				<CustomDateInput
 					data-testid={testId}

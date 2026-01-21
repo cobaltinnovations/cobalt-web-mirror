@@ -131,7 +131,7 @@ export const TopicCenterPinboardItem = ({ topicCenter, topicCenterRow, pinboardN
 								href={pinboardNote.url}
 								target="_blank"
 								rel="noreferrer"
-								onClick={(event) => {
+								onClick={() => {
 									const eventLabel = `topicCenterTitle:${topicCenter.name}, sectionTitle:${topicCenterRow.title}, cardTitle:${pinboardNote.title}, url:${pinboardNote.url}`;
 
 									trackEvent(TopicCenterAnalyticsEvent.clickPinboardNote(eventLabel));

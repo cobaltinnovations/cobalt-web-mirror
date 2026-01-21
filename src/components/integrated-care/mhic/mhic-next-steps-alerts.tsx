@@ -19,7 +19,7 @@ interface Props {
 	className?: string;
 }
 
-export const MhicNextStepsAlerts = ({ patientOrder, referenceData, disabled, className }: Props) => {
+export const MhicNextStepsAlerts = ({ patientOrder, disabled, className }: Props) => {
 	const { account } = useAccount();
 	const [showSafetyPlanningModal, setShowSafetyPlanningModal] = useState(false);
 	const [showEncounterModal, setShowEncounterModal] = useState(false);

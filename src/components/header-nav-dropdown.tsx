@@ -17,7 +17,7 @@ interface UseStylesProps {
 	hasFeaturedItem: boolean;
 }
 
-const useStyles = createUseThemedStyles((theme) => ({
+const useStyles = createUseThemedStyles(() => ({
 	dropdownMenu: {
 		width: ({ hasFeaturedItem }: UseStylesProps) => (hasFeaturedItem ? 640 : 344),
 	},
@@ -109,12 +109,12 @@ const HeaderNavDropdown = ({
 												topicCenterId: featuredItem.topicCenterId,
 												source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
 											}
-									  )
+										)
 									: analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
 											pageId: featuredItem.pageId,
 											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV_FEATURE,
 											siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
-									  });
+										});
 							}}
 						/>
 					)}

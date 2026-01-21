@@ -174,7 +174,7 @@ interface CourseUnitLayoutProps {
 	title?: string;
 	onExitButtonClick(): void;
 	onNeedHelpButtonClick(): void;
-	menuElement: (isMobile: boolean) => JSX.Element;
+	menuElement: (isMobile: boolean) => React.ReactElement;
 	showMenu: boolean;
 	onShowMenuToggle(showMenu: boolean): void;
 }
@@ -194,7 +194,7 @@ export const CourseUnitLayout = ({
 	children,
 }: PropsWithChildren<CourseUnitLayoutProps>) => {
 	const classes = useStyles();
-	const size = useRef<SIZES>();
+	const size = useRef<SIZES | null>(null);
 
 	useEffect(() => {
 		const handleWindowResize = () => {

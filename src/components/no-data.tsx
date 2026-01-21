@@ -16,7 +16,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 export interface NoDataAction {
 	size?: 'sm' | 'lg';
 	className?: string;
-	icon?: JSX.Element;
+	icon?: React.ReactNode;
 	variant: ButtonVariant;
 	title: string;
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;

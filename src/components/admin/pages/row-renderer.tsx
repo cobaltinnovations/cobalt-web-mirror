@@ -577,13 +577,7 @@ const ThreeColRowRenderer = ({
 	);
 };
 
-const MailingListRowRenderer = ({
-	pageId,
-	pageRow,
-	className,
-	enableAnalytics,
-	livePageSiteLocations,
-}: RowRendererProps<MailingListRowModel>) => {
+const MailingListRowRenderer = ({ pageRow, className, enableAnalytics }: RowRendererProps<MailingListRowModel>) => {
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [inputValue, setInputValue] = useState('');

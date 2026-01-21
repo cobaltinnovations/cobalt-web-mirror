@@ -35,7 +35,7 @@ interface PageSectionShelfPageProps {
 	onBackButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	showEditButton?: boolean;
 	onEditButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
-	customHeaderElements?: JSX.Element;
+	customHeaderElements?: React.ReactNode;
 	showDeleteButton?: boolean;
 	onDeleteButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	showCloseButton?: boolean;

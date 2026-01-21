@@ -4,7 +4,7 @@ import React, { ReactNode } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { SkeletonImage, SkeletonText } from './skeleton-loaders';
 
-const useStyles = createUseThemedStyles((theme) => ({
+const useStyles = createUseThemedStyles(() => ({
 	headerImg: {
 		borderRadius: 8,
 	},

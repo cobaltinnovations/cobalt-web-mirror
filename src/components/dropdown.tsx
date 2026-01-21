@@ -1,31 +1,29 @@
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
-import React, { RefObject, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { DropdownMenuProps } from 'react-bootstrap/esm/DropdownMenu';
 import { DropdownToggleProps } from 'react-bootstrap/esm/DropdownToggle';
 
-export const DropdownToggle = React.forwardRef(
-	(
-		{ variant, className, children, style, onClick, disabled }: DropdownToggleProps,
-		ref: ((instance: HTMLButtonElement | null) => void) | RefObject<HTMLButtonElement> | null | undefined
-	) => {
-		const classNameProp = useMemo(() => (className ?? '').replace('dropdown-toggle', ''), [className]);
+export const DropdownToggle = React.forwardRef<HTMLButtonElement, DropdownToggleProps>(function DropdownToggle(
+	{ variant, className, children, style, onClick, disabled }: DropdownToggleProps,
+	ref
+) {
+	const classNameProp = useMemo(() => (className ?? '').replace('dropdown-toggle', ''), [className]);
 
-		return (
-			<Button
-				ref={ref}
-				variant={variant ?? 'light'}
-				className={classNames(classNameProp)}
-				style={style}
-				onClick={onClick}
-				disabled={disabled}
-			>
-				{children}
-			</Button>
-		);
-	}
-);
+	return (
+		<Button
+			ref={ref}
+			variant={variant ?? 'light'}
+			className={classNames(classNameProp)}
+			style={style}
+			onClick={onClick}
+			disabled={disabled}
+		>
+			{children}
+		</Button>
+	);
+});
 
 const useDropdownMenuStyles = createUseThemedStyles((theme) => ({
 	dropdownMenu: {
@@ -65,8 +63,8 @@ const useDropdownMenuStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const DropdownMenu = React.forwardRef(
-	(
+export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps & { compact?: boolean }>(
+	function DropdownMenu(
 		{
 			children,
 			style,
@@ -74,8 +72,8 @@ export const DropdownMenu = React.forwardRef(
 			'aria-labelledby': labeledBy,
 			compact = false,
 		}: DropdownMenuProps & { compact?: boolean },
-		ref: React.LegacyRef<HTMLDivElement> | undefined
-	) => {
+		ref
+	) {
 		const classes = useDropdownMenuStyles();
 
 		return (

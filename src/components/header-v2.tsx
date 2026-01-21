@@ -293,7 +293,7 @@ const MobileAccordianItem = ({
 	toggleElement,
 	className,
 	children,
-}: PropsWithChildren<{ toggleElement: JSX.Element; className?: string }>) => {
+}: PropsWithChildren<{ toggleElement: React.ReactElement; className?: string }>) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
@@ -429,7 +429,7 @@ const HeaderV2 = () => {
 			navigationItemId?: string;
 			title: string;
 			to: To;
-			icon: JSX.Element;
+			icon: React.ReactElement;
 			description: string;
 			onClick?(): void;
 		}[];

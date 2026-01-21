@@ -17,7 +17,7 @@ interface MhicOutreachItemProps {
 	date: string;
 	onEditClick(): void;
 	onDeleteClick(): void;
-	icon: JSX.Element;
+	icon: React.ReactElement;
 	title: string;
 	description: string;
 	disabled?: boolean;

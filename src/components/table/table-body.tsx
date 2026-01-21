@@ -1,7 +1,7 @@
 import React, { FC, PropsWithChildren } from 'react';
 import { createUseThemedStyles } from '@/jss/theme';
 
-const useTableBodyStyles = createUseThemedStyles((theme) => ({
+const useTableBodyStyles = createUseThemedStyles(() => ({
 	tableBody: {
 		backgroundColor: 'inherit',
 	},

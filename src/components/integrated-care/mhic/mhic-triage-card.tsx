@@ -28,7 +28,7 @@ export const MhicTriageCard = ({ patientOrder, disabled, className }: Props) => 
 				onHide={() => {
 					setShowChangeTriageModal(false);
 				}}
-				onSave={(updatedPatientOrder) => {
+				onSave={() => {
 					setShowChangeTriageModal(false);
 					revalidator.revalidate();
 				}}

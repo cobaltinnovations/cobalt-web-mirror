@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { FC, useRef, useState, useCallback } from 'react';
 import { ModalProps, Modal, Button } from 'react-bootstrap';
-import ReactCrop from 'react-image-crop';
+import ReactCrop, { Crop } from 'react-image-crop';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -11,7 +11,7 @@ import SvgIcon from './svg-icon';
 
 function getCroppedImageAsBlob(
 	image: HTMLImageElement,
-	crop: ReactCrop.Crop
+	crop: Crop
 ): Promise<{ blob: Blob; extension: string }> | undefined {
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
@@ -20,10 +20,10 @@ function getCroppedImageAsBlob(
 		return;
 	}
 
-	const cropX = crop.x ?? 0;
-	const cropY = crop.y ?? 0;
-	const cropWidth = crop.width ?? 0;
-	const cropHeight = crop.height ?? 0;
+	const cropX = crop.unit === '%' ? (image.naturalWidth * (crop.x ?? 0)) / 100 : (crop.x ?? 0);
+	const cropY = crop.unit === '%' ? (image.naturalHeight * (crop.y ?? 0)) / 100 : (crop.y ?? 0);
+	const cropWidth = crop.unit === '%' ? (image.naturalWidth * (crop.width ?? 0)) / 100 : (crop.width ?? 0);
+	const cropHeight = crop.unit === '%' ? (image.naturalHeight * (crop.height ?? 0)) / 100 : (crop.height ?? 0);
 	const scaleX = image.naturalWidth / image.width;
 	const scaleY = image.naturalHeight / image.height;
 
@@ -102,6 +102,20 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const getInitialCrop = (useAspect: boolean): Crop => {
+	const width = 90;
+	const height = useAspect ? (width * 9) / 16 : 90;
+
+	return {
+		unit: '%',
+		width,
+		height,
+		x: (100 - width) / 2,
+		y: (100 - height) / 2,
+		...(useAspect && { aspect: 16 / 9 }),
+	};
+};
+
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
 	imageName?: string;
@@ -119,22 +133,14 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 }) => {
 	useTrackModalView('SessionCropModal', props.show);
 	const { addFlag } = useFlags();
-	const imageRef = useRef<HTMLImageElement>();
+	const imageRef = useRef<HTMLImageElement | null>(null);
 	const classes = useSessionCropModalStyles();
-	const [crop, setCrop] = useState<ReactCrop.Crop>({
-		width: 90,
-		...(cropImage && { aspect: 16 / 9 }),
-		unit: '%' as '%',
-	});
+	const [crop, setCrop] = useState<Crop>(() => getInitialCrop(cropImage));
 	const [isDragging, setIsDragging] = useState(false);
 
 	const onLoad = useCallback((htmlImageElement: HTMLImageElement) => {
 		imageRef.current = htmlImageElement;
 	}, []);
-
-	function handleCropChange(newCrop: ReactCrop.Crop) {
-		setCrop(newCrop);
-	}
 
 	async function handleOnSaveButtonClick() {
 		if (!imageRef.current) {
@@ -170,11 +176,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 	}, []);
 
 	const handleEntered = useCallback(() => {
-		setCrop({
-			width: 90,
-			...(cropImage && { aspect: 16 / 9 }),
-			unit: '%' as '%',
-		});
+		setCrop(getInitialCrop(cropImage));
 	}, [cropImage]);
 
 	const handleHide = useCallback(() => {
@@ -200,13 +202,15 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 			</Modal.Header>
 			<Modal.Body>
 				<ReactCrop
-					src={imageSource}
-					onImageLoaded={onLoad}
 					crop={crop}
-					onChange={handleCropChange}
+					onChange={(_, percentCrop) => {
+						setCrop(percentCrop);
+					}}
 					onDragStart={handleDragStart}
 					onDragEnd={handleDragEnd}
-				/>
+				>
+					<img src={imageSource} onLoad={(event) => onLoad(event.currentTarget)} />
+				</ReactCrop>
 				<div className="d-flex mt-5 align-items-center">
 					<SvgIcon kit="fas" icon="triangle-exclamation" size={16} className={classes.infoIcon} />
 					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>

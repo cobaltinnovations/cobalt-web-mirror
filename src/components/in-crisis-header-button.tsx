@@ -17,7 +17,7 @@ const InCrisisHeaderButton = ({ className, ...buttonProps }: InCrisisHeaderButto
 
 	return (
 		<Button
-			onClick={(e) => {
+			onClick={() => {
 				trackEvent(CrisisAnalyticsEvent.clickCrisisHeader());
 				trackEvent({
 					action: 'In Crisis Button',

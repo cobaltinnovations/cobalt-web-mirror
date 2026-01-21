@@ -49,7 +49,7 @@ interface MhicAssessmentCompleteProps {
 	onStartNewAssessment: () => void;
 }
 
-export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: MhicAssessmentCompleteProps) => {
+export const MhicAssessmentComplete = ({ patientOrder }: MhicAssessmentCompleteProps) => {
 	const { pathname } = useLocation();
 	const navigate = useNavigate();
 	const classes = useStyles();

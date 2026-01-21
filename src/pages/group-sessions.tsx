@@ -77,7 +77,7 @@ const GroupSessions = () => {
 				return;
 			}
 
-			const [{ groupSessions }, { groupSessionCollections }] = await Promise.all([
+			const [, { groupSessionCollections }] = await Promise.all([
 				groupSessionsService
 					.getGroupSessions({
 						viewType: 'PATIENT',

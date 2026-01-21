@@ -1,33 +1,15 @@
 import { createUseThemedStyles, useCobaltTheme } from '@/jss/theme';
 import { AdminAnalyticsMultiChartWidget, AdminAnalyticsWidgetChartData } from '@/lib/services/admin-analytics-service';
-import {
-	ChartDataset,
-	ChartTypeRegistry,
-	CoreChartOptions,
-	DatasetChartOptions,
-	ElementChartOptions,
-	LinearScaleOptions,
-	LineControllerChartOptions,
-	PluginChartOptions,
-	ScaleChartOptions,
-} from 'chart.js';
+import { ChartDataset, ChartOptions, ChartTypeRegistry, LinearScaleOptions } from 'chart.js';
 import Color from 'color';
 import React, { useMemo } from 'react';
 import { Chart as CJS2, Bar, Pie, Line } from 'react-chartjs-2';
 import { Table, TableBody, TableCell, TableHead, TableRow } from './table';
-import { _DeepPartialObject, DeepPartial } from 'chart.js/dist/types/utils';
 
 interface ChartProps<T extends keyof ChartTypeRegistry> {
 	label: string;
 	data: AdminAnalyticsWidgetChartData[];
-	options?: _DeepPartialObject<
-		CoreChartOptions<T> &
-			ElementChartOptions<T> &
-			PluginChartOptions<T> &
-			DatasetChartOptions<T> &
-			ScaleChartOptions<T> &
-			LineControllerChartOptions
-	>;
+	options?: ChartOptions<T>;
 }
 
 const useChartStyles = createUseThemedStyles((theme) => ({
@@ -36,9 +18,14 @@ const useChartStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const defaultScaleOptions: DeepPartial<LinearScaleOptions> = {
+const defaultScaleOptions: Partial<LinearScaleOptions> = {
 	border: {
+		display: true,
+		color: '#bdbdbd',
+		width: 1,
 		dash: [4, 4],
+		dashOffset: 0,
+		z: 0,
 	},
 	grid: {
 		color: '#bdbdbd',

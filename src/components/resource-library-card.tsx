@@ -166,8 +166,11 @@ const ResourceLibraryCard = ({
 	const tagRefs = useMemo(
 		() =>
 			tags.reduce(
-				(accumulator, current) => ({ ...accumulator, [current.tagId]: React.createRef<HTMLDivElement>() }),
-				{} as Record<string, React.RefObject<HTMLDivElement>>
+				(accumulator, current) => ({
+					...accumulator,
+					[current.tagId]: React.createRef<HTMLDivElement>(),
+				}),
+				{} as Record<string, React.RefObject<HTMLDivElement | null>>
 			),
 		[tags]
 	);
@@ -284,7 +287,9 @@ const ResourceLibraryCard = ({
 							)}
 							{duration && <span className="ms-1 fs-small fw-bold text-gray">{duration}</span>}
 						</Badge>
-						<p className="mb-0 text-truncate text-gray">{author}</p>
+						<p className="mb-0 text-truncate text-gray">
+							{authorPrefix} {author}
+						</p>
 					</div>
 					<div className="mb-4">
 						<h4 className={classNames(classes.title, 'text-dark')}>{title}</h4>

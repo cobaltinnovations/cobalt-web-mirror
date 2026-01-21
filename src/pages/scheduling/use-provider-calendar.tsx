@@ -15,7 +15,7 @@ export const useProviderCalendar = ({
 	endDate,
 }: Partial<{ providerId: string; startDate: string; endDate: string }>) => {
 	const handleError = useHandleError();
-	const inFlightRequest = useRef<ReturnType<(typeof schedulingService)['getCalendar']>>();
+	const inFlightRequest = useRef<ReturnType<(typeof schedulingService)['getCalendar']> | null>(null);
 	const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
 
 	const fetchData = useCallback(
@@ -126,7 +126,7 @@ function mapCalendarEvents(calendar: ProviderCalendar) {
 	});
 
 	// [TODO]: MAKE THIS REAL
-	const formattedFollowUps = calendar.followups.map((followup, index) => {
+	const formattedFollowUps = calendar.followups.map((_, index) => {
 		return {
 			id: `followups${index}`,
 			allDay: true,

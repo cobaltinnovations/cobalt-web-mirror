@@ -1,14 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import classNames from 'classnames';
 
-import {
-	AccountModel,
-	AppointmentModel,
-	ATTENDANCE_STATUS_ID,
-	PersonalizationAnswer,
-	PersonalizationDetails,
-} from '@/lib/models';
+import { AccountModel, AppointmentModel, PersonalizationAnswer, PersonalizationDetails } from '@/lib/models';
 
 import useHandleError from '@/hooks/use-handle-error';
 
@@ -298,11 +291,14 @@ export const AppointmentDetailPanel = ({
 
 						<div className="mb-1 justify-content-between align-items-center">
 							{assessment?.assessmentQuestions.map((question) => {
-								const answersMap = question.answers.reduce((acc, answer) => {
-									acc[answer.answerId] = answer;
+								const answersMap = question.answers.reduce(
+									(acc, answer) => {
+										acc[answer.answerId] = answer;
 
-									return acc;
-								}, {} as Record<string, PersonalizationAnswer>);
+										return acc;
+									},
+									{} as Record<string, PersonalizationAnswer>
+								);
 
 								return (
 									<React.Fragment key={question.questionId}>
@@ -379,78 +375,5 @@ export const AppointmentDetailPanel = ({
 				</div>
 			</div>
 		</>
-	);
-};
-
-const AppointmentAttendance = ({
-	appointment,
-	onUpdate,
-}: {
-	appointment: AppointmentModel;
-	onUpdate: (updatedAppointment: AppointmentModel) => void;
-}) => {
-	const handleError = useHandleError();
-	const classes = useStyles();
-	const schedulingClasses = useSchedulingStyles();
-	const updateAttendanceStatus = useCallback(
-		async (appointmentId: string, attendanceStatusId: ATTENDANCE_STATUS_ID) => {
-			try {
-				const response = await appointmentService
-					.updateAppointmentAttendanceStatus(appointmentId, attendanceStatusId)
-					.fetch();
-
-				onUpdate(response.appointment);
-			} catch (error) {
-				handleError(error);
-			}
-		},
-		[handleError, onUpdate]
-	);
-
-	return (
-		<div className="d-flex align-items-center">
-			{appointment.attendanceStatusId === 'UNKNOWN' && (
-				<>
-					<button
-						className={classNames(schedulingClasses.roundBtn, classes.attendedButton)}
-						onClick={() => {
-							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.ATTENDED);
-						}}
-					>
-						<SvgIcon kit="fak" icon="check" size={20} />
-					</button>
-					<button
-						className={classNames(schedulingClasses.roundBtn, classes.noShowButton, 'ms-2')}
-						onClick={() => {
-							updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.MISSED);
-						}}
-					>
-						<SvgIcon kit="far" icon="xmark" size={16} />
-					</button>
-				</>
-			)}
-
-			{appointment.attendanceStatusId === 'ATTENDED' && (
-				<button
-					className={classNames(schedulingClasses.roundBtnSolid, classes.attendedButtonSolid)}
-					onClick={() => {
-						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
-					}}
-				>
-					<SvgIcon kit="fak" icon="check" size={20} />
-				</button>
-			)}
-
-			{(appointment.attendanceStatusId === 'CANCELED' || appointment.attendanceStatusId === 'MISSED') && (
-				<button
-					className={classNames(schedulingClasses.roundBtnSolid, classes.noShowButtonSolid)}
-					onClick={() => {
-						updateAttendanceStatus(appointment.appointmentId, ATTENDANCE_STATUS_ID.UNKNOWN);
-					}}
-				>
-					<SvgIcon kit="far" icon="xmark" size={16} />
-				</button>
-			)}
-		</div>
 	);
 };

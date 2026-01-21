@@ -8,7 +8,7 @@ import useAccount from '@/hooks/use-account';
 export const PatientAssessmentComplete = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
-	const timeoutRef = useRef<NodeJS.Timeout>();
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
 		if (!timeoutRef.current) {

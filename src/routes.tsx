@@ -167,7 +167,7 @@ export const RedirectToLoginDestination = () => {
 	return <Navigate to={account ? LoginDestinationIdRouteMap[account.loginDestinationId] : '/'} replace />;
 };
 
-const RedirectToAdminPathOrRender = ({ pathname, element }: { pathname: string; element: JSX.Element }) => {
+const RedirectToAdminPathOrRender = ({ pathname, element }: { pathname: string; element: React.ReactElement }) => {
 	const { account } = useAccount();
 
 	return account?.roleId === ROLE_ID.ADMINISTRATOR ? <Navigate to={`/admin/${pathname}`} replace /> : element;

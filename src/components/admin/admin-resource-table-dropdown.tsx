@@ -28,7 +28,7 @@ const adminActionConfirmDialogPropsMap: Record<
 	string,
 	(content: AdminContent, onConfirm: () => void) => ConfirmDialogProps
 > = {
-	[AdminContentAction.EXPIRE]: (content, onConfirm) => ({
+	[AdminContentAction.EXPIRE]: (_content, onConfirm) => ({
 		titleText: 'Force Expire Resource',
 		bodyText: `Are you sure you want to force expire this resource?`,
 		detailText: `Expired resources are hidden from your Resource Library AND removed from the Resource Library of any institution currently using it.`,
@@ -65,7 +65,7 @@ const actionItemProps: Record<string, ActionItemProps> = {
 		icon: <SvgIcon kit={'far'} icon={'box-arrow-down'} className="me-2 text-n500" size={16} />,
 		label: 'Archive',
 		dividers: false,
-		action: async (content) => {
+		action: async (_content) => {
 			alert('TODO: Archive');
 			return {};
 		},

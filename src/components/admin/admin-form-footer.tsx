@@ -48,7 +48,7 @@ export const AdminFormFooter = ({
 							variant="outline-primary"
 							type={exitButtonType}
 							value="exit"
-							onClick={(event) => {
+							onClick={() => {
 								onExit();
 							}}
 						>

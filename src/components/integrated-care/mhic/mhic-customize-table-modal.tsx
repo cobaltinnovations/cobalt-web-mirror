@@ -9,7 +9,6 @@ import {
 	DraggableStateSnapshot,
 	Droppable,
 	DropResult,
-	ResponderProvided,
 } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 
@@ -81,7 +80,7 @@ export const MhicCustomizeTableModal: FC<Props> = ({ onSave, ...props }) => {
 	}, []);
 
 	const handleDragEnd = useCallback(
-		(result: DropResult, provided: ResponderProvided) => {
+		(result: DropResult) => {
 			if (!result.destination) {
 				return;
 			}

@@ -158,7 +158,7 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 			<TransitionGroup
 				component={null}
 				childFactory={(child) =>
-					React.cloneElement(child, {
+					React.cloneElement(child as React.ReactElement<React.ComponentProps<typeof CSSTransition>>, {
 						classNames: isNext ? 'right-to-left' : 'left-to-right',
 						timeout: PAGE_TRANSITION_DURATION_MS,
 					})

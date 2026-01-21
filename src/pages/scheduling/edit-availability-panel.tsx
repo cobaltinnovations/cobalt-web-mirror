@@ -8,7 +8,6 @@ import { AvailabilityFormDataFromLogicalAvailability } from '@/lib/utils/form-ut
 
 import useHandleError from '@/hooks/use-handle-error';
 import { useLocation, useParams } from 'react-router-dom';
-import { useCobaltTheme } from '@/jss/theme';
 import SvgIcon from '@/components/svg-icon';
 
 interface EditAvailabilityPanelProps {
@@ -16,7 +15,6 @@ interface EditAvailabilityPanelProps {
 }
 
 export const EditAvailabilityPanel = ({ onClose }: EditAvailabilityPanelProps) => {
-	const theme = useCobaltTheme();
 	const location = useLocation();
 	const { logicalAvailabilityId } = useParams<{ logicalAvailabilityId?: string }>();
 	const handleError = useHandleError();

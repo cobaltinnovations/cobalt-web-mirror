@@ -18,7 +18,7 @@ const collectText = (node: ReactNode): string => {
 	}
 
 	if (React.isValidElement(node)) {
-		return collectText(node.props.children);
+		return collectText((node.props as { children?: ReactNode }).children);
 	}
 
 	return '';
@@ -36,14 +36,16 @@ const extractTitle = (children: ReactNode): string | undefined => {
 			return;
 		}
 
+		const childProps = child.props as { children?: ReactNode };
+
 		if (child.type === 'title') {
-			const text = collectText(child.props.children).trim();
+			const text = collectText(childProps.children).trim();
 			title = text.length > 0 ? text : '';
 			return;
 		}
 
 		if (child.type === React.Fragment) {
-			const nestedTitle = extractTitle(child.props.children);
+			const nestedTitle = extractTitle(childProps.children);
 			if (nestedTitle !== undefined) {
 				title = nestedTitle;
 			}

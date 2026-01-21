@@ -71,7 +71,7 @@ export const Component = () => {
 					return newOrders;
 				});
 			})
-			.catch((e) => {
+			.catch(() => {
 				// don't update recent orders on rejection/fail/cancellation
 			});
 	}, [shelfLoaderData?.patientOrderPromise]);

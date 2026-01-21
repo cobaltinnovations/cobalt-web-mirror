@@ -206,6 +206,7 @@ const AnalyticsContext = createContext<
 >(undefined);
 
 let gtag = function (...args: unknown[]) {
+	void args;
 	//@ts-expect-error googtagmanager expects `arguments` not an Array
 	window.dataLayer.push(arguments);
 };
@@ -215,10 +216,10 @@ if (__DEV__) {
 	//@ts-expect-error
 	window.__GA4__ = window.__GA4__ || [];
 	const original = gtag;
-	gtag = function devGtag() {
-		original(...arguments);
+	gtag = function devGtag(...args: unknown[]) {
+		original(...args);
 		//@ts-expect-error
-		window.__GA4__.push(arguments);
+		window.__GA4__.push(args);
 	};
 }
 

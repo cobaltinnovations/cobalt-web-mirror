@@ -52,7 +52,7 @@ export const CourseVideo = ({
 	const handleError = useHandleError();
 	const [videoPlayerReady, setVideoPlayerReady] = useState(false);
 	const [videoPlayerTimedOut, setVideoPlayerTimedOut] = useState(false);
-	const videoLoadingTimeoutRef = useRef<NodeJS.Timeout>();
+	const videoLoadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const completionThresholdPassedRef = useRef(false);
 
 	const stopVideoLoadingTimer = useCallback(() => {
@@ -61,7 +61,7 @@ export const CourseVideo = ({
 		}
 
 		clearTimeout(videoLoadingTimeoutRef.current);
-		videoLoadingTimeoutRef.current = undefined;
+		videoLoadingTimeoutRef.current = null;
 	}, []);
 
 	const startVideoLoadingTimer = useCallback(() => {

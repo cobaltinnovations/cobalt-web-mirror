@@ -48,8 +48,8 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 	const handleError = useHandleError();
 	const [videoPlayerReady, setVideoPlayerReady] = useState(false);
 	const [videoPlayerTimedOut, setVideoPlayerTimedOut] = useState(false);
-	const videoLoadingTimeoutRef = useRef<NodeJS.Timeout>();
-	const scriptRef = useRef<HTMLScriptElement>();
+	const videoLoadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const scriptRef = useRef<HTMLScriptElement | null>(null);
 
 	const stopVideoLoadingTimer = useCallback(() => {
 		if (!videoLoadingTimeoutRef.current) {
@@ -57,7 +57,7 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 		}
 
 		clearTimeout(videoLoadingTimeoutRef.current);
-		videoLoadingTimeoutRef.current = undefined;
+		videoLoadingTimeoutRef.current = null;
 	}, []);
 
 	const startVideoLoadingTimer = useCallback(() => {

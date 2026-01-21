@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Form } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { Helmet } from '@/components/helmet';
 import useAccount from '@/hooks/use-account';
 

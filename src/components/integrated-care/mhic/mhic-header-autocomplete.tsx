@@ -292,7 +292,7 @@ const PatientSearchResult = ({ option, openShelf, onClick, ...itemProps }: Patie
 			option={option}
 			{...itemProps}
 			className="d-flex justify-content-between"
-			onClick={(e) => {
+			onClick={() => {
 				onClick();
 
 				if (openShelf && option.patientOrderId) {

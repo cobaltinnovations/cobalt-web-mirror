@@ -111,7 +111,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface HalfLayoutProps {
-	leftColChildren(className: string): JSX.Element;
+	leftColChildren(className: string): React.ReactElement;
 }
 
 const HalfLayout = ({ leftColChildren }: HalfLayoutProps) => {

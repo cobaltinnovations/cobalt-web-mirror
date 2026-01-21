@@ -11,7 +11,7 @@ import { AnalyticsNativeEventTypeId } from '@/lib/models';
 import useAccount from '@/hooks/use-account';
 
 interface InstitutionResourceGroupsLoaderData {
-	institutionResourceGroupsResponse: Promise<GetInstitutionResourceGroupsResponse[]>;
+	institutionResourceGroupsResponse: Promise<GetInstitutionResourceGroupsResponse>;
 }
 
 export function useInstitutionResourceGroupsLoaderData() {

@@ -14,7 +14,7 @@ const PathwaysIcon = ({
 	};
 	className?: string;
 }) => {
-	const iconMap: Record<FeatureId, JSX.Element> = {
+	const iconMap: Record<FeatureId, React.ReactElement> = {
 		[FeatureId.COUNSELING_SERVICES]: (
 			<SvgIcon kit="fak" icon="handshake-simple" className={className} {...svgProps} />
 		),

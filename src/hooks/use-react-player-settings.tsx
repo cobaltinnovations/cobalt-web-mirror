@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import ReactPlayer, { Config } from 'react-player';
+import type { ComponentProps } from 'react';
+import ReactPlayer from 'react-player';
+
+type ReactPlayerConfig = NonNullable<ComponentProps<typeof ReactPlayer>['config']>;
 
 function useReactPlayerSettings(contentUrl?: string) {
 	const [canEmbed, setCanEmbed] = useState(false);
@@ -10,7 +13,7 @@ function useReactPlayerSettings(contentUrl?: string) {
 			return;
 		}
 
-		setCanEmbed(ReactPlayer.canPlay(contentUrl));
+		setCanEmbed(ReactPlayer.canPlay?.(contentUrl) ?? false);
 	}, [contentUrl]);
 
 	const embedUrl = useMemo(() => {
@@ -21,15 +24,9 @@ function useReactPlayerSettings(contentUrl?: string) {
 		return new URL(contentUrl);
 	}, [canEmbed, contentUrl]);
 
-	const playerConfig: Config = useMemo(() => {
-		return {
-			youtube: {
-				playerVars: {
-					index: embedUrl?.searchParams?.get('index'),
-				},
-			},
-		};
-	}, [embedUrl?.searchParams]);
+	const playerConfig: ReactPlayerConfig = useMemo(() => {
+		return {};
+	}, []);
 
 	return {
 		canEmbed,

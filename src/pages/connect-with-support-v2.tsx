@@ -29,7 +29,7 @@ import HeroContainer from '@/components/hero-container';
 import AsyncWrapper from '@/components/async-page';
 import ConnectWithSupportItem from '@/components/connect-with-support-item';
 import FilterDropdown from '@/components/filter-dropdown';
-import DatePicker from '@/components/date-picker';
+import ReactDatePicker from 'react-datepicker';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import useHandleError from '@/hooks/use-handle-error';
@@ -425,11 +425,11 @@ const ConnectWithSupportV2 = () => {
 																</p>
 																<hr className="mb-6" />
 																<div className="d-flex justify-content-center">
-																	<DatePicker
+																	<ReactDatePicker
 																		inline
 																		minDate={new Date()}
 																		selected={selectedStartDate}
-																		onChange={(date) => {
+																		onChange={(date: Date | null) => {
 																			if (!date) {
 																				return;
 																			}

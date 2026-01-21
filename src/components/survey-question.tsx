@@ -13,14 +13,17 @@ interface SurveyQuestionProps extends PropsWithChildren {
 }
 
 const SurveyQuestion: FC<SurveyQuestionProps> = ({ question, onChange, children }) => {
-	const checkboxRefs = useRef<React.RefObject<HTMLInputElement>[]>([]).current;
-	const radioRefs = useRef<React.RefObject<HTMLInputElement>[]>([]).current;
+	const checkboxRefs = useRef<React.RefObject<HTMLInputElement | null>[]>([]).current;
+	const radioRefs = useRef<React.RefObject<HTMLInputElement | null>[]>([]).current;
 	const [answersTextValues, setAnswersTextValues] = useState(
-		question.selectedAssessmentAnswers.reduce((acc, answer) => {
-			acc[answer.answerId] = answer.answerText || '';
+		question.selectedAssessmentAnswers.reduce(
+			(acc, answer) => {
+				acc[answer.answerId] = answer.answerText || '';
 
-			return acc;
-		}, {} as Record<string, string>)
+				return acc;
+			},
+			{} as Record<string, string>
+		)
 	);
 
 	function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>, question: AssessmentQuestion) {

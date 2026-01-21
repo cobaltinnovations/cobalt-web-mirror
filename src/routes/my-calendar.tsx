@@ -205,7 +205,7 @@ const CalendarEventGroups = ({ sourceEventId, onCancel }: CalendarEventGroupsPro
 					});
 					return acc;
 				},
-				{} as { [key: string]: RefObject<HTMLDivElement> }
+				{} as { [key: string]: RefObject<HTMLDivElement | null> }
 			),
 		[calendarEventGroups]
 	);

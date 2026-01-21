@@ -5,7 +5,7 @@ import { CourseUnitModel, CourseUnitTypeId } from '@/lib/models';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '../svg-icon';
 
-const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number, className?: string) => JSX.Element> = {
+const courseUnitTypeIdIconMap: Record<CourseUnitTypeId, (size: number, className?: string) => React.ReactElement> = {
 	CARD_SORT: (size, className?: string) => (
 		<SvgIcon kit="far" icon="clipboard-list-check" size={size} className={className} />
 	),

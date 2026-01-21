@@ -1,8 +1,9 @@
 import moment from 'moment';
 import React, { useCallback, useRef, useState } from 'react';
 import {
+	BlockerFunction,
 	LoaderFunctionArgs,
-	unstable_useBlocker as useBlocker,
+	useBlocker,
 	useNavigate,
 	useParams,
 	useRouteLoaderData,
@@ -206,7 +207,7 @@ export const Component = () => {
 	const params = useParams<{ action: string; contentId: string }>();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
-	const descriptionWysiwygRef = useRef<ReactQuill>(null);
+	const descriptionWysiwygRef = useRef<ReactQuill | null>(null);
 
 	const isAdd = params.action === 'add';
 	const isEdit = params.action === 'edit';
@@ -230,7 +231,7 @@ export const Component = () => {
 	const [showImageSelectionTipsModal, setShowImageSelectionTipsModal] = useState(false);
 
 	const [isDirty, setIsDirty] = useState(false);
-	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
+	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }: Parameters<BlockerFunction>[0]) => {
 		// ignore changes in `search`
 		const navigatingAway = currentLocation.pathname !== nextLocation.pathname;
 		return navigatingAway && isDirty;

@@ -4,7 +4,6 @@ import { StudyOnboardingResponse, accountService, studyService } from '@/lib/ser
 import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { LoaderFunctionArgs, redirect, useNavigate, useRouteLoaderData } from 'react-router-dom';
-import { getSubdomain } from '@/lib/utils';
 import { AccountSourceId, AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 
 function useStudyOnboardingLoaderData() {
@@ -15,7 +14,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const url = new URL(request.url);
 	const urlName = params.studyIdOrUrlName;
 	const immediate = url.searchParams.get('immediate') === 'true' ? true : false;
-	const subdomain = getSubdomain(url);
 
 	if (!urlName) {
 		throw new Error('urlName is undefined.');

@@ -39,13 +39,13 @@ const requestSessionSchema = yup
 		dateInMind: yup.boolean().default(false),
 		date: yup.string().when('dateInMind', {
 			is: true,
-			then: yup.string().required().default(''),
-			otherwise: yup.string().default(''),
+			then: (schema) => schema.required().default(''),
+			otherwise: (schema) => schema.default(''),
 		}),
 		time: yup.string().when('dateInMind', {
 			is: true,
-			then: yup.string().required().default(''),
-			otherwise: yup.string().default(''),
+			then: (schema) => schema.required().default(''),
+			otherwise: (schema) => schema.default(''),
 		}),
 		numberOfPeople: yup.string().required().default(''),
 		additionalDetails: yup.string().default(''),

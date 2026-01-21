@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { createUseThemedStyles } from '@/jss/theme';
 
-const useFileInputButtonStyles = createUseThemedStyles((theme) => ({
+const useFileInputButtonStyles = createUseThemedStyles(() => ({
 	fileInput: {
 		display: 'none',
 	},

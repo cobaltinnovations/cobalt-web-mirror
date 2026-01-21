@@ -18,7 +18,7 @@ export interface ConfirmDialogProps extends ModalProps {
 	bodyText: string;
 	dismissText: string;
 	confirmText: string;
-	detailText?: string | JSX.Element;
+	detailText?: React.ReactNode;
 	isConfirming?: boolean;
 	onConfirm(): void;
 	destructive?: boolean;

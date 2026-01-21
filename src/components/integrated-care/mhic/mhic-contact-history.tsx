@@ -40,7 +40,7 @@ interface PastScheduledMessageGroupsOrOutreach {
 	name: string;
 	date: string;
 	dateDescription: string;
-	icon: JSX.Element;
+	icon: React.ReactElement;
 	title: string;
 	descriptionHtml: string;
 	original: any;

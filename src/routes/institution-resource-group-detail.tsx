@@ -43,7 +43,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	};
 };
 
-const useStyles = createUseThemedStyles((theme) => ({
+const useStyles = createUseThemedStyles(() => ({
 	imageOuter: {
 		borderRadius: 8,
 	},

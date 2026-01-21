@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { RefObject, useRef } from 'react';
+import React, { useRef } from 'react';
 import ReactQuill, { Quill } from 'react-quill-new';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -75,9 +75,9 @@ interface WysiwygProps {
 	height?: number;
 }
 
-const SizeStyle = Quill.import('attributors/style/size');
+const SizeStyle = Quill.import('attributors/style/size') as { whitelist: string[] };
 SizeStyle.whitelist = customFontSizes.map((cfs) => `${cfs.fontSize}px`);
-Quill.register(SizeStyle, true);
+Quill.register('attributors/style/size', SizeStyle, true);
 const quillModules = {
 	toolbar: [
 		[{ size: customFontSizes.map((cfs) => `${cfs.fontSize}px`) }],
@@ -87,32 +87,30 @@ const quillModules = {
 	],
 };
 
-const WysiwygBasic = React.forwardRef(
-	(
-		{ value, onChange, disabled, className, height }: WysiwygProps,
-		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
-	) => {
-		const classes = useWysiwygStyles({ height });
-		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
+const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(function WysiwygBasic(
+	{ value, onChange, disabled, className, height }: WysiwygProps,
+	ref
+) {
+	const classes = useWysiwygStyles({ height });
+	const reactQuillId = useRef(`quill-${uuidv4()}`).current;
 
-		return (
-			<ReactQuill
-				id={reactQuillId}
-				className={classNames(classes.quill, className)}
-				ref={ref}
-				theme="snow"
-				value={value}
-				onChange={onChange}
-				modules={quillModules}
-				readOnly={disabled}
-				bounds={`#${reactQuillId}`}
-			/>
-		);
-	}
-);
+	return (
+		<ReactQuill
+			id={reactQuillId}
+			className={classNames(classes.quill, className)}
+			ref={ref}
+			theme="snow"
+			value={value}
+			onChange={onChange}
+			modules={quillModules}
+			readOnly={disabled}
+			bounds={`#${reactQuillId}`}
+		/>
+	);
+});
 
 export const wysiwygIsValid = (
-	ref: React.RefObject<ReactQuill> | null,
+	ref: React.RefObject<ReactQuill | null> | null,
 	options?: { shouldFocus: boolean; shouldScroll: boolean }
 ) => {
 	if (!ref) {

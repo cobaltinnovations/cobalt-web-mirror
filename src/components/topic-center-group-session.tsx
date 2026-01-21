@@ -98,7 +98,6 @@ export const TopicCenterGroupSession = ({
 	title,
 	titleSecondary,
 	titleTertiary,
-	description,
 	badgeTitle,
 	buttonTitle,
 	onClick,

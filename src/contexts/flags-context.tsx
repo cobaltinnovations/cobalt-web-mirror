@@ -26,7 +26,7 @@ export interface FlagModel {
 	description?: string;
 	initExpanded?: boolean;
 	actions: FlagAction[];
-	nodeRef: React.RefObject<HTMLDivElement>;
+	nodeRef: React.RefObject<HTMLDivElement | null>;
 }
 
 type AddFlagConfig = Omit<FlagModel, 'flagId' | 'nodeRef'>;
@@ -47,7 +47,7 @@ const FlagsContext = createContext({} as FlagsContextConfig);
 
 const FlagsProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [flags, setFlags] = useState<FlagModel[]>([]);
-	const removalTimeout = useRef<NodeJS.Timeout>();
+	const removalTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const removalDurationInMs = useRef(8000);
 
 	const addFlag = useCallback((flag: AddFlagConfig) => {

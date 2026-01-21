@@ -117,9 +117,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps) => {
 	const classes = useStyles();
-	const { signOutAndClearContext } = useAccount();
+	const { signOutAndClearContext, account } = useAccount();
 	const navigate = useNavigate();
-	const { account, institution } = useAccount();
 	const location = useLocation();
 
 	const overviewMatch = useMatch({

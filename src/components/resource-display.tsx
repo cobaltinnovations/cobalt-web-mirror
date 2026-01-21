@@ -69,7 +69,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 				},
 			})
 			.fetch()
-			.catch((e) => {
+			.catch(() => {
 				// TODO: Swallowing error silently for now
 			});
 	}, [content, trackView]);
@@ -130,7 +130,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 										width="100%"
 										height="100%"
 										controls
-										url={embedUrl}
+										src={embedUrl}
 										config={playerConfig}
 										onPlay={() => {
 											trackActivity();

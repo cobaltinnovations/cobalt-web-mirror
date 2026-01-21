@@ -65,7 +65,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 export interface MhicNavigationItemModel {
 	title: string;
 	description?: string;
-	icon?(): JSX.Element;
+	icon?(): React.ReactElement;
 	onClick?(): void;
 	navigationItems?: MhicNavigationItemModel[];
 	isActive?: boolean;

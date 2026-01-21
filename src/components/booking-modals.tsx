@@ -37,7 +37,8 @@ interface HistoryLocationState {
 }
 
 export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
-	const { account } = useAccount();
+	void props;
+	useAccount();
 	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -63,20 +64,6 @@ export const BookingModals = forwardRef<BookingRefHandle>((props, ref) => {
 
 	const currentSearchString = searchParams.toString();
 	const skipAssessment = !!(location.state as HistoryLocationState)?.skipAssessment;
-
-	const navigateToEhrLookup = useCallback(() => {
-		const bookingSource = Cookies.get('bookingSource');
-
-		if (bookingSource === BookingSource.ProviderSearch) {
-			setPreservedFilterQueryString(currentSearchString);
-		}
-
-		navigate(`/ehr-lookup`, {
-			state: {
-				skipAssessment,
-			},
-		});
-	}, [currentSearchString, navigate, setPreservedFilterQueryString, skipAssessment]);
 
 	const navigateToIntakeAssessment = useCallback(
 		(provider: Provider) => {

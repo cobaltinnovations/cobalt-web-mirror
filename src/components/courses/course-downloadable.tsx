@@ -39,7 +39,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const iconMap: Record<string, JSX.Element> = {
+const iconMap: Record<string, React.ReactElement> = {
 	'application/pdf': <SvgIcon kit="far" icon="file-pdf" size={32} className="text-n500" />,
 	'application/msword': <SvgIcon kit="far" icon="file-doc" size={32} className="text-n500" />,
 	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': (

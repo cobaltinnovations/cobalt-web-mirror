@@ -217,7 +217,7 @@ const GroupSessionsRequest = () => {
 									</h6>
 									<p className="mb-2">Select all that apply.</p>
 									<Form.Group className="border rounded">
-										{groupTopics.map((topic, index) => {
+										{groupTopics.map((topic) => {
 											return (
 												<div key={topic.groupTopicId} className="border-bottom">
 													<div className="p-4 d-flex align-items-center justify-content-between">

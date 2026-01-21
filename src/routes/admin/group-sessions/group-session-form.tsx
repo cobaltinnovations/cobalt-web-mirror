@@ -18,7 +18,8 @@ import {
 	Link,
 	LoaderFunctionArgs,
 	Navigate,
-	unstable_useBlocker as useBlocker,
+	BlockerFunction,
+	useBlocker,
 	useMatch,
 	useNavigate,
 	useParams,
@@ -250,9 +251,9 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const selectedTab = searchParams.get('tab') ?? 'details';
 
-	const descriptionWysiwygRef = useRef<ReactQuill>(null);
-	const reminderWysiwygRef = useRef<ReactQuill>(null);
-	const followupWysiwygRef = useRef<ReactQuill>(null);
+	const descriptionWysiwygRef = useRef<ReactQuill | null>(null);
+	const reminderWysiwygRef = useRef<ReactQuill | null>(null);
+	const followupWysiwygRef = useRef<ReactQuill | null>(null);
 	const isPreview = params.action === 'preview';
 	const isEdit = params.action === 'edit';
 	const isDuplicate = params.action === 'duplicate';
@@ -275,7 +276,7 @@ export const Component = () => {
 	);
 
 	const [isDirty, setIsDirty] = useState(false);
-	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
+	const navigationBlocker = useBlocker(({ currentLocation, nextLocation }: Parameters<BlockerFunction>[0]) => {
 		// ignore changes in `search`
 		const navigatingAway = currentLocation.pathname !== nextLocation.pathname;
 
@@ -615,7 +616,7 @@ export const Component = () => {
 					hideChildren={
 						isExternal || formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON
 					}
-					onChange={({ currentTarget }) => {
+					onChange={() => {
 						updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.VIRTUAL);
 					}}
 				>
@@ -643,7 +644,7 @@ export const Component = () => {
 					hideChildren={
 						isExternal || formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.VIRTUAL
 					}
-					onChange={({ currentTarget }) => {
+					onChange={() => {
 						updateFormValue('groupSessionLocationTypeId', GroupSessionLocationTypeId.IN_PERSON);
 					}}
 					checked={formValues.groupSessionLocationTypeId === GroupSessionLocationTypeId.IN_PERSON}

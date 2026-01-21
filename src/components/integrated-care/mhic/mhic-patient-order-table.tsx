@@ -36,7 +36,7 @@ const nextContextTypeMap: Record<
 	PatientOrderContactTypeId,
 	{
 		title: string;
-		icon: () => JSX.Element;
+		icon: () => React.ReactElement;
 	}
 > = {
 	[PatientOrderContactTypeId.WELCOME_MESSAGE]: {
@@ -232,7 +232,7 @@ export const MhicPatientOrderTable = ({
 		return count;
 	}, []);
 
-	const getFlagColor = useCallback((patientOrder: PatientOrderModel) => {
+	const getFlagColor = useCallback((_patientOrder: PatientOrderModel) => {
 		return 'text-warning';
 	}, []);
 
@@ -250,7 +250,7 @@ export const MhicPatientOrderTable = ({
 
 				hasLoadedCallback?.(response);
 			})
-			.catch((e) => {
+			.catch(() => {
 				setPatientOrders([]);
 				setTotalPatientOrdersCount(0);
 				setTotalPatientOrdersDescription('0');

@@ -46,7 +46,7 @@ interface DraggableItemProps {
 	title: string;
 	subTitle?: string;
 	asideTitle?: string;
-	aside?: JSX.Element | null;
+	aside?: React.ReactNode;
 	active?: boolean;
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
