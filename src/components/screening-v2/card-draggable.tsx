@@ -3,6 +3,7 @@ import { Draggable } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '../svg-icon';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
@@ -32,6 +33,7 @@ interface CardDraggableProps {
 	cardText?: string;
 	className?: string;
 	disabled?: boolean;
+	renderHtml?: boolean;
 	onMouseDown?(event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>): void;
 }
 
@@ -41,6 +43,7 @@ export const CardDraggable = ({
 	cardText,
 	className,
 	disabled,
+	renderHtml,
 	onMouseDown,
 }: CardDraggableProps) => {
 	const classes = useStyles();
@@ -66,7 +69,11 @@ export const CardDraggable = ({
 					onTouchStart={onMouseDown}
 					onMouseDown={onMouseDown}
 				>
-					<p className="text-center">{cardText}</p>
+					{renderHtml ? (
+						<WysiwygDisplay className="text-center wysiwyg-display" html={cardText ?? ''} />
+					) : (
+						<p className="text-center">{cardText}</p>
+					)}
 					<div className={classes.dragHandleOuter}>
 						<SvgIcon kit="far" icon="grip-lines" size={20} className="text-gray" />
 					</div>

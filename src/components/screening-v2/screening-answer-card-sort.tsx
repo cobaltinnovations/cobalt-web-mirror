@@ -87,6 +87,7 @@ export const ScreeningAnswerCardSort = ({
 	const classes = useStyles();
 	const [questionStack, setQuestionStack] = useState<CardStackItem[]>([]);
 	const [answerStacksById, setAnswerStacksById] = useState<Record<string, CardStackItem[]>>({});
+	const renderQuestionHtml = Boolean(question.metadata?.renderQuestionHtml);
 	const answerStackTextById = useMemo(
 		() =>
 			options.reduce(
@@ -160,6 +161,7 @@ export const ScreeningAnswerCardSort = ({
 									cardId={card.id}
 									cardIndex={cardIndex}
 									cardText={card.text}
+									renderHtml={renderQuestionHtml}
 								/>
 							))}
 							{droppableProvided.placeholder}
@@ -195,6 +197,7 @@ export const ScreeningAnswerCardSort = ({
 											cardId={card.id}
 											cardIndex={cardIndex}
 											cardText={card.text}
+											renderHtml={renderQuestionHtml}
 											disabled={!!questionResult}
 										/>
 									))}

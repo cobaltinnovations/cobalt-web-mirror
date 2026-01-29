@@ -275,6 +275,8 @@ export const ScreeningQuestionContextCardSort = ({
 		return null;
 	}
 
+	const renderQuestionHtml = Boolean(screeningQuestionContext.screeningQuestion.metadata?.renderQuestionHtml);
+
 	return (
 		<div className={classes.questionOuter}>
 			<DragDropContext onDragEnd={handleDragEnd}>
@@ -305,6 +307,7 @@ export const ScreeningQuestionContextCardSort = ({
 													cardId={questionStack.card?.id}
 													cardText={questionStack.card?.text}
 													cardIndex={0}
+													renderHtml={renderQuestionHtml}
 													disabled={isLoading}
 												/>
 											</CSSTransition>
@@ -342,7 +345,10 @@ export const ScreeningQuestionContextCardSort = ({
 											mountOnEnter
 											unmountOnExit
 										>
-											<CardDraggableStatic cardText={answerStack.card?.text} />
+											<CardDraggableStatic
+												cardText={answerStack.card?.text}
+												renderHtml={renderQuestionHtml}
+											/>
 										</CSSTransition>
 									</div>
 								)}
