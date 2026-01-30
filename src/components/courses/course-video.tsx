@@ -1,4 +1,3 @@
-import { throttle } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { getKalturaScriptForVideo } from '@/lib/utils';
 import classNames from 'classnames';
@@ -33,6 +32,73 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const getCurrentTimeSeconds = (player: any) => {
+	if (!player) {
+		return undefined;
+	}
+
+	if (typeof player.getCurrentTime === 'function') {
+		return player.getCurrentTime();
+	}
+
+	if (typeof player.currentTime === 'number') {
+		return player.currentTime;
+	}
+
+	if (typeof player.currentTime === 'function') {
+		return player.currentTime();
+	}
+
+	return undefined;
+};
+
+const getDurationSeconds = (player: any) => {
+	if (!player) {
+		return undefined;
+	}
+
+	let mediaInfo: unknown;
+	if (typeof player.getMediaInfo === 'function') {
+		try {
+			mediaInfo = player.getMediaInfo();
+		} catch (error) {
+			mediaInfo = undefined;
+		}
+	}
+
+	if (mediaInfo && typeof mediaInfo === 'object') {
+		const mediaInfoRecord = mediaInfo as Record<string, unknown>;
+		if (typeof mediaInfoRecord.duration === 'number') {
+			return mediaInfoRecord.duration;
+		}
+
+		if (typeof mediaInfoRecord.durationSeconds === 'number') {
+			return mediaInfoRecord.durationSeconds;
+		}
+
+		if (typeof mediaInfoRecord.msDuration === 'number') {
+			return mediaInfoRecord.msDuration / 1000;
+		}
+
+		if (typeof mediaInfoRecord.durationMs === 'number') {
+			return mediaInfoRecord.durationMs / 1000;
+		}
+	}
+
+	if (typeof player.getDuration === 'function') {
+		const duration = player.getDuration();
+		if (typeof duration === 'number') {
+			return duration;
+		}
+	}
+
+	if (typeof player.duration === 'number') {
+		return player.duration;
+	}
+
+	return undefined;
+};
+
 interface CourseVideoProps {
 	videoId: string;
 	courseVideos: CourseVideoModel[];
@@ -53,6 +119,7 @@ export const CourseVideo = ({
 	const [videoPlayerReady, setVideoPlayerReady] = useState(false);
 	const [videoPlayerTimedOut, setVideoPlayerTimedOut] = useState(false);
 	const videoLoadingTimeoutRef = useRef<NodeJS.Timeout>();
+	const completionIntervalRef = useRef<NodeJS.Timeout>();
 	const completionThresholdPassedRef = useRef(false);
 
 	const stopVideoLoadingTimer = useCallback(() => {
@@ -72,17 +139,51 @@ export const CourseVideo = ({
 		}, 15000);
 	}, [onVideoPlayerEvent, stopVideoLoadingTimer]);
 
-	const throttledPlayerEvent = useRef(
-		throttle(
-			(eventName: string, eventPayload: unknown, mediaProxy: unknown) =>
-				onVideoPlayerEvent(eventName, eventPayload, mediaProxy),
-			5000,
-			{
-				leading: true,
-				trailing: false,
-			}
-		)
-	).current;
+	const stopCompletionInterval = useCallback(() => {
+		if (!completionIntervalRef.current) {
+			return;
+		}
+
+		clearInterval(completionIntervalRef.current);
+		completionIntervalRef.current = undefined;
+	}, []);
+
+	const startCompletionInterval = useCallback(
+		(player: any, videoIsPlaylist: boolean) => {
+			stopCompletionInterval();
+
+			completionIntervalRef.current = setInterval(() => {
+				if (completionThresholdPassedRef.current) {
+					return;
+				}
+
+				const currentTimeSeconds = getCurrentTimeSeconds(player);
+				if (typeof currentTimeSeconds !== 'number' || Number.isNaN(currentTimeSeconds)) {
+					return;
+				}
+
+				if (videoIsPlaylist) {
+					const durationSeconds = getDurationSeconds(player);
+					if (typeof durationSeconds !== 'number' || durationSeconds === 0 || Number.isNaN(durationSeconds)) {
+						return;
+					}
+
+					if (currentTimeSeconds > durationSeconds * 0.9) {
+						completionThresholdPassedRef.current = true;
+						onCompletionThresholdPassed();
+					}
+
+					return;
+				}
+
+				if (currentTimeSeconds > completionThresholdInSeconds) {
+					completionThresholdPassedRef.current = true;
+					onCompletionThresholdPassed();
+				}
+			}, 1000);
+		},
+		[completionThresholdInSeconds, onCompletionThresholdPassed, stopCompletionInterval]
+	);
 
 	useEffect(() => {
 		const video = courseVideos.find((courseVideo) => courseVideo.videoId === videoId);
@@ -90,52 +191,54 @@ export const CourseVideo = ({
 			return;
 		}
 
+		let isActive = true;
+		completionThresholdPassedRef.current = false;
 		setVideoPlayerReady(false);
 		setVideoPlayerTimedOut(false);
 		startVideoLoadingTimer();
 
 		const videoIsPlaylist = !!(video.kalturaPlaylistId && !video.kalturaEntryId);
-		const { script } = getKalturaScriptForVideo({
+		const { script, ready, destroy } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
 			eventCallback: (eventName, eventPayload, mediaProxy) => {
-				if (eventName === 'playerReady') {
-					setVideoPlayerReady(true);
-					setVideoPlayerTimedOut(false);
-					stopVideoLoadingTimer();
-				}
-
-				if (!completionThresholdPassedRef.current && eventName === 'playerUpdatePlayhead') {
-					const currentTimestampInSeconds = eventPayload as number;
-					const currentTimestampInMs = currentTimestampInSeconds * 1000;
-
-					if (videoIsPlaylist) {
-						const currentVideoDurationInMs = mediaProxy.msDuration;
-						const currentVideoThresholdInMs = currentVideoDurationInMs * 0.9;
-
-						if (currentTimestampInMs > currentVideoThresholdInMs) {
-							completionThresholdPassedRef.current = true;
-							onCompletionThresholdPassed();
-						}
-					} else {
-						if (currentTimestampInSeconds > completionThresholdInSeconds) {
-							completionThresholdPassedRef.current = true;
-							onCompletionThresholdPassed();
-						}
-					}
-				}
+				onVideoPlayerEvent(eventName, eventPayload, mediaProxy);
 			},
 			errorCallback: (error) => {
+				if (!isActive) {
+					return;
+				}
+
 				setVideoPlayerReady(false);
 				setVideoPlayerTimedOut(false);
 				stopVideoLoadingTimer();
+				stopCompletionInterval();
 				handleError(error);
 			},
 		});
 
 		document.body.appendChild(script);
+		ready()
+			.then((playerInstance) => {
+				if (!isActive) {
+					return;
+				}
+
+				setVideoPlayerReady(true);
+				setVideoPlayerTimedOut(false);
+				stopVideoLoadingTimer();
+				startCompletionInterval(playerInstance, videoIsPlaylist);
+			})
+			.catch(() => {});
+
 		return () => {
-			document.body.removeChild(script);
+			isActive = false;
+			stopVideoLoadingTimer();
+			stopCompletionInterval();
+			destroy();
+			if (script.isConnected) {
+				document.body.removeChild(script);
+			}
 		};
 	}, [
 		completionThresholdInSeconds,
@@ -144,8 +247,9 @@ export const CourseVideo = ({
 		onCompletionThresholdPassed,
 		onVideoPlayerEvent,
 		startVideoLoadingTimer,
+		startCompletionInterval,
+		stopCompletionInterval,
 		stopVideoLoadingTimer,
-		throttledPlayerEvent,
 		videoId,
 	]);
 

@@ -50,6 +50,8 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 	const [videoPlayerTimedOut, setVideoPlayerTimedOut] = useState(false);
 	const videoLoadingTimeoutRef = useRef<NodeJS.Timeout>();
 	const scriptRef = useRef<HTMLScriptElement>();
+	const playerCleanupRef = useRef<() => void>();
+	const playerActiveRef = useRef(false);
 
 	const stopVideoLoadingTimer = useCallback(() => {
 		if (!videoLoadingTimeoutRef.current) {
@@ -68,23 +70,22 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 	}, [stopVideoLoadingTimer]);
 
 	const handleOnEnter = useCallback(async () => {
+		playerActiveRef.current = true;
 		setVideoPlayerReady(false);
 		setVideoPlayerTimedOut(false);
 		startVideoLoadingTimer();
 
 		try {
 			const response = await institutionService.getVideo(videoId).fetch();
-			const { script } = getKalturaScriptForVideo({
+			const { script, ready, destroy } = getKalturaScriptForVideo({
 				videoPlayerId: 'kaltura_player',
 				courseVideo: response.video,
-				eventCallback: (eventName) => {
-					if (eventName === 'playerReady') {
-						setVideoPlayerReady(true);
-						setVideoPlayerTimedOut(false);
-						stopVideoLoadingTimer();
-					}
-				},
+				eventCallback: () => {},
 				errorCallback: (error) => {
+					if (!playerActiveRef.current) {
+						return;
+					}
+
 					setVideoPlayerReady(false);
 					setVideoPlayerTimedOut(false);
 					stopVideoLoadingTimer();
@@ -93,7 +94,19 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 			});
 
 			scriptRef.current = script;
+			playerCleanupRef.current = destroy;
 			document.body.appendChild(scriptRef.current);
+			ready()
+				.then(() => {
+					if (!playerActiveRef.current) {
+						return;
+					}
+
+					setVideoPlayerReady(true);
+					setVideoPlayerTimedOut(false);
+					stopVideoLoadingTimer();
+				})
+				.catch(() => {});
 		} catch (error) {
 			setVideoPlayerReady(false);
 			setVideoPlayerTimedOut(false);
@@ -103,12 +116,19 @@ const SignInVideoModal = ({ videoId, ...props }: SignInVideoModalProps) => {
 	}, [handleError, startVideoLoadingTimer, stopVideoLoadingTimer, videoId]);
 
 	const handleOnExit = useCallback(() => {
+		playerActiveRef.current = false;
+		stopVideoLoadingTimer();
+		playerCleanupRef.current?.();
+		playerCleanupRef.current = undefined;
 		if (!scriptRef.current) {
 			return;
 		}
 
-		document.body.removeChild(scriptRef.current);
-	}, []);
+		if (scriptRef.current.isConnected) {
+			document.body.removeChild(scriptRef.current);
+		}
+		scriptRef.current = undefined;
+	}, [stopVideoLoadingTimer]);
 
 	return (
 		<Modal
