@@ -15,6 +15,7 @@ import { screeningService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
 import InlineAlert from '@/components/inline-alert';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import SvgIcon from '../svg-icon';
@@ -322,6 +323,8 @@ export const ScreeningQuestionContext = ({
 		return null;
 	}
 
+	const renderQuestionHtml = Boolean(screeningQuestionContext.screeningQuestion.metadata?.renderQuestionHtml);
+
 	return (
 		<div className={classes.questionOuter}>
 			<TransitionGroup
@@ -353,9 +356,17 @@ export const ScreeningQuestionContext = ({
 						) : (
 							<Form onSubmit={handleQuestionFormSubmit}>
 								<fieldset disabled={isLoading}>
-									{screeningQuestionContext.screeningQuestion.introText && (
-										<p className="mb-2">{screeningQuestionContext.screeningQuestion.introText}</p>
-									)}
+									{screeningQuestionContext.screeningQuestion.introText &&
+										(renderQuestionHtml ? (
+											<WysiwygDisplay
+												className="mb-2 wysiwyg-display"
+												html={screeningQuestionContext.screeningQuestion.introText ?? ''}
+											/>
+										) : (
+											<p className="mb-2">
+												{screeningQuestionContext.screeningQuestion.introText}
+											</p>
+										))}
 
 									<h3
 										className={classNames({
@@ -363,14 +374,27 @@ export const ScreeningQuestionContext = ({
 											'mb-8': !screeningQuestionContext.screeningQuestion.supplementText,
 										})}
 									>
-										{screeningQuestionContext.screeningQuestion.questionText}
+										{renderQuestionHtml ? (
+											<WysiwygDisplay
+												className="wysiwyg-display"
+												html={screeningQuestionContext.screeningQuestion.questionText ?? ''}
+											/>
+										) : (
+											screeningQuestionContext.screeningQuestion.questionText
+										)}
 									</h3>
 
-									{screeningQuestionContext.screeningQuestion.supplementText && (
-										<p className="mb-6">
-											{screeningQuestionContext.screeningQuestion.supplementText}
-										</p>
-									)}
+									{screeningQuestionContext.screeningQuestion.supplementText &&
+										(renderQuestionHtml ? (
+											<WysiwygDisplay
+												className="mb-6 wysiwyg-display"
+												html={screeningQuestionContext.screeningQuestion.supplementText ?? ''}
+											/>
+										) : (
+											<p className="mb-6">
+												{screeningQuestionContext.screeningQuestion.supplementText}
+											</p>
+										))}
 
 									<ScreeningAnswer
 										className="mb-6"
@@ -386,9 +410,17 @@ export const ScreeningQuestionContext = ({
 										onChange={handleScreeningAnswerChange}
 									/>
 
-									{screeningQuestionContext.screeningQuestion.footerText && (
-										<p className="mb-6">{screeningQuestionContext.screeningQuestion.footerText}</p>
-									)}
+									{screeningQuestionContext.screeningQuestion.footerText &&
+										(renderQuestionHtml ? (
+											<WysiwygDisplay
+												className="mb-6 wysiwyg-display"
+												html={screeningQuestionContext.screeningQuestion.footerText ?? ''}
+											/>
+										) : (
+											<p className="mb-6">
+												{screeningQuestionContext.screeningQuestion.footerText}
+											</p>
+										))}
 
 									<Collapse in={(answerConfig?.messages ?? []).length > 0}>
 										<div>

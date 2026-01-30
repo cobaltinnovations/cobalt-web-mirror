@@ -135,6 +135,7 @@ export interface ScreeningQuestion {
 	supplementText?: string;
 	metadata?: {
 		prepopulatedEmailAddress?: string;
+		renderQuestionHtml?: boolean;
 		[key: string]: unknown;
 	};
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '../svg-icon';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	cardDraggable: {
@@ -28,13 +29,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface CardDraggableStaticProps {
 	cardText?: string;
 	className?: string;
+	renderHtml?: boolean;
 }
 
-export const CardDraggableStatic = ({ cardText, className }: CardDraggableStaticProps) => {
+export const CardDraggableStatic = ({ cardText, className, renderHtml }: CardDraggableStaticProps) => {
 	const classes = useStyles();
 	return (
 		<div className={classNames(classes.cardDraggable, className)}>
-			<p className="text-center">{cardText}</p>
+			{renderHtml ? (
+				<WysiwygDisplay className="text-center wysiwyg-display" html={cardText ?? ''} />
+			) : (
+				<p className="text-center">{cardText}</p>
+			)}
 			<div className={classes.dragHandleOuter}>
 				<SvgIcon kit="far" icon="grip-lines" size={20} className="text-gray" />
 			</div>
