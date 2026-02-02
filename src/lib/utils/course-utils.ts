@@ -149,6 +149,59 @@ export const getKalturaScriptForVideo = ({
 	let player: any;
 	let isDestroyed = false;
 	let hasErrored = false;
+	const eventThrottleDurationMs = 2500;
+	const lastEventAtByName = new Map<string, number>();
+	const unthrottledEventNames = new Set<string>([
+		'play',
+		'pause',
+		'ended',
+		'playing',
+		'firstplay',
+		'seeking',
+		'seeked',
+		'durationchange',
+		'ratechange',
+		'volumechange',
+		'mute',
+		'unmute',
+		'fullscreenchange',
+		'enterfullscreen',
+		'exitfullscreen',
+		'loadstart',
+		'loadedmetadata',
+		'loadeddata',
+		'canplay',
+		'canplaythrough',
+		'waiting',
+		'stalled',
+		'abort',
+		'emptied',
+		'playerready',
+		'ready',
+		'mediaready',
+		'playlistready',
+		'playlistended',
+		'playlistitemchanged',
+		'playlistplaynext',
+		'playlistplayprev',
+		'playlistupdate',
+		'castavailable',
+		'castsessionstarted',
+		'castsessionended',
+		'adstarted',
+		'adended',
+		'adclicked',
+		'adimpression',
+		'adskippablestatechanged',
+		'user_clicked_fullscreen_enter',
+		'user_clicked_fullscreen_exit',
+		'user_clicked_mute',
+		'user_clicked_pause',
+		'user_clicked_play',
+		'user_clicked_seek',
+		'user_clicked_unmute',
+		'user_clicked_volume_change',
+	]);
 	const teardownHandlers: Array<() => void> = [];
 
 	let readyResolve: (playerInstance: any) => void = () => {};
@@ -173,6 +226,17 @@ export const getKalturaScriptForVideo = ({
 
 		for (const eventName of eventNames) {
 			const handler = (event: { payload?: unknown } | unknown) => {
+				const normalizedEventName = eventName.toLowerCase();
+				if (!unthrottledEventNames.has(normalizedEventName)) {
+					const now = Date.now();
+					const lastEventAt = lastEventAtByName.get(normalizedEventName);
+					if (lastEventAt && now - lastEventAt < eventThrottleDurationMs) {
+						return;
+					}
+
+					lastEventAtByName.set(normalizedEventName, now);
+				}
+
 				const payload =
 					event && typeof event === 'object' && 'payload' in (event as Record<string, unknown>)
 						? (event as { payload?: unknown }).payload
