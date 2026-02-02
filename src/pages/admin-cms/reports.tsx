@@ -26,11 +26,13 @@ const Reports = () => {
 			PROVIDER_APPOINTMENT_CANCELATIONS:
 				account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
 			PROVIDER_APPOINTMENTS_EAP: account?.accountCapabilityFlags.canViewProviderReportAppointmentsEap,
+			SIGN_IN_PAGEVIEW_NO_ACCOUNT: account?.accountCapabilityFlags.canViewAnalytics,
 		} as Record<string, boolean>;
 	}, [
 		account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
 		account?.accountCapabilityFlags.canViewProviderReportAppointmentsEap,
 		account?.accountCapabilityFlags.canViewProviderReportUnusedAvailability,
+		account?.accountCapabilityFlags.canViewAnalytics,
 	]);
 
 	const fetchData = useCallback(async () => {
