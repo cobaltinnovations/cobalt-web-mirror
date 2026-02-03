@@ -28,6 +28,7 @@ const Reports = () => {
 			PROVIDER_APPOINTMENTS_EAP: account?.accountCapabilityFlags.canViewProviderReportAppointmentsEap,
 			SIGN_IN_PAGEVIEW_NO_ACCOUNT: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_SIGNUP_UNVERIFIED: account?.accountCapabilityFlags.canViewAnalytics,
+			ACCOUNT_ONBOARDING_INCOMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 		} as Record<string, boolean>;
 	}, [
 		account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
