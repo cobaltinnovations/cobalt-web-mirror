@@ -438,13 +438,6 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 					color: theme.colors.i500,
 				},
 			},
-			'&--attention': {
-				backgroundColor: theme.colors.t50,
-				borderColor: theme.colors.t500,
-				'& svg': {
-					color: theme.colors.t500,
-				},
-			},
 			'& .icon-outer': {
 				width: 24,
 				flexShrink: 0,

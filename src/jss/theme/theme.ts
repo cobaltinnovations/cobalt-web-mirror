@@ -89,14 +89,6 @@ export type CobaltTheme = {
 		i700: string;
 		i900: string;
 
-		// semantic -- attention
-		t50: string;
-		t100: string;
-		t300: string;
-		t500: string;
-		t700: string;
-		t900: string;
-
 		background: string;
 		border: string;
 		overlay: string;
