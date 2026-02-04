@@ -220,7 +220,7 @@ const GroupSession = ({
 											<SvgIcon
 												kit="far"
 												icon="loveseat"
-												size={24}
+												size={20}
 												className="text-primary me-4"
 											/>
 
@@ -255,7 +255,7 @@ const GroupSession = ({
 											<SvgIcon
 												kit="far"
 												icon="laptop-mobile"
-												size={24}
+												size={22}
 												className="text-primary me-4"
 											/>
 											<div>
@@ -268,7 +268,7 @@ const GroupSession = ({
 											<SvgIcon
 												kit="far"
 												icon="location-dot"
-												size={24}
+												size={20}
 												className="text-primary me-4"
 											/>
 											<div>
