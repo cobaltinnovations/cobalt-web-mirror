@@ -59,6 +59,8 @@ export enum ScreeningFlowTypeId {
 	COURSE_UNIT = 'COURSE_UNIT',
 }
 
+export type ModifiedAssessmentTypeId = 'SAFETY' | 'FULL';
+
 export enum ScreeningSessionDestinationResultId {
 	SUCCESS = 'SUCCESS',
 	FAILURE = 'FAILURE',
