@@ -6,6 +6,7 @@ import {
 	ScreeningSession,
 	ScreeningSessionDestination,
 	ScreeningSessionDestinationId,
+	ModifiedAssessmentTypeId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
 import { CrisisAnalyticsEvent, ScreeningAnalyticsEvent } from '@/contexts/analytics-context';
@@ -245,23 +246,28 @@ export function useScreeningFlow({
 	const hasIncompleteScreening = incompleteSessions.length > 0;
 
 	const createScreeningSession = useCallback(
-		(modifiedAssessment?: boolean) => {
+		(modifiedAssessment?: boolean, modifiedAssessmentType?: ModifiedAssessmentTypeId) => {
 			if (disabled) {
 				throw new Error('Screening Flow is disabled');
 			}
 
 			setIsCreatingScreeningSession(true);
 
+			const isModifiedAssessment = modifiedAssessmentType ? true : Boolean(modifiedAssessment);
+			const metadata =
+				isModifiedAssessment || modifiedAssessmentType
+					? {
+							modifiedAssessment: isModifiedAssessment,
+							...(modifiedAssessmentType && { modifiedAssessmentType }),
+					  }
+					: undefined;
+
 			return screeningService
 				.createScreeningSession({
 					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
 					groupSessionId,
 					patientOrderId,
-					...(modifiedAssessment && {
-						metadata: {
-							modifiedAssessment,
-						},
-					}),
+					...(metadata && { metadata }),
 				})
 				.fetch()
 				.then((sessionResponse) => {

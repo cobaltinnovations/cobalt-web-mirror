@@ -18,6 +18,7 @@ import {
 	MhicScheduleCallModal,
 	MhicSchedulingDepartmentModal,
 	MhicSelectAssessmentTypeModal,
+	AssessmentTypeId,
 	MhicTriageCard,
 } from '@/components/integrated-care/mhic';
 import NoData from '@/components/no-data';
@@ -33,6 +34,7 @@ import {
 	PatientOrderScreeningStatusId,
 	ScreeningSessionScreeningResult,
 	AnalyticsNativeEventTypeId,
+	ModifiedAssessmentTypeId,
 } from '@/lib/models';
 import { analyticsService, integratedCareService } from '@/lib/services';
 
@@ -127,12 +129,17 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 	}, [patientOrder.patientOrderVoicemailTasks]);
 
 	const navigateToAssessment = useCallback(
-		(options: { createNew?: boolean; resumeRecent?: boolean; modifiedAssessment?: boolean }) => {
+		(options: {
+			createNew?: boolean;
+			resumeRecent?: boolean;
+			modifiedAssessmentType?: ModifiedAssessmentTypeId;
+		}) => {
 			// if (patientOrder.patientOrderConsentStatusId === PatientOrderConsentStatusId.UNKNOWN) {
 			// 	setShowConsentModal(true);
 			// } else {
 			if (options.createNew) {
-				intakeScreeningFlow.createScreeningSession(options.modifiedAssessment);
+				const hasModifiedAssessment = Boolean(options.modifiedAssessmentType);
+				intakeScreeningFlow.createScreeningSession(hasModifiedAssessment, options.modifiedAssessmentType);
 			} else if (options.resumeRecent) {
 				if (!hasCompletedIntakeScreening) {
 					intakeScreeningFlow.resumeScreeningSession(patientOrder.mostRecentIntakeScreeningSessionId);
@@ -335,11 +342,13 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 				onHide={() => {
 					setShowSelectAssessmentTypeModal(false);
 				}}
-				onSave={(modifiedAssessment) => {
+				onSave={(assessmentTypeId: AssessmentTypeId) => {
+					const modifiedAssessmentType = assessmentTypeId === 'DEFAULT' ? undefined : assessmentTypeId;
+
 					setShowSelectAssessmentTypeModal(false);
 					navigateToAssessment({
 						createNew: true,
-						modifiedAssessment,
+						modifiedAssessmentType,
 					});
 				}}
 			/>

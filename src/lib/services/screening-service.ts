@@ -5,6 +5,7 @@ import {
 	ScreeningFlow,
 	ScreeningFlowTypeId,
 	ScreeningFlowVersion,
+	ModifiedAssessmentTypeId,
 	ScreeningQuestion,
 	ScreeningQuestionContextResponse,
 	ScreeningSession,
@@ -23,6 +24,7 @@ export type ScreeningFlowParams = {
 	courseSessionId?: string;
 	metadata?: {
 		modifiedAssessment?: boolean;
+		modifiedAssessmentType?: ModifiedAssessmentTypeId;
 	};
 };
 
