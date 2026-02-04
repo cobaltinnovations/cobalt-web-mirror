@@ -49,10 +49,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.p500,
 				'&:hover': {
-					backgroundColor: theme.colors.p300,
+					backgroundColor: theme.colors.p700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.p700,
+					backgroundColor: theme.colors.p900,
 				},
 			},
 
@@ -77,10 +77,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.s500,
 				'&:hover': {
-					backgroundColor: theme.colors.s300,
+					backgroundColor: theme.colors.s700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.s500,
+					backgroundColor: theme.colors.s900,
 				},
 			},
 
@@ -91,10 +91,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.d500,
 				'&:hover': {
-					backgroundColor: theme.colors.d300,
+					backgroundColor: theme.colors.d700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.d500,
+					backgroundColor: theme.colors.d900,
 				},
 			},
 
@@ -105,10 +105,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n900,
 				backgroundColor: theme.colors.w500,
 				'&:hover': {
-					backgroundColor: theme.colors.w300,
+					backgroundColor: theme.colors.w700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.w500,
+					backgroundColor: theme.colors.w900,
 				},
 			},
 
@@ -118,10 +118,10 @@ export const button = (theme: CobaltTheme) => {
 			'&-info': {
 				backgroundColor: theme.colors.i500,
 				'&:hover': {
-					backgroundColor: theme.colors.i300,
+					backgroundColor: theme.colors.i700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.i500,
+					backgroundColor: theme.colors.i900,
 				},
 			},
 
