@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
+import { ModifiedAssessmentTypeId } from '@/lib/models';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -9,20 +10,22 @@ const useStyles = createUseStyles({
 });
 
 interface Props extends ModalProps {
-	onSave(modifiedAssessment: boolean): void;
+	onSave(assessmentTypeId: AssessmentTypeId): void;
 }
+
+export type AssessmentTypeId = 'DEFAULT' | ModifiedAssessmentTypeId;
 
 export const MhicSelectAssessmentTypeModal: FC<Props> = ({ onSave, ...props }) => {
 	const classes = useStyles();
-	const [modifiedAssessment, setModifiedAssessment] = useState(false);
+	const [assessmentTypeId, setAssessmentTypeId] = useState<AssessmentTypeId>('DEFAULT');
 
 	const handleOnEnter = useCallback(() => {
-		setModifiedAssessment(false);
+		setAssessmentTypeId('DEFAULT');
 	}, []);
 
 	const handleSaveButtonClick = useCallback(async () => {
-		onSave(modifiedAssessment);
-	}, [modifiedAssessment, onSave]);
+		onSave(assessmentTypeId);
+	}, [assessmentTypeId, onSave]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter}>
@@ -36,20 +39,31 @@ export const MhicSelectAssessmentTypeModal: FC<Props> = ({ onSave, ...props }) =
 					id="assessment-type__default"
 					label="Default"
 					value="DEFAULT"
-					checked={modifiedAssessment === false}
+					checked={assessmentTypeId === 'DEFAULT'}
 					onChange={() => {
-						setModifiedAssessment(false);
+						setAssessmentTypeId('DEFAULT');
 					}}
 				/>
 				<Form.Check
 					type="radio"
 					name="assessment-type"
-					id="assessment-type__modified"
-					label="Modified (Permission needed)"
-					value="MODIFIED"
-					checked={modifiedAssessment}
+					id="assessment-type__modified-safety"
+					label="Modified - Safety Only (Permission needed)"
+					value="SAFETY"
+					checked={assessmentTypeId === 'SAFETY'}
 					onChange={() => {
-						setModifiedAssessment(true);
+						setAssessmentTypeId('SAFETY');
+					}}
+				/>
+				<Form.Check
+					type="radio"
+					name="assessment-type"
+					id="assessment-type__modified-full"
+					label="Modified - Full (Permission needed)"
+					value="FULL"
+					checked={assessmentTypeId === 'FULL'}
+					onChange={() => {
+						setAssessmentTypeId('FULL');
 					}}
 				/>
 			</Modal.Body>
