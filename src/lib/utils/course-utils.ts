@@ -5,7 +5,6 @@ import {
 	CourseUnitLockTypeId,
 	CourseUnitModel,
 	CourseVideoModel,
-	MediaEntry,
 } from '@/lib/models';
 
 export const getRequiredCourseModules = (courseModules: CourseModuleModel[], optionalCourseModuleIds: string[]) => {
@@ -84,6 +83,55 @@ export const getCurrentCourseModule = (courseModules: CourseModuleModel[], cours
 	);
 };
 
+const getKalturaEventNames = (kalturaPlayer: any, player: any) => {
+	const eventNames = new Set<string>();
+
+	const addEventEnum = (eventEnum: unknown) => {
+		if (!eventEnum || typeof eventEnum !== 'object') {
+			return;
+		}
+
+		for (const value of Object.values(eventEnum)) {
+			if (typeof value === 'string') {
+				eventNames.add(value);
+			}
+		}
+	};
+
+	const addEventRoot = (eventRoot: unknown) => {
+		if (!eventRoot || typeof eventRoot !== 'object') {
+			return;
+		}
+
+		addEventEnum(eventRoot);
+
+		for (const value of Object.values(eventRoot as Record<string, unknown>)) {
+			if (value && typeof value === 'object') {
+				addEventEnum(value);
+			}
+		}
+	};
+
+	addEventRoot(player?.Event);
+	addEventRoot(kalturaPlayer?.Event);
+	addEventEnum(kalturaPlayer?.playlist?.PlaylistEventType);
+	addEventEnum(player?.playlist?.PlaylistEventType);
+
+	return [...eventNames];
+};
+
+const getPlayerMediaInfo = (player: any) => {
+	if (!player || typeof player.getMediaInfo !== 'function') {
+		return undefined;
+	}
+
+	try {
+		return player.getMediaInfo();
+	} catch (error) {
+		return undefined;
+	}
+};
+
 export const getKalturaScriptForVideo = ({
 	videoPlayerId,
 	courseVideo,
@@ -92,110 +140,188 @@ export const getKalturaScriptForVideo = ({
 }: {
 	videoPlayerId: string;
 	courseVideo: CourseVideoModel;
-	eventCallback: (eventName: string, event: string | number | object, mediaProxy: MediaEntry) => void;
+	eventCallback: (eventName: string, event: unknown, mediaInfo: unknown) => void;
 	errorCallback: (error: unknown) => void;
 }) => {
 	const script = document.createElement('script');
-	script.src = `//cdnapisec.kaltura.com/p/${courseVideo.kalturaPartnerId}/sp/${courseVideo.kalturaPartnerId}00/embedIframeJs/uiconf_id/${courseVideo.kalturaUiconfId}/partner_id/${courseVideo.kalturaPartnerId}`;
+	script.src = `https://cdnapisec.kaltura.com/p/${courseVideo.kalturaPartnerId}/embedPlaykitJs/uiconf_id/${courseVideo.kalturaUiconfId}`;
 	script.async = true;
-	script.onload = () => {
-		// @ts-ignore
-		window.kWidget.embed({
-			targetId: videoPlayerId,
-			wid: courseVideo.kalturaWid,
-			uiconf_id: courseVideo.kalturaUiconfId,
-			...(courseVideo.kalturaEntryId && { entry_id: courseVideo.kalturaEntryId }),
-			...(courseVideo.kalturaPlaylistId && {
-				flashvars: {
-					playlistAPI: {
-						plugin: true,
-						includeInLayout: true,
-						autoPlay: false,
-						autoInsert: true,
-						layout: 'vertical',
-						kpl0Name: '',
-						kpl0Id: courseVideo.kalturaPlaylistId,
-					},
-				},
-			}),
-			readyCallback: (playerID: string) => {
-				const kdp = document.getElementById(playerID);
-				const events = [
-					'adClicked',
-					'adEnded',
-					'adImpression',
-					'adSkippableStateChanged',
-					'adStarted',
-					'bufferChange',
-					'closeFullScreen',
-					'cuePointReached',
-					'customEvent',
-					'firstPlay',
-					'HTML5_video_durationchange',
-					'HTML5_video_ended',
-					'HTML5_video_error',
-					'HTML5_video_loadeddata',
-					'HTML5_video_loadedmetadata',
-					'HTML5_video_pause',
-					'HTML5_video_playing',
-					'HTML5_video_progress',
-					'HTML5_video_ratechange',
-					'HTML5_video_seeked',
-					'HTML5_video_stalled',
-					'HTML5_video_timeupdate',
-					'layoutBuildDone',
-					'mediaError',
-					'mediaLoaded',
-					'mediaReady',
-					'mute',
-					'onChangeMedia',
-					'onChangeMediaDone',
-					'openFullScreen',
-					'playerPaused',
-					'playerPlayed',
-					'playerPlayEnd',
-					'playerReady',
-					'playerStateChange',
-					'playerUpdatePlayhead',
-					'playlistEnded',
-					'playlistItemChanged',
-					'playlistPlayNext',
-					'playlistPlayPrev',
-					'playlistReady',
-					'playlistUpdate',
-					'preSeek',
-					'seek',
-					'seeked',
-					'tracksChanged',
-					'unmute',
-					'USER_CLICKED_FULLSCREEN_ENTER',
-					'USER_CLICKED_FULLSCREEN_EXIT',
-					'USER_CLICKED_MUTE',
-					'USER_CLICKED_PAUSE',
-					'USER_CLICKED_PLAY',
-					'USER_CLICKED_SEEK',
-					'USER_CLICKED_UNMUTE',
-					'USER_CLICKED_VOLUME_CHANGE',
-					'volumeChanged',
-				];
+	let player: any;
+	let isDestroyed = false;
+	let hasErrored = false;
+	const eventThrottleDurationMs = 2500;
+	const lastEventAtByName = new Map<string, number>();
+	const unthrottledEventNames = new Set<string>([
+		'play',
+		'pause',
+		'ended',
+		'playing',
+		'firstplay',
+		'seeking',
+		'seeked',
+		'durationchange',
+		'ratechange',
+		'volumechange',
+		'mute',
+		'unmute',
+		'fullscreenchange',
+		'enterfullscreen',
+		'exitfullscreen',
+		'loadstart',
+		'loadedmetadata',
+		'loadeddata',
+		'canplay',
+		'canplaythrough',
+		'waiting',
+		'stalled',
+		'abort',
+		'emptied',
+		'playerready',
+		'ready',
+		'mediaready',
+		'playlistready',
+		'playlistended',
+		'playlistitemchanged',
+		'playlistplaynext',
+		'playlistplayprev',
+		'playlistupdate',
+		'castavailable',
+		'castsessionstarted',
+		'castsessionended',
+		'adstarted',
+		'adended',
+		'adclicked',
+		'adimpression',
+		'adskippablestatechanged',
+		'user_clicked_fullscreen_enter',
+		'user_clicked_fullscreen_exit',
+		'user_clicked_mute',
+		'user_clicked_pause',
+		'user_clicked_play',
+		'user_clicked_seek',
+		'user_clicked_unmute',
+		'user_clicked_volume_change',
+	]);
+	const teardownHandlers: Array<() => void> = [];
 
-				for (let i = 0; i < events.length; i++) {
-					if (!kdp) {
+	let readyResolve: (playerInstance: any) => void = () => {};
+	let readyReject: (error: unknown) => void = () => {};
+	const readyPromise = new Promise<any>((resolve, reject) => {
+		readyResolve = resolve;
+		readyReject = reject;
+	});
+
+	const handleError = (error: unknown) => {
+		if (hasErrored) {
+			return;
+		}
+
+		hasErrored = true;
+		errorCallback(error);
+		readyReject(error);
+	};
+
+	const registerEvents = (playerInstance: any, kalturaPlayer: any) => {
+		const eventNames = getKalturaEventNames(kalturaPlayer, playerInstance);
+
+		for (const eventName of eventNames) {
+			const handler = (event: { payload?: unknown } | unknown) => {
+				const normalizedEventName = eventName.toLowerCase();
+				if (!unthrottledEventNames.has(normalizedEventName)) {
+					const now = Date.now();
+					const lastEventAt = lastEventAtByName.get(normalizedEventName);
+					if (lastEventAt && now - lastEventAt < eventThrottleDurationMs) {
 						return;
 					}
 
-					// @ts-ignore
-					kdp.kBind(events[i], (event: string | number | object) => {
-						// @ts-ignore
-						eventCallback(events[i], event, kdp.evaluate('{mediaProxy.entry}'));
-					});
+					lastEventAtByName.set(normalizedEventName, now);
 				}
-			},
-		});
+
+				const payload =
+					event && typeof event === 'object' && 'payload' in (event as Record<string, unknown>)
+						? (event as { payload?: unknown }).payload
+						: event;
+
+				eventCallback(eventName, payload, getPlayerMediaInfo(playerInstance));
+			};
+
+			playerInstance.addEventListener(eventName, handler);
+			teardownHandlers.push(() => playerInstance.removeEventListener(eventName, handler));
+		}
 	};
-	script.onerror = errorCallback;
+
+	const initializePlayer = () => {
+		if (isDestroyed) {
+			return;
+		}
+
+		try {
+			const kalturaPlayer = (window as Window & { KalturaPlayer?: any }).KalturaPlayer;
+			if (!kalturaPlayer?.setup) {
+				handleError(new Error('KalturaPlayer not available'));
+				return;
+			}
+
+			player = kalturaPlayer.setup({
+				targetId: videoPlayerId,
+				provider: {
+					partnerId: courseVideo.kalturaPartnerId,
+					uiConfId: courseVideo.kalturaUiconfId,
+				},
+			});
+
+			registerEvents(player, kalturaPlayer);
+
+			const hasPlaylistId = !!courseVideo.kalturaPlaylistId;
+			const hasEntryId = !!courseVideo.kalturaEntryId;
+
+			if (!hasPlaylistId && !hasEntryId) {
+				handleError(new Error('Missing Kaltura entry or playlist id'));
+				return;
+			}
+
+			let loadPromise: unknown;
+			if (hasPlaylistId && !hasEntryId) {
+				if (typeof player.loadPlaylist !== 'function') {
+					handleError(new Error('Kaltura playlist support is not available'));
+					return;
+				}
+
+				loadPromise = player.loadPlaylist({ playlistId: courseVideo.kalturaPlaylistId });
+			} else {
+				if (typeof player.loadMedia !== 'function') {
+					handleError(new Error('Kaltura media loading is not available'));
+					return;
+				}
+
+				loadPromise = player.loadMedia({ entryId: courseVideo.kalturaEntryId });
+			}
+
+			Promise.resolve(loadPromise)
+				.then(() => (typeof player.ready === 'function' ? player.ready() : undefined))
+				.then(() => readyResolve(player))
+				.catch((error) => {
+					handleError(error);
+				});
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	script.onload = initializePlayer;
+	script.onerror = handleError;
 
 	return {
 		script,
+		ready: () => readyPromise,
+		getPlayer: () => player,
+		destroy: () => {
+			isDestroyed = true;
+			teardownHandlers.forEach((handler) => handler());
+			teardownHandlers.length = 0;
+			if (player?.destroy) {
+				player.destroy();
+			}
+		},
 	};
 };
