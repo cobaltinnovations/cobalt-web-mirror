@@ -132,6 +132,138 @@ const getPlayerMediaInfo = (player: any) => {
 	}
 };
 
+const toFiniteNumber = (value: unknown): number | undefined => {
+	return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+};
+
+const getCurrentTimeSeconds = (player: any): number | undefined => {
+	if (!player) {
+		return undefined;
+	}
+
+	if (typeof player.getCurrentTime === 'function') {
+		return toFiniteNumber(player.getCurrentTime());
+	}
+
+	if (typeof player.currentTime === 'number') {
+		return toFiniteNumber(player.currentTime);
+	}
+
+	if (typeof player.currentTime === 'function') {
+		return toFiniteNumber(player.currentTime());
+	}
+
+	return undefined;
+};
+
+const getDurationSeconds = (player: any, mediaInfo?: unknown): number | undefined => {
+	if (mediaInfo && typeof mediaInfo === 'object') {
+		const mediaInfoRecord = mediaInfo as Record<string, unknown>;
+		const mediaInfoDurationSeconds =
+			toFiniteNumber(mediaInfoRecord.duration) ??
+			toFiniteNumber(mediaInfoRecord.durationSeconds) ??
+			(typeof mediaInfoRecord.msDuration === 'number'
+				? toFiniteNumber(mediaInfoRecord.msDuration / 1000)
+				: undefined) ??
+			(typeof mediaInfoRecord.durationMs === 'number'
+				? toFiniteNumber(mediaInfoRecord.durationMs / 1000)
+				: undefined);
+		if (typeof mediaInfoDurationSeconds === 'number') {
+			return mediaInfoDurationSeconds;
+		}
+	}
+
+	if (!player) {
+		return undefined;
+	}
+
+	if (typeof player.getDuration === 'function') {
+		const duration = toFiniteNumber(player.getDuration());
+		if (typeof duration === 'number') {
+			return duration;
+		}
+	}
+
+	if (typeof player.duration === 'number') {
+		return toFiniteNumber(player.duration);
+	}
+
+	return undefined;
+};
+
+const getIsPaused = (player: any): boolean | undefined => {
+	if (!player) {
+		return undefined;
+	}
+
+	if (typeof player.paused === 'boolean') {
+		return player.paused;
+	}
+
+	if (typeof player.paused === 'function') {
+		const paused = player.paused();
+		return typeof paused === 'boolean' ? paused : undefined;
+	}
+
+	if (typeof player.isPaused === 'function') {
+		const paused = player.isPaused();
+		return typeof paused === 'boolean' ? paused : undefined;
+	}
+
+	return undefined;
+};
+
+const getPlaybackRate = (player: any): number | undefined => {
+	if (!player) {
+		return undefined;
+	}
+
+	if (typeof player.playbackRate === 'number') {
+		return toFiniteNumber(player.playbackRate);
+	}
+
+	if (typeof player.getPlaybackRate === 'function') {
+		return toFiniteNumber(player.getPlaybackRate());
+	}
+
+	return undefined;
+};
+
+export interface CourseVideoEventPlaybackTime {
+	currentTimeSeconds?: number;
+	currentTimeFloorSeconds?: number;
+	durationSeconds?: number;
+	percentComplete?: number;
+	playbackRate?: number;
+	isPaused?: boolean;
+}
+
+const getEventPlaybackTime = (player: any, mediaInfo?: unknown): CourseVideoEventPlaybackTime | undefined => {
+	const currentTimeSeconds = getCurrentTimeSeconds(player);
+	const durationSeconds = getDurationSeconds(player, mediaInfo);
+	const playbackRate = getPlaybackRate(player);
+	const isPaused = getIsPaused(player);
+
+	const eventPlaybackTime: CourseVideoEventPlaybackTime = {
+		...(typeof currentTimeSeconds === 'number' && {
+			currentTimeSeconds,
+			currentTimeFloorSeconds: Math.floor(currentTimeSeconds),
+		}),
+		...(typeof durationSeconds === 'number' && {
+			durationSeconds,
+		}),
+		...(typeof playbackRate === 'number' && { playbackRate }),
+		...(typeof isPaused === 'boolean' && { isPaused }),
+	};
+
+	if (typeof currentTimeSeconds === 'number' && typeof durationSeconds === 'number' && durationSeconds > 0) {
+		const percentComplete = Math.min(100, Math.max(0, (currentTimeSeconds / durationSeconds) * 100));
+		eventPlaybackTime.percentComplete = Math.round(percentComplete * 1000) / 1000;
+	}
+
+	return Object.keys(eventPlaybackTime).length > 0 ? eventPlaybackTime : undefined;
+};
+
 export const getKalturaScriptForVideo = ({
 	videoPlayerId,
 	courseVideo,
@@ -140,7 +272,12 @@ export const getKalturaScriptForVideo = ({
 }: {
 	videoPlayerId: string;
 	courseVideo: CourseVideoModel;
-	eventCallback: (eventName: string, event: unknown, mediaInfo: unknown) => void;
+	eventCallback: (
+		eventName: string,
+		event: unknown,
+		mediaInfo: unknown,
+		playbackTime?: CourseVideoEventPlaybackTime
+	) => void;
 	errorCallback: (error: unknown) => void;
 }) => {
 	const script = document.createElement('script');
@@ -242,7 +379,9 @@ export const getKalturaScriptForVideo = ({
 						? (event as { payload?: unknown }).payload
 						: event;
 
-				eventCallback(eventName, payload, getPlayerMediaInfo(playerInstance));
+				const mediaInfo = getPlayerMediaInfo(playerInstance);
+				const playbackTime = getEventPlaybackTime(playerInstance, mediaInfo);
+				eventCallback(eventName, payload, mediaInfo, playbackTime);
 			};
 
 			playerInstance.addEventListener(eventName, handler);
