@@ -20,6 +20,7 @@ import { Confetti } from '@/components/confetti';
 import SvgIcon from '@/components/svg-icon';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import { createUseThemedStyles } from '@/jss/theme';
+import { CourseVideoEventPlaybackTime } from '@/lib/utils';
 
 import mediaQueries from '@/jss/media-queries';
 
@@ -81,7 +82,12 @@ export const CourseUnitAvailable = ({
 	const [isComplete, setIsComplete] = useState(false);
 
 	const handleVideoPlayerEvent = useCallback(
-		(eventName: string, eventPayload: unknown, mediaProxy: unknown) => {
+		(
+			eventName: string,
+			eventPayload: unknown,
+			mediaProxy: unknown,
+			eventPlaybackTime?: CourseVideoEventPlaybackTime
+		) => {
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
 				courseUnitId: courseUnit.courseUnitId,
 				...(courseSessionId && { courseSessionId }),
@@ -89,6 +95,7 @@ export const CourseUnitAvailable = ({
 				eventName,
 				eventPayload,
 				...(mediaProxy ? { mediaProxy } : {}),
+				...(eventPlaybackTime ? { eventPlaybackTime } : {}),
 			});
 		},
 		[courseSessionId, courseUnit.courseUnitId, courseUnit.videoId]

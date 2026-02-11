@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { getKalturaScriptForVideo } from '@/lib/utils';
+import { CourseVideoEventPlaybackTime, getKalturaScriptForVideo } from '@/lib/utils';
 import classNames from 'classnames';
 import { CourseVideoModel } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
@@ -102,7 +102,12 @@ const getDurationSeconds = (player: any) => {
 interface CourseVideoProps {
 	videoId: string;
 	courseVideos: CourseVideoModel[];
-	onVideoPlayerEvent(eventName: string, eventPayload: unknown, mediaProxy: unknown): void;
+	onVideoPlayerEvent(
+		eventName: string,
+		eventPayload: unknown,
+		mediaProxy: unknown,
+		eventPlaybackTime?: CourseVideoEventPlaybackTime
+	): void;
 	completionThresholdInSeconds: number;
 	onCompletionThresholdPassed(): void;
 }
@@ -201,8 +206,8 @@ export const CourseVideo = ({
 		const { script, ready, destroy } = getKalturaScriptForVideo({
 			videoPlayerId: 'kaltura_player',
 			courseVideo: video,
-			eventCallback: (eventName, eventPayload, mediaProxy) => {
-				onVideoPlayerEvent(eventName, eventPayload, mediaProxy);
+			eventCallback: (eventName, eventPayload, mediaProxy, eventPlaybackTime) => {
+				onVideoPlayerEvent(eventName, eventPayload, mediaProxy, eventPlaybackTime);
 			},
 			errorCallback: (error) => {
 				if (!isActive) {
