@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
@@ -47,6 +47,55 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const asRecord = (value: unknown): Record<string, unknown> | undefined => {
+	return value && typeof value === 'object' ? (value as Record<string, unknown>) : undefined;
+};
+
+const getRecordStringValue = (record: Record<string, unknown> | undefined, key: string): string | undefined => {
+	if (!record) {
+		return undefined;
+	}
+
+	const value = record[key];
+	return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
+};
+
+const getKalturaEntryIdFromVideoEvent = (mediaProxy: unknown, eventPayload: unknown): string | undefined => {
+	const mediaProxyRecord = asRecord(mediaProxy);
+	const mediaProxyEntryId = getRecordStringValue(mediaProxyRecord, 'entryId');
+	if (mediaProxyEntryId) {
+		return mediaProxyEntryId;
+	}
+
+	const payloadRecord = asRecord(eventPayload);
+	if (!payloadRecord) {
+		return undefined;
+	}
+
+	const payloadEntryId = getRecordStringValue(payloadRecord, 'entryId');
+	if (payloadEntryId) {
+		return payloadEntryId;
+	}
+
+	const candidateRecords = [
+		asRecord(payloadRecord.mediaInfo),
+		asRecord(payloadRecord.item),
+		asRecord(payloadRecord.currentItem),
+		asRecord(payloadRecord.nextItem),
+		asRecord(payloadRecord.previousItem),
+	];
+
+	for (const candidateRecord of candidateRecords) {
+		const candidateEntryId =
+			getRecordStringValue(candidateRecord, 'entryId') ?? getRecordStringValue(candidateRecord, 'id');
+		if (candidateEntryId) {
+			return candidateEntryId;
+		}
+	}
+
+	return undefined;
+};
+
 interface CourseUnitAvailableProps {
 	courseUrlName: string;
 	courseSessionId: string;
@@ -80,6 +129,7 @@ export const CourseUnitAvailable = ({
 		[courseSessionId, courseUnit.screeningFlowId]
 	);
 	const [isComplete, setIsComplete] = useState(false);
+	const currentKalturaEntryIdRef = useRef<string>();
 
 	const handleVideoPlayerEvent = useCallback(
 		(
@@ -88,10 +138,19 @@ export const CourseUnitAvailable = ({
 			mediaProxy: unknown,
 			eventPlaybackTime?: CourseVideoEventPlaybackTime
 		) => {
+			const currentEventKalturaEntryId = getKalturaEntryIdFromVideoEvent(mediaProxy, eventPayload);
+			if (currentEventKalturaEntryId) {
+				currentKalturaEntryIdRef.current = currentEventKalturaEntryId;
+			}
+
+			const currentlyPlayingKalturaEntryId = currentEventKalturaEntryId ?? currentKalturaEntryIdRef.current;
+
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_COURSE_UNIT_VIDEO, {
 				courseUnitId: courseUnit.courseUnitId,
 				...(courseSessionId && { courseSessionId }),
 				videoId: courseUnit.videoId,
+				currentlyPlayingVideoId: courseUnit.videoId,
+				...(currentlyPlayingKalturaEntryId ? { currentlyPlayingKalturaEntryId } : {}),
 				eventName,
 				eventPayload,
 				...(mediaProxy ? { mediaProxy } : {}),
@@ -100,6 +159,10 @@ export const CourseUnitAvailable = ({
 		},
 		[courseSessionId, courseUnit.courseUnitId, courseUnit.videoId]
 	);
+
+	useEffect(() => {
+		currentKalturaEntryIdRef.current = undefined;
+	}, [courseUnit.videoId]);
 
 	useEffect(() => {
 		onView?.(courseUnit);
