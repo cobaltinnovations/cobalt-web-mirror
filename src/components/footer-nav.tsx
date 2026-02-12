@@ -24,6 +24,14 @@ const FooterNav = () => {
 			label: 'Home',
 			to: '/',
 		},
+		...(institution.aboutPageEnabled
+			? [
+					{
+						label: 'About',
+						to: '/about',
+					},
+			  ]
+			: []),
 		...(institution.featuresEnabled
 			? [
 					{
