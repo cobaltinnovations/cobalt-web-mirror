@@ -119,6 +119,7 @@ export class HttpClient {
 			return response;
 		} catch (error) {
 			// See https://axios-http.com/docs/handling_errors for details
+			const axiosError = axios.isAxiosError(error) ? CobaltError.fromAxiosError(error) : undefined;
 
 			// Store analytics for the error
 			try {
@@ -131,11 +132,17 @@ export class HttpClient {
 					request: {
 						method: config.method?.toUpperCase(),
 						url: config.url?.startsWith('/') ? config.url : `/${config.url}`,
-						body: config.data ? JSON.parse(config.data) : undefined,
+						body: this.serializableRequestBody(config),
 					},
 					response: {
 						status: serializableErrorContext ? serializableErrorContext.status : undefined,
 						body: serializableErrorContext ? serializableErrorContext.data : undefined,
+					},
+					error: {
+						name: (error as any)?.name,
+						message: (error as any)?.message,
+						code: (error as any)?.code,
+						networkDiagnostics: axiosError?.networkDiagnostics,
 					},
 				});
 			} catch (ignored) {
@@ -145,12 +152,28 @@ export class HttpClient {
 			// Surface error to users (if necessary)
 			if (axios.isCancel(error)) {
 				throw CobaltError.fromCancelledRequest();
-			} else if (axios.isAxiosError(error)) {
-				throw CobaltError.fromAxiosError(error);
+			} else if (axiosError) {
+				throw axiosError;
 			} else {
 				throw CobaltError.fromUnknownError(error);
 			}
 		}
+	}
+
+	private serializableRequestBody(config: AxiosRequestConfig) {
+		if (!config.data) {
+			return undefined;
+		}
+
+		if (typeof config.data === 'string') {
+			try {
+				return JSON.parse(config.data);
+			} catch (ignored) {
+				return config.data;
+			}
+		}
+
+		return config.data;
 	}
 
 	orchestrateRequest<T>(requestConfig: AxiosRequestConfig) {

@@ -21,16 +21,6 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 				handled = error;
 			} else if (axios.isAxiosError(error)) {
 				handled = CobaltError.fromAxiosError(error);
-
-				if (
-					!handled.axiosError?.response ||
-					handled.axiosError?.response?.status === 0 ||
-					handled.axiosError?.request?.status === 0
-				) {
-					handled = CobaltError.fromStatusCode0(error);
-				} else if (handled.axiosError?.code === 'ECONNABORTED') {
-					handled = CobaltError.fromEConnAborted(error);
-				}
 			} else if (isApiError(error)) {
 				handled = CobaltError.fromApiError(error);
 			} else if (isDeferredDataError(error)) {

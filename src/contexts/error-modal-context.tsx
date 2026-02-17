@@ -34,6 +34,7 @@ const ErrorModalProvider: FC<PropsWithChildren> = (props) => {
 					apiError: capturedError.apiError,
 					axiosError: capturedError.axiosError,
 					unknownError: capturedError.unknownError,
+					networkDiagnostics: capturedError.networkDiagnostics,
 				},
 			});
 		}
