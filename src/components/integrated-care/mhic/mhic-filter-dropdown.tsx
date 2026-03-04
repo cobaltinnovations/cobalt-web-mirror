@@ -240,6 +240,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 		>
 			<Dropdown.Toggle
 				as={DropdownToggle}
+				variant="secondary"
 				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>
@@ -297,7 +298,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 									</InputHelper>
 								)}
 								<Button
-									variant="danger"
+									variant="outline-danger"
 									className="p-2 flex-shrink-0"
 									onClick={() => {
 										handleFilterRemoveButtonClick(filterId);

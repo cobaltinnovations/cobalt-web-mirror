@@ -50,6 +50,7 @@ export const MhicFilterPractice = ({ referenceData, className }: MhicFilterPract
 		<FilterDropdown
 			className={className}
 			active={activeOptionIds.length > 0}
+			inactiveVariant="secondary"
 			id="mhic-filter-practice"
 			title="Practice"
 			dismissText="Clear"

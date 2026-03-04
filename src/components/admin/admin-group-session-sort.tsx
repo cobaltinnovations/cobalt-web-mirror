@@ -70,6 +70,7 @@ export const AdminGroupSessionSort = ({ className }: Props) => {
 			iconLeft
 			className={className}
 			active={isActive}
+			inactiveVariant="secondary"
 			id="admin-group-session-sort"
 			title={'Sort by: ' + selectedOption?.title}
 			dismissText="Clear"

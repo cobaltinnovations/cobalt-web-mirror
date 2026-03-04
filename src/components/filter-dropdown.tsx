@@ -58,6 +58,7 @@ interface FilterDropdownProps {
 	id: string;
 	title: string;
 	active?: boolean;
+	inactiveVariant?: 'light' | 'secondary';
 	width?: number;
 	dismissText?: string;
 	confirmText?: string;
@@ -74,6 +75,7 @@ const FilterDropdown = ({
 	id,
 	title,
 	active = false,
+	inactiveVariant = 'light',
 	width = 400,
 	dismissText = 'Cancel',
 	confirmText = 'Apply',
@@ -111,7 +113,7 @@ const FilterDropdown = ({
 			}}
 		>
 			<Dropdown.Toggle
-				variant={active ? 'primary' : 'light'}
+				variant={active ? 'primary' : inactiveVariant}
 				as={DropdownToggle}
 				className={classNames('d-inline-flex align-items-center', {
 					'pe-3': !iconLeft,

@@ -347,6 +347,7 @@ export const Component = () => {
 										key={filterId}
 										className={classNames({ 'me-2': !isLast })}
 										active={filterConfig.active}
+										inactiveVariant="secondary"
 										id={filterId}
 										title={filterConfig.name}
 										dismissText="Clear"
@@ -417,6 +418,7 @@ export const Component = () => {
 								iconLeft
 								className="ms-auto"
 								active={sortConfig.active}
+								inactiveVariant="secondary"
 								id="admin-resource-sort"
 								title={sortConfig.name}
 								dismissText="Clear"

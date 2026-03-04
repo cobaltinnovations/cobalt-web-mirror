@@ -55,6 +55,7 @@ export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
 		<FilterDropdown
 			className={className}
 			active={isActive}
+			inactiveVariant="secondary"
 			id="admin-group-session-filter-status"
 			title="Status"
 			dismissText="Clear"

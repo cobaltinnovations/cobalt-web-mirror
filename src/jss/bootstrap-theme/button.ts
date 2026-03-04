@@ -60,13 +60,14 @@ export const button = (theme: CobaltTheme) => {
 			/* Secondary variant */
 			/* ----------------------------------------------------------- */
 			'&-secondary': {
-				color: theme.colors.n0,
-				backgroundColor: theme.colors.a500,
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n0,
+				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
-					backgroundColor: theme.colors.a300,
+					backgroundColor: theme.colors.n50,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.a500,
+					backgroundColor: theme.colors.n75,
 				},
 			},
 
@@ -129,7 +130,7 @@ export const button = (theme: CobaltTheme) => {
 			/* Light variant */
 			/* ----------------------------------------------------------- */
 			'&-light': {
-				color: theme.colors.p700,
+				color: theme.colors.p500,
 				backgroundColor: theme.colors.n0,
 				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
@@ -153,6 +154,19 @@ export const button = (theme: CobaltTheme) => {
 				},
 				'&:active': {
 					backgroundColor: theme.colors.n100,
+				},
+			},
+
+			/* ----------------------------------------------------------- */
+			/* Accent variant */
+			/* ----------------------------------------------------------- */
+			'&-accent': {
+				backgroundColor: theme.colors.a500,
+				'&:hover': {
+					backgroundColor: theme.colors.a700,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.a900,
 				},
 			},
 
@@ -181,7 +195,7 @@ export const button = (theme: CobaltTheme) => {
 				...outlineButton(theme.colors.p500, theme.colors.n0, theme.colors.p700),
 			},
 			'&-outline-secondary': {
-				...outlineButton(theme.colors.a500, theme.colors.n0, theme.colors.a700),
+				...outlineButton(theme.colors.n500, theme.colors.n0, theme.colors.n700),
 			},
 			'&-outline-success': {
 				...outlineButton(theme.colors.s500, theme.colors.n0, theme.colors.s700),
@@ -205,6 +219,49 @@ export const button = (theme: CobaltTheme) => {
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.a500,
+				},
+			},
+			'&-outline-accent': {
+				...outlineButton(theme.colors.a500, theme.colors.n0, theme.colors.a700),
+			},
+
+			/* ----------------------------------------------------------- */
+			/* Transparent variants */
+			/* ----------------------------------------------------------- */
+			'&-transparent-primary': {
+				color: theme.colors.p500,
+				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.p700,
+					backgroundColor: theme.colors.n50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.n75,
+					color: theme.colors.p700,
+				},
+			},
+			'&-transparent-secondary': {
+				color: theme.colors.n500,
+				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.n700,
+					backgroundColor: theme.colors.n50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.n75,
+					color: theme.colors.n700,
+				},
+			},
+			'&-transparent-danger': {
+				color: theme.colors.d500,
+				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.d700,
+					backgroundColor: theme.colors.d50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.d75,
+					color: theme.colors.d700,
 				},
 			},
 		},

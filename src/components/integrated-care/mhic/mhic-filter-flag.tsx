@@ -136,6 +136,7 @@ export const MhicFilterFlag = ({ className }: MhicFilterFlagProps) => {
 		<FilterDropdown
 			className={className}
 			active={activeOptionIds.length > 0}
+			inactiveVariant="secondary"
 			id="pic-mhic__flag-filter"
 			title="Flag"
 			dismissText="Clear"
