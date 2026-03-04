@@ -45,7 +45,7 @@ export const Component = () => {
 					{hasSubmitted ? (
 						<>
 							<h1 className="mb-6">Unsubscribe from {displayName}</h1>
-							<p className="mb-6">{mailingListEntry.value} will no longer recieve updates.</p>
+							<p className="mb-6">{mailingListEntry.value} will no longer receive updates.</p>
 						</>
 					) : (
 						<>
