@@ -117,8 +117,13 @@ function requireAuthLoader({ request }: LoaderFunctionArgs) {
 	return null;
 }
 
+const AuthAwareAppDefaultLayout = () => {
+	const hasAccessToken = !!Cookies.get('accessToken');
+	return <AppDefaultLayout unauthenticated={!hasAccessToken} />;
+};
+
 function requireUnauthLoader({ request }: LoaderFunctionArgs) {
-	const allowedPartialPaths = ['reset-password', 'unsubscribe'];
+	const allowedPartialPaths = ['reset-password'];
 	const { pathname } = new URL(request.url);
 
 	if (allowedPartialPaths.some((s) => pathname.includes(s))) {
@@ -317,6 +322,15 @@ export const routes: RouteObject[] = [
 				path: 'mychart/authenticate',
 				lazy: () => import('@/routes/auth'),
 			},
+			{
+				element: <AuthAwareAppDefaultLayout />,
+				children: [
+					{
+						path: 'mailing-list-entries/:mailingListEntryId/unsubscribe',
+						lazy: () => import('@/routes/unsubscribe'),
+					},
+				],
+			},
 
 			{
 				// legacy/backwards compatibility
@@ -397,10 +411,6 @@ export const routes: RouteObject[] = [
 							hideHeader: true,
 							hideFooter: true,
 						} as RouteHandle,
-					},
-					{
-						path: 'mailing-list-entries/:mailingListEntryId/unsubscribe',
-						lazy: () => import('@/routes/unsubscribe'),
 					},
 				],
 			},

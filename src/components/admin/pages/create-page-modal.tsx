@@ -52,7 +52,6 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 		pagesService
 			.validatePageUrl({
 				searchQuery: debouncedPageNameQuery,
-				...(page && { pageId: page.pageId }),
 			})
 			.fetch()
 			.then((response) => {
@@ -71,7 +70,6 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 		pagesService
 			.validatePageUrl({
 				searchQuery: debouncedFriendlyUrlQuery,
-				...(page && { pageId: page.pageId }),
 			})
 			.fetch()
 			.then((response) => {
