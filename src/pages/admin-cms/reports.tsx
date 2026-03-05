@@ -30,6 +30,7 @@ const Reports = () => {
 			ACCOUNT_SIGNUP_UNVERIFIED: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_INCOMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_COMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
+			COURSE_MCB_DOWNLOAD: account?.accountCapabilityFlags.canViewAnalytics,
 		} as Record<string, boolean>;
 	}, [
 		account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
