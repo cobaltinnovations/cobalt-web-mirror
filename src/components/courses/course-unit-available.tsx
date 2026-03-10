@@ -60,13 +60,7 @@ const getRecordStringValue = (record: Record<string, unknown> | undefined, key: 
 	return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
 };
 
-const getKalturaEntryIdFromVideoEvent = (mediaProxy: unknown, eventPayload: unknown): string | undefined => {
-	const mediaProxyRecord = asRecord(mediaProxy);
-	const mediaProxyEntryId = getRecordStringValue(mediaProxyRecord, 'entryId');
-	if (mediaProxyEntryId) {
-		return mediaProxyEntryId;
-	}
-
+const getKalturaEntryIdFromPayload = (eventPayload: unknown): string | undefined => {
 	const payloadRecord = asRecord(eventPayload);
 	if (!payloadRecord) {
 		return undefined;
@@ -83,6 +77,9 @@ const getKalturaEntryIdFromVideoEvent = (mediaProxy: unknown, eventPayload: unkn
 		asRecord(payloadRecord.currentItem),
 		asRecord(payloadRecord.nextItem),
 		asRecord(payloadRecord.previousItem),
+		asRecord(payloadRecord.activeItem),
+		asRecord(asRecord(payloadRecord.activeItem)?._sources),
+		asRecord(asRecord(payloadRecord.activeItem)?.sources),
 	];
 
 	for (const candidateRecord of candidateRecords) {
@@ -94,6 +91,30 @@ const getKalturaEntryIdFromVideoEvent = (mediaProxy: unknown, eventPayload: unkn
 	}
 
 	return undefined;
+};
+
+const getKalturaEntryIdFromVideoEvent = (
+	mediaProxy: unknown,
+	eventPayload: unknown,
+	currentKalturaEntryId?: string
+): string | undefined => {
+	const payloadEntryId = getKalturaEntryIdFromPayload(eventPayload);
+	if (payloadEntryId) {
+		return payloadEntryId;
+	}
+
+	const mediaProxyRecord = asRecord(mediaProxy);
+	const mediaProxyEntryId = getRecordStringValue(mediaProxyRecord, 'entryId');
+
+	// Kaltura v7 playlist transitions can briefly emit the previous item's media info
+	// after the payload has already identified the new active entry.
+	if (currentKalturaEntryId) {
+		if (!mediaProxyEntryId || mediaProxyEntryId !== currentKalturaEntryId) {
+			return currentKalturaEntryId;
+		}
+	}
+
+	return mediaProxyEntryId;
 };
 
 interface CourseUnitAvailableProps {
@@ -138,7 +159,11 @@ export const CourseUnitAvailable = ({
 			mediaProxy: unknown,
 			eventPlaybackTime?: CourseVideoEventPlaybackTime
 		) => {
-			const currentEventKalturaEntryId = getKalturaEntryIdFromVideoEvent(mediaProxy, eventPayload);
+			const currentEventKalturaEntryId = getKalturaEntryIdFromVideoEvent(
+				mediaProxy,
+				eventPayload,
+				currentKalturaEntryIdRef.current
+			);
 			if (currentEventKalturaEntryId) {
 				currentKalturaEntryIdRef.current = currentEventKalturaEntryId;
 			}
