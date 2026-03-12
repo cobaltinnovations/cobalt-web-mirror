@@ -56,7 +56,7 @@ import { PreviewCanvas } from '@/components/preview-canvas';
 import { ScreeningFlow } from '@/components/screening-v2';
 
 const Index: FC = () => {
-	const { featuredTopicCenter, featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
+	const { featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
 		useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
@@ -328,23 +328,35 @@ const Index: FC = () => {
 				</>
 			) : (
 				<>
-					{featuredTopicCenter && (
+					{featuredTopicCenters.length > 0 && (
 						<Container className="pt-4 pt-lg-8">
-							<CallToActionBlock
-								heading={featuredTopicCenter.headline}
-								descriptionHtml={featuredTopicCenter.description}
-								imageUrl={featuredTopicCenter.imageUrl}
-								primaryActionText={featuredTopicCenter.callToAction}
-								onPrimaryActionClick={() => {
-									analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
-										pageId: featuredTopicCenter.pageId,
-										source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-										siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
-									});
+							{featuredTopicCenters.map((featuredTopic, featuredTopicIndex) => {
+								const isLast = featuredTopicCenters.length - 1 === featuredTopicIndex;
 
-									navigate(featuredTopicCenter.relativeUrl);
-								}}
-							/>
+								return (
+									<CallToActionBlock
+										key={featuredTopic.pageId}
+										className={classNames({ 'mb-4': !isLast })}
+										variant={featuredTopicIndex === 0 ? undefined : 'light'}
+										heading={featuredTopic.headline}
+										descriptionHtml={featuredTopic.description}
+										imageUrl={featuredTopic.imageUrl}
+										primaryActionText={featuredTopic.callToAction}
+										onPrimaryActionClick={() => {
+											analyticsService.persistEvent(
+												AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
+												{
+													pageId: featuredTopic.pageId,
+													source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
+													siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
+												}
+											);
+
+											navigate(featuredTopic.relativeUrl);
+										}}
+									/>
+								);
+							})}
 						</Container>
 					)}
 				</>
@@ -473,40 +485,7 @@ const Index: FC = () => {
 							</Container>
 						)}
 					</>
-				) : (
-					<>
-						{featuredTopicCenters.slice(1).length > 0 && (
-							<Container className="pt-4 pt-lg-8">
-								{featuredTopicCenters.slice(1).map((ftc, ftcIndex) => {
-									const isLast = featuredTopicCenters.slice(1).length - 1 === ftcIndex;
-
-									return (
-										<CallToActionBlock
-											className={classNames({ 'mb-4': !isLast })}
-											variant="light"
-											heading={ftc.headline}
-											descriptionHtml={ftc.description}
-											imageUrl={ftc.imageUrl}
-											primaryActionText={ftc.callToAction}
-											onPrimaryActionClick={() => {
-												analyticsService.persistEvent(
-													AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
-													{
-														pageId: ftc.pageId,
-														source: AnalyticsNativeEventClickthroughTopicCenterSource.HOME_FEATURE,
-														siteLocationId: SITE_LOCATION_ID.FEATURED_TOPIC,
-													}
-												);
-
-												navigate(ftc.relativeUrl);
-											}}
-										/>
-									);
-								})}
-							</Container>
-						)}
-					</>
-				)}
+				) : null}
 
 				{content.length > 0 && (
 					<Container className="py-20">
