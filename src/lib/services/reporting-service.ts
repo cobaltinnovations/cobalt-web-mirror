@@ -22,6 +22,7 @@ export enum REPORTING_WINDOW_ID {
 
 export enum ReportTypeId {
 	GROUP_SESSION_RESERVATION_EMAILS = 'GROUP_SESSION_RESERVATION_EMAILS',
+	ACCOUNT_TIMELINE = 'ACCOUNT_TIMELINE',
 }
 
 export interface ReportType {

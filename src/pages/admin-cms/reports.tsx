@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { reportingSerive, ReportType } from '@/lib/services';
+import { reportingSerive, ReportType, ReportTypeId } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import DatePicker from '@/components/date-picker';
 import { buildBackendDownloadUrl } from '@/lib/utils';
@@ -17,6 +17,7 @@ const Reports = () => {
 		reportTypeId: '',
 		startDate: '',
 		endDate: '',
+		accountId: '',
 	});
 
 	const enabledReportTypes = useMemo(() => {
@@ -31,6 +32,7 @@ const Reports = () => {
 			ACCOUNT_ONBOARDING_INCOMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_COMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			COURSE_MCB_DOWNLOAD: account?.accountCapabilityFlags.canViewAnalytics,
+			ACCOUNT_TIMELINE: account?.accountCapabilityFlags.canViewAnalytics,
 		} as Record<string, boolean>;
 	}, [
 		account?.accountCapabilityFlags.canViewProviderReportAppointmentCancelations,
@@ -51,6 +53,8 @@ const Reports = () => {
 		}));
 	}, [enabledReportTypes]);
 
+	const isAccountTimelineReport = formValues.reportTypeId === ReportTypeId.ACCOUNT_TIMELINE;
+
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
@@ -58,11 +62,14 @@ const Reports = () => {
 			window.location.href = buildBackendDownloadUrl('/reporting/run-report', {
 				reportTypeId: formValues.reportTypeId,
 				reportFormatId: 'CSV',
-				startDateTime: `${formValues.startDate}T00:00:00`,
-				endDateTime: `${formValues.endDate}T23:59:59`,
+				...(formValues.startDate ? { startDateTime: `${formValues.startDate}T00:00:00` } : {}),
+				...(formValues.endDate ? { endDateTime: `${formValues.endDate}T23:59:59` } : {}),
+				...(formValues.reportTypeId === ReportTypeId.ACCOUNT_TIMELINE && formValues.accountId
+					? { accountId: formValues.accountId }
+					: {}),
 			});
 		},
-		[formValues.endDate, formValues.reportTypeId, formValues.startDate]
+		[formValues.accountId, formValues.endDate, formValues.reportTypeId, formValues.startDate]
 	);
 
 	return (
@@ -107,7 +114,7 @@ const Reports = () => {
 								</InputHelper>
 								<DatePicker
 									className="mb-4"
-									labelText="Start Date"
+									labelText={isAccountTimelineReport ? 'Optional Start Date' : 'Start Date'}
 									showYearDropdown
 									showMonthDropdown
 									dropdownMode="select"
@@ -129,7 +136,7 @@ const Reports = () => {
 								/>
 								<DatePicker
 									className="mb-4"
-									labelText="End Date"
+									labelText={isAccountTimelineReport ? 'Optional End Date' : 'End Date'}
 									showYearDropdown
 									showMonthDropdown
 									dropdownMode="select"
@@ -149,6 +156,27 @@ const Reports = () => {
 										}));
 									}}
 								/>
+								{isAccountTimelineReport && (
+									<>
+										<InputHelper
+											className="mb-4"
+											label="Account ID"
+											type="text"
+											placeholder="UUID for the account to inspect"
+											value={formValues.accountId}
+											onChange={({ currentTarget }) => {
+												setFormValues((previousValues) => ({
+													...previousValues,
+													accountId: currentTarget.value,
+												}));
+											}}
+											required
+										/>
+										<p className="text-muted">
+											Leave the date fields blank to export the full timeline for this account.
+										</p>
+									</>
+								)}
 								<p>
 									Patient privacy is our highest priority at Cobalt. If you chose to download reports,
 									the information is only to be used for internal analysis, reporting or
@@ -180,7 +208,10 @@ const Reports = () => {
 										type="submit"
 										size="lg"
 										disabled={
-											!formValues.reportTypeId || !formValues.startDate || !formValues.endDate
+											!formValues.reportTypeId ||
+											(isAccountTimelineReport
+												? !formValues.accountId
+												: !formValues.startDate || !formValues.endDate)
 										}
 									>
 										Download Report
