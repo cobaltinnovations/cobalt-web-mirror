@@ -69,7 +69,6 @@ const PasswordForgot: FC = () => {
 									folder.
 								</p>
 								<Button
-									size="lg"
 									type="button"
 									variant="link"
 									className="d-block w-100 text-decoration-none"
@@ -78,7 +77,6 @@ const PasswordForgot: FC = () => {
 									Resend
 								</Button>
 								<Button
-									size="lg"
 									type="button"
 									variant="link"
 									className="d-block w-100 text-decoration-none"
@@ -110,7 +108,7 @@ const PasswordForgot: FC = () => {
 										}}
 										required
 									/>
-									<Button size="lg" type="submit" className="d-block w-100">
+									<Button type="submit" className="d-block w-100">
 										Send email
 									</Button>
 								</Form>
