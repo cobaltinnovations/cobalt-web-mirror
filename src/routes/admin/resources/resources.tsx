@@ -304,6 +304,7 @@ export const Component = () => {
 						<div className="mb-6 d-flex align-items-center justify-content-end">
 							<Button
 								variant="primary"
+								size="sm"
 								className="d-flex align-items-center"
 								onClick={() => {
 									navigate('/admin/resources/add');
@@ -348,6 +349,7 @@ export const Component = () => {
 										className={classNames({ 'me-2': !isLast })}
 										active={filterConfig.active}
 										inactiveVariant="secondary"
+										size="sm"
 										id={filterId}
 										title={filterConfig.name}
 										dismissText="Clear"
@@ -397,6 +399,7 @@ export const Component = () => {
 								<Button
 									className="d-flex align-items-center text-decoration-none text-nowrap"
 									variant="link"
+									size="sm"
 									onClick={() => {
 										filters.forEach((filter) => {
 											searchParams.delete(filter.searchParam);
@@ -419,6 +422,7 @@ export const Component = () => {
 								className="ms-auto"
 								active={sortConfig.active}
 								inactiveVariant="secondary"
+								size="sm"
 								id="admin-resource-sort"
 								title={sortConfig.name}
 								dismissText="Clear"

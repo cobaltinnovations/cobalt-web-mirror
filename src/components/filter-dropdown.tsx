@@ -59,6 +59,7 @@ interface FilterDropdownProps {
 	title: string;
 	active?: boolean;
 	inactiveVariant?: 'light' | 'secondary';
+	size?: 'sm' | 'lg';
 	width?: number;
 	dismissText?: string;
 	confirmText?: string;
@@ -76,6 +77,7 @@ const FilterDropdown = ({
 	title,
 	active = false,
 	inactiveVariant = 'light',
+	size,
 	width = 400,
 	dismissText = 'Cancel',
 	confirmText = 'Apply',
@@ -118,12 +120,13 @@ const FilterDropdown = ({
 				className={classNames('d-inline-flex align-items-center', {
 					'pe-3': !iconLeft,
 					'ps-3': iconLeft,
+					'cobalt-button-sm': size === 'sm',
+					'cobalt-button-lg': size === 'lg',
 				})}
 				id={id}
 			>
-				{iconLeft && <div className="me-1 d-flex">{icon}</div>}
 				<span>{title}</span>
-				{!iconLeft && <div className="ms-1 d-flex">{icon}</div>}
+				{!iconLeft && <div className="pe-1 ps-1 d-flex">{icon}</div>}
 			</Dropdown.Toggle>
 			<Dropdown.Menu
 				as={DropdownMenu}

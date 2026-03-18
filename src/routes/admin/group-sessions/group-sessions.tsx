@@ -190,6 +190,7 @@ export const Component = () => {
 							<h2 className="mb-0">Group Sessions</h2>
 							<Button
 								variant="primary"
+								size="sm"
 								className="d-flex align-items-center"
 								onClick={() => {
 									setShowAddGroupSessionModal(true);

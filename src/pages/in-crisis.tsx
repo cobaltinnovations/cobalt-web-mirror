@@ -22,7 +22,7 @@ const InCrisis = () => {
 			</Helmet>
 
 			<HeroContainer>
-				<h2 className="mb-0 text-center">In Crisis</h2>
+				<h1 className="mb-0 text-center">In Crisis</h1>
 			</HeroContainer>
 			<Container className="pt-6 pt-lg-14 pb-6 pb-lg-30">
 				<Row>

@@ -214,6 +214,7 @@ export const Component = () => {
 							<h2 className="mb-0">Pages</h2>
 							<Button
 								variant="primary"
+								size="sm"
 								className="d-flex align-items-center"
 								onClick={() => {
 									setShowAddPageModal(true);

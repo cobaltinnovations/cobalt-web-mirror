@@ -44,6 +44,7 @@ export const AdminGroupSessionFilterVisibility = ({ className }: Props) => {
 			className={className}
 			active={isActive}
 			inactiveVariant="secondary"
+			size="sm"
 			id="admin-group-session-filter-visibility"
 			title="Visibility"
 			dismissText="Clear"

@@ -56,6 +56,7 @@ export const AdminGroupSessionFilterStatus = ({ className }: Props) => {
 			className={className}
 			active={isActive}
 			inactiveVariant="secondary"
+			size="sm"
 			id="admin-group-session-filter-status"
 			title="Status"
 			dismissText="Clear"

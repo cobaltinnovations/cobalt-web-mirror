@@ -139,6 +139,9 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		'.fs-display3': {
 			...theme.fonts.display3,
 		},
+		'.fs-display6': {
+			...theme.fonts.display6,
+		},
 
 		'.fs-h1': {
 			...theme.fonts.h1.default,

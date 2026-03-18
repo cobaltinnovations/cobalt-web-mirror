@@ -4,6 +4,7 @@ export type CobaltFontFamily = {
 	fontFamily: string;
 	weights: {
 		regular: number;
+		medium: number;
 		bold: number;
 	};
 };
@@ -113,10 +114,12 @@ export type CobaltTheme = {
 		default: CobaltFontSizeConfig;
 		large: CobaltFontSizeConfig;
 		small: CobaltFontSizeConfig;
+		xlarge: CobaltFontSizeConfig;
 
 		headingNormal: CobaltFontConfig;
 		headingBold: CobaltFontConfig;
 		bodyNormal: CobaltFontConfig;
+		bodyMedium: CobaltFontConfig;
 		bodyBold: CobaltFontConfig;
 	};
 };

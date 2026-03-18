@@ -228,7 +228,7 @@ const Index: FC = () => {
 							{hasLandingPageFeatures ? (
 								<Col>
 									<h5 className="mb-5 text-center text-gray">Welcome to Cobalt</h5>
-									<h1 className="mb-0 text-center">What can we help you find today?</h1>
+									<h1 className="mb-0 fs-display6 text-center">What can we help you find today?</h1>
 								</Col>
 							) : (
 								<Col>
