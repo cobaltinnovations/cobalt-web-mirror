@@ -24,7 +24,9 @@ import {
 	GroupSessionSchedulingSystemId,
 	groupSessionsService,
 } from '@/lib/services';
+import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
+import InputHelperSearch from '@/components/input-helper-search';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
 import {
 	AdminGroupSessionFilterScheduling,
@@ -106,6 +108,7 @@ export function useAdminGroupSessionsLoaderData() {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const url = new URL(request.url);
 	const pageNumber = parseInt(url.searchParams.get('pageNumber') ?? '0', 10);
+	const search = url.searchParams.get('search');
 	const groupSessionStatusId = url.searchParams.get('groupSessionStatusId');
 	const groupSessionSchedulingSystemId = url.searchParams.get('groupSessionSchedulingSystemId');
 	const contentVisibilityTypeId = url.searchParams.get('contentVisibilityTypeId')
@@ -126,6 +129,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	if (contentVisibilityTypeId) {
 		queryParams.contentVisibilityTypeId = contentVisibilityTypeId;
+	}
+
+	if (search) {
+		queryParams.searchQuery = search;
 	}
 
 	const groupSessionsrequest = groupSessionsService.getGroupSessions({
@@ -149,12 +156,15 @@ export const Component = () => {
 
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = searchParams.get('pageNumber') ?? '0';
+	const initialSearchValue = searchParams.get('search');
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [groupSessions, setGroupSessions] = useState<GroupSessionModel[]>([]);
 	const [groupSessionsTotalCount, setGroupSessionsTotalCount] = useState(0);
 	const [groupSessionsTotalCountDescription, setGroupSessionsTotalCountDescription] = useState('0');
 
+	const [searchInputValue, setSearchInputValue] = useState(initialSearchValue);
+	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchInputValue);
 	const [showAddGroupSessionModal, setShowAddGroupSessionModal] = useState(false);
 
 	useEffect(() => {
@@ -179,6 +189,19 @@ export const Component = () => {
 
 		loadGroupSessions();
 	}, [groupSessionsPromise, handleError]);
+
+	useEffect(() => {
+		searchParams.delete('pageNumber');
+
+		if (debouncedSearchQuery) {
+			searchParams.set('search', debouncedSearchQuery);
+		} else {
+			searchParams.delete('search');
+		}
+
+		setSearchParams(searchParams);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [debouncedSearchQuery]);
 
 	const handleStatusUpdate = async (
 		groupSessionId: string,
@@ -248,17 +271,35 @@ export const Component = () => {
 					<Col>
 						<div className="mb-6 d-flex align-items-center justify-content-between">
 							<h2 className="mb-0">Group Sessions</h2>
-							<Button
-								variant="primary"
-								size="sm"
-								className="d-flex align-items-center"
-								onClick={() => {
-									setShowAddGroupSessionModal(true);
-								}}
-							>
-								<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
-								Add Group Session
-							</Button>
+							<div className="d-flex align-items-center">
+								<Button
+									variant="primary"
+									size="sm"
+									className="d-flex align-items-center"
+									onClick={() => {
+										setShowAddGroupSessionModal(true);
+									}}
+								>
+									<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
+									Add Group Session
+								</Button>
+								<InputHelperSearch
+									className="ms-2"
+									style={{ width: 335 }}
+									placeholder="Search"
+									value={searchInputValue ?? ''}
+									onChange={({ currentTarget }) => {
+										setSearchInputValue(currentTarget.value);
+									}}
+									onClear={() => {
+										setSearchInputValue('');
+										setDebouncedSearchQuery('');
+										searchParams.delete('search');
+										searchParams.delete('pageNumber');
+										setSearchParams(searchParams);
+									}}
+								/>
+							</div>
 						</div>
 						<hr />
 					</Col>
