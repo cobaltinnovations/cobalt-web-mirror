@@ -111,7 +111,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 		<Container className={classNames('py-18', className)}>
 			<Row className="justify-content-center">
 				<Col md={10} lg={8} xl={8}>
-					<h3 className="mb-4">{content?.title}</h3>
+					<h1 className="mb-4">{content?.title}</h1>
 					<div className="mb-12 d-flex align-items-center">
 						{content?.contentTypeId && (
 							<ContentTypeIcon className="me-2 text-muted" contentTypeId={content?.contentTypeId} />
