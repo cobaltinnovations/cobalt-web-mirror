@@ -28,7 +28,7 @@ export const button = (theme: CobaltTheme) => {
 				},
 			},
 			'&-lg': {
-				fontSize: '1.8rem',
+				fontSize: '1.6rem',
 				lineHeight: '2.4rem',
 				padding: '16px 24px',
 				minHeight: '48px',

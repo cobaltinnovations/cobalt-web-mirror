@@ -117,7 +117,10 @@ const GroupSession = ({
 							<Col>
 								<h1 className="mb-2 mb-lg-3">{groupSession.title}</h1>
 								<p className="mb-6 text-muted">with {groupSession.facilitatorName}</p>
-								<WysiwygDisplay className="mb-6 mb-lg-10" html={groupSession.description ?? ''} />
+								<WysiwygDisplay
+									className="mb-6 mb-lg-10 fs-large"
+									html={groupSession.description ?? ''}
+								/>
 
 								{(groupSession.tags ?? []).length > 0 && (
 									<div className="d-flex flex-wrap">

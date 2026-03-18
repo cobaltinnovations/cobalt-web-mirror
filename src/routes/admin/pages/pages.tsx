@@ -301,6 +301,7 @@ export const Component = () => {
 											<TableCell className="text-nowrap" width="40%">
 												<Button
 													variant="link"
+													size="sm"
 													className="p-0 text-decoration-none text-left"
 													onClick={() => {
 														handlePageButtonClick(page.pageId);
