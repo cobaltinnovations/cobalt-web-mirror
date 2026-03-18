@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash';
+import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
@@ -15,6 +16,40 @@ import ContentTypeIcon from '@/components/content-type-icon';
 import LoadingButton from '@/components/loading-button';
 import AsyncWrapper from '@/components/async-page';
 import SvgIcon from '@/components/svg-icon';
+
+const RESOURCE_TABLE_DATE_FORMAT = 'MMM DD, YYYY';
+const RESOURCE_TABLE_DATE_INPUT_FORMATS = [
+	'MM/DD/YY',
+	'M/D/YY',
+	'MM/DD/YYYY',
+	'M/D/YYYY',
+	'MMM D, YYYY',
+	'MMM DD, YYYY',
+	'MMMM D, YYYY',
+	'MMMM DD, YYYY',
+];
+
+const formatResourceTableDate = (rawDate?: string | null, description?: string | null) => {
+	if (rawDate) {
+		const parsedRawDate = moment(rawDate);
+
+		if (parsedRawDate.isValid()) {
+			return parsedRawDate.format(RESOURCE_TABLE_DATE_FORMAT);
+		}
+	}
+
+	if (!description) {
+		return '';
+	}
+
+	const parsedDescription = moment(description, RESOURCE_TABLE_DATE_INPUT_FORMATS, true);
+
+	if (parsedDescription.isValid()) {
+		return parsedDescription.format(RESOURCE_TABLE_DATE_FORMAT);
+	}
+
+	return description;
+};
 
 const contentStatusBadgeProps = {
 	[ContentStatusId.DRAFT]: {
@@ -467,12 +502,20 @@ export const Component = () => {
 						<Table isLoading={isLoading}>
 							<TableHead>
 								<TableRow>
-									<TableCell header>Date Added</TableCell>
-									<TableCell header>Resource Details</TableCell>
+									<TableCell header minWidth="max-content">
+										Date Added
+									</TableCell>
+									<TableCell header width={400}>
+										Resource Details
+									</TableCell>
 									<TableCell header>Owner</TableCell>
 									<TableCell header>Status</TableCell>
-									<TableCell header>Publish Date</TableCell>
-									<TableCell header>Expiry Date</TableCell>
+									<TableCell header minWidth="max-content">
+										Publish Date
+									</TableCell>
+									<TableCell header minWidth="max-content">
+										Expiry Date
+									</TableCell>
 									<TableCell header className="align-items-end">
 										Views
 									</TableCell>
@@ -488,9 +531,12 @@ export const Component = () => {
 
 									return (
 										<TableRow key={content.contentId}>
-											<TableCell>
+											<TableCell className="text-nowrap" minWidth="max-content">
 												<div className="d-flex align-items-center">
-													{content.dateAddedToInstitutionDescription}{' '}
+													{formatResourceTableDate(
+														undefined,
+														content.dateAddedToInstitutionDescription
+													)}{' '}
 													{content.newFlag && (
 														<div className="ms-4">
 															<Badge pill>New</Badge>
@@ -499,7 +545,7 @@ export const Component = () => {
 												</div>
 											</TableCell>
 
-											<TableCell width={480}>
+											<TableCell width={400}>
 												<div className="d-flex align-items-center">
 													<OverlayTrigger
 														placement="bottom"
@@ -538,9 +584,19 @@ export const Component = () => {
 												</div>
 											</TableCell>
 
-											<TableCell>{content.publishStartDateDescription}</TableCell>
+											<TableCell className="text-nowrap" minWidth="max-content">
+												{formatResourceTableDate(
+													content.publishStartDate,
+													content.publishStartDateDescription
+												)}
+											</TableCell>
 
-											<TableCell>{content.publishEndDateDescription ?? 'No Expiry'}</TableCell>
+											<TableCell className="text-nowrap" minWidth="max-content">
+												{formatResourceTableDate(
+													content.publishEndDate,
+													content.publishEndDateDescription ?? 'No Expiry'
+												)}
+											</TableCell>
 
 											<TableCell className="align-items-end">{content.views}</TableCell>
 

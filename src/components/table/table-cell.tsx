@@ -9,6 +9,7 @@ import SvgIcon from '../svg-icon';
 interface UseStylesProps {
 	header?: boolean;
 	width?: string | number;
+	minWidth?: string | number;
 	sticky?: boolean;
 	stickyBorder?: boolean;
 	stickyOffset?: string | number;
@@ -20,6 +21,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		height: 1, // Don't worry, this is ignored by the browser. It's a hack to allow a 100% height inner <div/>
 		padding: 0,
 		width: ({ width }: UseStylesProps) => width ?? 'auto',
+		minWidth: ({ minWidth }: UseStylesProps) => minWidth ?? undefined,
 		backgroundColor: ({ header }: UseStylesProps) => (header ? theme.colors.n75 : 'inherit'),
 		position: ({ sticky }: UseStylesProps) => (sticky ? 'sticky' : undefined),
 		left: ({ sticky, stickyOffset }: UseStylesProps) => (sticky ? stickyOffset ?? 0 : undefined),
@@ -28,6 +30,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		height: '100%',
 		padding: '14px 20px',
 		width: ({ width }: UseStylesProps) => width ?? '100%',
+		minWidth: ({ minWidth }: UseStylesProps) => minWidth ?? undefined,
 		display: 'inline-flex',
 		flexDirection: 'column',
 		justifyContent: 'center',
@@ -55,6 +58,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 interface TableCellProps extends PropsWithChildren {
 	header?: boolean;
 	width?: number | string;
+	minWidth?: number | string;
 	sticky?: boolean;
 	stickyBorder?: boolean;
 	stickyOffset?: number;
@@ -69,6 +73,7 @@ export const TableCell: FC<TableCellProps> = React.memo(
 	({
 		header,
 		width,
+		minWidth,
 		sticky,
 		stickyBorder,
 		stickyOffset,
@@ -82,6 +87,7 @@ export const TableCell: FC<TableCellProps> = React.memo(
 		const classes = useTableCellStyles({
 			header,
 			width,
+			minWidth,
 			sticky,
 			stickyBorder,
 			stickyOffset,

@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash';
+import moment from 'moment';
 import React, { Suspense, useEffect, useState } from 'react';
 import {
 	Await,
@@ -34,6 +35,65 @@ import {
 } from '@/components/admin';
 import SelectGroupSessionTypeModal from '@/components/select-group-session-type-modal';
 import SvgIcon from '@/components/svg-icon';
+
+const GROUP_SESSION_TABLE_DATE_FORMAT = 'MMM DD, YYYY';
+const GROUP_SESSION_TABLE_DATE_INPUT_FORMATS = [
+	'MM/DD/YY',
+	'M/D/YY',
+	'MM/DD/YYYY',
+	'M/D/YYYY',
+	'MMM D, YYYY',
+	'MMM DD, YYYY',
+	'MMMM D, YYYY',
+	'MMMM DD, YYYY',
+];
+
+const formatGroupSessionTableDate = (rawDate?: string | null, description?: string | null) => {
+	if (rawDate) {
+		const parsedRawDate = moment(rawDate);
+
+		if (parsedRawDate.isValid()) {
+			return parsedRawDate.format(GROUP_SESSION_TABLE_DATE_FORMAT);
+		}
+	}
+
+	if (!description) {
+		return '';
+	}
+
+	const parsedDescription = moment(description, GROUP_SESSION_TABLE_DATE_INPUT_FORMATS, true);
+
+	if (parsedDescription.isValid()) {
+		return parsedDescription.format(GROUP_SESSION_TABLE_DATE_FORMAT);
+	}
+
+	return description;
+};
+
+const GROUP_SESSION_TABLE_TIME_FORMAT = 'h:mmA';
+const GROUP_SESSION_TABLE_TIME_INPUT_FORMATS = ['HH:mm', 'H:mm', 'h:mm A', 'hh:mm A'];
+
+const formatGroupSessionTableTime = (rawTime?: string | null, description?: string | null) => {
+	if (rawTime) {
+		const parsedRawTime = moment(rawTime, GROUP_SESSION_TABLE_TIME_INPUT_FORMATS, true);
+
+		if (parsedRawTime.isValid()) {
+			return parsedRawTime.format(GROUP_SESSION_TABLE_TIME_FORMAT);
+		}
+	}
+
+	if (!description) {
+		return '';
+	}
+
+	const parsedDescription = moment(description, GROUP_SESSION_TABLE_TIME_INPUT_FORMATS, true);
+
+	if (parsedDescription.isValid()) {
+		return parsedDescription.format(GROUP_SESSION_TABLE_TIME_FORMAT);
+	}
+
+	return description;
+};
 
 interface AdminGroupSessionsLoaderData {
 	groupSessionsPromise: Promise<[GetGroupSessionsResponseBody, GetGroupSessionCountsResponseBody]>;
@@ -224,17 +284,21 @@ export const Component = () => {
 								<Table isLoading={isLoading}>
 									<TableHead>
 										<TableRow>
-											<TableCell header>Session Date and Time</TableCell>
-											<TableCell header>Session</TableCell>
+											<TableCell header minWidth="max-content">
+												Session Date and Time
+											</TableCell>
+											<TableCell header width={400}>
+												Session
+											</TableCell>
 											<TableCell header>Facilitator</TableCell>
-											<TableCell header>Scheduling</TableCell>
 											<TableCell header>Registrations</TableCell>
-											<TableCell header>Capacity</TableCell>
 											<TableCell header>Status</TableCell>
 											<TableCell header>Visibility</TableCell>
-											<TableCell header colSpan={2}>
+											<TableCell header>Scheduling</TableCell>
+											<TableCell header minWidth="align-items-end">
 												Date Added
 											</TableCell>
+											<TableCell header />
 										</TableRow>
 									</TableHead>
 									<TableBody>
@@ -243,16 +307,33 @@ export const Component = () => {
 												groupSession.groupSessionStatusId === GROUP_SESSION_STATUS_ID.NEW;
 											return (
 												<TableRow key={groupSession.groupSessionId}>
-													<TableCell>{groupSession.startDateTimeDescription}</TableCell>
-													<TableCell>
-														<Link
-															className="text-decoration-none"
-															to={`/admin/group-sessions/${
-																linkToEdit ? 'edit' : 'view'
-															}/${groupSession.groupSessionId}`}
-														>
-															{groupSession.title}
-														</Link>
+													<TableCell className="text-nowrap" minWidth="max-content">
+														<span className="d-block">
+															{formatGroupSessionTableDate(
+																groupSession.startDate,
+																groupSession.startDateDescription
+															)}
+														</span>
+														<span className="d-block text-muted">
+															{formatGroupSessionTableTime(
+																groupSession.startTime,
+																groupSession.startTimeDescription
+															)}
+														</span>
+													</TableCell>
+													<TableCell width={400}>
+														<div className="d-flex align-items-center">
+															<div className="text-truncate me-5">
+																<Link
+																	className="text-decoration-none"
+																	to={`/admin/group-sessions/${
+																		linkToEdit ? 'edit' : 'view'
+																	}/${groupSession.groupSessionId}`}
+																>
+																	{groupSession.title}
+																</Link>
+															</div>
+														</div>
 													</TableCell>
 													<TableCell>
 														<span className="d-block">{groupSession.facilitatorName}</span>
@@ -261,27 +342,25 @@ export const Component = () => {
 														</span>
 													</TableCell>
 													<TableCell>
-														{groupSession.groupSessionSchedulingSystemId ===
-														GroupSessionSchedulingSystemId.COBALT
-															? 'Cobalt'
-															: 'External'}
-													</TableCell>
-													<TableCell>
 														{groupSession.seatsReserved > 0 ? (
-															<Link
-																className="text-decoration-none"
-																to={{
-																	pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
-																	search: '?tab=registrants',
-																}}
-															>
-																{groupSession.seatsReserved}
-															</Link>
+															<>
+																<Link
+																	className="text-decoration-none"
+																	to={{
+																		pathname: `/admin/group-sessions/view/${groupSession.groupSessionId}`,
+																		search: '?tab=registrants',
+																	}}
+																>
+																	{groupSession.seatsReserved}
+																</Link>
+																/{groupSession.seats ?? 'N/A'}
+															</>
 														) : (
-															groupSession.seatsReserved ?? 'N/A'
+															`${groupSession.seatsReserved ?? 'N/A'} / ${
+																groupSession.seats ?? 'N/A'
+															}`
 														)}
 													</TableCell>
-													<TableCell>{groupSession.seats ?? 'N/A'}</TableCell>
 													<TableCell className="flex-row align-items-center justify-content-start">
 														{groupSession.groupSessionStatusId ===
 															GROUP_SESSION_STATUS_ID.ADDED && (
@@ -322,7 +401,18 @@ export const Component = () => {
 															<span className="text-danger">Unlisted</span>
 														)}
 													</TableCell>
-													<TableCell>{groupSession.createdDateDescription}</TableCell>
+													<TableCell>
+														{groupSession.groupSessionSchedulingSystemId ===
+														GroupSessionSchedulingSystemId.COBALT
+															? 'Cobalt'
+															: 'External'}
+													</TableCell>
+													<TableCell className="text-nowrap" minWidth="max-content">
+														{formatGroupSessionTableDate(
+															groupSession.created,
+															groupSession.createdDateDescription
+														)}
+													</TableCell>
 													<TableCell>
 														<GroupSessionTableDropdown
 															groupSession={groupSession}
