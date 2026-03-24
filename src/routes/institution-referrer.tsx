@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { LoaderFunctionArgs, useLoaderData, useLocation } from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -24,10 +24,18 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { institutionReferrer } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const location = useLocation();
 	const { institution } = useAccount();
+	const usesFullscreenScreening = Boolean(institutionReferrer.metadata?.screening?.fullscreen);
 	const featuresScreeningFlow = useScreeningFlow({
 		screeningFlowId: institutionReferrer.intakeScreeningFlowId,
 		instantiateOnLoad: false,
+		screeningQuestionPathPrefix: usesFullscreenScreening ? '/screening-questions-fullscreen' : undefined,
+		screeningQuestionSearch: usesFullscreenScreening
+			? new URLSearchParams({
+					returnTo: location.pathname + location.search,
+			  }).toString()
+			: undefined,
 	});
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = featuresScreeningFlow;
 

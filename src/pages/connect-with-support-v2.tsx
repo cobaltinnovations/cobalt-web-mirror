@@ -43,8 +43,14 @@ import scheduleApptWoman from '@/assets/images/img-ill-schedule-appt-woman.png';
 enum SEARCH_PARAMS {
 	START_DATE = 'startDate',
 	APPOINTMENT_TIME_IDS = 'appointmentTimeIds',
+	APPOINTMENT_TYPE_ID = 'appointmentTypeId',
 	INSTITUTION_LOCATION_ID = 'institutionLocationId',
 	PATIENT_ORDER_ID = 'patientOrderId',
+	CLINIC_ID = 'clinicId',
+	PROVIDER_ID = 'providerId',
+	FEATURE_ID = 'featureId',
+	PAGE_TITLE = 'pageTitle',
+	PAGE_DESCRIPTION = 'pageDescription',
 }
 
 const ConnectWithSupportV2 = () => {
@@ -61,11 +67,20 @@ const ConnectWithSupportV2 = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const startDate = useMemo(() => searchParams.get(SEARCH_PARAMS.START_DATE), [searchParams]);
 	const appointmentTimeIds = useMemo(() => searchParams.getAll(SEARCH_PARAMS.APPOINTMENT_TIME_IDS), [searchParams]);
+	const appointmentTypeIds = useMemo(() => searchParams.getAll(SEARCH_PARAMS.APPOINTMENT_TYPE_ID), [searchParams]);
 	const institutionLocationId = useMemo(
 		() => searchParams.get(SEARCH_PARAMS.INSTITUTION_LOCATION_ID),
 		[searchParams]
 	);
 	const patientOrderId = useMemo(() => searchParams.get(SEARCH_PARAMS.PATIENT_ORDER_ID) ?? undefined, [searchParams]);
+	const clinicIds = useMemo(() => searchParams.getAll(SEARCH_PARAMS.CLINIC_ID), [searchParams]);
+	const providerId = useMemo(() => searchParams.get(SEARCH_PARAMS.PROVIDER_ID) ?? undefined, [searchParams]);
+	const featureIdOverride = useMemo(
+		() => searchParams.get(SEARCH_PARAMS.FEATURE_ID) as FeatureId | null,
+		[searchParams]
+	);
+	const pageTitleOverride = useMemo(() => searchParams.get(SEARCH_PARAMS.PAGE_TITLE), [searchParams]);
+	const pageDescriptionOverride = useMemo(() => searchParams.get(SEARCH_PARAMS.PAGE_DESCRIPTION), [searchParams]);
 	const forceLocation = useMemo(() => {
 		const v = searchParams.get('forceLocation');
 		return v?.toLowerCase() === 'true';
@@ -90,9 +105,17 @@ const ConnectWithSupportV2 = () => {
 	const { setAppointmentTypes, setEpicDepartments, isEligible, setIsEligible } = useContext(BookingContext);
 
 	const featureDetails = useMemo(() => {
+		if (featureIdOverride) {
+			return (institution?.features ?? []).find((feature) => feature.featureId === featureIdOverride);
+		}
+
 		return (institution?.features ?? []).find((feature) => pathname.includes(feature.urlName));
-	}, [institution?.features, pathname]);
+	}, [featureIdOverride, institution?.features, pathname]);
 	const featureDescription = useMemo(() => {
+		if (pageDescriptionOverride !== null) {
+			return pageDescriptionOverride;
+		}
+
 		if (!featureDetails) {
 			return '';
 		}
@@ -102,12 +125,16 @@ const ConnectWithSupportV2 = () => {
 		}
 
 		return connectWithSupportDescriptionOverride ?? featureDetails.description ?? '';
-	}, [connectWithSupportDescriptionOverride, featureDetails]);
+	}, [connectWithSupportDescriptionOverride, featureDetails, pageDescriptionOverride]);
 
 	const [institutionReferrers, setInstitutionReferrers] = useState<InstitutionReferrer[]>([]);
 	const [institutionFeatureInstitutionReferrers, setInstitutionFeatureInstitutionReferrers] = useState<
 		InstitutionFeatureInstitutionReferrer[]
 	>([]);
+
+	useEffect(() => {
+		filtersFetched.current = false;
+	}, [clinicIds, featureDetails?.featureId, institution?.institutionId, providerId]);
 
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
@@ -171,6 +198,8 @@ const ConnectWithSupportV2 = () => {
 				.fetchFindOptions({
 					institutionId: institution.institutionId,
 					featureId: featureDetails.featureId,
+					...(clinicIds.length > 0 && { clinicIds }),
+					...(providerId && { providerId }),
 				})
 				.fetch(),
 			institutionService.getInstitutionLocations().fetch(),
@@ -180,7 +209,7 @@ const ConnectWithSupportV2 = () => {
 		setInstitutionLocations(institutionLocationsResponse.locations);
 
 		filtersFetched.current = true;
-	}, [featureDetails, institution]);
+	}, [clinicIds, featureDetails, institution, providerId]);
 
 	const fetchInstitutionReferrer = useCallback(async () => {
 		if (!featureDetails) {
@@ -211,6 +240,9 @@ const ConnectWithSupportV2 = () => {
 				supportRoleIds: featureDetails.supportRoleIds,
 				availability: findOptions.defaultAvailability,
 				visitTypeIds: findOptions.defaultVisitTypeIds,
+				...(clinicIds.length > 0 && { clinicIds }),
+				...(providerId && { providerId }),
+				...(appointmentTypeIds.length > 0 && { appointmentTypeIds }),
 				...(institutionLocationId && { institutionLocationId }),
 				...(appointmentTimeIds.length > 0 && { appointmentTimeIds }),
 				...(patientOrderId && { patientOrderId }),
@@ -227,6 +259,9 @@ const ConnectWithSupportV2 = () => {
 			supportRoleIds: featureDetails.supportRoleIds,
 			startDate: startDate ?? findOptions.defaultStartDate,
 			endDate: findOptions.defaultEndDate,
+			...(clinicIds.length > 0 && { clinicIds }),
+			...(providerId && { providerId }),
+			...(appointmentTypeIds.length > 0 && { appointmentTypeIds }),
 			...(institutionLocationId && { institutionLocationId }),
 			...(appointmentTimeIds.length > 0 && { appointmentTimeIds }),
 			...(patientOrderId && { patientOrderId }),
@@ -234,10 +269,13 @@ const ConnectWithSupportV2 = () => {
 		});
 	}, [
 		appointmentTimeIds,
+		appointmentTypeIds,
+		clinicIds,
 		featureDetails,
 		findOptions,
 		institutionLocationId,
 		patientOrderId,
+		providerId,
 		setAppointmentTypes,
 		setEpicDepartments,
 		startDate,
@@ -321,7 +359,7 @@ const ConnectWithSupportV2 = () => {
 	return (
 		<>
 			<Helmet>
-				<title>{`Cobalt | Connect with Support - ${featureDetails?.name}`}</title>
+				<title>{`Cobalt | Connect with Support - ${pageTitleOverride ?? featureDetails?.name ?? ''}`}</title>
 			</Helmet>
 
 			<Modal centered show={showEmployerModal}>
@@ -387,10 +425,15 @@ const ConnectWithSupportV2 = () => {
 				/>
 			)}
 
-			{featureDetails && (
+			{(featureDetails || pageTitleOverride) && (
 				<HeroContainer className="bg-n75">
-					<h1 className="mb-4 text-center">{featureDetails.name}</h1>
-					<p className="mb-0 text-center fs-large" dangerouslySetInnerHTML={{ __html: featureDescription }} />
+					<h1 className="mb-4 text-center">{pageTitleOverride ?? featureDetails?.name}</h1>
+					{featureDescription && (
+						<p
+							className="mb-0 text-center fs-large"
+							dangerouslySetInnerHTML={{ __html: featureDescription }}
+						/>
+					)}
 				</HeroContainer>
 			)}
 

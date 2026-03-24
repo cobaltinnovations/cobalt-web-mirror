@@ -44,6 +44,7 @@ export interface RouteHandle {
 	hideHeader?: boolean;
 	hideFooter?: boolean;
 	hideFooterContactUs?: boolean;
+	fullscreenScreening?: boolean;
 }
 
 export const Onboarding = lazyLoadWithRefresh(() => import('@/pages/onboarding'));
@@ -555,6 +556,15 @@ export const routes: RouteObject[] = [
 						],
 					},
 					{
+						path: 'referrals/:urlName/results/:resultKey',
+						lazy: () => import('@/routes/institution-referrer-results'),
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+							fullscreenScreening: true,
+						} as RouteHandle,
+					},
+					{
 						path: 'referrals/:urlName',
 						lazy: () => import('@/routes/institution-referrer'),
 					},
@@ -635,6 +645,15 @@ export const routes: RouteObject[] = [
 						element: <ScreeningQuestionsPage />,
 						handle: {
 							hideFooterContactUs: true,
+						} as RouteHandle,
+					},
+					{
+						path: 'screening-questions-fullscreen/:screeningQuestionContextId',
+						element: <ScreeningQuestionsPage />,
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+							fullscreenScreening: true,
 						} as RouteHandle,
 					},
 					{
