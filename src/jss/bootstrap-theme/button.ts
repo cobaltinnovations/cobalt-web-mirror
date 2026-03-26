@@ -9,7 +9,7 @@ export const button = (theme: CobaltTheme) => {
 			appearance: 'none',
 			padding: '12px 20px',
 			...theme.fonts.bodyMedium,
-			fontSize: '1.6rem',
+			fontSize: '1.4rem',
 			lineHeight: '2.0rem',
 			minHeight: '44px',
 			position: 'relative',

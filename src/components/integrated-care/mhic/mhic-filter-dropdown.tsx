@@ -241,6 +241,7 @@ export const MhicFilterDropdown = ({ align, className }: Props) => {
 			<Dropdown.Toggle
 				as={DropdownToggle}
 				variant="secondary"
+				size="sm"
 				className="d-inline-flex align-items-center"
 				id="order-filters--add-filter"
 			>

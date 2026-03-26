@@ -70,7 +70,7 @@ export const Component = () => {
 		<Container fluid className="p-8">
 			<Row>
 				<Col xs={12} className="d-flex flex-wrap align-items-center justify-content-between">
-					<h1>Analytics</h1>
+					<h2>Analytics</h2>
 					<div className="d-flex">
 						<InputHelper
 							style={{ width: 200 }}

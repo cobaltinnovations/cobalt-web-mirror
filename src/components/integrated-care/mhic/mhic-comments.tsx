@@ -180,6 +180,7 @@ export const MhicComments = ({ patientOrder }: Props) => {
 						<div className="text-right">
 							<Button
 								type="submit"
+								size="sm"
 								disabled={
 									!commentInputValue ||
 									patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN
