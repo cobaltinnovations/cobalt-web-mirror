@@ -68,6 +68,7 @@ export const MhicFilterState = ({ className }: MhicFilterStateProps) => {
 		<FilterDropdown
 			className={className}
 			active={isActive}
+			inactiveVariant="secondary"
 			id={`pic-mhic__state-filter`}
 			title="Order State"
 			dismissText="Clear"

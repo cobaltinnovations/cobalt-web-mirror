@@ -21,7 +21,6 @@ function FeatureScreeningCta({ onStartAssessment }: FeatureScreeningCtaProps) {
 							institution.epicFhirEnabled
 								? [
 										{
-											size: 'lg' as const,
 											variant: 'outline-primary',
 											title: 'Speak with a Resource Navigator',
 											onClick: () => {
@@ -31,7 +30,6 @@ function FeatureScreeningCta({ onStartAssessment }: FeatureScreeningCtaProps) {
 								  ]
 								: [
 										{
-											size: 'lg',
 											variant: 'primary',
 											title: 'Take the Assessment',
 											onClick: onStartAssessment,

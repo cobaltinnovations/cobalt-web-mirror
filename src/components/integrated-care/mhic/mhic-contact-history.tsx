@@ -265,6 +265,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 									<Dropdown>
 										<Dropdown.Toggle
 											variant="primary"
+											size="sm"
 											as={DropdownToggle}
 											className="me-2"
 											id="mhic-contact-history__dropdown-menu"
@@ -318,6 +319,7 @@ export const MhicContactHistory = ({ patientOrder }: Props) => {
 									</Dropdown>
 									<Button
 										variant="outline-primary"
+										size="sm"
 										onClick={() => {
 											setMessageToEdit(undefined);
 											setShowMessageModal(true);

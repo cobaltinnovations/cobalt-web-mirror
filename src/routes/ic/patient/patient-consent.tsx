@@ -134,7 +134,6 @@ const PatientConsent = () => {
 								<Button
 									className="mb-2 d-block w-100 text-left border"
 									variant="light"
-									size="lg"
 									name="consent"
 									id="consent-yes"
 									value={PatientOrderConsentStatusId.CONSENTED}
@@ -146,7 +145,6 @@ const PatientConsent = () => {
 								<Button
 									className="d-block w-100 text-left border"
 									variant="light"
-									size="lg"
 									name="consent"
 									id="consent-no"
 									value={PatientOrderConsentStatusId.REJECTED}

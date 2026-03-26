@@ -181,6 +181,7 @@ export const Component = () => {
 								<Button
 									className="me-2 d-flex align-items-center"
 									variant="primary"
+									size="sm"
 									onClick={() => {
 										setShowFormModal(true);
 									}}

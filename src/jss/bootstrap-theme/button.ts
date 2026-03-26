@@ -7,10 +7,11 @@ export const button = (theme: CobaltTheme) => {
 			border: 0,
 			borderRadius: 500,
 			appearance: 'none',
-			padding: '8px 20px',
-			...theme.fonts.bodyBold,
+			padding: '12px 20px',
+			...theme.fonts.bodyMedium,
 			fontSize: '1.4rem',
-			lineHeight: '2.4rem',
+			lineHeight: '2.0rem',
+			minHeight: '44px',
 			position: 'relative',
 			textTransform: 'none',
 			'&:focus-visible': {
@@ -29,11 +30,14 @@ export const button = (theme: CobaltTheme) => {
 			'&-lg': {
 				fontSize: '1.6rem',
 				lineHeight: '2.4rem',
-				padding: '12px 28px',
+				padding: '16px 24px',
+				minHeight: '48px',
 			},
 			'&-sm': {
 				fontSize: '1.4rem',
-				padding: '6px 16px',
+				lineHeight: '1.6rem',
+				padding: '8px 16px',
+				minHeight: '40px',
 			},
 			'& svg': {
 				fill: 'currentColor',
@@ -49,10 +53,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.p500,
 				'&:hover': {
-					backgroundColor: theme.colors.p300,
+					backgroundColor: theme.colors.p700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.p700,
+					backgroundColor: theme.colors.p900,
 				},
 			},
 
@@ -60,13 +64,14 @@ export const button = (theme: CobaltTheme) => {
 			/* Secondary variant */
 			/* ----------------------------------------------------------- */
 			'&-secondary': {
-				color: theme.colors.n0,
-				backgroundColor: theme.colors.a500,
+				color: theme.colors.n500,
+				backgroundColor: theme.colors.n0,
+				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
-					backgroundColor: theme.colors.a300,
+					backgroundColor: theme.colors.n50,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.a500,
+					backgroundColor: theme.colors.n75,
 				},
 			},
 
@@ -77,10 +82,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.s500,
 				'&:hover': {
-					backgroundColor: theme.colors.s300,
+					backgroundColor: theme.colors.s700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.s500,
+					backgroundColor: theme.colors.s900,
 				},
 			},
 
@@ -91,10 +96,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.d500,
 				'&:hover': {
-					backgroundColor: theme.colors.d300,
+					backgroundColor: theme.colors.d700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.d500,
+					backgroundColor: theme.colors.d900,
 				},
 			},
 
@@ -105,10 +110,10 @@ export const button = (theme: CobaltTheme) => {
 				color: theme.colors.n900,
 				backgroundColor: theme.colors.w500,
 				'&:hover': {
-					backgroundColor: theme.colors.w300,
+					backgroundColor: theme.colors.w700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.w500,
+					backgroundColor: theme.colors.w900,
 				},
 			},
 
@@ -118,10 +123,10 @@ export const button = (theme: CobaltTheme) => {
 			'&-info': {
 				backgroundColor: theme.colors.i500,
 				'&:hover': {
-					backgroundColor: theme.colors.i300,
+					backgroundColor: theme.colors.i700,
 				},
 				'&:active': {
-					backgroundColor: theme.colors.i500,
+					backgroundColor: theme.colors.i900,
 				},
 			},
 
@@ -129,7 +134,7 @@ export const button = (theme: CobaltTheme) => {
 			/* Light variant */
 			/* ----------------------------------------------------------- */
 			'&-light': {
-				color: theme.colors.p700,
+				color: theme.colors.p500,
 				backgroundColor: theme.colors.n0,
 				border: `1px solid ${theme.colors.border}`,
 				'&:hover': {
@@ -153,6 +158,19 @@ export const button = (theme: CobaltTheme) => {
 				},
 				'&:active': {
 					backgroundColor: theme.colors.n100,
+				},
+			},
+
+			/* ----------------------------------------------------------- */
+			/* Accent variant */
+			/* ----------------------------------------------------------- */
+			'&-accent': {
+				backgroundColor: theme.colors.a500,
+				'&:hover': {
+					backgroundColor: theme.colors.a700,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.a900,
 				},
 			},
 
@@ -181,7 +199,7 @@ export const button = (theme: CobaltTheme) => {
 				...outlineButton(theme.colors.p500, theme.colors.n0, theme.colors.p700),
 			},
 			'&-outline-secondary': {
-				...outlineButton(theme.colors.a500, theme.colors.n0, theme.colors.a700),
+				...outlineButton(theme.colors.n500, theme.colors.n0, theme.colors.n700),
 			},
 			'&-outline-success': {
 				...outlineButton(theme.colors.s500, theme.colors.n0, theme.colors.s700),
@@ -205,6 +223,49 @@ export const button = (theme: CobaltTheme) => {
 				'&:hover': {
 					color: theme.colors.n0,
 					backgroundColor: theme.colors.a500,
+				},
+			},
+			'&-outline-accent': {
+				...outlineButton(theme.colors.a500, theme.colors.n0, theme.colors.a700),
+			},
+
+			/* ----------------------------------------------------------- */
+			/* Transparent variants */
+			/* ----------------------------------------------------------- */
+			'&-transparent-primary': {
+				color: theme.colors.p500,
+				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.p700,
+					backgroundColor: theme.colors.n50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.n75,
+					color: theme.colors.p700,
+				},
+			},
+			'&-transparent-secondary': {
+				color: theme.colors.n500,
+				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.n700,
+					backgroundColor: theme.colors.n50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.n75,
+					color: theme.colors.n700,
+				},
+			},
+			'&-transparent-danger': {
+				color: theme.colors.d500,
+				backgroundColor: 'transparent',
+				'&:hover': {
+					color: theme.colors.d700,
+					backgroundColor: theme.colors.d50,
+				},
+				'&:active': {
+					backgroundColor: theme.colors.d75,
+					color: theme.colors.d700,
 				},
 			},
 		},

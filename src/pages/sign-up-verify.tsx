@@ -53,7 +53,6 @@ const SignUpVerify: FC = () => {
 							<div className="text-center">
 								<Button
 									variant="link"
-									size="lg"
 									className="d-block w-100 text-decoration-none"
 									onClick={handleResendButtonClick}
 								>
@@ -61,7 +60,6 @@ const SignUpVerify: FC = () => {
 								</Button>
 								<Button
 									variant="link"
-									size="lg"
 									className="d-block w-100 text-decoration-none"
 									onClick={() => {
 										navigate('/sign-in-email');

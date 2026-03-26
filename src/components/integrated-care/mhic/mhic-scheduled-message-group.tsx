@@ -17,7 +17,7 @@ export const MhicScheduledMessageGroup = ({ message, onEditClick, disabled }: Mh
 				<Card.Title>Message scheduled for {message.scheduledAtDateTimeDescription}</Card.Title>
 				<div className="button-container">
 					<Button
-						variant="light"
+						variant="transparent-secondary"
 						className="p-2"
 						onClick={() => {
 							onEditClick(message);

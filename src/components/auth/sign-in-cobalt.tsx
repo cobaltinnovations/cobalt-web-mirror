@@ -108,7 +108,6 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 						</p>
 						{institution.signInVideoId && (
 							<Button
-								size="lg"
 								variant="outline-primary"
 								className="d-flex align-items-center justify-content-center mb-6 mb-lg-8 d-block w-100"
 								onClick={() => {
@@ -126,7 +125,6 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 						{showSignUpLogInUi ? (
 							<div className="mb-8 mb-lg-10">
 								<Button
-									size="lg"
 									variant="primary"
 									className="mb-3 d-block w-100 text-decoration-none"
 									onClick={() => {
@@ -136,7 +134,6 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 									Sign up
 								</Button>
 								<Button
-									size="lg"
 									variant="outline-primary"
 									className="d-block w-100 text-decoration-none"
 									onClick={() => {
@@ -177,7 +174,6 @@ export const SignInCobalt = ({ onAccountSourceClick }: SignInCobaltProps) => {
 												)}
 												<Button
 													key={`account-source-${index}`}
-													size="lg"
 													className={classNames('d-block w-100 text-decoration-none', {
 														'mb-3': !isLast,
 													})}

@@ -871,7 +871,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Card.Title>Primary Contact</Card.Title>
 									<div className="button-container">
 										<Button
-											variant="light"
+											variant="transparent-secondary"
 											className="p-2"
 											onClick={() => {
 												setShowContactInformationModal(true);
@@ -1020,7 +1020,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<Card.Title>Demographics</Card.Title>
 									<div className="button-container">
 										<Button
-											variant="light"
+											variant="transparent-secondary"
 											className="p-2"
 											onClick={() => {
 												setShowDemographicsModal(true);

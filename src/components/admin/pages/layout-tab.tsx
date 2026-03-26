@@ -139,7 +139,7 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 				</Droppable>
 			</DragDropContext>
 			<div className="p-6 text-right">
-				<Button variant="outline-primary" onClick={onAddSectionButtonClick}>
+				<Button variant="light" onClick={onAddSectionButtonClick}>
 					Add Section
 				</Button>
 			</div>

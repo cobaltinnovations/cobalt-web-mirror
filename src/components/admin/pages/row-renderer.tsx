@@ -642,7 +642,7 @@ const MailingListRowRenderer = ({
 									required
 								/>
 								<div className="text-center">
-									<LoadingButton isLoading={isLoading} size="lg" type="submit">
+									<LoadingButton isLoading={isLoading} type="submit">
 										Subscribe
 									</LoadingButton>
 								</div>

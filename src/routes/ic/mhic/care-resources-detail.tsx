@@ -102,6 +102,7 @@ export const Component = () => {
 								<h4>Details</h4>
 								<Button
 									variant="outline-primary"
+									size="sm"
 									className="d-flex align-items-center"
 									onClick={() => {
 										setShowFormModal(true);
@@ -193,6 +194,7 @@ export const Component = () => {
 								<h4>Locations</h4>
 								<Button
 									variant="primary"
+									size="sm"
 									className="d-flex align-items-center"
 									onClick={() => {
 										navigate(`./location/add`);
