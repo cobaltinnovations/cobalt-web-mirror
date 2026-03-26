@@ -9,13 +9,16 @@ import {
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
 	isGroupSessionsRow,
+	isOneColumnImageRightRow,
 	isMailingListRow,
 	isOneColumnImageRow,
+	isOneColumnTextRow,
 	isResourcesRow,
 	isTagGroupRow,
 	isTagRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
+	isTwoColumnTextRow,
 	MailingListEntryTypeId,
 	MailingListRowModel,
 	OneColumnImageRowModel,
@@ -394,9 +397,48 @@ const OneColRowRenderer = ({
 	enableAnalytics,
 	livePageSiteLocations,
 }: RowRendererProps<OneColumnImageRowModel>) => {
+	if (isOneColumnTextRow(pageRow)) {
+		return (
+			<Row className={className}>
+				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }}>
+					{pageRow.columnOne.headline && (
+						<h2 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
+							{pageRow.columnOne.headline}
+						</h2>
+					)}
+					{pageRow.columnOne.description && (
+						<WysiwygDisplay
+							html={pageRow.columnOne.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+			</Row>
+		);
+	}
+
+	const imageFirst = !isOneColumnImageRightRow(pageRow);
+
 	return (
 		<Row className={classNames('align-items-center', className)}>
-			<Col xs={12} lg={6} className="mb-10 mb-lg-0">
+			<Col
+				xs={12}
+				lg={6}
+				className={classNames('mb-10 mb-lg-0', {
+					'order-lg-2': !imageFirst,
+				})}
+			>
 				{pageRow.columnOne.imageUrl && (
 					<img
 						className="w-100"
@@ -405,7 +447,13 @@ const OneColRowRenderer = ({
 					/>
 				)}
 			</Col>
-			<Col xs={12} lg={6}>
+			<Col
+				xs={12}
+				lg={6}
+				className={classNames({
+					'order-lg-1': !imageFirst,
+				})}
+			>
 				{pageRow.columnOne.headline && (
 					<h3 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
 						{pageRow.columnOne.headline}
@@ -440,6 +488,53 @@ const TwoColRowRenderer = ({
 	enableAnalytics,
 	livePageSiteLocations,
 }: RowRendererProps<TwoColumnImageRowModel>) => {
+	if (isTwoColumnTextRow(pageRow)) {
+		return (
+			<Row className={className}>
+				<Col xs={12} lg={6} className="mb-16 mb-lg-0">
+					{pageRow.columnOne.headline && <h3 className={classNames('mb-6')}>{pageRow.columnOne.headline}</h3>}
+					{pageRow.columnOne.description && (
+						<WysiwygDisplay
+							html={pageRow.columnOne.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+				<Col xs={12} lg={6}>
+					{pageRow.columnTwo.headline && <h3 className={classNames('mb-6')}>{pageRow.columnTwo.headline}</h3>}
+					{pageRow.columnTwo.description && (
+						<WysiwygDisplay
+							html={pageRow.columnTwo.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+			</Row>
+		);
+	}
+
 	return (
 		<Row className={className}>
 			<Col xs={12} lg={6} className="mb-16 mb-lg-0">

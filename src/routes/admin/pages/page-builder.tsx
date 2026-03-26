@@ -1,27 +1,24 @@
 import React, { useCallback, useState } from 'react';
-import { Badge, Button, Tab } from 'react-bootstrap';
+import { Badge, Button } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
 import useFlags from '@/hooks/use-flags';
 import { PageBuilderProvider } from '@/contexts/page-builder-context';
-import TabBar from '@/components/tab-bar';
-import {
-	AddPageSectionModal,
-	HERO_SECTION_ID,
-	LayoutTab,
-	PagePreview,
-	PageSectionShelf,
-	SettingsTab,
-} from '@/components/admin/pages';
+import { HERO_SECTION_ID, LayoutTab, PagePreview, PageSectionShelf } from '@/components/admin/pages';
 import ConfirmDialog from '@/components/confirm-dialog';
 import AsyncWrapper from '@/components/async-page';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createUseThemedStyles } from '@/jss/theme';
 import { CobaltError } from '@/lib/http-client';
+import classNames from 'classnames';
+import SvgIcon from '@/components/svg-icon';
 
-const SHELF_TRANSITION_DURATION_MS = 600;
+const headerHeight = 60;
+const asideWidth = 344;
+const asideWidthCollapsed = 60;
+const shelfTransitionDurationMs = 600;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	wrapper: {
@@ -36,7 +33,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		top: 0,
 		left: 0,
 		right: 0,
-		height: 60,
+		height: headerHeight,
 		zIndex: 3,
 		display: 'flex',
 		padding: '0 24px',
@@ -46,26 +43,43 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
 	},
+	headerLeft: {
+		display: 'flex',
+		alignItems: 'center',
+		minWidth: 0,
+	},
+	menuToggle: {
+		marginRight: 12,
+	},
 	aside: {
-		top: 60,
+		top: headerHeight,
 		left: 0,
 		bottom: 0,
 		zIndex: 2,
-		width: 344,
+		overflow: 'hidden',
 		position: 'absolute',
+		width: asideWidthCollapsed,
 		backgroundColor: theme.colors.n0,
+		transition: '200ms width',
 		borderRight: `1px solid ${theme.colors.n100}`,
-	},
-	tabContent: {
-		height: 'calc(100% - 57px)',
-		'& .tab-pane': {
+		'& .aside-inner': {
+			width: asideWidth,
 			height: '100%',
-			overflowY: 'auto',
+			opacity: 0,
+			pointerEvents: 'none',
+			transition: '200ms opacity',
+		},
+		'&.show': {
+			width: asideWidth,
+			'& .aside-inner': {
+				opacity: 1,
+				pointerEvents: 'auto',
+			},
 		},
 	},
 	asideShelf: {
-		top: 60,
-		left: 344,
+		top: headerHeight,
+		left: asideWidth,
 		bottom: 0,
 		width: 576,
 		zIndex: 1,
@@ -75,15 +89,22 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderRight: `1px solid ${theme.colors.n100}`,
 	},
 	previewPane: {
-		top: 60,
-		left: 344,
+		top: headerHeight,
+		left: asideWidthCollapsed,
 		right: 0,
 		bottom: 0,
 		zIndex: 0,
 		padding: 24,
 		overflowY: 'auto',
 		position: 'absolute',
+		transition: `left ${shelfTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`,
 		backgroundColor: theme.colors.n75,
+		'&.show': {
+			left: asideWidth,
+		},
+		'&.showShelf': {
+			left: asideWidth + 576,
+		},
 	},
 	previewPage: {
 		borderRadius: 8,
@@ -97,14 +118,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 		'.menu-animation-enter-active': {
 			transform: 'translateX(0)',
-			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
+			transition: `transform ${shelfTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`,
 		},
 		'.menu-animation-exit': {
 			transform: 'translateX(0)',
 		},
 		'.menu-animation-exit-active': {
 			transform: 'translateX(-100%)',
-			transition: `opacity ${SHELF_TRANSITION_DURATION_MS}ms, transform ${SHELF_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
+			transition: `transform ${shelfTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`,
 		},
 	},
 }));
@@ -122,14 +143,11 @@ const PageBuilder = () => {
 		currentPageSection,
 		setCurrentPageSectionId,
 		setCurrentPageRowId,
-		deletePageSection,
 		isSaving,
 		setIsSaving,
 		lastSaved,
 	} = usePageBuilderContext();
-	const [currentTab, setCurrentTab] = useState('LAYOUT');
-	const [showAddSectionModal, setShowAddSectionModal] = useState(false);
-	const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
+	const [showMenu, setShowMenu] = useState(true);
 	const [showPublishModal, setShowPublishModal] = useState(false);
 	const [showUnpublishModal, setShowUnpublishModal] = useState(false);
 
@@ -140,23 +158,9 @@ const PageBuilder = () => {
 
 		const response = await pagesService.getPage(pageId).fetch();
 		setPage(response.page);
-	}, [pageId, setPage]);
-
-	const deleteCurrentSection = useCallback(async () => {
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			await pagesService.deletePageSection(currentPageSection.pageSectionId).fetch();
-
-			deletePageSection(currentPageSection.pageSectionId);
-			setCurrentPageSectionId('');
-			setShowDeleteSectionModal(false);
-		} catch (error) {
-			handleError(error);
-		}
-	}, [currentPageSection, deletePageSection, handleError, setCurrentPageSectionId]);
+		setCurrentPageSectionId('');
+		setCurrentPageRowId('');
+	}, [pageId, setCurrentPageRowId, setCurrentPageSectionId, setPage]);
 
 	const handlePublishConfirm = useCallback(async () => {
 		setIsSaving(true);
@@ -181,11 +185,9 @@ const PageBuilder = () => {
 
 				if (metadata?.pageId) {
 					setCurrentPageSectionId(HERO_SECTION_ID);
-				} else if (metadata?.sectionId && !metadata?.rowId) {
-					setCurrentPageSectionId(`${metadata?.sectionId}`);
 				} else if (metadata?.sectionId && metadata?.rowId) {
-					setCurrentPageSectionId(`${metadata?.sectionId}`);
-					setCurrentPageRowId(`${metadata?.rowId}`);
+					setCurrentPageSectionId(`${metadata.sectionId}`);
+					setCurrentPageRowId(`${metadata.rowId}`);
 				}
 			}
 
@@ -220,27 +222,6 @@ const PageBuilder = () => {
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
-			<AddPageSectionModal
-				show={showAddSectionModal}
-				onHide={() => {
-					setShowAddSectionModal(false);
-				}}
-			/>
-
-			<ConfirmDialog
-				show={showDeleteSectionModal}
-				size="lg"
-				titleText="Delete section"
-				bodyText={`Are you sure you want to delete "${currentPageSection?.name ?? ''}"?`}
-				dismissText="Cancel"
-				confirmText="Delete"
-				destructive
-				onHide={() => {
-					setShowPublishModal(false);
-				}}
-				onConfirm={deleteCurrentSection}
-			/>
-
 			<ConfirmDialog
 				show={showUnpublishModal}
 				size="lg"
@@ -289,10 +270,18 @@ const PageBuilder = () => {
 			/>
 
 			<div className={classes.wrapper}>
-				{/* path matching logic in components/admin/admin-header.tsx hides the default header */}
 				<div className={classes.header}>
-					<div className="d-flex align-items-center">
-						<h5 className="mb-0 me-4">{page?.name}</h5>
+					<div className={classes.headerLeft}>
+						<Button
+							variant="light"
+							className={classes.menuToggle}
+							onClick={() => {
+								setShowMenu((previousValue) => !previousValue);
+							}}
+						>
+							<SvgIcon kit="fas" icon="bars" size={16} />
+						</Button>
+						<h5 className="mb-0 me-4 text-truncate">{page?.name}</h5>
 						{page?.editingLivePage ? (
 							<Badge pill bg="outline-success" className="text-nowrap">
 								Live
@@ -343,62 +332,39 @@ const PageBuilder = () => {
 						</Button>
 					</div>
 				</div>
-				<div className={classes.aside}>
-					<Tab.Container id="page-tabs" defaultActiveKey="LAYOUT" activeKey={currentTab}>
-						<TabBar
-							classNameInner="px-6"
-							value={currentTab}
-							tabs={[
-								{
-									title: 'Layout',
-									value: 'LAYOUT',
-								},
-								{
-									title: 'Settings',
-									value: 'SETTINGS',
-								},
-							]}
-							onTabClick={(tabValue) => {
-								setCurrentTab(tabValue);
-								setCurrentPageSectionId('');
+
+				<div
+					className={classNames(classes.aside, {
+						show: showMenu,
+					})}
+				>
+					<div className="aside-inner">
+						<LayoutTab
+							onAddRowButtonClick={() => {
+								return;
 							}}
 						/>
-						<Tab.Content className={classes.tabContent}>
-							<Tab.Pane eventKey="LAYOUT">
-								<LayoutTab
-									onAddSectionButtonClick={() => {
-										setCurrentPageSectionId('');
-										setShowAddSectionModal(true);
-									}}
-								/>
-							</Tab.Pane>
-							<Tab.Pane eventKey="SETTINGS" mountOnEnter unmountOnExit>
-								<div className="p-6">
-									<SettingsTab />
-								</div>
-							</Tab.Pane>
-						</Tab.Content>
-					</Tab.Container>
+					</div>
 				</div>
+
 				<CSSTransition
-					in={!!currentPageSection}
-					timeout={SHELF_TRANSITION_DURATION_MS}
+					in={showMenu && !!currentPageSection}
+					timeout={shelfTransitionDurationMs}
 					classNames="menu-animation"
 					mountOnEnter
 					unmountOnExit
 				>
 					<div className={classes.asideShelf}>
-						<PageSectionShelf
-							onEditButtonClick={() => {
-								setShowAddSectionModal(true);
-							}}
-							onDeleteButtonClick={() => {
-								setShowDeleteSectionModal(true);
-							}}
-						/>
+						<PageSectionShelf />
 					</div>
 				</CSSTransition>
-				<div className={classes.previewPane}>
+
+				<div
+					className={classNames(classes.previewPane, {
+						show: showMenu,
+						showShelf: showMenu && !!currentPageSection,
+					})}
+				>
 					<div className={classes.previewPage}>
 						{page && <PagePreview page={page} enableAnalytics={false} />}
 					</div>

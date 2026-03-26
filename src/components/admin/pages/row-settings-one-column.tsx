@@ -1,19 +1,25 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { OneColumnImageRowModel } from '@/lib/models';
+import { OneColumnImageRowModel, ROW_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
+import { RowSettingsMetaForm } from '@/components/admin/pages';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 
-export const RowSettingsOneColumn = () => {
+interface RowSettingsOneColumnProps {
+	nameInputRef?: RefObject<HTMLInputElement>;
+}
+
+export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const oneColumnImageRow = useMemo(() => currentPageRow as OneColumnImageRowModel | undefined, [currentPageRow]);
+	const isTextRow = oneColumnImageRow?.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT;
 	const [formValues, setFormValues] = useState({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 	});
@@ -39,11 +45,24 @@ export const RowSettingsOneColumn = () => {
 			setIsSaving(true);
 
 			try {
-				const response = await pagesService
-					.updateOneColumnRow(ocir.pageRowId, {
-						columnOne: fv.columnOne,
-					})
-					.fetch();
+				const response =
+					ocir.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT
+						? await pagesService
+								.updateOneColumnTextRow(ocir.pageRowId, {
+									columnOne: fv.columnOne,
+								})
+								.fetch()
+						: ocir.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT
+						? await pagesService
+								.updateOneColumnImageRightRow(ocir.pageRowId, {
+									columnOne: fv.columnOne,
+								})
+								.fetch()
+						: await pagesService
+								.updateOneColumnRow(ocir.pageRowId, {
+									columnOne: fv.columnOne,
+								})
+								.fetch();
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -108,15 +127,19 @@ export const RowSettingsOneColumn = () => {
 					throw new Error('oneColumnImageRow is undefined.');
 				}
 
-				const response = await pagesService
-					.updateOneColumnRow(oneColumnImageRow.pageRowId, {
-						...formValues,
-						[column]: {
-							...formValues[column],
-							imageFileUploadId,
-						},
-					})
-					.fetch();
+				const nextValue = {
+					...formValues,
+					[column]: {
+						...formValues[column],
+						imageFileUploadId,
+					},
+				};
+				const response =
+					oneColumnImageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT
+						? await pagesService
+								.updateOneColumnImageRightRow(oneColumnImageRow.pageRowId, nextValue)
+								.fetch()
+						: await pagesService.updateOneColumnRow(oneColumnImageRow.pageRowId, nextValue).fetch();
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -148,6 +171,7 @@ export const RowSettingsOneColumn = () => {
 
 	return (
 		<>
+			<RowSettingsMetaForm nameInputRef={nameInputRef} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"
@@ -169,35 +193,37 @@ export const RowSettingsOneColumn = () => {
 						}}
 					/>
 				</Form.Group>
-				<Form.Group className="mb-6">
-					<Form.Label className="mb-2">Image</Form.Label>
-					<AdminFormImageInput
-						className="mb-4"
-						imageSrc={formValues.columnOne.imageUrl}
-						onSrcChange={(nextId, nextSrc) => {
-							handleImageChange('columnOne', { nextId, nextSrc });
-						}}
-						onUploadComplete={(fileUploadId) => {
-							handleUploadComplete('columnOne', fileUploadId);
-						}}
-						presignedUploadGetter={(blob, name) => {
-							return pagesService.createPresignedFileUpload({
-								contentType: blob.type,
-								filename: name,
-							}).fetch;
-						}}
-						cropImage={false}
-					/>
-					<InputHelper
-						type="text"
-						label="Image alt text"
-						name="imageAltText"
-						value={formValues.columnOne.imageAltText}
-						onChange={(event) => {
-							handleInputChange('columnOne', event);
-						}}
-					/>
-				</Form.Group>
+				{!isTextRow && (
+					<Form.Group className="mb-6">
+						<Form.Label className="mb-2">Image</Form.Label>
+						<AdminFormImageInput
+							className="mb-4"
+							imageSrc={formValues.columnOne.imageUrl}
+							onSrcChange={(nextId, nextSrc) => {
+								handleImageChange('columnOne', { nextId, nextSrc });
+							}}
+							onUploadComplete={(fileUploadId) => {
+								handleUploadComplete('columnOne', fileUploadId);
+							}}
+							presignedUploadGetter={(blob, name) => {
+								return pagesService.createPresignedFileUpload({
+									contentType: blob.type,
+									filename: name,
+								}).fetch;
+							}}
+							cropImage={false}
+						/>
+						<InputHelper
+							type="text"
+							label="Image alt text"
+							name="imageAltText"
+							value={formValues.columnOne.imageAltText}
+							onChange={(event) => {
+								handleInputChange('columnOne', event);
+							}}
+						/>
+					</Form.Group>
+				)}
 			</CollapseButton>
 		</>
 	);

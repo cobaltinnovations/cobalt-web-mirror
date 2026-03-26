@@ -1,16 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { ThreeColumnImageRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
+import { RowSettingsMetaForm } from '@/components/admin/pages';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
-export const RowSettingsThreeColumns = () => {
+interface RowSettingsThreeColumnsProps {
+	nameInputRef?: RefObject<HTMLInputElement>;
+}
+
+export const RowSettingsThreeColumns = ({ nameInputRef }: RowSettingsThreeColumnsProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const threeColumnImageRow = useMemo(() => currentPageRow as ThreeColumnImageRowModel | undefined, [currentPageRow]);
@@ -169,6 +174,7 @@ export const RowSettingsThreeColumns = () => {
 
 	return (
 		<>
+			<RowSettingsMetaForm nameInputRef={nameInputRef} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"

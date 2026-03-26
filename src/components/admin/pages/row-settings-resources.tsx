@@ -6,15 +6,19 @@ import { ResourcesRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
-import { DraggableItem, PageSectionShelfPage, SelectResourcesModal } from '@/components/admin/pages';
+import {
+	DraggableItem,
+	PageSectionShelfPage,
+	RowSettingsMetaForm,
+	SelectResourcesModal,
+} from '@/components/admin/pages';
 import SvgIcon from '@/components/svg-icon';
 
 interface RowSettingsResourcesProps {
-	onBackButtonClick(event?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onDeleteButtonClick(): void;
 }
 
-export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsResourcesProps) => {
+export const RowSettingsResources = ({ onDeleteButtonClick }: RowSettingsResourcesProps) => {
 	const handleError = useHandleError();
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
@@ -103,8 +107,6 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 			/>
 
 			<PageSectionShelfPage
-				showBackButton
-				onBackButtonClick={onBackButtonClick}
 				showDeleteButton
 				onDeleteButtonClick={onDeleteButtonClick}
 				showCloseButton
@@ -112,13 +114,14 @@ export const RowSettingsResources = ({ onBackButtonClick, onDeleteButtonClick }:
 					setCurrentPageSectionId('');
 					setCurrentPageRowId('');
 				}}
-				title={`Resources (${(resourcesRow?.contents ?? []).length})`}
+				title={resourcesRow?.name ?? 'Resources'}
 				customHeaderElements={
 					<Button className="me-2" size="sm" onClick={() => setShowSelectResourcesModal(true)}>
 						Add resources
 					</Button>
 				}
 			>
+				<RowSettingsMetaForm />
 				<DragDropContext onDragEnd={handleDragEnd}>
 					<Droppable droppableId="row-settings-resources-droppable" direction="vertical">
 						{(droppableProvided) => (

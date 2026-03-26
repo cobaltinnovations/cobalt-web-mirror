@@ -32,7 +32,10 @@ export enum ROW_TYPE_ID {
 	GROUP_SESSIONS = 'GROUP_SESSIONS',
 	TAG_GROUP = 'TAG_GROUP',
 	TAG = 'TAG',
+	ONE_COLUMN_TEXT = 'ONE_COLUMN_TEXT',
+	TWO_COLUMN_TEXT = 'TWO_COLUMN_TEXT',
 	ONE_COLUMN_IMAGE = 'ONE_COLUMN_IMAGE',
+	ONE_COLUMN_IMAGE_RIGHT = 'ONE_COLUMN_IMAGE_RIGHT',
 	TWO_COLUMN_IMAGE = 'TWO_COLUMN_IMAGE',
 	THREE_COLUMN_IMAGE = 'THREE_COLUMN_IMAGE',
 	MAILING_LIST = 'MAILING_LIST',
@@ -93,72 +96,62 @@ export type PageRowUnionModel =
 	| GroupSessionsRowModel
 	| TagGroupRowModel
 	| TagRowModel
-	| OneColumnImageRowModel
-	| TwoColumnImageRowModel
-	| ThreeColumnImageRowModel
+	| OneColumnRowModel
+	| TwoColumnRowModel
+	| ThreeColumnRowModel
 	| MailingListRowModel;
 
-export interface ResourcesRowModel {
+export interface PageRowBaseModel {
 	pageRowId: string;
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
+	name: string;
+	backgroundColorId: BACKGROUND_COLOR_ID;
 	displayOrder: number;
+}
+
+export interface ResourcesRowModel extends PageRowBaseModel {
 	contents: AdminContent[];
 }
 
-export interface GroupSessionsRowModel {
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
+export interface GroupSessionsRowModel extends PageRowBaseModel {
 	groupSessions: GroupSessionModel[];
 }
 
-export interface TagGroupRowModel {
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
+export interface TagGroupRowModel extends PageRowBaseModel {
 	tagGroup: TagGroup;
 }
 
-export interface TagRowModel {
+export interface TagRowModel extends PageRowBaseModel {
 	tagGroupColorId: COLOR_IDS;
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
 	tag: Tag;
 }
 
-export interface OneColumnImageRowModel {
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
-	columnOne: ColumnImageModel;
+export interface OneColumnRowModel extends PageRowBaseModel {
+	rowTypeId: ROW_TYPE_ID.ONE_COLUMN_IMAGE | ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT | ROW_TYPE_ID.ONE_COLUMN_TEXT;
+	columnOne: PageRowColumnModel;
 }
 
-export interface TwoColumnImageRowModel {
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
-	columnOne: ColumnImageModel;
-	columnTwo: ColumnImageModel;
+export interface TwoColumnRowModel extends PageRowBaseModel {
+	rowTypeId: ROW_TYPE_ID.TWO_COLUMN_IMAGE | ROW_TYPE_ID.TWO_COLUMN_TEXT;
+	columnOne: PageRowColumnModel;
+	columnTwo: PageRowColumnModel;
 }
 
-export interface ThreeColumnImageRowModel {
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
-	displayOrder: number;
-	columnOne: ColumnImageModel;
-	columnTwo: ColumnImageModel;
-	columnThree: ColumnImageModel;
+export interface ThreeColumnRowModel extends PageRowBaseModel {
+	rowTypeId: ROW_TYPE_ID.THREE_COLUMN_IMAGE;
+	columnOne: PageRowColumnModel;
+	columnTwo: PageRowColumnModel;
+	columnThree: PageRowColumnModel;
 }
 
-interface ColumnImageModel {
+export type OneColumnImageRowModel = OneColumnRowModel;
+export type OneColumnTextRowModel = OneColumnRowModel;
+export type TwoColumnImageRowModel = TwoColumnRowModel;
+export type TwoColumnTextRowModel = TwoColumnRowModel;
+export type ThreeColumnImageRowModel = ThreeColumnRowModel;
+
+export interface PageRowColumnModel {
 	pageRowColumnId: string;
 	pageRowId: string;
 	headline: string;
@@ -169,13 +162,9 @@ interface ColumnImageModel {
 	columnDisplayOrder: number;
 }
 
-export interface MailingListRowModel {
+export interface MailingListRowModel extends PageRowBaseModel {
 	description: string;
-	displayOrder: number;
 	mailingListId: string;
-	pageRowId: string;
-	pageSectionId: string;
-	rowTypeId: ROW_TYPE_ID;
 	title: string;
 }
 
@@ -195,18 +184,42 @@ export const isTagRow = (x: PageRowUnionModel): x is TagRowModel => {
 	return x.hasOwnProperty('tag');
 };
 
+export const isOneColumnRow = (x: PageRowUnionModel): x is OneColumnRowModel => {
+	return (
+		x.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE ||
+		x.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT ||
+		x.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT
+	);
+};
+
 export const isOneColumnImageRow = (x: PageRowUnionModel): x is OneColumnImageRowModel => {
-	return x.hasOwnProperty('columnOne') && !x.hasOwnProperty('columnTwo') && !x.hasOwnProperty('columnThree');
+	return isOneColumnRow(x);
+};
+
+export const isOneColumnTextRow = (x: PageRowUnionModel): x is OneColumnTextRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT;
+};
+
+export const isOneColumnImageRightRow = (x: PageRowUnionModel): x is OneColumnImageRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT;
+};
+
+export const isTwoColumnRow = (x: PageRowUnionModel): x is TwoColumnRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE || x.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT;
 };
 
 export const isTwoColumnImageRow = (x: PageRowUnionModel): x is TwoColumnImageRowModel => {
-	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && !x.hasOwnProperty('columnThree');
+	return isTwoColumnRow(x);
+};
+
+export const isTwoColumnTextRow = (x: PageRowUnionModel): x is TwoColumnTextRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT;
 };
 
 export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnImageRowModel => {
-	return x.hasOwnProperty('columnOne') && x.hasOwnProperty('columnTwo') && x.hasOwnProperty('columnThree');
+	return x.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE;
 };
 
-export const isMailingListRow = (x: PageRowUnionModel): x is ResourcesRowModel => {
+export const isMailingListRow = (x: PageRowUnionModel): x is MailingListRowModel => {
 	return x.rowTypeId === ROW_TYPE_ID.MAILING_LIST;
 };

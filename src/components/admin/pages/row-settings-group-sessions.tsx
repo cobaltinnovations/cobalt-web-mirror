@@ -6,15 +6,19 @@ import { GroupSessionsRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
-import { DraggableItem, PageSectionShelfPage, SelectGroupSessionsModal } from '@/components/admin/pages';
+import {
+	DraggableItem,
+	PageSectionShelfPage,
+	RowSettingsMetaForm,
+	SelectGroupSessionsModal,
+} from '@/components/admin/pages';
 import SvgIcon from '@/components/svg-icon';
 
 interface RowSettingsGroupSessionsProps {
-	onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onDeleteButtonClick(): void;
 }
 
-export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsGroupSessionsProps) => {
+export const RowSettingsGroupSessions = ({ onDeleteButtonClick }: RowSettingsGroupSessionsProps) => {
 	const handleError = useHandleError();
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
@@ -106,8 +110,6 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClic
 			/>
 
 			<PageSectionShelfPage
-				showBackButton
-				onBackButtonClick={onBackButtonClick}
 				showDeleteButton
 				onDeleteButtonClick={onDeleteButtonClick}
 				showCloseButton
@@ -115,13 +117,14 @@ export const RowSettingsGroupSessions = ({ onBackButtonClick, onDeleteButtonClic
 					setCurrentPageSectionId('');
 					setCurrentPageRowId('');
 				}}
-				title={`Group Sessions (${(groupSessionsRow?.groupSessions ?? []).length})`}
+				title={groupSessionsRow?.name ?? 'Group Sessions'}
 				customHeaderElements={
 					<Button className="me-2" size="sm" onClick={() => setShowSelectGroupSessionsModal(true)}>
 						Add group sessions
 					</Button>
 				}
 			>
+				<RowSettingsMetaForm />
 				<DragDropContext onDragEnd={handleDragEnd}>
 					<Droppable droppableId="row-settings-group-sessions-droppable" direction="vertical">
 						{(droppableProvided) => (

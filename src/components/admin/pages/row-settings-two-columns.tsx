@@ -1,19 +1,25 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { TwoColumnImageRowModel } from '@/lib/models';
+import { ROW_TYPE_ID, TwoColumnImageRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
+import { RowSettingsMetaForm } from '@/components/admin/pages';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 
-export const RowSettingsTwoColumns = () => {
+interface RowSettingsTwoColumnsProps {
+	nameInputRef?: RefObject<HTMLInputElement>;
+}
+
+export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const twoColumnImageRow = useMemo(() => currentPageRow as TwoColumnImageRowModel | undefined, [currentPageRow]);
+	const isTextRow = twoColumnImageRow?.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT;
 	const [formValues, setFormValues] = useState({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 		columnTwo: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
@@ -47,12 +53,20 @@ export const RowSettingsTwoColumns = () => {
 			setIsSaving(true);
 
 			try {
-				const response = await pagesService
-					.updateTwoColumnRow(tcir.pageRowId, {
-						columnOne: fv.columnOne,
-						columnTwo: fv.columnTwo,
-					})
-					.fetch();
+				const response =
+					tcir.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT
+						? await pagesService
+								.updateTwoColumnTextRow(tcir.pageRowId, {
+									columnOne: fv.columnOne,
+									columnTwo: fv.columnTwo,
+								})
+								.fetch()
+						: await pagesService
+								.updateTwoColumnRow(tcir.pageRowId, {
+									columnOne: fv.columnOne,
+									columnTwo: fv.columnTwo,
+								})
+								.fetch();
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -116,15 +130,14 @@ export const RowSettingsTwoColumns = () => {
 					throw new Error('twoColumnImageRow is undefined.');
 				}
 
-				const response = await pagesService
-					.updateTwoColumnRow(twoColumnImageRow.pageRowId, {
-						...formValues,
-						[column]: {
-							...formValues[column],
-							imageFileUploadId,
-						},
-					})
-					.fetch();
+				const nextValue = {
+					...formValues,
+					[column]: {
+						...formValues[column],
+						imageFileUploadId,
+					},
+				};
+				const response = await pagesService.updateTwoColumnRow(twoColumnImageRow.pageRowId, nextValue).fetch();
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -156,6 +169,7 @@ export const RowSettingsTwoColumns = () => {
 
 	return (
 		<>
+			<RowSettingsMetaForm nameInputRef={nameInputRef} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"
@@ -177,34 +191,36 @@ export const RowSettingsTwoColumns = () => {
 						}}
 					/>
 				</Form.Group>
-				<Form.Group className="mb-6">
-					<Form.Label className="mb-2">Image</Form.Label>
-					<AdminFormImageInput
-						className="mb-4"
-						imageSrc={formValues.columnOne.imageUrl}
-						onSrcChange={(nextId, nextSrc) => {
-							handleImageChange('columnOne', { nextId, nextSrc });
-						}}
-						onUploadComplete={(fileUploadId) => {
-							handleUploadComplete('columnOne', fileUploadId);
-						}}
-						presignedUploadGetter={(blob, name) => {
-							return pagesService.createPresignedFileUpload({
-								contentType: blob.type,
-								filename: name,
-							}).fetch;
-						}}
-					/>
-					<InputHelper
-						type="text"
-						label="Image alt text"
-						name="imageAltText"
-						value={formValues.columnOne.imageAltText}
-						onChange={(event) => {
-							handleInputChange('columnOne', event);
-						}}
-					/>
-				</Form.Group>
+				{!isTextRow && (
+					<Form.Group className="mb-6">
+						<Form.Label className="mb-2">Image</Form.Label>
+						<AdminFormImageInput
+							className="mb-4"
+							imageSrc={formValues.columnOne.imageUrl}
+							onSrcChange={(nextId, nextSrc) => {
+								handleImageChange('columnOne', { nextId, nextSrc });
+							}}
+							onUploadComplete={(fileUploadId) => {
+								handleUploadComplete('columnOne', fileUploadId);
+							}}
+							presignedUploadGetter={(blob, name) => {
+								return pagesService.createPresignedFileUpload({
+									contentType: blob.type,
+									filename: name,
+								}).fetch;
+							}}
+						/>
+						<InputHelper
+							type="text"
+							label="Image alt text"
+							name="imageAltText"
+							value={formValues.columnOne.imageAltText}
+							onChange={(event) => {
+								handleInputChange('columnOne', event);
+							}}
+						/>
+					</Form.Group>
+				)}
 			</CollapseButton>
 			<hr />
 			<CollapseButton title="Item 2" initialShow>
@@ -228,34 +244,36 @@ export const RowSettingsTwoColumns = () => {
 						}}
 					/>
 				</Form.Group>
-				<Form.Group className="mb-6">
-					<Form.Label className="mb-2">Image</Form.Label>
-					<AdminFormImageInput
-						className="mb-4"
-						imageSrc={formValues.columnTwo.imageUrl}
-						onSrcChange={(nextId, nextSrc) => {
-							handleImageChange('columnTwo', { nextId, nextSrc });
-						}}
-						onUploadComplete={(fileUploadId) => {
-							handleUploadComplete('columnTwo', fileUploadId);
-						}}
-						presignedUploadGetter={(blob, name) => {
-							return pagesService.createPresignedFileUpload({
-								contentType: blob.type,
-								filename: name,
-							}).fetch;
-						}}
-					/>
-					<InputHelper
-						type="text"
-						label="Image alt text"
-						name="imageAltText"
-						value={formValues.columnTwo.imageAltText}
-						onChange={(event) => {
-							handleInputChange('columnTwo', event);
-						}}
-					/>
-				</Form.Group>
+				{!isTextRow && (
+					<Form.Group className="mb-6">
+						<Form.Label className="mb-2">Image</Form.Label>
+						<AdminFormImageInput
+							className="mb-4"
+							imageSrc={formValues.columnTwo.imageUrl}
+							onSrcChange={(nextId, nextSrc) => {
+								handleImageChange('columnTwo', { nextId, nextSrc });
+							}}
+							onUploadComplete={(fileUploadId) => {
+								handleUploadComplete('columnTwo', fileUploadId);
+							}}
+							presignedUploadGetter={(blob, name) => {
+								return pagesService.createPresignedFileUpload({
+									contentType: blob.type,
+									filename: name,
+								}).fetch;
+							}}
+						/>
+						<InputHelper
+							type="text"
+							label="Image alt text"
+							name="imageAltText"
+							value={formValues.columnTwo.imageAltText}
+							onChange={(event) => {
+								handleInputChange('columnTwo', event);
+							}}
+						/>
+					</Form.Group>
+				)}
 			</CollapseButton>
 		</>
 	);

@@ -1,7 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
-import classNames from 'classnames';
+import { Container } from 'react-bootstrap';
 import {
 	AnalyticsNativeEventTypeId,
 	BACKGROUND_COLOR_ID,
@@ -42,6 +41,10 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
+	const pageRows = useMemo(
+		() => page.pageSections.flatMap((pageSection) => pageSection.pageRows),
+		[page.pageSections]
+	);
 
 	const fetchData = useCallback(async () => {
 		const [libraryResponse, filtersResponse] = await Promise.all([
@@ -71,9 +74,9 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 		}
 	}, [enableAnalytics, page.livePageSiteLocations, page.pageId]);
 
-	const mailingListRowData = page.pageSections
-		.flatMap((ps) => ps.pageRows.find((pr) => pr.rowTypeId === ROW_TYPE_ID.MAILING_LIST))
-		.filter(Boolean)[0] as PageRowMailingListModel | undefined;
+	const mailingListRowData = pageRows.find((pageRow) => pageRow.rowTypeId === ROW_TYPE_ID.MAILING_LIST) as
+		| PageRowMailingListModel
+		| undefined;
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -109,49 +112,21 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 						: undefined
 				}
 			/>
-			{(page.pageSections ?? []).map((ps) => (
+			{pageRows.map((pageRow, rowIndex) => (
 				<Container
-					key={ps.pageSectionId}
+					key={pageRow.pageRowId}
 					fluid
-					className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
+					className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 				>
 					<Container className="py-16">
-						{(ps.headline || ps.description) && (
-							<Row className="mb-16">
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									{ps.headline && (
-										<h2
-											className={classNames('text-center', {
-												'mb-6': ps.description,
-											})}
-										>
-											{ps.headline}
-										</h2>
-									)}
-									{ps.description && <p className="mb-0 fs-large text-center">{ps.description}</p>}
-								</Col>
-							</Row>
-						)}
-						{ps.pageRows.map((r, rowIndex) => {
-							const isLast = ps.pageRows.length - 1 === rowIndex;
-
-							return (
-								<React.Fragment key={r.pageRowId}>
-									{getRendererForPageRow({
-										pageId: page.pageId,
-										pageRow: r,
-										contentsByTagGroupId: contentsByTagGroupId ?? {},
-										tagsByTagId: tagsByTagId ?? {},
-										isLast,
-										enableAnalytics,
-										livePageSiteLocations: page.livePageSiteLocations,
-									})}
-								</React.Fragment>
-							);
+						{getRendererForPageRow({
+							pageId: page.pageId,
+							pageRow,
+							contentsByTagGroupId: contentsByTagGroupId ?? {},
+							tagsByTagId: tagsByTagId ?? {},
+							isLast: rowIndex === pageRows.length - 1,
+							enableAnalytics,
+							livePageSiteLocations: page.livePageSiteLocations,
 						})}
 					</Container>
 				</Container>

@@ -3,16 +3,15 @@ import { TagGroup, TagRowModel } from '@/lib/models';
 import { pagesService, tagService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
-import { PageSectionShelfPage } from '@/components/admin/pages';
+import { PageSectionShelfPage, RowSettingsMetaForm } from '@/components/admin/pages';
 import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 
 interface RowSettingsTagProps {
-	onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	onDeleteButtonClick(): void;
 }
 
-export const RowSettingsTag = ({ onBackButtonClick, onDeleteButtonClick }: RowSettingsTagProps) => {
+export const RowSettingsTag = ({ onDeleteButtonClick }: RowSettingsTagProps) => {
 	const handleError = useHandleError();
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
@@ -54,8 +53,6 @@ export const RowSettingsTag = ({ onBackButtonClick, onDeleteButtonClick }: RowSe
 
 	return (
 		<PageSectionShelfPage
-			showBackButton
-			onBackButtonClick={onBackButtonClick}
 			showDeleteButton
 			onDeleteButtonClick={onDeleteButtonClick}
 			showCloseButton
@@ -63,9 +60,10 @@ export const RowSettingsTag = ({ onBackButtonClick, onDeleteButtonClick }: RowSe
 				setCurrentPageSectionId('');
 				setCurrentPageRowId('');
 			}}
-			title="Tag"
+			title={tagRow?.name ?? 'Tag'}
 		>
 			<AsyncWrapper fetchData={fetchData}>
+				<RowSettingsMetaForm />
 				<InputHelper
 					as="select"
 					label="Tag"

@@ -101,6 +101,44 @@ export const RowSelectionForm = () => {
 		}
 	};
 
+	const handleOneColumnTextButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createOneColumnTextRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleOneColumnRightButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createOneColumnImageRightRow(currentPageSection.pageSectionId)
+				.fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	const handleTwoColumnButtonClick = async () => {
 		setIsSaving(true);
 
@@ -110,6 +148,24 @@ export const RowSelectionForm = () => {
 			}
 
 			const { pageRow } = await pagesService.createTwoColumnRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleTwoColumnTextButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createTwoColumnTextRow(currentPageSection.pageSectionId).fetch();
 			addPageRowToCurrentPageSection(pageRow);
 			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
@@ -224,10 +280,19 @@ export const RowSelectionForm = () => {
 				</div>
 			</CollapseButton>
 			<hr />
-			<CollapseButton title="Custom Row" initialShow>
-				<p className="mb-4">Custom rows are blank layouts. You will need to add your own images and text.</p>
+			<CollapseButton title="Text" initialShow>
+				<p className="mb-4">Text rows use the rich text editor and stack responsively on smaller screens.</p>
+				<div className="pb-6">
+					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnTextButtonClick} />
+					<CustomRowButton cols={2} title="Select Layout" onClick={handleTwoColumnTextButtonClick} />
+				</div>
+			</CollapseButton>
+			<hr />
+			<CollapseButton title="Text & Image" initialShow>
+				<p className="mb-4">Use these layouts to combine editable text with one or more images.</p>
 				<div className="pb-6">
 					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnButtonClick} />
+					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnRightButtonClick} />
 					<CustomRowButton
 						className="mb-4"
 						cols={2}

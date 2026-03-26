@@ -8,12 +8,20 @@ import SvgIcon from '@/components/svg-icon';
 interface PageActionsDropdownProps {
 	page: PageDetailModel;
 	onEdit(page: PageDetailModel): void;
+	onPageSettings(page: PageDetailModel): void;
 	onDuplicate(page: PageDetailModel): void;
 	onDelete(page: PageDetailModel): void;
 	onUnpublish(page: PageDetailModel): void;
 }
 
-export const PageActionsDropdown = ({ page, onEdit, onDuplicate, onDelete, onUnpublish }: PageActionsDropdownProps) => {
+export const PageActionsDropdown = ({
+	page,
+	onEdit,
+	onPageSettings,
+	onDuplicate,
+	onDelete,
+	onUnpublish,
+}: PageActionsDropdownProps) => {
 	return (
 		<Dropdown>
 			<Dropdown.Toggle as={DropdownToggle} id={`dropdown--${page.pageId}`} className="p-2 border-0">
@@ -28,6 +36,15 @@ export const PageActionsDropdown = ({ page, onEdit, onDuplicate, onDelete, onUnp
 				>
 					<SvgIcon kit="far" icon="pen" size={16} className="me-2 text-n500" />
 					Edit
+				</Dropdown.Item>
+				<Dropdown.Item
+					className="d-flex align-items-center"
+					onClick={() => {
+						onPageSettings(page);
+					}}
+				>
+					<SvgIcon kit="far" icon="gear" size={16} className="me-2 text-n500" />
+					Page Settings
 				</Dropdown.Item>
 				<Dropdown.Item
 					className="d-flex align-items-center"

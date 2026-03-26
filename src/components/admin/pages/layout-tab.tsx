@@ -11,6 +11,15 @@ import { cloneDeep } from 'lodash';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import SvgIcon from '@/components/svg-icon';
+import {
+	isGroupSessionsRow,
+	isMailingListRow,
+	isResourcesRow,
+	isTagGroupRow,
+	isTagRow,
+	PageRowUnionModel,
+	ResourcesRowModel,
+} from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	sectionItem: {
@@ -45,26 +54,74 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface LayoutTabProps {
-	onAddSectionButtonClick(): void;
+	onAddRowButtonClick(): void;
 }
 
-export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
+export const LayoutTab = ({ onAddRowButtonClick }: LayoutTabProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
-	const { page, setPage, setCurrentPageSectionId, currentPageSection, setIsSaving } = usePageBuilderContext();
+	const {
+		page,
+		setPage,
+		setCurrentPageSectionId,
+		setCurrentPageRowId,
+		currentPageSection,
+		currentPageRow,
+		setIsSaving,
+	} = usePageBuilderContext();
+
+	const contentSection = page?.pageSections[0];
+	const pageRows = contentSection?.pageRows ?? [];
+
+	const getSubTitleForPageRow = (pageRow: PageRowUnionModel) => {
+		if (isTagGroupRow(pageRow)) {
+			return pageRow.tagGroup.name;
+		}
+
+		if (isTagRow(pageRow)) {
+			return pageRow.tag.name;
+		}
+
+		if (isMailingListRow(pageRow)) {
+			return 'Subscribe';
+		}
+
+		if (isGroupSessionsRow(pageRow)) {
+			return `${pageRow.groupSessions.length} Session${pageRow.groupSessions.length === 1 ? '' : 's'}`;
+		}
+
+		if (isResourcesRow(pageRow)) {
+			const resourceRow = pageRow as ResourcesRowModel;
+			return `${resourceRow.contents.length} Resource${resourceRow.contents.length === 1 ? '' : 's'}`;
+		}
+
+		if ('columnThree' in pageRow) {
+			return '3 columns';
+		}
+
+		if ('columnTwo' in pageRow) {
+			return '2 columns';
+		}
+
+		if ('columnOne' in pageRow) {
+			return '1 column';
+		}
+
+		return '';
+	};
 
 	const handleDragEnd = async ({ source, destination }: DropResult) => {
 		if (!destination) {
 			return;
 		}
 
-		if (!page) {
+		if (!page || !contentSection) {
 			return;
 		}
 
 		const pageClone = cloneDeep(page);
-		const [removedSection] = pageClone.pageSections.splice(source.index, 1);
-		pageClone.pageSections.splice(destination.index, 0, removedSection);
+		const [removedRow] = pageClone.pageSections[0].pageRows.splice(source.index, 1);
+		pageClone.pageSections[0].pageRows.splice(destination.index, 0, removedRow);
 
 		setPage(pageClone);
 		setIsSaving(true);
@@ -74,13 +131,13 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 				throw new Error('page is undefined.');
 			}
 
-			const { pageSections } = await pagesService
-				.reorderPageSections(page.pageId, {
-					pageSectionIds: pageClone.pageSections.map((ps) => ps.pageSectionId),
+			const { pageRows } = await pagesService
+				.reorderPageSectionRows(contentSection.pageSectionId, {
+					pageRowIds: pageClone.pageSections[0].pageRows.map((pr) => pr.pageRowId),
 				})
 				.fetch();
 
-			pageClone.pageSections = pageSections;
+			pageClone.pageSections[0].pageRows = pageRows;
 			setPage(pageClone);
 		} catch (error) {
 			handleError(error);
@@ -109,26 +166,27 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 				</button>
 			</div>
 			<DragDropContext onDragEnd={handleDragEnd}>
-				<Droppable droppableId="page-sections-droppable" direction="vertical">
+				<Droppable droppableId="page-rows-droppable" direction="vertical">
 					{(droppableProvided) => (
 						<div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-							{(page?.pageSections ?? []).map((section, sectionIndex) => (
+							{pageRows.map((pageRow, rowIndex) => (
 								<Draggable
-									key={section.pageSectionId}
-									draggableId={`page-sections-draggable-${section.pageSectionId}`}
-									index={sectionIndex}
+									key={pageRow.pageRowId}
+									draggableId={`page-rows-draggable-${pageRow.pageRowId}`}
+									index={rowIndex}
 								>
 									{(draggableProvided, draggableSnapshot) => (
 										<DraggableItem
-											key={section.pageSectionId}
+											key={pageRow.pageRowId}
 											draggableProvided={draggableProvided}
 											draggableSnapshot={draggableSnapshot}
-											active={currentPageSection?.pageSectionId === section.pageSectionId}
-											onClick={() => setCurrentPageSectionId(section.pageSectionId)}
-											title={section.name}
-											asideTitle={`${section.pageRows.length} row${
-												section.pageRows.length === 1 ? '' : 's'
-											}`}
+											active={currentPageRow?.pageRowId === pageRow.pageRowId}
+											onClick={() => {
+												setCurrentPageSectionId(contentSection?.pageSectionId ?? '');
+												setCurrentPageRowId(pageRow.pageRowId);
+											}}
+											title={pageRow.name}
+											subTitle={getSubTitleForPageRow(pageRow)}
 										/>
 									)}
 								</Draggable>
@@ -139,8 +197,19 @@ export const LayoutTab = ({ onAddSectionButtonClick }: LayoutTabProps) => {
 				</Droppable>
 			</DragDropContext>
 			<div className="p-6 text-right">
-				<Button variant="outline-primary" onClick={onAddSectionButtonClick}>
-					Add Section
+				<Button
+					variant="outline-primary"
+					onClick={() => {
+						if (!contentSection) {
+							return;
+						}
+
+						setCurrentPageSectionId(contentSection.pageSectionId);
+						setCurrentPageRowId('');
+						onAddRowButtonClick();
+					}}
+				>
+					Add Row
 				</Button>
 			</div>
 		</>
