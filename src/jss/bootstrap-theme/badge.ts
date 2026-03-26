@@ -3,9 +3,9 @@ import { CobaltTheme } from '@/jss/theme';
 export const badge = (theme: CobaltTheme) => {
 	return {
 		'.cobalt-badge': {
-			padding: '5px 10px',
+			padding: '4px 8px',
 			...theme.fonts.small,
-			...theme.fonts.bodyNormal,
+			...theme.fonts.bodyMedium,
 			'&.bg-primary': {
 				color: theme.colors.n0,
 				backgroundColor: theme.colors.p500,

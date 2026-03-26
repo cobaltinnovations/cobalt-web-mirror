@@ -164,7 +164,6 @@ export const PatientAssessmentResults = () => {
 										<div className="text-center">
 											<Button
 												variant="outline-primary"
-												size="lg"
 												onClick={() => {
 													navigate('/ic/patient');
 												}}
@@ -247,7 +246,6 @@ export const PatientAssessmentResults = () => {
 
 									<div className="mb-4 text-center">
 										<Button
-											size="lg"
 											onClick={() => {
 												setShowInsuranceStatementModal(true);
 											}}
@@ -258,7 +256,6 @@ export const PatientAssessmentResults = () => {
 									<div className="text-center">
 										<Button
 											variant="outline-primary"
-											size="lg"
 											onClick={() => {
 												navigate('/ic/patient');
 											}}
@@ -316,7 +313,6 @@ export const PatientAssessmentResults = () => {
 
 									<div className="text-center">
 										<Button
-											size="lg"
 											onClick={() => {
 												navigate('/ic/patient');
 											}}
@@ -339,7 +335,6 @@ export const PatientAssessmentResults = () => {
 										<Button
 											className="mb-2 d-block w-100 text-left border"
 											variant="light"
-											size="lg"
 											name="subclincal"
 											id="subclincal-yes"
 											value="YES"
@@ -351,7 +346,6 @@ export const PatientAssessmentResults = () => {
 										<Button
 											className="d-block w-100 text-left border"
 											variant="light"
-											size="lg"
 											name="subclincal"
 											id="subclincal-no"
 											value="NO"

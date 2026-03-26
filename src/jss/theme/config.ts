@@ -5,6 +5,7 @@ const headingFontFamily: CobaltFontFamily = {
 	fontFamily: '"Lexend", sans-serif',
 	weights: {
 		regular: 400,
+		medium: 500,
 		bold: 600,
 	},
 };
@@ -14,6 +15,7 @@ const bodyFontFamily: CobaltFontFamily = {
 		'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 	weights: {
 		regular: 400,
+		medium: 500,
 		bold: 600,
 	},
 };
@@ -48,10 +50,14 @@ const theme: CobaltTheme = {
 			fontSize: '4.2rem',
 			lineHeight: '4.8rem',
 		},
+		display6: {
+			fontSize: '3.6rem',
+			lineHeight: '4.0rem',
+		},
 		h1: {
 			default: {
-				fontSize: '3.6rem',
-				lineHeight: '4.4rem',
+				fontSize: '3.2rem',
+				lineHeight: '4.0rem',
 			},
 			mobile: {
 				fontSize: '2.8rem',
@@ -112,13 +118,17 @@ const theme: CobaltTheme = {
 			fontSize: '1.4rem',
 			lineHeight: '2rem',
 		},
-		large: {
-			fontSize: '1.6rem',
-			lineHeight: '2.2rem',
-		},
 		small: {
 			fontSize: '1.2rem',
 			lineHeight: '1.6rem',
+		},
+		large: {
+			fontSize: '1.6rem',
+			lineHeight: '2.4rem',
+		},
+		xlarge: {
+			fontSize: '1.8rem',
+			lineHeight: '2.8rem',
 		},
 
 		headingNormal: {
@@ -133,6 +143,10 @@ const theme: CobaltTheme = {
 		bodyNormal: {
 			fontFamily: bodyFontFamily.fontFamily,
 			fontWeight: bodyFontFamily.weights.regular,
+		},
+		bodyMedium: {
+			fontFamily: bodyFontFamily.fontFamily,
+			fontWeight: bodyFontFamily.weights.medium,
 		},
 		bodyBold: {
 			fontFamily: bodyFontFamily.fontFamily,

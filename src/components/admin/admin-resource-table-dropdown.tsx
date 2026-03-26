@@ -178,8 +178,10 @@ export const AdminResourcesTableDropdown = ({ content, onRefresh }: AdminResourc
 			<Dropdown>
 				<Dropdown.Toggle
 					as={DropdownToggle}
+					variant="transparent-secondary"
+					size="sm"
 					id={`admin-resources__dropdown-menu--${content.contentId}`}
-					className="p-2 border-0"
+					className="p-2"
 				>
 					<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 				</Dropdown.Toggle>

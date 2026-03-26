@@ -53,7 +53,6 @@ const SignUpClaim: FC = () => {
 								{inviteExpired ? (
 									<Button
 										variant="link"
-										size="lg"
 										className="d-block w-100 text-decoration-none"
 										onClick={() => {
 											navigate('/sign-up');
@@ -64,7 +63,6 @@ const SignUpClaim: FC = () => {
 								) : (
 									<Button
 										variant="link"
-										size="lg"
 										className="d-block w-100 text-decoration-none"
 										onClick={() => {
 											navigate('/sign-in-email');

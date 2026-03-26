@@ -43,6 +43,8 @@ export const AdminGroupSessionFilterScheduling = ({ className }: Props) => {
 		<FilterDropdown
 			className={className}
 			active={isActive}
+			inactiveVariant="secondary"
+			size="sm"
 			id="admin-group-session-filter-scheduling"
 			title="Scheduling"
 			dismissText="Clear"

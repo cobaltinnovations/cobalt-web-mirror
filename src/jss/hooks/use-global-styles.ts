@@ -139,6 +139,9 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 		'.fs-display3': {
 			...theme.fonts.display3,
 		},
+		'.fs-display6': {
+			...theme.fonts.display6,
+		},
 
 		'.fs-h1': {
 			...theme.fonts.h1.default,
@@ -436,13 +439,6 @@ export const useGlobalStyles = createUseThemedStyles((theme) => ({
 				borderColor: theme.colors.i500,
 				'& svg': {
 					color: theme.colors.i500,
-				},
-			},
-			'&--attention': {
-				backgroundColor: theme.colors.t50,
-				borderColor: theme.colors.t500,
-				'& svg': {
-					color: theme.colors.t500,
 				},
 			},
 			'& .icon-outer': {

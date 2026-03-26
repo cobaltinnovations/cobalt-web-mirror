@@ -50,6 +50,7 @@ export const MhicFilterAssignment = ({ panelAccounts, className }: MhicFilterAss
 		<FilterDropdown
 			className={className}
 			active={activeOptionIds.length > 0}
+			inactiveVariant="secondary"
 			id="mhic-filter-assignment"
 			title="Assigned MHIC"
 			dismissText="Clear"

@@ -219,8 +219,8 @@ const ShelfContent = ({
 				<MhicPatientOrderShelfActions patientOrder={patientOrderResponse.patientOrder} />
 
 				<Button
-					variant="light"
-					className={classNames(classes.shelfCloseButton, 'p-2 border-0 position-absolute')}
+					variant="transparent-secondary"
+					className={classNames(classes.shelfCloseButton, 'p-2 position-absolute')}
 					onClick={() => {
 						navigate({
 							pathname: '..',

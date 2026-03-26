@@ -37,7 +37,6 @@ const AccountSourcesModal = ({ accountSources, onAccountSourceClick, ...props }:
 						<Button
 							key={as.accountSourceId}
 							variant={variant}
-							size="lg"
 							className={classNames('d-block w-100', { 'mb-4': !isLast })}
 							data-testid={`signIn-${as.accountSourceId}`}
 							onClick={() => {

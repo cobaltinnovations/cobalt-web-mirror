@@ -33,12 +33,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	button: {
-		minHeight: 40,
+		minHeight: 44,
 		borderRadius: 500,
 		appearance: 'none',
 		alignItems: 'center',
 		display: 'inline-flex',
-		padding: '0 12px 0 20px',
+		padding: '10px 16px',
 		backgroundColor: 'transparent',
 		border: `2px solid ${theme.colors.p500}`,
 		'& span': {
@@ -226,7 +226,7 @@ function MegaFilter({
 				{displayFilterIcon && <SvgIcon kit="fas" icon="bars-filter" size={16} className="me-2" />}
 				<span>{buttonTitle}</span>
 				{displayCount && activeLength > 0 && <span>&nbsp;&bull; {activeLength}</span>}
-				{displayDownArrow && <SvgIcon kit="fas" icon="caret-down" size={12} className="ms-1" />}
+				{displayDownArrow && <SvgIcon kit="fas" icon="caret-down" size={12} className="ms-2" />}
 			</button>
 		</>
 	);

@@ -118,7 +118,7 @@ const SignInEmail = () => {
 									Forgot Password?
 								</Button>
 							</div>
-							<Button size="lg" type="submit" className="d-block w-100">
+							<Button type="submit" className="d-block w-100">
 								Sign in
 							</Button>
 						</Form>

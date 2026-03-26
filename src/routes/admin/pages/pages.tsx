@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Badge, Button, Col, Container, Row } from 'react-bootstrap';
@@ -12,6 +13,40 @@ import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import SvgIcon from '@/components/svg-icon';
 import { buildBackendDownloadUrl } from '@/lib/utils';
+
+const PAGE_TABLE_DATE_FORMAT = 'MMM DD, YYYY';
+const PAGE_TABLE_DATE_INPUT_FORMATS = [
+	'MM/DD/YY',
+	'M/D/YY',
+	'MM/DD/YYYY',
+	'M/D/YYYY',
+	'MMM D, YYYY',
+	'MMM DD, YYYY',
+	'MMMM D, YYYY',
+	'MMMM DD, YYYY',
+];
+
+const formatPageTableDate = (rawDate?: string | null, description?: string | null) => {
+	if (rawDate) {
+		const parsedRawDate = moment(rawDate);
+
+		if (parsedRawDate.isValid()) {
+			return parsedRawDate.format(PAGE_TABLE_DATE_FORMAT);
+		}
+	}
+
+	if (!description) {
+		return '';
+	}
+
+	const parsedDescription = moment(description, PAGE_TABLE_DATE_INPUT_FORMATS, true);
+
+	if (parsedDescription.isValid()) {
+		return parsedDescription.format(PAGE_TABLE_DATE_FORMAT);
+	}
+
+	return description;
+};
 
 export async function loader() {
 	return null;
@@ -214,6 +249,7 @@ export const Component = () => {
 							<h2 className="mb-0">Pages</h2>
 							<Button
 								variant="primary"
+								size="sm"
 								className="d-flex align-items-center"
 								onClick={() => {
 									setShowAddPageModal(true);
@@ -232,13 +268,19 @@ export const Component = () => {
 						<Table isLoading={isLoading}>
 							<TableHead>
 								<TableRow>
-									<TableCell header width="48%">
+									<TableCell header width="40%">
 										Name
 									</TableCell>
 									<TableCell header>Status</TableCell>
-									<TableCell header>Created</TableCell>
-									<TableCell header>Modified</TableCell>
-									<TableCell header>Published</TableCell>
+									<TableCell header minWidth="max-content">
+										Created
+									</TableCell>
+									<TableCell header minWidth="max-content">
+										Modified
+									</TableCell>
+									<TableCell header minWidth="max-content">
+										Published
+									</TableCell>
 									<TableCell header className="text-right">
 										Subscribers
 									</TableCell>
@@ -256,9 +298,10 @@ export const Component = () => {
 								{pages.map((page) => {
 									return (
 										<TableRow key={page.pageId}>
-											<TableCell className="text-nowrap" width="48%">
+											<TableCell className="text-nowrap" width="40%">
 												<Button
 													variant="link"
+													size="sm"
 													className="p-0 text-decoration-none text-left"
 													onClick={() => {
 														handlePageButtonClick(page.pageId);
@@ -281,10 +324,14 @@ export const Component = () => {
 													)}
 												</div>
 											</TableCell>
-											<TableCell className="text-nowrap">{page.createdDescription}</TableCell>
-											<TableCell className="text-nowrap">{page.lastUpdatedDescription}</TableCell>
-											<TableCell className="text-nowrap">
-												{page.publishedDateDescription}
+											<TableCell className="text-nowrap" minWidth="max-content">
+												{formatPageTableDate(page.created, page.createdDescription)}
+											</TableCell>
+											<TableCell className="text-nowrap" minWidth="max-content">
+												{formatPageTableDate(page.lastUpdated, page.lastUpdatedDescription)}
+											</TableCell>
+											<TableCell className="text-nowrap" minWidth="max-content">
+												{formatPageTableDate(page.publishedDate, page.publishedDateDescription)}
 											</TableCell>
 											<TableCell className="text-nowrap text-right">
 												{page.mailingListEntryCountDescription}

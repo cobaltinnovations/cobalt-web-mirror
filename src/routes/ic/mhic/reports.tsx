@@ -326,6 +326,7 @@ export const Component = () => {
 									<div className="text-right">
 										<Button
 											type="submit"
+											size="sm"
 											disabled={
 												!formValues.startDateTime ||
 												!formValues.endDateTime ||
