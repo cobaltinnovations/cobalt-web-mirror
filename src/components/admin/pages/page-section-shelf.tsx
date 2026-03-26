@@ -77,12 +77,7 @@ export const PageSectionShelf = () => {
 			/>
 
 			{currentPageSection.pageSectionId === HERO_SECTION_ID ? (
-				<PageSectionShelfPage
-					showCloseButton
-					onCloseButtonButtonClick={handleClose}
-					title="Hero"
-					bodyClassName="pt-0"
-				>
+				<PageSectionShelfPage showCloseButton onCloseButtonButtonClick={handleClose} title="Hero">
 					<SectionHeroSettingsForm />
 				</PageSectionShelfPage>
 			) : currentPageRow ? (
