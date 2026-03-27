@@ -84,7 +84,6 @@ export const SignInStaff = ({ onAccountSourceClick }: SignInCobaltProps) => {
 											<Button
 												key={`account-source-${index}`}
 												variant={variant}
-												size="lg"
 												className={classNames('d-block w-100', {
 													'mb-4': !isLast,
 												})}

@@ -43,6 +43,8 @@ export const AdminGroupSessionFilterVisibility = ({ className }: Props) => {
 		<FilterDropdown
 			className={className}
 			active={isActive}
+			inactiveVariant="secondary"
+			size="sm"
 			id="admin-group-session-filter-visibility"
 			title="Visibility"
 			dismissText="Clear"

@@ -21,7 +21,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 					return theme.colors.p500;
 			}
 		},
-		'& h1': {
+		'& h2': {
 			color: ({ variant }: UseStylesProps) => {
 				switch (variant) {
 					case 'light':
@@ -92,7 +92,7 @@ const CallToActionBlock = ({
 				<Col xs={12} md={8} lg={7} className="d-flex flex-column">
 					{subheading && <p className={classes.subheading}>{subheading}</p>}
 
-					<h1 className="my-4">{heading}</h1>
+					<h2 className="my-4">{heading}</h2>
 
 					<div
 						className={classNames(classes.htmlContent, {

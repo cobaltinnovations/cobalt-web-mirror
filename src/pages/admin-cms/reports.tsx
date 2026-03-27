@@ -206,7 +206,7 @@ const Reports = () => {
 								<div className="text-right">
 									<Button
 										type="submit"
-										size="lg"
+										size="sm"
 										disabled={
 											!formValues.reportTypeId ||
 											(isAccountTimelineReport

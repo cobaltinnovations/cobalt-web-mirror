@@ -43,7 +43,6 @@ const ScreeningFlowCta = ({ buttonVariant, className }: Props) => {
 			</p>
 			<div className="text-center">
 				<Button
-					size="lg"
 					variant={buttonVariant ?? 'primary'}
 					className="d-inline-flex align-items-center"
 					onClick={() => {

@@ -44,8 +44,10 @@ export const GroupSessionTableDropdown = ({ groupSession, onCancel, onDelete }: 
 		<Dropdown>
 			<Dropdown.Toggle
 				as={DropdownToggle}
+				variant="transparent-secondary"
+				size="sm"
 				id={`admin-group-sessions__dropdown-menu--${groupSession.groupSessionId}`}
-				className="p-2 border-0"
+				className="p-2"
 			>
 				<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 			</Dropdown.Toggle>

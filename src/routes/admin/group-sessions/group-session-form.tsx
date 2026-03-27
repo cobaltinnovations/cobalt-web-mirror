@@ -1687,7 +1687,7 @@ export const Component = () => {
 									<h3>Registrants</h3>
 
 									<Button
-										variant="light"
+										variant="secondary"
 										className="ms-4 text-decoration-none"
 										disabled={!registrantDownloadLink}
 										href={registrantDownloadLink || undefined}
