@@ -75,7 +75,6 @@ const PatientCheckIn = () => {
 								<Button
 									className="mb-2 d-block w-100 text-left border"
 									variant="light"
-									size="lg"
 									name="check-in"
 									id="check-in--scheduled"
 									value={PatientOrderResourceCheckInResponseStatusId.APPOINTMENT_SCHEDULED}
@@ -87,7 +86,6 @@ const PatientCheckIn = () => {
 								<Button
 									className="mb-2 d-block w-100 text-left border"
 									variant="light"
-									size="lg"
 									name="check-in"
 									id="check-in--none"
 									value={PatientOrderResourceCheckInResponseStatusId.NEED_FOLLOWUP}
@@ -100,7 +98,6 @@ const PatientCheckIn = () => {
 								<Button
 									className="mb-2 d-block w-100 text-left border"
 									variant="light"
-									size="lg"
 									name="check-in"
 									id="check-in--no-longer-need-care"
 									value={PatientOrderResourceCheckInResponseStatusId.NO_LONGER_NEED_CARE}

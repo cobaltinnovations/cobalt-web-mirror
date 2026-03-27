@@ -281,7 +281,7 @@ const ConfirmAppointment = () => {
 								{institution.integratedCareAvailabilityDescription}.
 							</p>
 							<div className="text-right">
-								<Button size="lg" onClick={createAppointmentAndNavigate} disabled={submitting}>
+								<Button onClick={createAppointmentAndNavigate} disabled={submitting}>
 									Book Appointment
 								</Button>
 							</div>
@@ -336,7 +336,7 @@ const ConfirmAppointment = () => {
 												/>
 											)}
 											<div className="text-right">
-												<Button type="submit" size="lg" disabled={submitting}>
+												<Button type="submit" disabled={submitting}>
 													Continue
 												</Button>
 											</div>
@@ -366,13 +366,12 @@ const ConfirmAppointment = () => {
 												<Button
 													className="me-4"
 													variant="light"
-													size="lg"
 													onClick={handleResendCodeButtonClick}
 													disabled={submitting}
 												>
 													Resend Code
 												</Button>
-												<Button type="submit" size="lg" disabled={submitting}>
+												<Button type="submit" disabled={submitting}>
 													Continue
 												</Button>
 											</div>

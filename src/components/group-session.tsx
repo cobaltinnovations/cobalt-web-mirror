@@ -115,9 +115,12 @@ const GroupSession = ({
 						</Row>
 						<Row>
 							<Col>
-								<h2 className="mb-2 mb-lg-3">{groupSession.title}</h2>
+								<h1 className="mb-2 mb-lg-3">{groupSession.title}</h1>
 								<p className="mb-6 text-muted">with {groupSession.facilitatorName}</p>
-								<WysiwygDisplay className="mb-6 mb-lg-10" html={groupSession.description ?? ''} />
+								<WysiwygDisplay
+									className="mb-6 mb-lg-10 fs-large"
+									html={groupSession.description ?? ''}
+								/>
 
 								{(groupSession.tags ?? []).length > 0 && (
 									<div className="d-flex flex-wrap">
@@ -220,7 +223,7 @@ const GroupSession = ({
 											<SvgIcon
 												kit="far"
 												icon="loveseat"
-												size={24}
+												size={20}
 												className="text-primary me-4"
 											/>
 
@@ -255,7 +258,7 @@ const GroupSession = ({
 											<SvgIcon
 												kit="far"
 												icon="laptop-mobile"
-												size={24}
+												size={22}
 												className="text-primary me-4"
 											/>
 											<div>
@@ -268,7 +271,7 @@ const GroupSession = ({
 											<SvgIcon
 												kit="far"
 												icon="location-dot"
-												size={24}
+												size={20}
 												className="text-primary me-4"
 											/>
 											<div>

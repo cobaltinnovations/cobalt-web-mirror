@@ -52,7 +52,6 @@ export const Component = () => {
 							<h1 className="mb-6">Unsubscribe from {displayName}</h1>
 							<p className="mb-6">Stop receiving updates sent to {mailingListEntry.value}.</p>
 							<LoadingButton
-								size="lg"
 								className="d-block w-100 text-center"
 								type="button"
 								isLoading={isLoading}

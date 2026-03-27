@@ -278,6 +278,7 @@ export const Component = () => {
 								{config.showDebug && (
 									<Button
 										className="me-2"
+										size="sm"
 										variant="outline-primary"
 										onClick={() => {
 											setShowGenerateOrdersModal(true);
@@ -295,6 +296,7 @@ export const Component = () => {
 									>
 										<Button
 											as="div"
+											size="sm"
 											variant={
 												account?.accountCapabilityFlags.canImportIcPatientOrders
 													? 'outline-primary'
@@ -308,6 +310,7 @@ export const Component = () => {
 									</FileInputButton>
 								)}
 								<Button
+									size="sm"
 									onClick={() => {
 										// fetchPanelAccounts();
 										setShowAssignOrderModal(true);

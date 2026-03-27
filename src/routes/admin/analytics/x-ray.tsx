@@ -106,7 +106,7 @@ export const Component = () => {
 			<Container className="py-8">
 				<Row>
 					<Col className="d-flex flex-wrap align-items-center justify-content-between">
-						<h1>Analytics</h1>
+						<h2>Analytics</h2>
 						<div className="d-flex">
 							<InputHelper
 								style={{ width: 200 }}

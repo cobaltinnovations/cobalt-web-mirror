@@ -4,6 +4,7 @@ export type CobaltFontFamily = {
 	fontFamily: string;
 	weights: {
 		regular: number;
+		medium: number;
 		bold: number;
 	};
 };
@@ -43,6 +44,7 @@ export type CobaltTheme = {
 
 		// brand -- primary
 		p50: string;
+		p75: string;
 		p100: string;
 		p300: string;
 		p500: string;
@@ -51,6 +53,7 @@ export type CobaltTheme = {
 
 		// brand -- accent
 		a50: string;
+		a75: string;
 		a100: string;
 		a300: string;
 		a500: string;
@@ -59,6 +62,7 @@ export type CobaltTheme = {
 
 		// semantic -- danger
 		d50: string;
+		d75: string;
 		d100: string;
 		d300: string;
 		d500: string;
@@ -67,6 +71,7 @@ export type CobaltTheme = {
 
 		// semantic -- warning
 		w50: string;
+		w75: string;
 		w100: string;
 		w300: string;
 		w500: string;
@@ -75,6 +80,7 @@ export type CobaltTheme = {
 
 		// semantic -- success
 		s50: string;
+		s75: string;
 		s100: string;
 		s300: string;
 		s500: string;
@@ -83,19 +89,12 @@ export type CobaltTheme = {
 
 		// semantic -- info
 		i50: string;
+		i75: string;
 		i100: string;
 		i300: string;
 		i500: string;
 		i700: string;
 		i900: string;
-
-		// semantic -- attention
-		t50: string;
-		t100: string;
-		t300: string;
-		t500: string;
-		t700: string;
-		t900: string;
 
 		background: string;
 		border: string;
@@ -115,10 +114,12 @@ export type CobaltTheme = {
 		default: CobaltFontSizeConfig;
 		large: CobaltFontSizeConfig;
 		small: CobaltFontSizeConfig;
+		xlarge: CobaltFontSizeConfig;
 
 		headingNormal: CobaltFontConfig;
 		headingBold: CobaltFontConfig;
 		bodyNormal: CobaltFontConfig;
+		bodyMedium: CobaltFontConfig;
 		bodyBold: CobaltFontConfig;
 	};
 };

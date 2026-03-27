@@ -110,7 +110,6 @@ export const Component = () => {
 							<div className="text-right">
 								<Button
 									type="submit"
-									size="lg"
 									disabled={!formValues.username || !formValues.recordingPreferenceId}
 								>
 									Save

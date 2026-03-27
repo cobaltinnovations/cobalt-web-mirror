@@ -82,7 +82,7 @@ const SignUp: FC = () => {
 									}}
 									required
 								/>
-								<Button size="lg" type="submit" className="d-block w-100">
+								<Button type="submit" className="d-block w-100">
 									Create Account
 								</Button>
 							</Form>

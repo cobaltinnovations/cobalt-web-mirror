@@ -198,7 +198,7 @@ export const LayoutTab = ({ onAddRowButtonClick }: LayoutTabProps) => {
 			</DragDropContext>
 			<div className="p-6 text-right">
 				<Button
-					variant="outline-primary"
+					variant="light"
 					onClick={() => {
 						if (!contentSection) {
 							return;
