@@ -14,9 +14,15 @@ import {
 	ScreeningAnswerContentHintId,
 	AnalyticsNativeEventTypeId,
 	AnalyticsNativeEventOverlayViewInCrisisSource,
+	ContentSnippet,
 	InstitutionReferrer,
 } from '@/lib/models';
-import { analyticsService, institutionReferrersService, screeningService } from '@/lib/services';
+import {
+	analyticsService,
+	contentSnippetsService,
+	institutionReferrersService,
+	screeningService,
+} from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
@@ -27,6 +33,43 @@ import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 import { Helmet } from 'react-helmet';
 import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
 import SvgIcon from '@/components/svg-icon';
+import { contentSnippetFromLegacySharedContent, ContentSnippetModal } from '@/components/content-snippet';
+
+type NormalizedFooterAction = {
+	label: string;
+	contentSnippetKey?: string;
+	legacyContentKey?: string;
+};
+
+const buildContentSnippetsByKey = (contentSnippets: ContentSnippet[]) =>
+	contentSnippets.reduce((accumulator, contentSnippet) => {
+		accumulator[contentSnippet.contentSnippetKey] = contentSnippet;
+		return accumulator;
+	}, {} as Record<string, ContentSnippet>);
+
+const normalizeFooterAction = (
+	footerAction: NonNullable<ScreeningQuestionContextResponse['screeningQuestion']['metadata']>['footerAction']
+): NormalizedFooterAction | null => {
+	if (!footerAction?.label) {
+		return null;
+	}
+
+	if (footerAction.actionType === 'OPEN_CONTENT_MODAL' && footerAction.contentSnippetKey) {
+		return {
+			label: footerAction.label,
+			contentSnippetKey: footerAction.contentSnippetKey,
+		};
+	}
+
+	if (footerAction.type === 'modal' && footerAction.contentKey) {
+		return {
+			label: footerAction.label,
+			legacyContentKey: footerAction.contentKey,
+		};
+	}
+
+	return null;
+};
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
@@ -40,6 +83,9 @@ const ScreeningQuestionsPage = () => {
 	const [fullscreenInstitutionReferrer, setFullscreenInstitutionReferrer] = useState<InstitutionReferrer | null>(
 		null
 	);
+	const [fullscreenContentSnippetsByKey, setFullscreenContentSnippetsByKey] = useState<
+		Record<string, ContentSnippet>
+	>({});
 
 	const { navigateToQuestion, navigateToDestination } = useScreeningNavigation();
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
@@ -55,6 +101,7 @@ const ScreeningQuestionsPage = () => {
 	// flags whether the confirmation prompt was due to a submission error
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 	const [showHelpModal, setShowHelpModal] = useState(false);
+	const [activeContentSnippetKey, setActiveContentSnippetKey] = useState<string | null>(null);
 	const fullscreenScreening = useMemo(() => {
 		return routeMatches.some((match) => {
 			return Boolean((match.handle as { fullscreenScreening?: boolean } | undefined)?.fullscreenScreening);
@@ -76,11 +123,69 @@ const ScreeningQuestionsPage = () => {
 		);
 	}, [fullscreenInstitutionReferrer?.metadata?.screening?.title, screeningQuestionContextResponse?.screening.name]);
 	const fullscreenInstructionsHtml = fullscreenInstitutionReferrer?.metadata?.screening?.instructionsHtml;
+	const footerAction = useMemo(() => {
+		return normalizeFooterAction(screeningQuestionContextResponse?.screeningQuestion.metadata?.footerAction);
+	}, [screeningQuestionContextResponse?.screeningQuestion.metadata?.footerAction]);
+	const activeContentSnippet = useMemo(() => {
+		if (!activeContentSnippetKey) {
+			return null;
+		}
+
+		const contentSnippet = fullscreenContentSnippetsByKey[activeContentSnippetKey];
+
+		if (contentSnippet) {
+			return contentSnippet;
+		}
+
+		const legacyContent = fullscreenInstitutionReferrer?.metadata?.sharedContent?.[activeContentSnippetKey];
+		return legacyContent ? contentSnippetFromLegacySharedContent(activeContentSnippetKey, legacyContent) : null;
+	}, [
+		activeContentSnippetKey,
+		fullscreenContentSnippetsByKey,
+		fullscreenInstitutionReferrer?.metadata?.sharedContent,
+	]);
+	const footerActionAvailable = Boolean(
+		footerAction?.label &&
+			(footerAction.contentSnippetKey ||
+				(footerAction.legacyContentKey &&
+					fullscreenInstitutionReferrer?.metadata?.sharedContent?.[footerAction.legacyContentKey]))
+	);
 
 	const clearPrompt = useCallback(() => {
 		setConfirmationPrompt(null);
 		setIsSubmitPrompt(false);
 	}, []);
+
+	const openFooterAction = useCallback(async () => {
+		if (!footerAction) {
+			return;
+		}
+
+		if (footerAction.contentSnippetKey) {
+			if (!fullscreenContentSnippetsByKey[footerAction.contentSnippetKey]) {
+				try {
+					const { contentSnippets } = await contentSnippetsService
+						.getContentSnippetsByKeys([footerAction.contentSnippetKey])
+						.fetch();
+
+					setFullscreenContentSnippetsByKey((previousContentSnippetsByKey) => ({
+						...previousContentSnippetsByKey,
+						...buildContentSnippetsByKey(contentSnippets),
+					}));
+				} catch (error) {
+					handleError(error);
+					return;
+				}
+			}
+
+			setActiveContentSnippetKey(footerAction.contentSnippetKey);
+			return;
+		}
+
+		if (footerAction.legacyContentKey) {
+			setActiveContentSnippetKey(footerAction.legacyContentKey);
+		}
+	}, [footerAction, fullscreenContentSnippetsByKey, handleError]);
 
 	const fetchData = useCallback(async () => {
 		const request = screeningService.getScreeningQuestionContext(screeningQuestionContextId);
@@ -257,6 +362,7 @@ const ScreeningQuestionsPage = () => {
 	useEffect(() => {
 		if (!fullscreenScreening || !fullscreenReferrerUrlName) {
 			setFullscreenInstitutionReferrer(null);
+			setFullscreenContentSnippetsByKey({});
 			return;
 		}
 
@@ -268,11 +374,13 @@ const ScreeningQuestionsPage = () => {
 			.then(({ institutionReferrer }) => {
 				if (!cancelled) {
 					setFullscreenInstitutionReferrer(institutionReferrer);
+					setFullscreenContentSnippetsByKey({});
 				}
 			})
 			.catch((error) => {
 				if (!cancelled) {
 					setFullscreenInstitutionReferrer(null);
+					setFullscreenContentSnippetsByKey({});
 					handleError(error);
 				}
 			});
@@ -281,6 +389,10 @@ const ScreeningQuestionsPage = () => {
 			cancelled = true;
 		};
 	}, [fullscreenReferrerUrlName, fullscreenScreening, handleError]);
+
+	useEffect(() => {
+		setActiveContentSnippetKey(null);
+	}, [screeningQuestionContextResponse?.screeningQuestion.screeningQuestionId]);
 
 	const renderedAnswerOptions = useMemo(() => {
 		switch (screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId) {
@@ -715,14 +827,29 @@ const ScreeningQuestionsPage = () => {
 										>
 											{renderedAnswerOptions}
 
-											{screeningQuestionContextResponse?.screeningQuestion.footerText && (
-												<div
-													className="mt-3 mb-5"
-													dangerouslySetInnerHTML={{
-														__html: screeningQuestionContextResponse?.screeningQuestion
-															.footerText,
-													}}
-												/>
+											{(screeningQuestionContextResponse?.screeningQuestion.footerText ||
+												footerActionAvailable) && (
+												<div className="mt-3 mb-5 d-flex flex-wrap align-items-baseline gap-2">
+													{screeningQuestionContextResponse?.screeningQuestion.footerText && (
+														<div
+															className="wysiwyg-display"
+															dangerouslySetInnerHTML={{
+																__html: screeningQuestionContextResponse
+																	.screeningQuestion.footerText,
+															}}
+														/>
+													)}
+													{footerActionAvailable && footerAction?.label && (
+														<Button
+															variant="link"
+															className="p-0 align-baseline"
+															type="button"
+															onClick={openFooterAction}
+														>
+															{footerAction.label}
+														</Button>
+													)}
+												</div>
 											)}
 
 											<div className="d-flex">
@@ -881,6 +1008,13 @@ const ScreeningQuestionsPage = () => {
 							</Modal>
 						</>
 					)}
+				<ContentSnippetModal
+					contentSnippet={activeContentSnippet}
+					onHide={() => {
+						setActiveContentSnippetKey(null);
+					}}
+					show={Boolean(activeContentSnippet)}
+				/>
 			</AsyncPage>
 		</>
 	);

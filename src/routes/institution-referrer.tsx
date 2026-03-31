@@ -3,11 +3,13 @@ import { LoaderFunctionArgs, useLoaderData, useLocation } from 'react-router-dom
 import { Button, Container } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { institutionReferrersService } from '@/lib/services';
+import { contentSnippetsService, institutionReferrersService } from '@/lib/services';
+import { ContentSnippet, InstitutionReferrer, InstitutionReferrerPageContentSnippetSection } from '@/lib/models';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import { contentSnippetFromLegacySharedContent, ContentSnippetView } from '@/components/content-snippet';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	pilotHeroSection: {
@@ -71,9 +73,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	pageContent: {
 		color: theme.colors.n900,
-		'& > section': {
+		'& > .pageContentMarkup > section, & > section': {
 			borderBottom: `1px solid ${theme.colors.n100}`,
 			padding: '40px 0',
+		},
+		'& > .pageContentMarkup > section:first-child': {
+			paddingTop: 0,
 		},
 		'& > section:first-child': {
 			paddingTop: 0,
@@ -128,12 +133,12 @@ const useStyles = createUseThemedStyles((theme) => ({
 			margin: '40px 0',
 			opacity: 1,
 		},
-		'& .referrer-table-wrap': {
+		'& .pageContentMarkup .referrer-table-wrap': {
 			marginTop: 24,
 			overflowX: 'auto',
 			width: '100%',
 		},
-		'& table': {
+		'& .pageContentMarkup table': {
 			backgroundColor: theme.colors.n0,
 			border: `1px solid ${theme.colors.n100}`,
 			borderCollapse: 'separate',
@@ -142,7 +147,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			minWidth: '100%',
 			overflow: 'hidden',
 		},
-		'& thead th': {
+		'& .pageContentMarkup thead th': {
 			...theme.fonts.bodyNormal,
 			backgroundColor: theme.colors.n50,
 			borderBottom: `1px solid ${theme.colors.n100}`,
@@ -153,7 +158,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 			padding: 12,
 			textAlign: 'left',
 		},
-		'& tbody td': {
+		'& .pageContentMarkup tbody td': {
 			...theme.fonts.bodyNormal,
 			borderBottom: `1px solid ${theme.colors.n100}`,
 			color: theme.colors.n900,
@@ -162,14 +167,39 @@ const useStyles = createUseThemedStyles((theme) => ({
 			padding: 12,
 			verticalAlign: 'top',
 		},
-		'& tbody tr:last-child td': {
+		'& .pageContentMarkup tbody tr:last-child td': {
 			borderBottom: 0,
 		},
-		'& th:last-child, & td:last-child': {
+		'& .pageContentMarkup th:last-child, & .pageContentMarkup td:last-child': {
 			textAlign: 'right',
 		},
 	},
+	sharedContentBlock: {
+		marginTop: 24,
+	},
 }));
+
+const buildContentSnippetsByKey = (contentSnippets: ContentSnippet[]) =>
+	contentSnippets.reduce((accumulator, contentSnippet) => {
+		accumulator[contentSnippet.contentSnippetKey] = contentSnippet;
+		return accumulator;
+	}, {} as Record<string, ContentSnippet>);
+
+const normalizeContentSnippetSections = (
+	institutionReferrer: InstitutionReferrer
+): InstitutionReferrerPageContentSnippetSection[] => {
+	const contentSnippetSections = institutionReferrer.metadata?.page?.contentSnippetSections;
+
+	if (contentSnippetSections && contentSnippetSections.length > 0) {
+		return contentSnippetSections;
+	}
+
+	return (institutionReferrer.metadata?.page?.sharedContentSections ?? []).map((section) => ({
+		contentSnippetKey: section.contentKey,
+		title: section.title,
+		leadHtml: section.leadHtml,
+	}));
+};
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { urlName } = params;
@@ -179,15 +209,26 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	}
 
 	const { institutionReferrer } = await institutionReferrersService.getReferrerByUrlName(urlName).fetch();
+	const contentSnippetSections = normalizeContentSnippetSections(institutionReferrer);
+	const contentSnippetKeys = Array.from(
+		new Set(contentSnippetSections.map((section) => section.contentSnippetKey).filter(Boolean))
+	);
+	let contentSnippetsByKey: Record<string, ContentSnippet> = {};
+
+	if (contentSnippetKeys.length > 0) {
+		const { contentSnippets } = await contentSnippetsService.getContentSnippetsByKeys(contentSnippetKeys).fetch();
+		contentSnippetsByKey = buildContentSnippetsByKey(contentSnippets);
+	}
 
 	return {
 		institutionReferrer,
+		contentSnippetsByKey,
 	};
 };
 
 export const Component = () => {
 	const classes = useStyles();
-	const { institutionReferrer } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+	const { institutionReferrer, contentSnippetsByKey } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const location = useLocation();
 	const { institution } = useAccount();
 	const usesFullscreenScreening = Boolean(institutionReferrer.metadata?.screening?.fullscreen);
@@ -202,6 +243,7 @@ export const Component = () => {
 			: undefined,
 	});
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = featuresScreeningFlow;
+	const contentSnippetSections = normalizeContentSnippetSections(institutionReferrer);
 
 	if (renderedPreScreeningLoader) {
 		return renderedPreScreeningLoader;
@@ -231,10 +273,35 @@ export const Component = () => {
 				</Container>
 			</Container>
 			<Container className={classes.pilotContentSection}>
-				<div
-					className={`${classes.pilotInner} ${classes.pageContent}`}
-					dangerouslySetInnerHTML={{ __html: institutionReferrer.pageContent ?? '' }}
-				/>
+				<div className={`${classes.pilotInner} ${classes.pageContent}`}>
+					<div
+						className="pageContentMarkup"
+						dangerouslySetInnerHTML={{ __html: institutionReferrer.pageContent ?? '' }}
+					/>
+					{contentSnippetSections.map((section) => {
+						const legacyContent = institutionReferrer.metadata?.sharedContent?.[section.contentSnippetKey];
+						const contentSnippet =
+							contentSnippetsByKey[section.contentSnippetKey] ??
+							(legacyContent
+								? contentSnippetFromLegacySharedContent(section.contentSnippetKey, legacyContent)
+								: null);
+
+						if (!contentSnippet) {
+							return null;
+						}
+
+						return (
+							<section key={section.contentSnippetKey}>
+								<h2>{section.title}</h2>
+								{section.leadHtml && <div dangerouslySetInnerHTML={{ __html: section.leadHtml }} />}
+								<ContentSnippetView
+									className={classes.sharedContentBlock}
+									contentSnippet={contentSnippet}
+								/>
+							</section>
+						);
+					})}
+				</div>
 			</Container>
 			<Container fluid className={classes.pilotCtaSection}>
 				<Container>

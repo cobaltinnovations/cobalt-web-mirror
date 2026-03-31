@@ -18,11 +18,44 @@ export interface InstitutionReferrerResultScreen {
 	booking?: InstitutionReferrerResultScreenBooking;
 }
 
+export interface InstitutionReferrerSharedContentTableColumn {
+	key: string;
+	label: string;
+	align?: 'left' | 'right';
+}
+
+export interface InstitutionReferrerSharedContentTable {
+	type: 'table';
+	title: string;
+	dismissText?: string;
+	columns: InstitutionReferrerSharedContentTableColumn[];
+	rows: Array<Record<string, string>>;
+}
+
+export type InstitutionReferrerSharedContent = InstitutionReferrerSharedContentTable;
+
+export interface InstitutionReferrerPageSharedContentSection {
+	contentKey: string;
+	title: string;
+	leadHtml?: string;
+}
+
+export interface InstitutionReferrerPageContentSnippetSection {
+	contentSnippetKey: string;
+	title: string;
+	leadHtml?: string;
+}
+
 export interface InstitutionReferrerMetadata {
 	screening?: {
 		fullscreen?: boolean;
 		title?: string;
 		instructionsHtml?: string;
+	};
+	sharedContent?: Record<string, InstitutionReferrerSharedContent>;
+	page?: {
+		contentSnippetSections?: InstitutionReferrerPageContentSnippetSection[];
+		sharedContentSections?: InstitutionReferrerPageSharedContentSection[];
 	};
 	resultScreens?: Record<string, InstitutionReferrerResultScreen>;
 }

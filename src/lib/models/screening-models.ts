@@ -138,6 +138,13 @@ export interface ScreeningQuestion {
 	metadata?: {
 		prepopulatedEmailAddress?: string;
 		renderQuestionHtml?: boolean;
+		footerAction?: {
+			label: string;
+			actionType?: 'OPEN_CONTENT_MODAL';
+			contentSnippetKey?: string;
+			type?: 'modal';
+			contentKey?: string;
+		};
 		[key: string]: unknown;
 	};
 }
