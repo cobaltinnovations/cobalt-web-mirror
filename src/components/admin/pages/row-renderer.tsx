@@ -6,9 +6,11 @@ import {
 	AnalyticsNativeEventTypeId,
 	Content,
 	ContentStatusId,
+	CustomRowModel,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
 	isGroupSessionsRow,
+	isCustomRow,
 	isOneColumnImageRightRow,
 	isMailingListRow,
 	isOneColumnImageRow,
@@ -387,6 +389,68 @@ const TagRowRenderer = ({
 				</Col>
 			</Row>
 		</AsyncWrapper>
+	);
+};
+
+const CustomRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+}: RowRendererProps<CustomRowModel>) => {
+	const columns = [...pageRow.columns].sort(
+		(leftColumn, rightColumn) => leftColumn.columnDisplayOrder - rightColumn.columnDisplayOrder
+	);
+	const lgColumnSpan = columns.length === 1 ? 12 : columns.length === 2 ? 6 : columns.length === 3 ? 4 : 3;
+
+	if (columns.length === 0) {
+		return null;
+	}
+
+	return (
+		<Row className={className}>
+			{columns.map((column, columnIndex) => (
+				<Col
+					key={column.pageRowColumnId}
+					xs={12}
+					lg={lgColumnSpan}
+					className={classNames({
+						'mb-16 mb-lg-0': columnIndex !== columns.length - 1,
+					})}
+				>
+					{column.imageUrl && (
+						<img
+							className={classNames('w-100', {
+								'mb-6': column.headline || column.description,
+							})}
+							src={column.imageUrl}
+							alt={column.imageAltText ?? ''}
+						/>
+					)}
+					{column.headline && (
+						<h3 className={classNames({ 'mb-6': column.description })}>{column.headline}</h3>
+					)}
+					{column.description && (
+						<WysiwygDisplay
+							html={column.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+			))}
+		</Row>
 	);
 };
 
@@ -814,6 +878,20 @@ export const getRendererForPageRow = ({
 			check: isTagRow,
 			getRow: (row: any) => (
 				<TagRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
+		},
+		{
+			check: isCustomRow,
+			getRow: (row: any) => (
+				<CustomRowRenderer
 					pageId={pageId}
 					pageRow={row}
 					contentsByTagGroupId={contentsByTagGroupId}

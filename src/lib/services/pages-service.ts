@@ -294,6 +294,32 @@ export const pagesService = {
 			data,
 		});
 	},
+	updateCustomRowColumn(
+		pageRowId: string,
+		pageRowColumnId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			imageFileUploadId?: string;
+			imageAltText?: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-row/column/${pageRowColumnId}`,
+			data,
+		});
+	},
+	deleteCustomRowColumn(pageRowId: string, pageRowColumnId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'DELETE',
+			url: `/pages/row/${pageRowId}/custom-row/column/${pageRowColumnId}`,
+		});
+	},
 	createOneColumnRow(pageSectionId: string) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: OneColumnImageRowModel;

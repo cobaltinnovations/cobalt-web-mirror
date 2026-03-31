@@ -13,6 +13,10 @@ import { createUseThemedStyles } from '@/jss/theme';
 const MAX_COLUMNS = 4;
 const COLUMN_LABELS = ['A', 'B', 'C', 'D'];
 
+interface RowSettingsCustomRowProps {
+	onColumnClick?(pageRowColumnId: string, columnLabel: string): void;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	divider: {
 		margin: '0 -24px 24px',
@@ -102,12 +106,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	columnPreview: {
+		width: '100%',
+		border: 0,
 		height: 110,
 		display: 'flex',
+		padding: 0,
 		borderRadius: 4,
 		position: 'relative',
+		textAlign: 'center',
 		alignItems: 'center',
 		justifyContent: 'center',
+		background: 'transparent',
 		backgroundColor: theme.colors.n50,
 	},
 	columnPreviewLabel: {
@@ -139,7 +148,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export const RowSettingsCustomRow = () => {
+export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
@@ -363,43 +372,54 @@ export const RowSettingsCustomRow = () => {
 										draggableId={`custom-row-column-${column.pageRowColumnId}`}
 										index={columnIndex}
 									>
-										{(draggableProvided, draggableSnapshot) => (
-											<div
-												ref={draggableProvided.innerRef}
-												{...draggableProvided.draggableProps}
-												className={classes.columnItem}
-												style={{
-													width: columnWidth,
-													flexBasis: columnWidth,
-													flexShrink: 0,
-													boxSizing: 'border-box',
-													...draggableProvided.draggableProps.style,
-												}}
-											>
+										{(draggableProvided, draggableSnapshot) => {
+											const columnLabel =
+												columnLabelsByIdRef.current[column.pageRowColumnId] ??
+												COLUMN_LABELS[columnIndex] ??
+												`Column ${columnIndex + 1}`;
+
+											return (
 												<div
-													className={`${classes.columnCard}${
-														draggableSnapshot.isDragging ? ' dragging' : ''
-													}`}
+													ref={draggableProvided.innerRef}
+													{...draggableProvided.draggableProps}
+													className={classes.columnItem}
+													style={{
+														width: columnWidth,
+														flexBasis: columnWidth,
+														flexShrink: 0,
+														boxSizing: 'border-box',
+														...draggableProvided.draggableProps.style,
+													}}
 												>
-													<div className={classes.columnPreview}>
-														<span className={classes.columnPreviewLabel}>
-															{columnLabelsByIdRef.current[column.pageRowColumnId] ??
-																COLUMN_LABELS[columnIndex] ??
-																`Column ${columnIndex + 1}`}
-														</span>
-														<div className={classes.columnPreviewOverlay}>
-															<SvgIcon kit="far" icon="pen" size={20} />
+													<div
+														className={`${classes.columnCard}${
+															draggableSnapshot.isDragging ? ' dragging' : ''
+														}`}
+													>
+														<button
+															type="button"
+															className={classes.columnPreview}
+															onClick={() => {
+																onColumnClick?.(column.pageRowColumnId, columnLabel);
+															}}
+														>
+															<span className={classes.columnPreviewLabel}>
+																{columnLabel}
+															</span>
+															<div className={classes.columnPreviewOverlay}>
+																<SvgIcon kit="far" icon="pen" size={20} />
+															</div>
+														</button>
+														<div
+															className={classes.columnHandle}
+															{...draggableProvided.dragHandleProps}
+														>
+															<SvgIcon kit="far" icon="grip-lines" size={16} />
 														</div>
 													</div>
-													<div
-														className={classes.columnHandle}
-														{...draggableProvided.dragHandleProps}
-													>
-														<SvgIcon kit="far" icon="grip-lines" size={16} />
-													</div>
 												</div>
-											</div>
-										)}
+											);
+										}}
 									</Draggable>
 								))}
 								{droppableProvided.placeholder}

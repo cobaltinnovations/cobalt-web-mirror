@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ROW_TYPE_ID } from '@/lib/models';
 import {
@@ -6,6 +6,7 @@ import {
 	PageSectionShelfPage,
 	RowSelectionForm,
 	RowSettingsCustomRow,
+	RowSettingsCustomRowColumn,
 	RowSettingsGroupSessions,
 	RowSettingsMailingList,
 	RowSettingsOneColumn,
@@ -56,6 +57,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 			transform: 'translateX(-100%)',
 			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
 		},
+		'.shelf-page-animation-backward-enter': {
+			opacity: 0,
+			transform: 'translateX(-100%)',
+		},
+		'.shelf-page-animation-backward-enter-active': {
+			opacity: 1,
+			transform: 'translateX(0)',
+			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
+		},
+		'.shelf-page-animation-backward-exit': {
+			opacity: 1,
+			transform: 'translateX(0)',
+		},
+		'.shelf-page-animation-backward-exit-active': {
+			opacity: 1,
+			transform: 'translateX(100%)',
+			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
+		},
 	},
 }));
 
@@ -67,15 +86,46 @@ export const PageSectionShelf = () => {
 		currentPageSection,
 		setCurrentPageRowId,
 		currentPageRow,
+		updatePageRow,
 		deletePageRow,
 		setIsSaving,
 	} = usePageBuilderContext();
 	const [showRowDeleteModal, setShowRowDeleteModal] = useState(false);
+	const [showCustomRowColumnDeleteModal, setShowCustomRowColumnDeleteModal] = useState(false);
+	const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
+	const [selectedCustomRowColumn, setSelectedCustomRowColumn] = useState<
+		{ pageRowColumnId: string; label: string } | undefined
+	>();
 
 	const handleClose = useCallback(() => {
+		setSelectedCustomRowColumn(undefined);
 		setCurrentPageSectionId('');
 		setCurrentPageRowId('');
 	}, [setCurrentPageRowId, setCurrentPageSectionId]);
+
+	const handleCustomRowColumnBack = useCallback(() => {
+		setTransitionDirection('backward');
+		setSelectedCustomRowColumn(undefined);
+	}, []);
+
+	useEffect(() => {
+		setSelectedCustomRowColumn(undefined);
+		setTransitionDirection('forward');
+	}, [currentPageRow?.pageRowId]);
+
+	useEffect(() => {
+		if (currentPageRow?.rowTypeId !== ROW_TYPE_ID.CUSTOM_ROW) {
+			setSelectedCustomRowColumn(undefined);
+			return;
+		}
+
+		if (
+			selectedCustomRowColumn &&
+			!currentPageRow.columns.some((column) => column.pageRowColumnId === selectedCustomRowColumn.pageRowColumnId)
+		) {
+			setSelectedCustomRowColumn(undefined);
+		}
+	}, [currentPageRow, selectedCustomRowColumn]);
 
 	const handleRowDelete = useCallback(async () => {
 		setIsSaving(true);
@@ -97,15 +147,43 @@ export const PageSectionShelf = () => {
 		}
 	}, [currentPageRow, deletePageRow, handleClose, handleError, setIsSaving]);
 
+	const handleCustomRowColumnDelete = useCallback(async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageRow || !selectedCustomRowColumn) {
+				throw new Error('currentPageRow or selectedCustomRowColumn is undefined.');
+			}
+
+			const { pageRow: updatedPageRow } = await pagesService
+				.deleteCustomRowColumn(currentPageRow.pageRowId, selectedCustomRowColumn.pageRowColumnId)
+				.fetch();
+
+			updatePageRow(updatedPageRow);
+			setTransitionDirection('backward');
+			setSelectedCustomRowColumn(undefined);
+			setShowCustomRowColumnDeleteModal(false);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	}, [currentPageRow, handleError, selectedCustomRowColumn, setIsSaving, updatePageRow]);
+
 	if (!currentPageSection) {
 		return null;
 	}
+
+	const transitionClassNames =
+		transitionDirection === 'backward' ? 'shelf-page-animation-backward' : 'shelf-page-animation';
 
 	const currentPageKey =
 		currentPageSection.pageSectionId === HERO_SECTION_ID
 			? 'hero'
 			: currentPageRow
-			? `row-${currentPageRow.pageRowId}`
+			? currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW && selectedCustomRowColumn
+				? `row-${currentPageRow.pageRowId}-column-${selectedCustomRowColumn.pageRowColumnId}`
+				: `row-${currentPageRow.pageRowId}`
 			: 'row-selection';
 
 	const currentPage =
@@ -131,19 +209,39 @@ export const PageSectionShelf = () => {
 					<RowSettingsTag onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
 				)}
 
-				{currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW && (
-					<PageSectionShelfPage
-						showDeleteButton
-						onDeleteButtonClick={() => {
-							setShowRowDeleteModal(true);
-						}}
-						showCloseButton
-						onCloseButtonButtonClick={handleClose}
-						title={currentPageRow.name}
-					>
-						<RowSettingsCustomRow />
-					</PageSectionShelfPage>
-				)}
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW &&
+					(selectedCustomRowColumn ? (
+						<PageSectionShelfPage
+							showBackButton
+							onBackButtonClick={handleCustomRowColumnBack}
+							showDeleteButton
+							onDeleteButtonClick={() => {
+								setShowCustomRowColumnDeleteModal(true);
+							}}
+							showCloseButton
+							onCloseButtonButtonClick={handleClose}
+							title={`Column ${selectedCustomRowColumn.label}`}
+						>
+							<RowSettingsCustomRowColumn pageRowColumnId={selectedCustomRowColumn.pageRowColumnId} />
+						</PageSectionShelfPage>
+					) : (
+						<PageSectionShelfPage
+							showDeleteButton
+							onDeleteButtonClick={() => {
+								setShowRowDeleteModal(true);
+							}}
+							showCloseButton
+							onCloseButtonButtonClick={handleClose}
+							title={currentPageRow.name}
+						>
+							<RowSettingsCustomRow
+								onColumnClick={(pageRowColumnId, label) => {
+									setTransitionDirection('forward');
+									setSelectedCustomRowColumn({ pageRowColumnId, label });
+								}}
+							/>
+						</PageSectionShelfPage>
+					))}
 
 				{(currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE ||
 					currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT ||
@@ -230,13 +328,33 @@ export const PageSectionShelf = () => {
 				}}
 				onConfirm={handleRowDelete}
 			/>
+			<ConfirmDialog
+				show={showCustomRowColumnDeleteModal}
+				size="lg"
+				titleText="Delete Column"
+				bodyText="Are you sure you want to delete this column?"
+				dismissText="Cancel"
+				confirmText="Delete"
+				destructive
+				onHide={() => {
+					setShowCustomRowColumnDeleteModal(false);
+				}}
+				onConfirm={handleCustomRowColumnDelete}
+			/>
 
 			<div className={classes.transitionContainer}>
-				<TransitionGroup component={null}>
+				<TransitionGroup
+					component={null}
+					childFactory={(child) =>
+						React.cloneElement(child, {
+							classNames: transitionClassNames,
+						})
+					}
+				>
 					<CSSTransition
 						key={currentPageKey}
 						timeout={shelfPageTransitionDurationMs}
-						classNames="shelf-page-animation"
+						classNames={transitionClassNames}
 						unmountOnExit
 					>
 						<div className={classes.transitionPage}>{currentPage}</div>
