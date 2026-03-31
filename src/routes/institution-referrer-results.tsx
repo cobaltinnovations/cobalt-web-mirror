@@ -3,6 +3,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { LoaderFunctionArgs, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
 
+import FullscreenBar from '@/components/fullscreen-bar';
 import useAccount from '@/hooks/use-account';
 import { InstitutionReferrer, InstitutionReferrerResultScreen } from '@/lib/models';
 import { institutionReferrersService } from '@/lib/services';
@@ -98,21 +99,12 @@ export const Component = () => {
 				</title>
 			</Helmet>
 
-			<div className="bg-white border-bottom">
-				<Container className="py-4 d-flex align-items-center">
-					<Button
-						variant="link"
-						className="px-0 me-4 text-decoration-none"
-						type="button"
-						onClick={() => {
-							navigate(returnTo);
-						}}
-					>
-						Exit
-					</Button>
-					<div className="fw-semibold text-secondary">{screeningTitle}</div>
-				</Container>
-			</div>
+			<FullscreenBar
+				title={screeningTitle}
+				onExit={() => {
+					navigate(returnTo);
+				}}
+			/>
 
 			<Container className="py-8 min-vh-100">
 				<Row>

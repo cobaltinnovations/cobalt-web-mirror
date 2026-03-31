@@ -111,6 +111,8 @@ const ConnectWithSupportV2 = () => {
 
 		return (institution?.features ?? []).find((feature) => pathname.includes(feature.urlName));
 	}, [featureIdOverride, institution?.features, pathname]);
+	const effectiveFeatureId = featureDetails?.featureId ?? featureIdOverride ?? undefined;
+	const effectiveSupportRoleIds = featureDetails?.supportRoleIds;
 	const featureDescription = useMemo(() => {
 		if (pageDescriptionOverride !== null) {
 			return pageDescriptionOverride;
@@ -134,7 +136,7 @@ const ConnectWithSupportV2 = () => {
 
 	useEffect(() => {
 		filtersFetched.current = false;
-	}, [clinicIds, featureDetails?.featureId, institution?.institutionId, providerId]);
+	}, [clinicIds, effectiveFeatureId, institution?.institutionId, providerId]);
 
 	/* --------------------------------------------------- */
 	/* Employer modal check  */
@@ -181,7 +183,7 @@ const ConnectWithSupportV2 = () => {
 	/* Get available filters for feature  */
 	/* --------------------------------------------------- */
 	const fetchFilters = useCallback(async () => {
-		if (!institution || !featureDetails) {
+		if (!institution || !effectiveFeatureId) {
 			return;
 		}
 
@@ -197,7 +199,7 @@ const ConnectWithSupportV2 = () => {
 			providerService
 				.fetchFindOptions({
 					institutionId: institution.institutionId,
-					featureId: featureDetails.featureId,
+					featureId: effectiveFeatureId,
 					...(clinicIds.length > 0 && { clinicIds }),
 					...(providerId && { providerId }),
 				})
@@ -209,24 +211,24 @@ const ConnectWithSupportV2 = () => {
 		setInstitutionLocations(institutionLocationsResponse.locations);
 
 		filtersFetched.current = true;
-	}, [clinicIds, featureDetails, institution, providerId]);
+	}, [clinicIds, effectiveFeatureId, institution, providerId]);
 
 	const fetchInstitutionReferrer = useCallback(async () => {
-		if (!featureDetails) {
+		if (!effectiveFeatureId) {
 			return;
 		}
 
-		const response = await institutionReferrersService.getReferrerByFeatureId(featureDetails.featureId).fetch();
+		const response = await institutionReferrersService.getReferrerByFeatureId(effectiveFeatureId).fetch();
 
 		setInstitutionReferrers(response.institutionReferrers);
 		setInstitutionFeatureInstitutionReferrers(response.institutionFeatureInstitutionReferrers);
-	}, [featureDetails]);
+	}, [effectiveFeatureId]);
 
 	/* --------------------------------------------------- */
 	/* Get providers based on searchParams  */
 	/* --------------------------------------------------- */
 	const fetchProviders = useCallback(async () => {
-		if (!findOptions || !featureDetails) {
+		if (!findOptions || !effectiveFeatureId) {
 			return;
 		}
 
@@ -237,7 +239,7 @@ const ConnectWithSupportV2 = () => {
 				daysOfWeek: FILTER_DAYS.map((d) => d.key),
 				startTime: findOptions.defaultStartTime,
 				endTime: findOptions.defaultEndTime,
-				supportRoleIds: featureDetails.supportRoleIds,
+				...(effectiveSupportRoleIds && { supportRoleIds: effectiveSupportRoleIds }),
 				availability: findOptions.defaultAvailability,
 				visitTypeIds: findOptions.defaultVisitTypeIds,
 				...(clinicIds.length > 0 && { clinicIds }),
@@ -255,8 +257,8 @@ const ConnectWithSupportV2 = () => {
 		setConnectWithSupportDescriptionOverride(response.connectWithSupportDescriptionOverride);
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDERS, {
-			featureId: featureDetails.featureId,
-			supportRoleIds: featureDetails.supportRoleIds,
+			featureId: effectiveFeatureId,
+			...(effectiveSupportRoleIds && { supportRoleIds: effectiveSupportRoleIds }),
 			startDate: startDate ?? findOptions.defaultStartDate,
 			endDate: findOptions.defaultEndDate,
 			...(clinicIds.length > 0 && { clinicIds }),
@@ -271,7 +273,8 @@ const ConnectWithSupportV2 = () => {
 		appointmentTimeIds,
 		appointmentTypeIds,
 		clinicIds,
-		featureDetails,
+		effectiveFeatureId,
+		effectiveSupportRoleIds,
 		findOptions,
 		institutionLocationId,
 		patientOrderId,

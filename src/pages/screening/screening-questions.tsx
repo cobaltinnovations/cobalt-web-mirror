@@ -1,6 +1,7 @@
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
+import FullscreenBar from '@/components/fullscreen-bar';
 import useHandleError from '@/hooks/use-handle-error';
 import {
 	ScreeningAnswerFormatId,
@@ -578,21 +579,12 @@ const ScreeningQuestionsPage = () => {
 				)}
 
 				{fullscreenScreening && (
-					<div className="bg-white border-bottom">
-						<Container className="py-4 d-flex align-items-center">
-							<Button
-								variant="link"
-								className="px-0 me-4 text-decoration-none"
-								type="button"
-								onClick={() => {
-									navigate(fullscreenReturnTo);
-								}}
-							>
-								Exit
-							</Button>
-							<div className="fw-semibold text-secondary">{fullscreenScreeningTitle}</div>
-						</Container>
-					</div>
+					<FullscreenBar
+						title={fullscreenScreeningTitle ?? ''}
+						onExit={() => {
+							navigate(fullscreenReturnTo);
+						}}
+					/>
 				)}
 
 				<Container className={classNames('py-8', { 'min-vh-100': fullscreenScreening })}>
