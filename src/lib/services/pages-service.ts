@@ -2,6 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
+	CustomRowModel,
 	GroupSessionsRowModel,
 	MailingListRowModel,
 	OneColumnImageRowModel,
@@ -249,6 +250,47 @@ export const pagesService = {
 		}>({
 			method: 'PUT',
 			url: `/pages/row/${pageRowId}/tag`,
+			data,
+		});
+	},
+	createCustomRow(
+		pageSectionId: string,
+		data: {
+			name?: string;
+			backgroundColorId?: BACKGROUND_COLOR_ID;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-row`,
+			data,
+		});
+	},
+	createCustomRowColumn(
+		pageRowId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			imageFileUploadId?: string;
+			imageAltText?: string;
+		} = {}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageRowId}/custom-row/column`,
+			data,
+		});
+	},
+	reorderCustomRowColumns(pageRowId: string, data: { pageRowColumnIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-row/column`,
 			data,
 		});
 	},

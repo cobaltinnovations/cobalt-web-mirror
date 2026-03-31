@@ -13,8 +13,33 @@ import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 import subscribeImg from '@/assets/images/subscribe.png';
-import { ROW_TYPE_ID } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
 import InlineAlert from '@/components/inline-alert';
+
+const CUSTOM_ROW_NAME_PREFIX = 'Custom Row';
+
+const getNextCustomRowName = (page?: PageDetailModel) => {
+	const maxCustomRowNumber =
+		page?.pageSections
+			.flatMap((pageSection) => pageSection.pageRows)
+			.reduce((max, pageRow) => {
+				const match = pageRow.name.match(/^Custom Row(?: (\d+))?$/i);
+
+				if (!match) {
+					return max;
+				}
+
+				const customRowNumber = match[1] ? Number(match[1]) : 1;
+
+				if (!Number.isFinite(customRowNumber)) {
+					return max;
+				}
+
+				return Math.max(max, customRowNumber);
+			}, 0) ?? 0;
+
+	return `${CUSTOM_ROW_NAME_PREFIX} ${maxCustomRowNumber + 1}`;
+};
 
 export const RowSelectionForm = () => {
 	const handleError = useHandleError();
@@ -193,6 +218,30 @@ export const RowSelectionForm = () => {
 		}
 	};
 
+	const handleEmptyRowButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const customRowName = getNextCustomRowName(page);
+			const { pageRow } = await pagesService
+				.createCustomRow(currentPageSection.pageSectionId, {
+					name: customRowName,
+					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+				})
+				.fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	const handleMailingListButtonClick = async () => {
 		setIsSaving(true);
 
@@ -300,6 +349,13 @@ export const RowSelectionForm = () => {
 						onClick={handleTwoColumnButtonClick}
 					/>
 					<CustomRowButton cols={3} title="Select Layout" onClick={handleThreeColumnButtonClick} />
+				</div>
+			</CollapseButton>
+			<hr />
+			<CollapseButton title="Custom Row" initialShow>
+				<p className="mb-4">Start with an empty custom row and build it out in the editor.</p>
+				<div className="pb-6">
+					<CustomRowButton title="Empty Row" onClick={handleEmptyRowButtonClick} />
 				</div>
 			</CollapseButton>
 			<hr />

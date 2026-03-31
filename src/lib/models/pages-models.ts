@@ -32,6 +32,7 @@ export enum ROW_TYPE_ID {
 	GROUP_SESSIONS = 'GROUP_SESSIONS',
 	TAG_GROUP = 'TAG_GROUP',
 	TAG = 'TAG',
+	CUSTOM_ROW = 'CUSTOM_ROW',
 	ONE_COLUMN_TEXT = 'ONE_COLUMN_TEXT',
 	TWO_COLUMN_TEXT = 'TWO_COLUMN_TEXT',
 	ONE_COLUMN_IMAGE = 'ONE_COLUMN_IMAGE',
@@ -96,6 +97,7 @@ export type PageRowUnionModel =
 	| GroupSessionsRowModel
 	| TagGroupRowModel
 	| TagRowModel
+	| CustomRowModel
 	| OneColumnRowModel
 	| TwoColumnRowModel
 	| ThreeColumnRowModel
@@ -125,6 +127,11 @@ export interface TagGroupRowModel extends PageRowBaseModel {
 export interface TagRowModel extends PageRowBaseModel {
 	tagGroupColorId: COLOR_IDS;
 	tag: Tag;
+}
+
+export interface CustomRowModel extends PageRowBaseModel {
+	rowTypeId: ROW_TYPE_ID.CUSTOM_ROW;
+	columns: PageRowColumnModel[];
 }
 
 export interface OneColumnRowModel extends PageRowBaseModel {
@@ -182,6 +189,10 @@ export const isTagGroupRow = (x: PageRowUnionModel): x is TagGroupRowModel => {
 
 export const isTagRow = (x: PageRowUnionModel): x is TagRowModel => {
 	return x.hasOwnProperty('tag');
+};
+
+export const isCustomRow = (x: PageRowUnionModel): x is CustomRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW;
 };
 
 export const isOneColumnRow = (x: PageRowUnionModel): x is OneColumnRowModel => {

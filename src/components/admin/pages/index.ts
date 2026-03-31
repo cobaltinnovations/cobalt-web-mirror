@@ -16,6 +16,7 @@ export * from './row-renderer';
 export * from './row-selection-form';
 export * from './row-settings-group-sessions';
 export * from './row-settings-mailing-list';
+export * from './row-settings-custom-row';
 export * from './row-settings-meta-form';
 export * from './row-settings-one-column';
 export * from './row-settings-resources';

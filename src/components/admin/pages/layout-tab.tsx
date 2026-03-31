@@ -12,6 +12,7 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import SvgIcon from '@/components/svg-icon';
 import {
+	isCustomRow,
 	isGroupSessionsRow,
 	isMailingListRow,
 	isResourcesRow,
@@ -93,6 +94,10 @@ export const LayoutTab = ({ onAddRowButtonClick }: LayoutTabProps) => {
 		if (isResourcesRow(pageRow)) {
 			const resourceRow = pageRow as ResourcesRowModel;
 			return `${resourceRow.contents.length} Resource${resourceRow.contents.length === 1 ? '' : 's'}`;
+		}
+
+		if (isCustomRow(pageRow)) {
+			return `${pageRow.columns.length} column${pageRow.columns.length === 1 ? '' : 's'}`;
 		}
 
 		if ('columnThree' in pageRow) {

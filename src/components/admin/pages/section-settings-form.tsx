@@ -6,7 +6,9 @@ import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
 import {
 	BACKGROUND_COLOR_ID,
+	CustomRowModel,
 	GroupSessionsRowModel,
+	isCustomRow,
 	isGroupSessionsRow,
 	isMailingListRow,
 	isOneColumnImageRow,
@@ -63,6 +65,10 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			{ check: isTagGroupRow, title: () => 'Tag Group' },
 			{ check: isTagRow, title: () => 'Tag' },
 			{
+				check: isCustomRow,
+				title: (row: CustomRowModel) => row.name,
+			},
+			{
 				check: (row: PageRowUnionModel) =>
 					isOneColumnImageRow(row) || isTwoColumnImageRow(row) || isThreeColumnImageRow(row),
 				title: (row: OneColumnImageRowModel) => row.columnOne.headline ?? 'Custom Row',
@@ -95,6 +101,11 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 				check: isGroupSessionsRow,
 				getSubtitle: (row: GroupSessionsRowModel) =>
 					`${row.groupSessions.length} Session${row.groupSessions.length === 1 ? '' : 's'}`,
+			},
+			{
+				check: isCustomRow,
+				getSubtitle: (row: CustomRowModel) =>
+					`${row.columns.length} Column${row.columns.length === 1 ? '' : 's'}`,
 			},
 			{ check: isTagGroupRow, getSubtitle: (row: TagGroupRowModel) => row.tagGroup.name },
 			{ check: isTagRow, getSubtitle: (row: TagRowModel) => row.tag.name },
