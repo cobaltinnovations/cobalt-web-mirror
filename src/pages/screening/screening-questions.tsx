@@ -1,6 +1,7 @@
 import AsyncPage from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
+import FullscreenBar from '@/components/fullscreen-bar';
 import useHandleError from '@/hooks/use-handle-error';
 import {
 	ScreeningAnswerFormatId,
@@ -8,15 +9,23 @@ import {
 	ScreeningFlowSkipTypeId,
 	ScreeningQuestionContextResponse,
 	ScreeningConfirmationPrompt,
+	ScreeningQuestionSubmissionStyleId,
 	UserExperienceTypeId,
 	ScreeningAnswerContentHintId,
 	AnalyticsNativeEventTypeId,
 	AnalyticsNativeEventOverlayViewInCrisisSource,
+	ContentSnippet,
+	InstitutionReferrer,
 } from '@/lib/models';
-import { analyticsService, screeningService } from '@/lib/services';
+import {
+	analyticsService,
+	contentSnippetsService,
+	institutionReferrersService,
+	screeningService,
+} from '@/lib/services';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useMatches, useNavigate, useParams } from 'react-router-dom';
 import { useScreeningNavigation } from './screening.hooks';
 import classNames from 'classnames';
 import useAccount from '@/hooks/use-account';
@@ -24,14 +33,59 @@ import { IcScreeningCrisisModal } from '@/components/integrated-care/patient';
 import { Helmet } from 'react-helmet';
 import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
 import SvgIcon from '@/components/svg-icon';
+import { contentSnippetFromLegacySharedContent, ContentSnippetModal } from '@/components/content-snippet';
+
+type NormalizedFooterAction = {
+	label: string;
+	contentSnippetKey?: string;
+	legacyContentKey?: string;
+};
+
+const buildContentSnippetsByKey = (contentSnippets: ContentSnippet[]) =>
+	contentSnippets.reduce((accumulator, contentSnippet) => {
+		accumulator[contentSnippet.contentSnippetKey] = contentSnippet;
+		return accumulator;
+	}, {} as Record<string, ContentSnippet>);
+
+const normalizeFooterAction = (
+	footerAction: NonNullable<ScreeningQuestionContextResponse['screeningQuestion']['metadata']>['footerAction']
+): NormalizedFooterAction | null => {
+	if (!footerAction?.label) {
+		return null;
+	}
+
+	if (footerAction.actionType === 'OPEN_CONTENT_MODAL' && footerAction.contentSnippetKey) {
+		return {
+			label: footerAction.label,
+			contentSnippetKey: footerAction.contentSnippetKey,
+		};
+	}
+
+	if (footerAction.type === 'modal' && footerAction.contentKey) {
+		return {
+			label: footerAction.label,
+			legacyContentKey: footerAction.contentKey,
+		};
+	}
+
+	return null;
+};
 
 const ScreeningQuestionsPage = () => {
 	const handleError = useHandleError();
 	const { institution } = useAccount();
+	const navigate = useNavigate();
+	const routeMatches = useMatches();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const location = useLocation();
 	const [screeningQuestionContextResponse, setScreeningQuestionContextResponse] =
 		useState<ScreeningQuestionContextResponse>();
+	const [fullscreenInstitutionReferrer, setFullscreenInstitutionReferrer] = useState<InstitutionReferrer | null>(
+		null
+	);
+	const [fullscreenContentSnippetsByKey, setFullscreenContentSnippetsByKey] = useState<
+		Record<string, ContentSnippet>
+	>({});
 
 	const { navigateToQuestion, navigateToDestination } = useScreeningNavigation();
 	const { screeningQuestionContextId } = useParams<{ screeningQuestionContextId: string }>();
@@ -47,11 +101,91 @@ const ScreeningQuestionsPage = () => {
 	// flags whether the confirmation prompt was due to a submission error
 	const [isSubmitPrompt, setIsSubmitPrompt] = useState(false);
 	const [showHelpModal, setShowHelpModal] = useState(false);
+	const [activeContentSnippetKey, setActiveContentSnippetKey] = useState<string | null>(null);
+	const fullscreenScreening = useMemo(() => {
+		return routeMatches.some((match) => {
+			return Boolean((match.handle as { fullscreenScreening?: boolean } | undefined)?.fullscreenScreening);
+		});
+	}, [routeMatches]);
+	const fullscreenReturnTo = useMemo(() => {
+		return new URLSearchParams(location.search).get('returnTo') ?? '/';
+	}, [location.search]);
+	const fullscreenReferrerUrlName = useMemo(() => {
+		const pathname = fullscreenReturnTo.split('?')[0];
+		const match = pathname.match(/^\/referrals\/([^/]+)$/);
+
+		return match?.[1] ?? null;
+	}, [fullscreenReturnTo]);
+	const fullscreenScreeningTitle = useMemo(() => {
+		return (
+			fullscreenInstitutionReferrer?.metadata?.screening?.title ??
+			screeningQuestionContextResponse?.screening.name
+		);
+	}, [fullscreenInstitutionReferrer?.metadata?.screening?.title, screeningQuestionContextResponse?.screening.name]);
+	const fullscreenInstructionsHtml = fullscreenInstitutionReferrer?.metadata?.screening?.instructionsHtml;
+	const footerAction = useMemo(() => {
+		return normalizeFooterAction(screeningQuestionContextResponse?.screeningQuestion.metadata?.footerAction);
+	}, [screeningQuestionContextResponse?.screeningQuestion.metadata?.footerAction]);
+	const activeContentSnippet = useMemo(() => {
+		if (!activeContentSnippetKey) {
+			return null;
+		}
+
+		const contentSnippet = fullscreenContentSnippetsByKey[activeContentSnippetKey];
+
+		if (contentSnippet) {
+			return contentSnippet;
+		}
+
+		const legacyContent = fullscreenInstitutionReferrer?.metadata?.sharedContent?.[activeContentSnippetKey];
+		return legacyContent ? contentSnippetFromLegacySharedContent(activeContentSnippetKey, legacyContent) : null;
+	}, [
+		activeContentSnippetKey,
+		fullscreenContentSnippetsByKey,
+		fullscreenInstitutionReferrer?.metadata?.sharedContent,
+	]);
+	const footerActionAvailable = Boolean(
+		footerAction?.label &&
+			(footerAction.contentSnippetKey ||
+				(footerAction.legacyContentKey &&
+					fullscreenInstitutionReferrer?.metadata?.sharedContent?.[footerAction.legacyContentKey]))
+	);
 
 	const clearPrompt = useCallback(() => {
 		setConfirmationPrompt(null);
 		setIsSubmitPrompt(false);
 	}, []);
+
+	const openFooterAction = useCallback(async () => {
+		if (!footerAction) {
+			return;
+		}
+
+		if (footerAction.contentSnippetKey) {
+			if (!fullscreenContentSnippetsByKey[footerAction.contentSnippetKey]) {
+				try {
+					const { contentSnippets } = await contentSnippetsService
+						.getContentSnippetsByKeys([footerAction.contentSnippetKey])
+						.fetch();
+
+					setFullscreenContentSnippetsByKey((previousContentSnippetsByKey) => ({
+						...previousContentSnippetsByKey,
+						...buildContentSnippetsByKey(contentSnippets),
+					}));
+				} catch (error) {
+					handleError(error);
+					return;
+				}
+			}
+
+			setActiveContentSnippetKey(footerAction.contentSnippetKey);
+			return;
+		}
+
+		if (footerAction.legacyContentKey) {
+			setActiveContentSnippetKey(footerAction.legacyContentKey);
+		}
+	}, [footerAction, fullscreenContentSnippetsByKey, handleError]);
 
 	const fetchData = useCallback(async () => {
 		const request = screeningService.getScreeningQuestionContext(screeningQuestionContextId);
@@ -225,6 +359,41 @@ const ScreeningQuestionsPage = () => {
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerContentHintId,
 	]);
 
+	useEffect(() => {
+		if (!fullscreenScreening || !fullscreenReferrerUrlName) {
+			setFullscreenInstitutionReferrer(null);
+			setFullscreenContentSnippetsByKey({});
+			return;
+		}
+
+		let cancelled = false;
+
+		institutionReferrersService
+			.getReferrerByUrlName(fullscreenReferrerUrlName)
+			.fetch()
+			.then(({ institutionReferrer }) => {
+				if (!cancelled) {
+					setFullscreenInstitutionReferrer(institutionReferrer);
+					setFullscreenContentSnippetsByKey({});
+				}
+			})
+			.catch((error) => {
+				if (!cancelled) {
+					setFullscreenInstitutionReferrer(null);
+					setFullscreenContentSnippetsByKey({});
+					handleError(error);
+				}
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [fullscreenReferrerUrlName, fullscreenScreening, handleError]);
+
+	useEffect(() => {
+		setActiveContentSnippetKey(null);
+	}, [screeningQuestionContextResponse?.screeningQuestion.screeningQuestionId]);
+
 	const renderedAnswerOptions = useMemo(() => {
 		switch (screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId) {
 			case ScreeningAnswerFormatId.SINGLE_SELECT:
@@ -260,7 +429,13 @@ const ScreeningQuestionsPage = () => {
 											const selection = [optionId];
 											setSelectedAnswers(selection);
 
-											if (!option.freeformSupplement) {
+											if (
+												screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit &&
+												screeningQuestionContextResponse?.screeningQuestion
+													.screeningQuestionSubmissionStyleId !==
+													ScreeningQuestionSubmissionStyleId.NEXT &&
+												!option.freeformSupplement
+											) {
 												submitAnswers({
 													answers: selection,
 													answerText,
@@ -410,8 +585,10 @@ const ScreeningQuestionsPage = () => {
 		answerText,
 		isSubmitting,
 		screeningQuestionContextResponse?.screeningAnswerOptions,
+		screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerContentHintId,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
+		screeningQuestionContextResponse?.screeningQuestion.screeningQuestionSubmissionStyleId,
 		selectedAnswers,
 		submitAnswers,
 		supplementText,
@@ -431,11 +608,20 @@ const ScreeningQuestionsPage = () => {
 			return option?.freeformSupplement;
 		});
 
-		return isSingleSelect && (!previouslyAnswered || previouslySkipped) && !selectedAnswersHaveSupplements;
+		return Boolean(
+			isSingleSelect &&
+				screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit &&
+				screeningQuestionContextResponse?.screeningQuestion.screeningQuestionSubmissionStyleId !==
+					ScreeningQuestionSubmissionStyleId.NEXT &&
+				(!previouslyAnswered || previouslySkipped) &&
+				!selectedAnswersHaveSupplements
+		);
 	}, [
 		screeningQuestionContextResponse?.previouslyAnswered,
 		screeningQuestionContextResponse?.screeningAnswerOptions,
 		screeningQuestionContextResponse?.screeningAnswers.length,
+		screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit,
+		screeningQuestionContextResponse?.screeningQuestion.screeningQuestionSubmissionStyleId,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
 	]);
@@ -504,7 +690,26 @@ const ScreeningQuestionsPage = () => {
 					/>
 				)}
 
-				<Container className="py-8">
+				{fullscreenScreening && (
+					<FullscreenBar
+						title={fullscreenScreeningTitle ?? ''}
+						onExit={() => {
+							navigate(fullscreenReturnTo);
+						}}
+					/>
+				)}
+
+				<Container className={classNames('py-8', { 'min-vh-100': fullscreenScreening })}>
+					{fullscreenScreening && fullscreenInstructionsHtml && (
+						<Row className="mb-8">
+							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
+								<div
+									className="mb-0 fs-large wysiwyg-display"
+									dangerouslySetInnerHTML={{ __html: fullscreenInstructionsHtml }}
+								/>
+							</Col>
+						</Row>
+					)}
 					{screeningQuestionContextResponse?.screeningFlowVersion.screeningFlowId ===
 						institution.integratedCareScreeningFlowId &&
 						institution.userExperienceTypeId === UserExperienceTypeId.STAFF && (
@@ -522,200 +727,224 @@ const ScreeningQuestionsPage = () => {
 
 					<Row>
 						<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-							{confirmationPrompt ? (
-								<>
-									{confirmationPrompt.screeningImageId && (
-										<ScreeningPromptImage
-											screeningImageId={confirmationPrompt.screeningImageId}
-											className="mt-6 mx-auto d-block"
-										/>
-									)}
-
-									<div
-										className="my-6 wysiwyg-display text-center"
-										dangerouslySetInnerHTML={{
-											__html: confirmationPrompt.text,
-										}}
-									/>
-
-									<div
-										className={classNames('d-flex align-items-center', {
-											'justify-content-between': showPromptPrevious,
-											'justify-content-center': !showPromptPrevious,
-										})}
-									>
-										{showPromptPrevious && (
-											<Button
-												disabled={isSubmitting}
-												type="button"
-												onClick={() => {
-													if (isSubmitPrompt) {
-														clearPrompt();
-													} else if (
-														screeningQuestionContextResponse?.previousScreeningQuestionContextId
-													) {
-														navigateToQuestion(
-															screeningQuestionContextResponse.previousScreeningQuestionContextId
-														);
-													}
-												}}
-											>
-												Previous
-											</Button>
-										)}
-
-										<Button
-											disabled={disableNextBtn}
-											onClick={async () => {
-												if (isSubmitPrompt) {
-													submitAnswers({
-														answers: selectedAnswers,
-														answerText,
-														supplementText,
-														force: true,
-													});
-												} else {
-													clearPrompt();
-												}
-											}}
-										>
-											{confirmationPrompt.actionText}
-										</Button>
-									</div>
-								</>
-							) : (
-								<>
-									{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
-										<div
-											className="mb-3"
-											dangerouslySetInnerHTML={{
-												__html: screeningQuestionContextResponse.screeningQuestion.introText,
-											}}
-										/>
-									)}
-
-									<h3 className="mb-5">
-										<div
-											className="wysiwyg-display"
-											dangerouslySetInnerHTML={{
-												__html: screeningQuestionContextResponse?.screeningQuestion
-													.questionText!,
-											}}
-										/>
-									</h3>
-
-									<Form
-										onSubmit={(e) => {
-											e.preventDefault();
-											submitAnswers({
-												answers: selectedAnswers,
-												answerText,
-												supplementText,
-											});
-										}}
-									>
-										{renderedAnswerOptions}
-
-										{screeningQuestionContextResponse?.screeningQuestion.footerText && (
-											<div
-												className="mt-3 mb-5"
-												dangerouslySetInnerHTML={{
-													__html: screeningQuestionContextResponse?.screeningQuestion
-														.footerText,
-												}}
+							<div
+								className={classNames({
+									'bg-white border rounded-3 p-8 shadow-sm': fullscreenScreening,
+								})}
+							>
+								{confirmationPrompt ? (
+									<>
+										{confirmationPrompt.screeningImageId && (
+											<ScreeningPromptImage
+												screeningImageId={confirmationPrompt.screeningImageId}
+												className="mt-6 mx-auto d-block"
 											/>
 										)}
 
-										<div className="d-flex">
-											{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
+										<div
+											className="my-6 wysiwyg-display text-center"
+											dangerouslySetInnerHTML={{
+												__html: confirmationPrompt.text,
+											}}
+										/>
+
+										<div
+											className={classNames('d-flex align-items-center', {
+												'justify-content-between': showPromptPrevious,
+												'justify-content-center': !showPromptPrevious,
+											})}
+										>
+											{showPromptPrevious && (
 												<Button
 													disabled={isSubmitting}
 													type="button"
 													onClick={() => {
-														navigateToQuestion(
-															screeningQuestionContextResponse.previousScreeningQuestionContextId ??
-																''
-														);
+														if (isSubmitPrompt) {
+															clearPrompt();
+														} else if (
+															screeningQuestionContextResponse?.previousScreeningQuestionContextId
+														) {
+															navigateToQuestion(
+																screeningQuestionContextResponse.previousScreeningQuestionContextId
+															);
+														}
 													}}
 												>
 													Previous
 												</Button>
 											)}
 
-											<div className="ms-auto">
-												{showSkipBtn && (
+											<Button
+												disabled={disableNextBtn}
+												onClick={async () => {
+													if (isSubmitPrompt) {
+														submitAnswers({
+															answers: selectedAnswers,
+															answerText,
+															supplementText,
+															force: true,
+														});
+													} else {
+														clearPrompt();
+													}
+												}}
+											>
+												{confirmationPrompt.actionText}
+											</Button>
+										</div>
+									</>
+								) : (
+									<>
+										{!!screeningQuestionContextResponse?.screeningQuestion.introText && (
+											<div
+												className="mb-3"
+												dangerouslySetInnerHTML={{
+													__html: screeningQuestionContextResponse.screeningQuestion
+														.introText,
+												}}
+											/>
+										)}
+
+										<h3 className="mb-5">
+											<div
+												className="wysiwyg-display"
+												dangerouslySetInnerHTML={{
+													__html: screeningQuestionContextResponse?.screeningQuestion
+														.questionText!,
+												}}
+											/>
+										</h3>
+
+										<Form
+											onSubmit={(e) => {
+												e.preventDefault();
+												submitAnswers({
+													answers: selectedAnswers,
+													answerText,
+													supplementText,
+												});
+											}}
+										>
+											{renderedAnswerOptions}
+
+											{(screeningQuestionContextResponse?.screeningQuestion.footerText ||
+												footerActionAvailable) && (
+												<div className="mt-3 mb-5 d-flex flex-wrap align-items-baseline gap-2">
+													{screeningQuestionContextResponse?.screeningQuestion.footerText && (
+														<div
+															className="wysiwyg-display"
+															dangerouslySetInnerHTML={{
+																__html: screeningQuestionContextResponse
+																	.screeningQuestion.footerText,
+															}}
+														/>
+													)}
+													{footerActionAvailable && footerAction?.label && (
+														<Button
+															variant="link"
+															className="p-0 align-baseline"
+															type="button"
+															onClick={openFooterAction}
+														>
+															{footerAction.label}
+														</Button>
+													)}
+												</div>
+											)}
+
+											<div className="d-flex">
+												{screeningQuestionContextResponse?.previousScreeningQuestionContextId && (
 													<Button
-														variant="outline-primary"
 														disabled={isSubmitting}
-														className={classNames({
-															'me-2': !hideNextBtn,
-														})}
 														type="button"
 														onClick={() => {
-															submitAnswers({
-																answers: [],
-																answerText: {},
-																supplementText: {},
-															});
+															navigateToQuestion(
+																screeningQuestionContextResponse.previousScreeningQuestionContextId ??
+																	''
+															);
 														}}
 													>
-														Skip Question
+														Previous
 													</Button>
 												)}
 
-												{!hideNextBtn && (
-													<Button disabled={disableNextBtn} type="submit">
-														Next
+												<div className="ms-auto">
+													{showSkipBtn && (
+														<Button
+															variant="outline-primary"
+															disabled={isSubmitting}
+															className={classNames({
+																'me-2': !hideNextBtn,
+															})}
+															type="button"
+															onClick={() => {
+																submitAnswers({
+																	answers: [],
+																	answerText: {},
+																	supplementText: {},
+																});
+															}}
+														>
+															Skip Question
+														</Button>
+													)}
+
+													{!hideNextBtn && (
+														<Button disabled={disableNextBtn} type="submit">
+															Next
+														</Button>
+													)}
+												</div>
+											</div>
+
+											{screeningQuestionContextResponse?.screeningFlowVersion.skippable && (
+												<div className="d-flex">
+													<Button
+														variant="link"
+														className="mx-auto"
+														type="button"
+														disabled={isSubmitting}
+														onClick={() => {
+															if (isSubmitting || !screeningQuestionContextId) {
+																return;
+															}
+
+															if (
+																!window.confirm(
+																	'Are you sure you want to skip this assessment?'
+																)
+															) {
+																return;
+															}
+
+															screeningService
+																.skipScreeningQuestionContext(
+																	screeningQuestionContextId
+																)
+																.fetch()
+																.then((response) => {
+																	navigateToDestination(
+																		response.screeningSession
+																			.screeningSessionDestination,
+																		{ skipped: true }
+																	);
+																})
+																.catch((e) => {
+																	handleError(e);
+																});
+														}}
+													>
+														{screeningQuestionContextResponse?.screeningFlowVersion
+															.screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
+															? 'Exit Assessment'
+															: 'Skip Assessment'}
 													</Button>
-												)}
-											</div>
-										</div>
-
-										{screeningQuestionContextResponse?.screeningFlowVersion.skippable && (
-											<div className="d-flex">
-												<Button
-													variant="link"
-													className="mx-auto"
-													type="button"
-													disabled={isSubmitting}
-													onClick={() => {
-														if (isSubmitting || !screeningQuestionContextId) {
-															return;
-														}
-
-														if (
-															!window.confirm(
-																'Are you sure you want to skip this assessment?'
-															)
-														) {
-															return;
-														}
-
-														screeningService
-															.skipScreeningQuestionContext(screeningQuestionContextId)
-															.fetch()
-															.then((response) => {
-																navigateToDestination(
-																	response.screeningSession
-																		.screeningSessionDestination,
-																	{ skipped: true }
-																);
-															})
-															.catch((e) => {
-																handleError(e);
-															});
-													}}
-												>
-													{screeningQuestionContextResponse?.screeningFlowVersion
-														.screeningFlowSkipTypeId === ScreeningFlowSkipTypeId.EXIT
-														? 'Exit Assessment'
-														: 'Skip Assessment'}
-												</Button>
-											</div>
-										)}
-									</Form>
-								</>
-							)}
+												</div>
+											)}
+										</Form>
+									</>
+								)}
+							</div>
 						</Col>
 					</Row>
 				</Container>
@@ -779,6 +1008,13 @@ const ScreeningQuestionsPage = () => {
 							</Modal>
 						</>
 					)}
+				<ContentSnippetModal
+					contentSnippet={activeContentSnippet}
+					onHide={() => {
+						setActiveContentSnippetKey(null);
+					}}
+					show={Boolean(activeContentSnippet)}
+				/>
 			</AsyncPage>
 		</>
 	);
