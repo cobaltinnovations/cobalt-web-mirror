@@ -6,6 +6,7 @@ import {
 	AnalyticsNativeEventTypeId,
 	Content,
 	ContentStatusId,
+	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
 	CustomRowModel,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
@@ -419,35 +420,57 @@ const CustomRowRenderer = ({
 						'mb-16 mb-lg-0': columnIndex !== columns.length - 1,
 					})}
 				>
-					{column.imageUrl && (
-						<img
-							className={classNames('w-100', {
-								'mb-6': column.headline || column.description,
-							})}
-							src={column.imageUrl}
-							alt={column.imageAltText ?? ''}
-						/>
-					)}
-					{column.headline && (
-						<h3 className={classNames({ 'mb-6': column.description })}>{column.headline}</h3>
-					)}
-					{column.description && (
-						<WysiwygDisplay
-							html={column.description ?? ''}
-							onClick={({ linkUrl, linkText }) => {
-								if (!enableAnalytics) {
-									return;
-								}
+					{(column.contentOrderId === CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE
+						? ['text', 'image']
+						: ['image', 'text']
+					)
+						.filter((sectionId) => {
+							if (sectionId === 'image') {
+								return !!column.imageUrl;
+							}
 
-								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
-									pageId,
-									linkUrl,
-									linkText,
-									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
-								});
-							}}
-						/>
-					)}
+							return !!(column.headline || column.description);
+						})
+						.map((sectionId, sectionIndex, sectionIds) => (
+							<div
+								key={`${column.pageRowColumnId}-${sectionId}`}
+								className={classNames({ 'mb-6': sectionIndex !== sectionIds.length - 1 })}
+							>
+								{sectionId === 'image' ? (
+									<img className="w-100" src={column.imageUrl} alt={column.imageAltText ?? ''} />
+								) : (
+									<>
+										{column.headline && (
+											<h3 className={classNames({ 'mb-6': column.description })}>
+												{column.headline}
+											</h3>
+										)}
+										{column.description && (
+											<WysiwygDisplay
+												html={column.description ?? ''}
+												onClick={({ linkUrl, linkText }) => {
+													if (!enableAnalytics) {
+														return;
+													}
+
+													analyticsService.persistEvent(
+														AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK,
+														{
+															pageId,
+															linkUrl,
+															linkText,
+															siteLocationIds: livePageSiteLocations.map(
+																(i) => i.siteLocationId
+															),
+														}
+													);
+												}}
+											/>
+										)}
+									</>
+								)}
+							</div>
+						))}
 				</Col>
 			))}
 		</Row>

@@ -2,6 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
+	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
 	CustomRowModel,
 	GroupSessionsRowModel,
 	MailingListRowModel,
@@ -275,6 +276,7 @@ export const pagesService = {
 			description?: string;
 			imageFileUploadId?: string;
 			imageAltText?: string;
+			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 		} = {}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -302,6 +304,7 @@ export const pagesService = {
 			description?: string;
 			imageFileUploadId?: string;
 			imageAltText?: string;
+			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{

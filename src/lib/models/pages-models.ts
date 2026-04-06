@@ -42,6 +42,11 @@ export enum ROW_TYPE_ID {
 	MAILING_LIST = 'MAILING_LIST',
 }
 
+export enum CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID {
+	IMAGE_THEN_TEXT = 'IMAGE_THEN_TEXT',
+	TEXT_THEN_IMAGE = 'TEXT_THEN_IMAGE',
+}
+
 export interface PageSectionModel {
 	pageSectionId: string;
 	pageId: string;
@@ -167,6 +172,7 @@ export interface PageRowColumnModel {
 	imageAltText: string;
 	imageUrl: string;
 	columnDisplayOrder: number;
+	contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 }
 
 export interface MailingListRowModel extends PageRowBaseModel {

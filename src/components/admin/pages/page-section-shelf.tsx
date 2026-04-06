@@ -220,6 +220,7 @@ export const PageSectionShelf = () => {
 							}}
 							showCloseButton
 							onCloseButtonButtonClick={handleClose}
+							bodyClassName="pt-0"
 							title={`Column ${selectedCustomRowColumn.label}`}
 						>
 							<RowSettingsCustomRowColumn pageRowColumnId={selectedCustomRowColumn.pageRowColumnId} />
