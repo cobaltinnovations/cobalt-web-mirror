@@ -148,7 +148,7 @@ export const MhicHeader = ({ recentOrders = [], patientOrder }: MhicHeaderProps)
 
 	const isInAssessmentView = !!assessmentMatch;
 
-	const hasAssessmentResult = !!patientOrder?.screeningSessionResult;
+	const hasAssessmentResult = !!patientOrder?.screeningSessionResult || !!patientOrder?.intakeScreeningSessionResult;
 
 	const navigationLinks = useMemo(
 		() => [

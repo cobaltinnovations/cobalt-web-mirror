@@ -1,6 +1,7 @@
 import { ScreeningIntro } from '@/components/integrated-care/common';
 import { MhicAssessmentComplete } from '@/components/integrated-care/mhic';
 import useAccount from '@/hooks/use-account';
+import { PatientOrderIntakeScreeningStatusId, PatientOrderScreeningStatusId } from '@/lib/models';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import React, { useState } from 'react';
 import { useParams, useRevalidator } from 'react-router-dom';
@@ -18,9 +19,14 @@ export const MhicOrderAssessment = () => {
 		instantiateOnLoad: false,
 	});
 	const [isRecreate, setIsRecreate] = useState(false);
+	const patientOrder = patientOrderResponse.patientOrder;
 
-	const isCompleted =
-		!!patientOrderResponse.patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied && !isRecreate;
+	const isCompleted = !!patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied && !isRecreate;
+	const isInProgress =
+		(patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS ||
+			patientOrder?.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS) &&
+		!isRecreate;
+	const isReviewable = isCompleted || isInProgress;
 
 	if (renderedPreScreeningLoader) {
 		return renderedPreScreeningLoader;
@@ -28,10 +34,10 @@ export const MhicOrderAssessment = () => {
 
 	return (
 		<>
-			{!isCompleted && (
+			{!isReviewable && (
 				<ScreeningIntro
 					isMhic
-					patientOrder={patientOrderResponse.patientOrder}
+					patientOrder={patientOrder}
 					onBegin={async () => {
 						await createScreeningSession();
 
@@ -40,9 +46,9 @@ export const MhicOrderAssessment = () => {
 				/>
 			)}
 
-			{isCompleted && (
+			{isReviewable && (
 				<MhicAssessmentComplete
-					patientOrder={patientOrderResponse.patientOrder}
+					patientOrder={patientOrder}
 					onStartNewAssessment={() => {
 						setIsRecreate(true);
 					}}
