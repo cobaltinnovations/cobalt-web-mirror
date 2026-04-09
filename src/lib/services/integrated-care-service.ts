@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildBackendDownloadUrl, buildQueryParamUrl } from '@/lib/utils';
 import {
 	AccountModel,
 	DepartmentAvailabilityStatusId,
@@ -495,6 +495,9 @@ export const integratedCareService = {
 			method: 'GET',
 			url: `/patient-orders/${patientOrderId}/clinical-report`,
 		});
+	},
+	getAssessmentAnswerReportDownloadUrl(patientOrderId: string) {
+		return buildBackendDownloadUrl(`/patient-orders/${patientOrderId}/assessment-answer-report`, {});
 	},
 	getEpicDepartments() {
 		return httpSingleton.orchestrateRequest<{

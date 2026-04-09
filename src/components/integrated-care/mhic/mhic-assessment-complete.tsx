@@ -10,7 +10,9 @@ import {
 	AnalyticsNativeEventTypeId,
 	PatientOrderConsentStatusId,
 	PatientOrderDispositionId,
+	PatientOrderIntakeScreeningStatusId,
 	PatientOrderModel,
+	PatientOrderScreeningStatusId,
 	PatientOrderSafetyPlanningStatusId,
 	ScreeningSessionScreeningResult,
 	ScreeningType,
@@ -62,6 +64,28 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	const handleError = useHandleError();
 	const [showResetModel, setShowResetModel] = useState(false);
 	const { addFlag } = useFlags();
+	const isAssessmentComplete = !!patientOrder?.mostRecentIntakeAndClinicalScreeningsSatisfied;
+	const assessmentAnswerReportSessionId =
+		patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS
+			? patientOrder?.mostRecentIntakeScreeningSessionId
+			: patientOrder?.patientOrderScreeningStatusId === PatientOrderScreeningStatusId.IN_PROGRESS
+			? patientOrder?.mostRecentScreeningSessionId
+			: patientOrder?.mostRecentScreeningSessionId ?? patientOrder?.mostRecentIntakeScreeningSessionId;
+	const hasAssessmentAnswerReport = !!assessmentAnswerReportSessionId;
+	const assessmentActorDisplayName = isAssessmentComplete
+		? patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName ??
+		  patientOrder?.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName
+		: patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS
+		? patientOrder?.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName
+		: patientOrder?.mostRecentScreeningSessionCreatedByAccountDisplayName;
+	const assessmentStatusDescription = isAssessmentComplete
+		? patientOrder?.screeningSession?.completedAtDescription ??
+		  patientOrder?.intakeScreeningSession?.completedAtDescription
+		: patientOrder?.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS
+		? patientOrder?.mostRecentIntakeScreeningSessionCreatedAtDescription
+		: patientOrder?.mostRecentScreeningSessionCreatedAtDescription;
+	const assessmentSummaryVerb = isAssessmentComplete ? 'Completed' : 'Started';
+	const assessmentResultsTitle = isAssessmentComplete ? 'Completed Assessments' : 'Assessments';
 
 	const eligilityResults = useMemo(
 		() => patientOrder?.intakeScreeningSessionResult?.screeningSessionScreeningResults ?? [],
@@ -74,7 +98,14 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 	);
 
 	const fetchData = useCallback(async () => {
-		if (!patientOrder?.screeningSession?.screeningFlowVersionId) {
+		if (patientOrder) {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_ASSESSMENT_RESULTS, {
+				patientOrderId: patientOrder.patientOrderId,
+			});
+		}
+
+		if (!isAssessmentComplete || !patientOrder?.screeningSession?.screeningFlowVersionId) {
+			setNotTakeScreeningTypes([]);
 			return;
 		}
 
@@ -93,15 +124,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 				return !takenScreeningTypeIds.includes(st.screeningTypeId);
 			})
 		);
-
-		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_MHIC_ORDER_ASSESSMENT_RESULTS, {
-			patientOrderId: patientOrder.patientOrderId,
-		});
-	}, [
-		patientOrder?.patientOrderId,
-		patientOrder?.screeningSession?.screeningFlowVersionId,
-		patientOrder?.screeningSessionResult?.screeningSessionScreeningResults,
-	]);
+	}, [isAssessmentComplete, patientOrder]);
 
 	const handleExportResultsClick = useCallback(async () => {
 		if (patientOrder) {
@@ -137,6 +160,14 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 			setIsExportingResults(false);
 		}
 	}, [copyTextToClipboard, handleError, patientOrder]);
+
+	const handleDownloadAssessmentReport = useCallback(() => {
+		if (!patientOrder) {
+			return;
+		}
+
+		window.location.href = integratedCareService.getAssessmentAnswerReportDownloadUrl(patientOrder.patientOrderId);
+	}, [patientOrder]);
 
 	const handleResetPatientOrder = useCallback(async () => {
 		try {
@@ -207,6 +238,16 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											<SvgIcon kit="far" icon="arrow-rotate-left" size={16} className="me-2" />
 											Reset
 										</Button>
+										{hasAssessmentAnswerReport && (
+											<Button
+												variant="outline-primary"
+												className="me-2 d-flex align-items-center"
+												onClick={handleDownloadAssessmentReport}
+											>
+												Download Report
+												<SvgIcon kit="far" icon="download" size={16} className="ms-2" />
+											</Button>
+										)}
 										<Button
 											className="d-flex align-items-center"
 											onClick={handleExportResultsClick}
@@ -218,12 +259,19 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 									</div>
 								</div>
 								<p className="mb-0">
-									Completed{' '}
-									{patientOrder.screeningSession?.completedAtDescription ??
-										patientOrder.intakeScreeningSession?.completedAtDescription}{' '}
-									by{' '}
-									{patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName ??
-										patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName}
+									{assessmentSummaryVerb}
+									{assessmentStatusDescription && (
+										<>
+											{' '}
+											<strong>{assessmentStatusDescription}</strong>
+										</>
+									)}
+									{assessmentActorDisplayName && (
+										<>
+											{' '}
+											by <strong>{assessmentActorDisplayName}</strong>
+										</>
+									)}
 								</p>
 							</Col>
 						</Row>
@@ -238,7 +286,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 								<div className="mb-8 d-flex align-items-center justify-content-between">
 									<h3 className="mb-0">Results</h3>
 
-									{canFlagForSafetyPlanning && (
+									{isAssessmentComplete && canFlagForSafetyPlanning && (
 										<MhicFlagOrderForSafetyPlanning patientOrderId={patientOrder.patientOrderId} />
 									)}
 								</div>
@@ -252,32 +300,48 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										</Col>
 									</Row>
 								)}
-								<MhicNextStepsAlerts
-									patientOrder={patientOrder}
-									referenceData={referenceDataResponse}
-									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
-								/>
-								<MhicTriageCard
-									className="mb-6"
-									patientOrder={patientOrder}
-									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
-								/>
-								<MhicNextStepsAppointment
-									className="mb-6"
-									patientOrder={patientOrder}
-									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
-								/>
-								<hr className="mb-8" />
+								{isAssessmentComplete && (
+									<>
+										<MhicNextStepsAlerts
+											patientOrder={patientOrder}
+											referenceData={referenceDataResponse}
+											disabled={
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
+											}
+										/>
+										<MhicTriageCard
+											className="mb-6"
+											patientOrder={patientOrder}
+											disabled={
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
+											}
+										/>
+										<MhicNextStepsAppointment
+											className="mb-6"
+											patientOrder={patientOrder}
+											disabled={
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
+											}
+										/>
+										<hr className="mb-8" />
 
-								<div className="mb-8">
-									<h3 className="mb-0">Resources</h3>
-								</div>
-								<MhicNextStepsResources
-									patientOrder={patientOrder}
-									referenceData={referenceDataResponse}
-									disabled={patientOrder.patientOrderDispositionId !== PatientOrderDispositionId.OPEN}
-								/>
-								<hr className="mb-8" />
+										<div className="mb-8">
+											<h3 className="mb-0">Resources</h3>
+										</div>
+										<MhicNextStepsResources
+											patientOrder={patientOrder}
+											referenceData={referenceDataResponse}
+											disabled={
+												patientOrder.patientOrderDispositionId !==
+												PatientOrderDispositionId.OPEN
+											}
+										/>
+										<hr className="mb-8" />
+									</>
+								)}
 
 								{eligilityResults.length > 0 && (
 									<>
@@ -297,7 +361,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 								{completedAssessmentsResults.length > 0 && (
 									<>
 										<div className={classes.scrollAnchor} id="completed-assessments" />
-										<h3 className="mb-8">Completed Assessments</h3>
+										<h3 className="mb-8">{assessmentResultsTitle}</h3>
 										{completedAssessmentsResults.map((screening) => (
 											<ScreeningResultCard
 												key={screening.screeningId}
@@ -310,7 +374,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 
 								<AsyncWrapper fetchData={fetchData}>
 									<>
-										{notTakenScreeningTypes.length > 0 && (
+										{isAssessmentComplete && notTakenScreeningTypes.length > 0 && (
 											<>
 												<hr className="mb-8" />
 												<div className={classes.scrollAnchor} id="other-assessments" />
@@ -371,7 +435,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 										...(completedAssessmentsResults.length > 0
 											? [
 													{
-														title: 'Completed Assessments',
+														title: assessmentResultsTitle,
 														value: '#completed-assessments',
 													},
 											  ]
@@ -381,7 +445,7 @@ export const MhicAssessmentComplete = ({ patientOrder, onStartNewAssessment }: M
 											value: result.screeningId ? `#${result.screeningId}` : '#',
 											level: 1,
 										})),
-										...(notTakenScreeningTypes.length > 0
+										...(isAssessmentComplete && notTakenScreeningTypes.length > 0
 											? [
 													{
 														title: 'Other Assessments',
