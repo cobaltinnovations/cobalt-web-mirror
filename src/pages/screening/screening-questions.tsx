@@ -9,7 +9,6 @@ import {
 	ScreeningFlowSkipTypeId,
 	ScreeningQuestionContextResponse,
 	ScreeningConfirmationPrompt,
-	ScreeningQuestionSubmissionStyleId,
 	UserExperienceTypeId,
 	ScreeningAnswerContentHintId,
 	AnalyticsNativeEventTypeId,
@@ -431,9 +430,6 @@ const ScreeningQuestionsPage = () => {
 
 											if (
 												screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit &&
-												screeningQuestionContextResponse?.screeningQuestion
-													.screeningQuestionSubmissionStyleId !==
-													ScreeningQuestionSubmissionStyleId.NEXT &&
 												!option.freeformSupplement
 											) {
 												submitAnswers({
@@ -588,7 +584,6 @@ const ScreeningQuestionsPage = () => {
 		screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerContentHintId,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
-		screeningQuestionContextResponse?.screeningQuestion.screeningQuestionSubmissionStyleId,
 		selectedAnswers,
 		submitAnswers,
 		supplementText,
@@ -611,8 +606,6 @@ const ScreeningQuestionsPage = () => {
 		return Boolean(
 			isSingleSelect &&
 				screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit &&
-				screeningQuestionContextResponse?.screeningQuestion.screeningQuestionSubmissionStyleId !==
-					ScreeningQuestionSubmissionStyleId.NEXT &&
 				(!previouslyAnswered || previouslySkipped) &&
 				!selectedAnswersHaveSupplements
 		);
@@ -621,7 +614,6 @@ const ScreeningQuestionsPage = () => {
 		screeningQuestionContextResponse?.screeningAnswerOptions,
 		screeningQuestionContextResponse?.screeningAnswers.length,
 		screeningQuestionContextResponse?.screeningQuestion.preferAutosubmit,
-		screeningQuestionContextResponse?.screeningQuestion.screeningQuestionSubmissionStyleId,
 		screeningQuestionContextResponse?.screeningQuestion.screeningAnswerFormatId,
 		selectedAnswers,
 	]);
