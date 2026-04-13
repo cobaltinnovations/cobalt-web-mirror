@@ -112,7 +112,7 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 						: undefined
 				}
 			/>
-			{pageRows.map((pageRow, rowIndex) => (
+			{pageRows.map((pageRow) => (
 				<Container
 					key={pageRow.pageRowId}
 					fluid
@@ -124,7 +124,6 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 							pageRow,
 							contentsByTagGroupId: contentsByTagGroupId ?? {},
 							tagsByTagId: tagsByTagId ?? {},
-							isLast: rowIndex === pageRows.length - 1,
 							enableAnalytics,
 							livePageSiteLocations: page.livePageSiteLocations,
 						})}

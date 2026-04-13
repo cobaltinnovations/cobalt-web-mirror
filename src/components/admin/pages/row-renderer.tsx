@@ -944,7 +944,6 @@ export const getRendererForPageRow = ({
 	pageRow,
 	contentsByTagGroupId,
 	tagsByTagId,
-	isLast,
 	enableAnalytics,
 	livePageSiteLocations,
 }: {
@@ -952,7 +951,6 @@ export const getRendererForPageRow = ({
 	pageRow: PageRowUnionModel;
 	contentsByTagGroupId: Record<string, Content[]>;
 	tagsByTagId: Record<string, Tag>;
-	isLast: boolean;
 	enableAnalytics: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
 }) => {
@@ -967,7 +965,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -981,7 +978,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -995,7 +991,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1009,7 +1004,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1023,7 +1017,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1037,7 +1030,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1051,7 +1043,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1065,7 +1056,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1079,7 +1069,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1093,7 +1082,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
@@ -1107,7 +1095,6 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
 				/>
 			),
 		},
