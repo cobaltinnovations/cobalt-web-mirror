@@ -2,6 +2,8 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
+	CallToActionBlockRowModel,
+	CallToActionFullWidthRowModel,
 	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
 	CustomRowModel,
 	GroupSessionsRowModel,
@@ -443,6 +445,76 @@ export const pagesService = {
 		}>({
 			method: 'PUT',
 			url: `/pages/row/${pageRowId}/mailing-list`,
+			data,
+		});
+	},
+	createCallToActionBlockRow(
+		pageSectionId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			buttonText?: string;
+			buttonUrl?: string;
+			imageFileUploadId?: string;
+		} = {}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionBlockRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/call-to-action-block`,
+			data,
+		});
+	},
+	updateCallToActionBlockRow(
+		pageRowId: string,
+		data: {
+			headline: string;
+			description: string;
+			buttonText: string;
+			buttonUrl: string;
+			imageFileUploadId?: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionBlockRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/call-to-action-block`,
+			data,
+		});
+	},
+	createCallToActionFullWidthRow(
+		pageSectionId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			buttonText?: string;
+			buttonUrl?: string;
+		} = {}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionFullWidthRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/call-to-action-full-width`,
+			data,
+		});
+	},
+	updateCallToActionFullWidthRow(
+		pageRowId: string,
+		data: {
+			headline: string;
+			description: string;
+			buttonText: string;
+			buttonUrl: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionFullWidthRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/call-to-action-full-width`,
 			data,
 		});
 	},

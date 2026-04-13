@@ -6,8 +6,12 @@ import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
 import {
 	BACKGROUND_COLOR_ID,
+	CallToActionBlockRowModel,
+	CallToActionFullWidthRowModel,
 	CustomRowModel,
 	GroupSessionsRowModel,
+	isCallToActionBlockRow,
+	isCallToActionFullWidthRow,
 	isCustomRow,
 	isGroupSessionsRow,
 	isMailingListRow,
@@ -79,6 +83,14 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					return row.title ?? 'Subscribe';
 				},
 			},
+			{
+				check: isCallToActionBlockRow,
+				title: (row: CallToActionBlockRowModel) => row.headline || row.name,
+			},
+			{
+				check: isCallToActionFullWidthRow,
+				title: (row: CallToActionFullWidthRowModel) => row.headline || row.name,
+			},
 		];
 
 		for (const { check, title } of rowTypeMap) {
@@ -113,6 +125,8 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
 			{ check: isMailingListRow, getSubtitle: () => 'Subscribe' },
+			{ check: isCallToActionBlockRow, getSubtitle: () => 'Block CTA' },
+			{ check: isCallToActionFullWidthRow, getSubtitle: () => 'Full-width CTA' },
 		];
 
 		for (const { check, getSubtitle } of rowTypeMap) {

@@ -40,6 +40,8 @@ export enum ROW_TYPE_ID {
 	TWO_COLUMN_IMAGE = 'TWO_COLUMN_IMAGE',
 	THREE_COLUMN_IMAGE = 'THREE_COLUMN_IMAGE',
 	MAILING_LIST = 'MAILING_LIST',
+	CALL_TO_ACTION_BLOCK = 'CALL_TO_ACTION_BLOCK',
+	CALL_TO_ACTION_FULL_WIDTH = 'CALL_TO_ACTION_FULL_WIDTH',
 }
 
 export enum CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID {
@@ -106,7 +108,9 @@ export type PageRowUnionModel =
 	| OneColumnRowModel
 	| TwoColumnRowModel
 	| ThreeColumnRowModel
-	| MailingListRowModel;
+	| MailingListRowModel
+	| CallToActionBlockRowModel
+	| CallToActionFullWidthRowModel;
 
 export interface PageRowBaseModel {
 	pageRowId: string;
@@ -181,6 +185,23 @@ export interface MailingListRowModel extends PageRowBaseModel {
 	title: string;
 }
 
+export interface CallToActionRowBaseModel extends PageRowBaseModel {
+	headline: string;
+	description: string;
+	buttonText: string;
+	buttonUrl: string;
+	imageFileUploadId?: string;
+	imageUrl?: string;
+}
+
+export interface CallToActionBlockRowModel extends CallToActionRowBaseModel {
+	rowTypeId: ROW_TYPE_ID.CALL_TO_ACTION_BLOCK;
+}
+
+export interface CallToActionFullWidthRowModel extends CallToActionRowBaseModel {
+	rowTypeId: ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH;
+}
+
 export const isResourcesRow = (x: PageRowUnionModel): x is ResourcesRowModel => {
 	return x.hasOwnProperty('contents');
 };
@@ -239,4 +260,18 @@ export const isThreeColumnImageRow = (x: PageRowUnionModel): x is ThreeColumnIma
 
 export const isMailingListRow = (x: PageRowUnionModel): x is MailingListRowModel => {
 	return x.rowTypeId === ROW_TYPE_ID.MAILING_LIST;
+};
+
+export const isCallToActionBlockRow = (x: PageRowUnionModel): x is CallToActionBlockRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK;
+};
+
+export const isCallToActionFullWidthRow = (x: PageRowUnionModel): x is CallToActionFullWidthRowModel => {
+	return x.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH;
+};
+
+export const isCallToActionRow = (
+	x: PageRowUnionModel
+): x is CallToActionBlockRowModel | CallToActionFullWidthRowModel => {
+	return isCallToActionBlockRow(x) || isCallToActionFullWidthRow(x);
 };

@@ -4,12 +4,16 @@ import { Button, Col, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
+	CallToActionBlockRowModel,
+	CallToActionFullWidthRowModel,
 	Content,
 	ContentStatusId,
 	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
 	CustomRowModel,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
+	isCallToActionBlockRow,
+	isCallToActionFullWidthRow,
 	isGroupSessionsRow,
 	isCustomRow,
 	isOneColumnImageRightRow,
@@ -47,6 +51,8 @@ import AsyncWrapper from '@/components/async-page';
 import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
 import InputHelper from '@/components/input-helper';
 import LoadingButton from '@/components/loading-button';
+import NoData from '@/components/no-data';
+import CallToActionBlock from '@/components/call-to-action-block';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageId: string;
@@ -759,6 +765,102 @@ const ThreeColRowRenderer = ({
 	);
 };
 
+const FullWidthCallToActionRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+}: RowRendererProps<CallToActionFullWidthRowModel>) => {
+	const handleButtonClick = () => {
+		if (enableAnalytics && pageRow.buttonUrl) {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+				pageId,
+				linkUrl: pageRow.buttonUrl,
+				linkText: pageRow.buttonText ?? '',
+				siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+			});
+		}
+
+		if (pageRow.buttonUrl) {
+			window.location.assign(pageRow.buttonUrl);
+		}
+	};
+
+	return (
+		<NoData
+			className={className}
+			title={pageRow.headline}
+			description={
+				pageRow.description ? (
+					<WysiwygDisplay
+						className="text-center"
+						html={pageRow.description}
+						onClick={({ linkUrl, linkText }) => {
+							if (!enableAnalytics) {
+								return;
+							}
+
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+								pageId,
+								linkUrl,
+								linkText,
+								siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+							});
+						}}
+					/>
+				) : undefined
+			}
+			actions={
+				pageRow.buttonText
+					? [
+							{
+								variant: 'primary' as const,
+								title: pageRow.buttonText,
+								onClick: handleButtonClick,
+								disabled: !pageRow.buttonUrl,
+							},
+					  ]
+					: []
+			}
+		/>
+	);
+};
+
+const BlockCallToActionRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+}: RowRendererProps<CallToActionBlockRowModel>) => {
+	const handleButtonClick = () => {
+		if (enableAnalytics && pageRow.buttonUrl) {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+				pageId,
+				linkUrl: pageRow.buttonUrl,
+				linkText: pageRow.buttonText ?? '',
+				siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+			});
+		}
+
+		if (pageRow.buttonUrl) {
+			window.location.assign(pageRow.buttonUrl);
+		}
+	};
+
+	return (
+		<CallToActionBlock
+			className={className}
+			heading={pageRow.headline}
+			descriptionHtml={pageRow.description ?? ''}
+			imageUrl={pageRow.imageUrl ?? ''}
+			primaryActionText={pageRow.buttonText}
+			onPrimaryActionClick={handleButtonClick}
+		/>
+	);
+};
+
 const MailingListRowRenderer = ({
 	pageId,
 	pageRow,
@@ -957,6 +1059,34 @@ export const getRendererForPageRow = ({
 			check: isThreeColumnImageRow,
 			getRow: (row: any) => (
 				<ThreeColRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
+		},
+		{
+			check: isCallToActionBlockRow,
+			getRow: (row: any) => (
+				<BlockCallToActionRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					className={classNames({ 'mb-16': !isLast })}
+				/>
+			),
+		},
+		{
+			check: isCallToActionFullWidthRow,
+			getRow: (row: any) => (
+				<FullWidthCallToActionRowRenderer
 					pageId={pageId}
 					pageRow={row}
 					contentsByTagGroupId={contentsByTagGroupId}

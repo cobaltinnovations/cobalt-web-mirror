@@ -12,6 +12,8 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import SvgIcon from '@/components/svg-icon';
 import {
+	isCallToActionBlockRow,
+	isCallToActionFullWidthRow,
 	isCustomRow,
 	isGroupSessionsRow,
 	isMailingListRow,
@@ -85,6 +87,14 @@ export const LayoutTab = ({ onAddRowButtonClick }: LayoutTabProps) => {
 
 		if (isMailingListRow(pageRow)) {
 			return 'Subscribe';
+		}
+
+		if (isCallToActionBlockRow(pageRow)) {
+			return 'Block CTA';
+		}
+
+		if (isCallToActionFullWidthRow(pageRow)) {
+			return 'Full-width CTA';
 		}
 
 		if (isGroupSessionsRow(pageRow)) {

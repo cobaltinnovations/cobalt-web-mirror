@@ -5,6 +5,7 @@ import {
 	HERO_SECTION_ID,
 	PageSectionShelfPage,
 	RowSelectionForm,
+	RowSettingsCallToAction,
 	RowSettingsCustomRow,
 	RowSettingsCustomRowColumn,
 	RowSettingsGroupSessions,
@@ -243,6 +244,34 @@ export const PageSectionShelf = () => {
 							/>
 						</PageSectionShelfPage>
 					))}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsCallToAction variant="block" />
+					</PageSectionShelfPage>
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsCallToAction variant="full-width" />
+					</PageSectionShelfPage>
+				)}
 
 				{(currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE ||
 					currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT ||

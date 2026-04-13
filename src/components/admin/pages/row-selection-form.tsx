@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import {
+	CallToActionRowButton,
 	CollapseButton,
 	CustomRowButton,
 	PremadeComponentRowButton,
@@ -181,6 +182,44 @@ export const RowSelectionForm = () => {
 		}
 	};
 
+	const handleCallToActionBlockButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createCallToActionBlockRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleCallToActionFullWidthButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createCallToActionFullWidthRow(currentPageSection.pageSectionId)
+				.fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	const pageContainsSubscribeRow =
 		page?.pageSections.some((ps) => ps.pageRows.some((pr) => pr.rowTypeId === ROW_TYPE_ID.MAILING_LIST)) ?? false;
 
@@ -289,6 +328,22 @@ export const RowSelectionForm = () => {
 						title="Select Layout"
 						preview="empty"
 						onClick={() => handleCustomRowPresetButtonClick([])}
+					/>
+				</div>
+			</CollapseButton>
+			<hr />
+			<CollapseButton title="Call-to-Action" initialShow>
+				<div className="pb-6">
+					<CallToActionRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="full-width"
+						onClick={handleCallToActionFullWidthButtonClick}
+					/>
+					<CallToActionRowButton
+						title="Select Layout"
+						preview="block"
+						onClick={handleCallToActionBlockButtonClick}
 					/>
 				</div>
 			</CollapseButton>

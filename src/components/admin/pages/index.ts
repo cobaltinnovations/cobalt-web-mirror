@@ -1,5 +1,6 @@
 export * from './add-page-section-modal';
 export * from './collapse-button';
+export * from './call-to-action-row-button';
 export * from './create-page-modal';
 export * from './custom-row-button';
 export * from './draggable-item';
@@ -16,6 +17,7 @@ export * from './row-renderer';
 export * from './row-selection-form';
 export * from './row-settings-group-sessions';
 export * from './row-settings-mailing-list';
+export * from './row-settings-call-to-action';
 export * from './row-settings-custom-row';
 export * from './row-settings-custom-row-column';
 export * from './row-settings-meta-form';
