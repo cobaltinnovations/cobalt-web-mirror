@@ -20,6 +20,7 @@ import {
 	PageSiteLocationModel,
 	PresignedUploadResponse,
 	ResourcesRowModel,
+	ROW_PADDING_ID,
 	SITE_LOCATION_ID,
 	TagGroupRowModel,
 	TagRowModel,
@@ -529,6 +530,7 @@ export const pagesService = {
 		data: {
 			name: string;
 			backgroundColorId: BACKGROUND_COLOR_ID;
+			paddingId: ROW_PADDING_ID;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{

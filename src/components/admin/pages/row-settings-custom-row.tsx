@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
-import { BACKGROUND_COLOR_ID, CustomRowModel, isCustomRow } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, CustomRowModel, isCustomRow, ROW_PADDING_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
@@ -169,6 +169,7 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 	const [formValues, setFormValues] = useState({
 		name: '',
 		backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+		paddingId: ROW_PADDING_ID.MEDIUM,
 	});
 
 	useEffect(() => {
@@ -179,6 +180,7 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 		setFormValues({
 			name: pageRow.name ?? '',
 			backgroundColorId: pageRow.backgroundColorId ?? BACKGROUND_COLOR_ID.WHITE,
+			paddingId: pageRow.paddingId ?? ROW_PADDING_ID.MEDIUM,
 		});
 	}, [pageRow]);
 
@@ -216,6 +218,7 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 				.updatePageRow(pr.pageRowId, {
 					name: fv.name,
 					backgroundColorId: fv.backgroundColorId,
+					paddingId: fv.paddingId,
 				})
 				.fetch();
 
@@ -332,6 +335,18 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 			>
 				<option value={BACKGROUND_COLOR_ID.WHITE}>White</option>
 				<option value={BACKGROUND_COLOR_ID.NEUTRAL}>Neutral</option>
+			</InputHelper>
+			<InputHelper
+				className="mb-6"
+				as="select"
+				label="Padding"
+				name="paddingId"
+				value={formValues.paddingId}
+				onChange={handleInputChange}
+			>
+				<option value={ROW_PADDING_ID.SMALL}>Small</option>
+				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+				<option value={ROW_PADDING_ID.LARGE}>Large</option>
 			</InputHelper>
 			<div className={classes.divider} />
 			<div className={classes.sectionHeader}>

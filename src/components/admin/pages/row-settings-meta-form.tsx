@@ -1,6 +1,6 @@
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { BACKGROUND_COLOR_ID, PageRowBaseModel } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, PageRowBaseModel, ROW_PADDING_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
@@ -18,6 +18,7 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 	const [formValues, setFormValues] = useState({
 		name: '',
 		backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+		paddingId: ROW_PADDING_ID.MEDIUM,
 	});
 
 	useEffect(() => {
@@ -28,6 +29,7 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 		setFormValues({
 			name: pageRow.name ?? '',
 			backgroundColorId: pageRow.backgroundColorId ?? BACKGROUND_COLOR_ID.WHITE,
+			paddingId: pageRow.paddingId ?? ROW_PADDING_ID.MEDIUM,
 		});
 	}, [pageRow]);
 
@@ -39,6 +41,7 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 				.updatePageRow(pr.pageRowId, {
 					name: fv.name,
 					backgroundColorId: fv.backgroundColorId,
+					paddingId: fv.paddingId,
 				})
 				.fetch();
 
@@ -51,7 +54,7 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 	});
 
 	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+		({ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 			setFormValues((previousValue) => {
 				const newValue = {
 					...previousValue,
@@ -105,6 +108,18 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 					onChange={handleInputChange}
 				/>
 			</Form.Group>
+			<InputHelper
+				className="mb-6"
+				as="select"
+				label="Padding"
+				name="paddingId"
+				value={formValues.paddingId}
+				onChange={handleInputChange}
+			>
+				<option value={ROW_PADDING_ID.SMALL}>Small</option>
+				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+				<option value={ROW_PADDING_ID.LARGE}>Large</option>
+			</InputHelper>
 			<hr />
 		</>
 	);

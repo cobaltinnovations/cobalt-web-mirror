@@ -7,6 +7,7 @@ import {
 	Content,
 	PageDetailModel,
 	PageRowMailingListModel,
+	ROW_PADDING_ID,
 	ROW_TYPE_ID,
 	Tag,
 } from '@/lib/models';
@@ -22,6 +23,12 @@ interface PagePreviewProps {
 	page: PageDetailModel;
 	enableAnalytics: boolean;
 }
+
+const ROW_PADDING_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
+	[ROW_PADDING_ID.SMALL]: 'py-12',
+	[ROW_PADDING_ID.MEDIUM]: 'py-16',
+	[ROW_PADDING_ID.LARGE]: 'py-20',
+};
 
 export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
@@ -118,7 +125,7 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 					fluid
 					className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 				>
-					<Container className="py-16">
+					<Container className={ROW_PADDING_CLASS_BY_ID[pageRow.paddingId ?? ROW_PADDING_ID.MEDIUM]}>
 						{getRendererForPageRow({
 							pageId: page.pageId,
 							pageRow,

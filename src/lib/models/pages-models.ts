@@ -27,6 +27,12 @@ export enum BACKGROUND_COLOR_ID {
 	NEUTRAL = 'NEUTRAL',
 }
 
+export enum ROW_PADDING_ID {
+	SMALL = 'SMALL',
+	MEDIUM = 'MEDIUM',
+	LARGE = 'LARGE',
+}
+
 export enum ROW_TYPE_ID {
 	RESOURCES = 'RESOURCES',
 	GROUP_SESSIONS = 'GROUP_SESSIONS',
@@ -118,6 +124,7 @@ export interface PageRowBaseModel {
 	rowTypeId: ROW_TYPE_ID;
 	name: string;
 	backgroundColorId: BACKGROUND_COLOR_ID;
+	paddingId: ROW_PADDING_ID;
 	displayOrder: number;
 }
 

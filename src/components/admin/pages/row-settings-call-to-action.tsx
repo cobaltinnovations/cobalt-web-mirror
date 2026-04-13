@@ -5,6 +5,7 @@ import {
 	CallToActionFullWidthRowModel,
 	isCallToActionBlockRow,
 	isCallToActionFullWidthRow,
+	ROW_PADDING_ID,
 	ROW_TYPE_ID,
 } from '@/lib/models';
 import { pagesService } from '@/lib/services';
@@ -42,6 +43,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 		buttonUrl: '',
 		imageFileUploadId: '',
 		imageUrl: '',
+		paddingId: ROW_PADDING_ID.MEDIUM,
 	});
 
 	useEffect(() => {
@@ -56,32 +58,42 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 			buttonUrl: callToActionRow.buttonUrl ?? '',
 			imageFileUploadId: callToActionRow.imageFileUploadId ?? '',
 			imageUrl: callToActionRow.imageUrl ?? '',
+			paddingId: callToActionRow.paddingId ?? ROW_PADDING_ID.MEDIUM,
 		});
 	}, [callToActionRow]);
 
 	const persistValues = useCallback(
 		async (row: CallToActionRowModel, values: typeof formValues) => {
-			const response =
-				row.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK
-					? await pagesService
-							.updateCallToActionBlockRow(row.pageRowId, {
-								headline: values.headline,
-								description: values.description,
-								buttonText: values.buttonText,
-								buttonUrl: values.buttonUrl,
-								imageFileUploadId: values.imageFileUploadId,
-							})
-							.fetch()
-					: await pagesService
-							.updateCallToActionFullWidthRow(row.pageRowId, {
-								headline: values.headline,
-								description: values.description,
-								buttonText: values.buttonText,
-								buttonUrl: values.buttonUrl,
-							})
-							.fetch();
+			if (row.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK) {
+				await pagesService
+					.updateCallToActionBlockRow(row.pageRowId, {
+						headline: values.headline,
+						description: values.description,
+						buttonText: values.buttonText,
+						buttonUrl: values.buttonUrl,
+						imageFileUploadId: values.imageFileUploadId,
+					})
+					.fetch();
+			} else {
+				await pagesService
+					.updateCallToActionFullWidthRow(row.pageRowId, {
+						headline: values.headline,
+						description: values.description,
+						buttonText: values.buttonText,
+						buttonUrl: values.buttonUrl,
+					})
+					.fetch();
+			}
 
-			updatePageRow(response.pageRow);
+			const { pageRow: updatedPageRow } = await pagesService
+				.updatePageRow(row.pageRowId, {
+					name: row.name,
+					backgroundColorId: row.backgroundColorId,
+					paddingId: values.paddingId,
+				})
+				.fetch();
+
+			updatePageRow(updatedPageRow);
 		},
 		[updatePageRow]
 	);
@@ -107,7 +119,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 	}, [debouncedSubmission]);
 
 	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+		({ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 			setFormValues((previousValue) => {
 				const nextValue = {
 					...previousValue,
@@ -196,6 +208,18 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 				value={formValues.headline}
 				onChange={handleInputChange}
 			/>
+			<InputHelper
+				className="mb-6"
+				as="select"
+				label="Padding"
+				name="paddingId"
+				value={formValues.paddingId}
+				onChange={handleInputChange}
+			>
+				<option value={ROW_PADDING_ID.SMALL}>Small</option>
+				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+				<option value={ROW_PADDING_ID.LARGE}>Large</option>
+			</InputHelper>
 			<Form.Group className="mb-6">
 				<Form.Label className="mb-2">Description (optional)</Form.Label>
 				<WysiwygBasic value={formValues.description} height={180} onChange={handleDescriptionChange} />
