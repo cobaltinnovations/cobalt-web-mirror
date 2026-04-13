@@ -13,7 +13,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 import subscribeImg from '@/assets/images/subscribe.png';
-import { BACKGROUND_COLOR_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
 import InlineAlert from '@/components/inline-alert';
 
 const CUSTOM_ROW_NAME_PREFIX = 'Custom Row';
@@ -44,8 +44,14 @@ const getNextCustomRowName = (page?: PageDetailModel) => {
 export const RowSelectionForm = () => {
 	const handleError = useHandleError();
 
-	const { page, currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
-		usePageBuilderContext();
+	const {
+		page,
+		currentPageSection,
+		addPageRowToCurrentPageSection,
+		updatePageRow,
+		setCurrentPageRowId,
+		setIsSaving,
+	} = usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 	const [showSelectTagModal, setShowSelectTagModal] = useState(false);
@@ -108,117 +114,9 @@ export const RowSelectionForm = () => {
 		}
 	};
 
-	const handleOneColumnButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			const { pageRow } = await pagesService.createOneColumnRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleOneColumnTextButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			const { pageRow } = await pagesService.createOneColumnTextRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleOneColumnRightButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			const { pageRow } = await pagesService
-				.createOneColumnImageRightRow(currentPageSection.pageSectionId)
-				.fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleTwoColumnButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			const { pageRow } = await pagesService.createTwoColumnRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleTwoColumnTextButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			const { pageRow } = await pagesService.createTwoColumnTextRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleThreeColumnButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
-			}
-
-			const { pageRow } = await pagesService.createThreeColumnRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleEmptyRowButtonClick = async () => {
+	const handleCustomRowPresetButtonClick = async (
+		columnConfigs: Array<{ contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID }>
+	) => {
 		setIsSaving(true);
 
 		try {
@@ -227,14 +125,32 @@ export const RowSelectionForm = () => {
 			}
 
 			const customRowName = getNextCustomRowName(page);
-			const { pageRow } = await pagesService
+			const { pageRow: createdPageRow } = await pagesService
 				.createCustomRow(currentPageSection.pageSectionId, {
 					name: customRowName,
 					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
 				})
 				.fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
+
+			addPageRowToCurrentPageSection(createdPageRow);
+			setCurrentPageRowId(createdPageRow.pageRowId);
+
+			let latestPageRow = createdPageRow;
+
+			for (const columnConfig of columnConfigs) {
+				const { pageRow } = await pagesService
+					.createCustomRowColumn(createdPageRow.pageRowId, {
+						contentOrderId: columnConfig.contentOrderId,
+					})
+					.fetch();
+
+				latestPageRow = pageRow;
+				updatePageRow(pageRow);
+			}
+
+			if (columnConfigs.length === 0) {
+				updatePageRow(latestPageRow);
+			}
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -329,33 +245,51 @@ export const RowSelectionForm = () => {
 				</div>
 			</CollapseButton>
 			<hr />
-			<CollapseButton title="Text" initialShow>
-				<p className="mb-4">Text rows use the rich text editor and stack responsively on smaller screens.</p>
+			<CollapseButton title="Custom Row" initialShow>
+				<p className="mb-4">
+					Select from the recommended layouts or start completely from scratch. You will need to add your own
+					images and text to custom rows.
+				</p>
 				<div className="pb-6">
-					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnTextButtonClick} />
-					<CustomRowButton cols={2} title="Select Layout" onClick={handleTwoColumnTextButtonClick} />
-				</div>
-			</CollapseButton>
-			<hr />
-			<CollapseButton title="Text & Image" initialShow>
-				<p className="mb-4">Use these layouts to combine editable text with one or more images.</p>
-				<div className="pb-6">
-					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnButtonClick} />
-					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnRightButtonClick} />
 					<CustomRowButton
 						className="mb-4"
-						cols={2}
 						title="Select Layout"
-						onClick={handleTwoColumnButtonClick}
+						preview="split-two"
+						onClick={() =>
+							handleCustomRowPresetButtonClick([
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE },
+							])
+						}
 					/>
-					<CustomRowButton cols={3} title="Select Layout" onClick={handleThreeColumnButtonClick} />
-				</div>
-			</CollapseButton>
-			<hr />
-			<CollapseButton title="Custom Row" initialShow>
-				<p className="mb-4">Start with an empty custom row and build it out in the editor.</p>
-				<div className="pb-6">
-					<CustomRowButton title="Empty Row" onClick={handleEmptyRowButtonClick} />
+					<CustomRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="two-columns"
+						onClick={() =>
+							handleCustomRowPresetButtonClick([
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+							])
+						}
+					/>
+					<CustomRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="three-columns"
+						onClick={() =>
+							handleCustomRowPresetButtonClick([
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+							])
+						}
+					/>
+					<CustomRowButton
+						title="Select Layout"
+						preview="empty"
+						onClick={() => handleCustomRowPresetButtonClick([])}
+					/>
 				</div>
 			</CollapseButton>
 			<hr />

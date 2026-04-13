@@ -67,29 +67,90 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface CustomRowButtonProps {
 	title: string;
-	cols?: number;
 	className?: string;
+	preview?: 'split-two' | 'two-columns' | 'three-columns' | 'empty';
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
-export const CustomRowButton = ({ title, cols = 1, className, onClick }: CustomRowButtonProps) => {
+const useEnhancedStyles = createUseThemedStyles((theme) => ({
+	previewRow: {
+		display: 'flex',
+		gap: 16,
+		width: '100%',
+	},
+	previewColumn: {
+		flex: 1,
+		minWidth: 0,
+	},
+	previewText: {
+		flex: 1,
+		minWidth: 0,
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'center',
+	},
+	emptyState: {
+		width: '100%',
+		minHeight: 132,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		...theme.fonts.default,
+		...theme.fonts.headingBold,
+	},
+}));
+
+export const CustomRowButton = ({ title, className, preview = 'split-two', onClick }: CustomRowButtonProps) => {
 	const classes = useStyles();
+	const enhancedClasses = useEnhancedStyles();
+
+	const renderImageBlock = (key: string) => (
+		<div className={classes.image} key={`${key}-image`}>
+			<SvgIcon kit="far" icon="image" size={40} className="text-gray" />
+		</div>
+	);
+
+	const renderTextBlock = (key: string) => (
+		<div className={enhancedClasses.previewText} key={`${key}-text`}>
+			<div className={classes.header} />
+			<div className={classes.paragraph} />
+			<div className={classes.paragraph} />
+		</div>
+	);
+
+	const renderStackedColumn = (key: string) => (
+		<div className={classes.column} key={key}>
+			{renderImageBlock(key)}
+			<div className={classes.header} />
+			<div className={classes.paragraph} />
+			<div className={classes.paragraph} />
+		</div>
+	);
 
 	return (
 		<div className={classNames(classes.customRowButton, className)}>
 			<div className="overlay">
 				<Button onClick={onClick}>{title}</Button>
 			</div>
-			{Array.apply(null, Array(cols)).map((_col, colIndex) => (
-				<div className={classes.column} key={colIndex}>
-					<div className={classes.image}>
-						<SvgIcon kit="far" icon="image" size={40} className="text-gray" />
-					</div>
-					<div className={classes.header} />
-					<div className={classes.paragraph} />
-					<div className={classes.paragraph} />
+			{preview === 'empty' ? (
+				<div className={enhancedClasses.emptyState}>Empty Row</div>
+			) : preview === 'split-two' ? (
+				<div className={enhancedClasses.previewRow}>
+					<div className={enhancedClasses.previewColumn}>{renderImageBlock('left')}</div>
+					<div className={enhancedClasses.previewColumn}>{renderTextBlock('right')}</div>
 				</div>
-			))}
+			) : preview === 'two-columns' ? (
+				<div className={enhancedClasses.previewRow}>
+					{renderStackedColumn('left')}
+					{renderStackedColumn('right')}
+				</div>
+			) : (
+				<div className={enhancedClasses.previewRow}>
+					{renderStackedColumn('left')}
+					{renderStackedColumn('middle')}
+					{renderStackedColumn('right')}
+				</div>
+			)}
 		</div>
 	);
 };
