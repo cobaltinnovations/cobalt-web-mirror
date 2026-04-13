@@ -16,6 +16,7 @@ export const RowSettingsTag = ({ onDeleteButtonClick }: RowSettingsTagProps) => 
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
 	const tagRow = useMemo(() => currentPageRow as TagRowModel | undefined, [currentPageRow]);
+	const selectedTagId = tagRow?.tag?.tagId ?? '';
 	const [tagGroupOptions, setTagGroupOptions] = useState<TagGroup[]>([]);
 	const [formValues, setFormValues] = useState({ tagId: '' });
 
@@ -31,8 +32,8 @@ export const RowSettingsTag = ({ onDeleteButtonClick }: RowSettingsTagProps) => 
 	}, [handleError]);
 
 	useEffect(() => {
-		setFormValues({ tagId: tagRow?.tag.tagId ?? '' });
-	}, [tagRow?.tag.tagId]);
+		setFormValues({ tagId: selectedTagId });
+	}, [selectedTagId]);
 
 	const handleTagSelectChange = async (tagId: string) => {
 		setIsSaving(true);

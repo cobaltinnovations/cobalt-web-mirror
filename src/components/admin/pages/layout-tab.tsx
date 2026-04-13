@@ -82,7 +82,7 @@ export const LayoutTab = ({ onAddRowButtonClick }: LayoutTabProps) => {
 		}
 
 		if (isTagRow(pageRow)) {
-			return pageRow.tag.name;
+			return pageRow.tag?.name ?? 'Tag';
 		}
 
 		if (isMailingListRow(pageRow)) {

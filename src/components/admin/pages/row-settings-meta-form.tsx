@@ -1,5 +1,4 @@
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
-import { Form } from 'react-bootstrap';
 import { BACKGROUND_COLOR_ID, PageRowBaseModel, ROW_PADDING_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -87,27 +86,17 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 				onChange={handleInputChange}
 				required
 			/>
-			<Form.Group className="mb-6">
-				<Form.Label className="mb-2">Background color</Form.Label>
-				<Form.Check
-					type="radio"
-					id="row-background-color--white"
-					label="White"
-					name="backgroundColorId"
-					value={BACKGROUND_COLOR_ID.WHITE}
-					checked={formValues.backgroundColorId === BACKGROUND_COLOR_ID.WHITE}
-					onChange={handleInputChange}
-				/>
-				<Form.Check
-					type="radio"
-					id="row-background-color--neutral"
-					label="Neutral"
-					name="backgroundColorId"
-					value={BACKGROUND_COLOR_ID.NEUTRAL}
-					checked={formValues.backgroundColorId === BACKGROUND_COLOR_ID.NEUTRAL}
-					onChange={handleInputChange}
-				/>
-			</Form.Group>
+			<InputHelper
+				className="mb-6"
+				as="select"
+				label="Background color"
+				name="backgroundColorId"
+				value={formValues.backgroundColorId}
+				onChange={handleInputChange}
+			>
+				<option value={BACKGROUND_COLOR_ID.WHITE}>White</option>
+				<option value={BACKGROUND_COLOR_ID.NEUTRAL}>Neutral</option>
+			</InputHelper>
 			<InputHelper
 				className="mb-6"
 				as="select"

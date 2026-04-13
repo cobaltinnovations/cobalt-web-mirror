@@ -303,21 +303,23 @@ const TagRowRenderer = ({
 	livePageSiteLocations,
 }: RowRendererProps<TagRowModel>) => {
 	const [content, setContent] = useState<Content[]>([]);
+	const tag = pageRow.tag;
 
 	const fetchContent = useCallback(async () => {
-		if (!pageRow.tag.urlName) {
-			throw new Error('pageRow.tag.urlName is undefined.');
+		if (!tag?.urlName) {
+			setContent([]);
+			return;
 		}
 
 		const { findResult } = await resourceLibraryService
-			.getResourceLibraryContentByUrlName(pageRow.tag.urlName, {
+			.getResourceLibraryContentByUrlName(tag.urlName, {
 				pageNumber: 0,
 				pageSize: 200,
 			})
 			.fetch();
 
 		setContent(findResult.contents);
-	}, [pageRow.tag.urlName]);
+	}, [tag?.urlName]);
 
 	return (
 		<AsyncWrapper fetchData={fetchContent}>
@@ -326,17 +328,17 @@ const TagRowRenderer = ({
 					<ResourceLibrarySubtopicCard
 						className="h-100"
 						colorId={pageRow.tagGroupColorId}
-						title={pageRow.tag.name}
-						description={pageRow.tag.description}
-						to={`/resource-library/tags/${pageRow.tag.urlName}`}
+						title={tag?.name ?? 'Tag'}
+						description={tag?.description ?? ''}
+						to={tag?.urlName ? `/resource-library/tags/${tag.urlName}` : '#'}
 						onClick={() => {
-							if (!enableAnalytics) {
+							if (!enableAnalytics || !tag?.tagId) {
 								return;
 							}
 
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 								pageId,
-								tagId: pageRow.tag.tagId,
+								tagId: tag.tagId,
 								siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 							});
 						}}

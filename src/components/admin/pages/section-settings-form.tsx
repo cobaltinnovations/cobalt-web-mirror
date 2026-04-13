@@ -120,7 +120,7 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					`${row.columns.length} Column${row.columns.length === 1 ? '' : 's'}`,
 			},
 			{ check: isTagGroupRow, getSubtitle: (row: TagGroupRowModel) => row.tagGroup.name },
-			{ check: isTagRow, getSubtitle: (row: TagRowModel) => row.tag.name },
+			{ check: isTagRow, getSubtitle: (row: TagRowModel) => row.tag?.name ?? 'Tag' },
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
@@ -229,27 +229,17 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					value={formValues.description}
 					onChange={handleInputChange}
 				/>
-				<Form.Group className="mb-6">
-					<Form.Label className="mb-2">Background color</Form.Label>
-					<Form.Check
-						type="radio"
-						id="background-color--white"
-						label="White"
-						name="backgroundColor"
-						value={BACKGROUND_COLOR_ID.WHITE}
-						checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.WHITE}
-						onChange={handleInputChange}
-					/>
-					<Form.Check
-						type="radio"
-						id="background-color--neutral"
-						label="Neutral"
-						name="backgroundColor"
-						value={BACKGROUND_COLOR_ID.NEUTRAL}
-						checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.NEUTRAL}
-						onChange={handleInputChange}
-					/>
-				</Form.Group>
+				<InputHelper
+					className="mb-6"
+					as="select"
+					label="Background color"
+					name="backgroundColor"
+					value={formValues.backgroundColor}
+					onChange={handleInputChange}
+				>
+					<option value={BACKGROUND_COLOR_ID.WHITE}>White</option>
+					<option value={BACKGROUND_COLOR_ID.NEUTRAL}>Neutral</option>
+				</InputHelper>
 			</CollapseButton>
 			<hr />
 			<Form.Group className="py-6 d-flex align-items-center justify-content-between">

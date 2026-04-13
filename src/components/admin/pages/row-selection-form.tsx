@@ -244,7 +244,6 @@ export const RowSelectionForm = () => {
 			/>
 
 			<SelectTagModal
-				tagId=""
 				show={showSelectTagModal}
 				onAdd={handleTagAdd}
 				onHide={() => {

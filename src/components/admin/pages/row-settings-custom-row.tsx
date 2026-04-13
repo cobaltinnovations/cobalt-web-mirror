@@ -328,7 +328,7 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 			<InputHelper
 				className="mb-6"
 				as="select"
-				label="Background Color"
+				label="Background color"
 				name="backgroundColorId"
 				value={formValues.backgroundColorId}
 				onChange={handleInputChange}
