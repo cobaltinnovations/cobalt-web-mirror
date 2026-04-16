@@ -107,6 +107,22 @@ app.get('/ic/patient-order-csv-generator', (req, res, next) => {
 	return proxy(proxyUrl)(req, res, next);
 });
 
+// Assessment answer report downloads can proxy through to backend and tack on access token.
+// This way FE does not have access token embedded in URL, preventing
+// unintentional "copy-paste" sharing
+app.get('/patient-orders/:patientOrderId/assessment-answer-report', (req, res, next) => {
+	const baseUrl = settings.nodeApp.webApiBaseUrl;
+	const patientOrderId = req.params.patientOrderId;
+	const accessToken = extractCookieValueFromRequest(req, 'accessToken');
+	const proxyUrl = `${baseUrl}/patient-orders/${patientOrderId}/assessment-answer-report?X-Cobalt-Access-Token=${
+		accessToken ?? ''
+	}`;
+
+	req.url = proxyUrl;
+
+	return proxy(proxyUrl)(req, res, next);
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

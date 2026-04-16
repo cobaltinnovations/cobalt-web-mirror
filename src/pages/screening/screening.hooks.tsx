@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { useMemo, useCallback, useEffect, useRef, useState } from 'react';
-import { useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
+import { useLocation, useMatches, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import {
 	ScreeningFlowVersion,
 	ScreeningSession,
@@ -21,10 +21,16 @@ import useAccountSourceClickHandler from '@/hooks/use-account-source-click-handl
 
 export function useScreeningNavigation() {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { trackEvent } = useAnalytics();
 	const revalidator = useRevalidator();
 
 	const matches = useMatches();
+	const fullscreenScreening = useMemo(() => {
+		return matches.some((match) => {
+			return Boolean((match.handle as { fullscreenScreening?: boolean } | undefined)?.fullscreenScreening);
+		});
+	}, [matches]);
 
 	const navigateToQuestion = useCallback(
 		(contextId: string) => {
@@ -37,15 +43,20 @@ export function useScreeningNavigation() {
 				return match.pathname.includes('/ic/patient');
 			});
 
-			navigate(
-				mhicRouteMatch
-					? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
-					: icPatientRouteMatch
-					? `/ic/patient/assessment/${contextId}`
-					: `/screening-questions/${contextId}`
-			);
+			const pathname = mhicRouteMatch
+				? `/ic/mhic/order-assessment/${mhicRouteMatch.params.patientOrderId}/${contextId}`
+				: icPatientRouteMatch
+				? `/ic/patient/assessment/${contextId}`
+				: fullscreenScreening
+				? `/screening-questions-fullscreen/${contextId}`
+				: `/screening-questions/${contextId}`;
+
+			navigate({
+				pathname,
+				search: fullscreenScreening ? location.search : '',
+			});
 		},
-		[matches, navigate]
+		[fullscreenScreening, location.search, matches, navigate]
 	);
 
 	const navigateToDestination = useCallback(
@@ -205,6 +216,8 @@ export function useScreeningFlow({
 	instantiateOnLoad = true,
 	checkCompletionState = true,
 	disabled = false,
+	screeningQuestionPathPrefix,
+	screeningQuestionSearch,
 }: {
 	screeningFlowId?: string;
 	groupSessionId?: string;
@@ -212,7 +225,10 @@ export function useScreeningFlow({
 	instantiateOnLoad?: boolean;
 	checkCompletionState?: boolean;
 	disabled?: boolean;
+	screeningQuestionPathPrefix?: string;
+	screeningQuestionSearch?: string;
 }) {
+	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	// For now - if not in "on load" mode, ignore the concept of "skipped"
 	const isSkipped = instantiateOnLoad ? searchParams.get('skipped') === 'true' : false;
@@ -223,9 +239,28 @@ export function useScreeningFlow({
 
 	const [activeFlowVersion, setActiveFlowVersion] = useState<ScreeningFlowVersion>();
 	const handleError = useHandleError();
-	const { navigateToNext, navigateToDestination } = useScreeningNavigation();
+	const { navigateToDestination, navigateToQuestion } = useScreeningNavigation();
 	const [isCreatingScreeningSession, setIsCreatingScreeningSession] = useState(false);
 	const [hasCompletedScreening, setHasCompletedScreening] = useState(false);
+
+	const navigateToNext = useCallback(
+		(session: ScreeningSession) => {
+			if (session?.nextScreeningQuestionContextId) {
+				if (screeningQuestionPathPrefix) {
+					navigate({
+						pathname: `${screeningQuestionPathPrefix}/${session.nextScreeningQuestionContextId}`,
+						search: screeningQuestionSearch ?? '',
+					});
+					return;
+				}
+
+				navigateToQuestion(session.nextScreeningQuestionContextId);
+			} else if (session?.screeningSessionDestination) {
+				navigateToDestination(session.screeningSessionDestination);
+			}
+		},
+		[navigate, navigateToDestination, navigateToQuestion, screeningQuestionPathPrefix, screeningQuestionSearch]
+	);
 
 	const handleAccountSourceClick = useAccountSourceClickHandler();
 	const { account } = useAccount();

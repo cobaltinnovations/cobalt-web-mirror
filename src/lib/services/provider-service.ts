@@ -70,6 +70,7 @@ export interface FindOptionsResponse {
 
 export interface FindFilters {
 	providerId?: string;
+	appointmentTypeIds?: string[];
 	startDate?: string;
 	endDate?: string;
 	daysOfWeek?: string[];

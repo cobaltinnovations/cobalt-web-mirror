@@ -4,16 +4,16 @@
 
 `cobalt-web-mirror-codex` is the React + Node web frontend for Cobalt's mental-health product experiences:
 
-- Institutional/internal user experiences
-- Integrated care patient and MHIC workflows
+-   Institutional/internal user experiences
+-   Integrated care patient and MHIC workflows
 
 ## Stack
 
-- React 18 + TypeScript
-- React Router v6 data routers
-- JSS + SCSS styling
-- Express server for production bundle hosting/proxy
-- CRA tooling via `react-app-rewired`
+-   React 18 + TypeScript
+-   React Router v6 data routers
+-   JSS + SCSS styling
+-   Express server for production bundle hosting/proxy
+-   CRA tooling via `react-app-rewired`
 
 ## Quick Start
 
@@ -57,33 +57,33 @@ npm run storybook
 
 ### Build-time
 
-- `COBALT_WEB_ENV` selects `src/config/config.<env>.ts` via `config-overrides.js`.
-- `TARGET_INSTITUTION` selects institution override tree in `institution-overrides/<institution>/`.
+-   `COBALT_WEB_ENV` selects `src/config/config.<env>.ts` via `config-overrides.js`.
+-   `TARGET_INSTITUTION` selects institution override tree in `institution-overrides/<institution>/`.
 
 ### Runtime (Node server)
 
-- `server.js` loads `config/<COBALT_WEB_ENV>/settings.js`.
-- Current local example: `config/local/settings.js`.
-- Node server injects API base URL and serves subdomain-specific build folders.
+-   `server.js` loads `config/<COBALT_WEB_ENV>/settings.js`.
+-   Current local example: `config/local/settings.js`.
+-   Node server injects API base URL and serves subdomain-specific build folders.
 
 ## Directory Map
 
-- `src/routes.tsx`: canonical route tree and route guards
-- `src/routes/ic/`: integrated care route modules (MHIC + patient)
-- `src/components/integrated-care/`: IC UI components and modals
-- `src/lib/services/`: typed API client methods
-- `src/lib/models/`: shared frontend model contracts
-- `institution-overrides/`: institution-specific file replacement bundles
-- `config/`: runtime settings for Node host app
+-   `src/routes.tsx`: canonical route tree and route guards
+-   `src/routes/ic/`: integrated care route modules (MHIC + patient)
+-   `src/components/integrated-care/`: IC UI components and modals
+-   `src/lib/services/`: typed API client methods
+-   `src/lib/models/`: shared frontend model contracts
+-   `institution-overrides/`: institution-specific file replacement bundles
+-   `config/`: runtime settings for Node host app
 
 ## Integrated Care Hotspots
 
-- Route tree and IC gate: `src/routes.tsx`
-- MHIC routes: `src/routes/ic/mhic/`
-- Patient routes: `src/routes/ic/patient/`
-- IC service client: `src/lib/services/integrated-care-service.ts`
-- IC data models: `src/lib/models/integrated-care-models.ts`
-- Login destination routing: `src/contexts/account-context.tsx`
+-   Route tree and IC gate: `src/routes.tsx`
+-   MHIC routes: `src/routes/ic/mhic/`
+-   Patient routes: `src/routes/ic/patient/`
+-   IC service client: `src/lib/services/integrated-care-service.ts`
+-   IC data models: `src/lib/models/integrated-care-models.ts`
+-   Login destination routing: `src/contexts/account-context.tsx`
 
 ## Changing IC Features Safely
 
@@ -95,11 +95,11 @@ npm run storybook
 
 ## Institutional Overrides
 
-- Build can produce multiple institution bundles.
-- Override files must preserve the same module exports as the default source module.
-- Public asset overrides may be copied from `institution-overrides/<institution>/public` (excluding generated JS and `index.html`).
+-   Build can produce multiple institution bundles.
+-   Override files must preserve the same module exports as the default source module.
+-   Public asset overrides may be copied from `institution-overrides/<institution>/public` (excluding generated JS and `index.html`).
 
 ## Related Docs
 
-- `docs/integrated-care-ui-map.md`
-- `docs/api-crosswalk.md`
+-   `docs/integrated-care-ui-map.md`
+-   `docs/api-crosswalk.md`

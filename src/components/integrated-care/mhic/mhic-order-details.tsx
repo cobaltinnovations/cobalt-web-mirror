@@ -189,6 +189,19 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 		patientOrder.patientOrderScreeningStatusId,
 	]);
 
+	const inProgressAssessmentCreatedByAccountDisplayName =
+		patientOrder.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS
+			? patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName
+			: patientOrder.mostRecentScreeningSessionCreatedByAccountDisplayName;
+	const inProgressAssessmentCreatedAtDescription =
+		patientOrder.patientOrderIntakeScreeningStatusId === PatientOrderIntakeScreeningStatusId.IN_PROGRESS
+			? patientOrder.mostRecentIntakeScreeningSessionCreatedAtDescription
+			: patientOrder.mostRecentScreeningSessionCreatedAtDescription;
+	const inProgressAssessmentDescription =
+		inProgressAssessmentCreatedByAccountDisplayName && inProgressAssessmentCreatedAtDescription
+			? `${inProgressAssessmentCreatedByAccountDisplayName} began the assessment on ${inProgressAssessmentCreatedAtDescription}`
+			: undefined;
+
 	const handleResetPatientOrder = useCallback(async () => {
 		try {
 			await integratedCareService.resetPatientOrder(patientOrder.patientOrderId).fetch();
@@ -785,7 +798,7 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 									<NoData
 										className="bg-white"
 										title="Assessment in Progress"
-										description={`${patientOrder.mostRecentIntakeScreeningSessionCreatedByAccountDisplayName} began the assessment on ${patientOrder.mostRecentIntakeScreeningSessionCreatedAtDescription}`}
+										description={inProgressAssessmentDescription}
 										actions={[
 											{
 												variant: 'primary',
@@ -798,6 +811,30 @@ export const MhicOrderDetails = ({ patientOrder, pastPatientOrders }: Props) => 
 												disabled:
 													patientOrder.patientOrderDispositionId !==
 													PatientOrderDispositionId.OPEN,
+											},
+											{
+												variant: 'outline-primary',
+												title: 'Review',
+												icon: (
+													<SvgIcon
+														kit="far"
+														icon="arrow-up-right-from-square"
+														size={16}
+														className="ms-2 order-last"
+													/>
+												),
+												onClick: () => {
+													analyticsService.persistEvent(
+														AnalyticsNativeEventTypeId.CLICKTHROUGH_MHIC_ORDER_ASSESSMENT_RESULTS,
+														{
+															patientOrderId: patientOrder.patientOrderId,
+														}
+													);
+
+													navigate(
+														`/ic/mhic/order-assessment/${patientOrder.patientOrderId}`
+													);
+												},
 											},
 											{
 												variant: 'link',
