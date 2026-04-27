@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import {
 	AnalyticsNativeEventTypeId,
@@ -33,6 +33,7 @@ const ROW_PADDING_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
 
 export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
+	const livePageSiteLocationIdsRef = useRef(page.livePageSiteLocations.map((i) => i.siteLocationId));
 
 	// Use cookieName that includes the page ID
 	const cookieName = useMemo(() => cookieNameForPage(page.pageId), [page.pageId]);
@@ -53,6 +54,10 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 		() => page.pageSections.flatMap((pageSection) => pageSection.pageRows),
 		[page.pageSections]
 	);
+
+	useEffect(() => {
+		livePageSiteLocationIdsRef.current = page.livePageSiteLocations.map((i) => i.siteLocationId);
+	}, [page.livePageSiteLocations]);
 
 	const fetchData = useCallback(async () => {
 		const [libraryResponse, filtersResponse] = await Promise.all([
@@ -77,10 +82,10 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 		if (enableAnalytics) {
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PAGE, {
 				pageId: page.pageId,
-				siteLocationIds: page.livePageSiteLocations.map((i) => i.siteLocationId),
+				siteLocationIds: livePageSiteLocationIdsRef.current,
 			});
 		}
-	}, [enableAnalytics, page.livePageSiteLocations, page.pageId]);
+	}, [enableAnalytics, page.pageId]);
 
 	const mailingListRowData = pageRows.find((pageRow) => pageRow.rowTypeId === ROW_TYPE_ID.MAILING_LIST) as
 		| PageRowMailingListModel
