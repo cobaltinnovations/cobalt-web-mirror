@@ -107,13 +107,13 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, expired, className }) 
 					</BackgroundImageContainer>
 				)}
 				<div className={classes.informationContainer}>
-					<h4 className="mb-0">{studioEvent.title}</h4>
+					<h4 className="mb-2">{studioEvent.title}</h4>
 
-					<p className="mb-0 text-muted fw-bold">{studioEvent.appointmentTimeDescription}</p>
+					<p className="mb-2 fw-bold">{studioEvent.appointmentTimeDescription}</p>
 
 					{studioEvent.facilitatorName && (
-						<p className="mb-0 text-muted">
-							<>with {studioEvent.facilitatorName}</>
+						<p className="mb-0 text-n700">
+							<>{studioEvent.facilitatorName}</>
 						</p>
 					)}
 				</div>
@@ -139,10 +139,10 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, expired, className }) 
 				)}
 
 				<div className={classes.informationContainer}>
-					<h4 className="mb-0">{studioEvent.title}</h4>
+					<h4 className="mb-2">{studioEvent.title}</h4>
 					{studioEvent.facilitatorName && (
-						<p className="mb-0 text-muted">
-							<>with {studioEvent.facilitatorName}</>
+						<p className="mb-0 text-700">
+							<>{studioEvent.facilitatorName}</>
 						</p>
 					)}
 				</div>
