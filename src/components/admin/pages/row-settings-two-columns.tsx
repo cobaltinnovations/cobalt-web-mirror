@@ -184,6 +184,7 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnOne.description}
 						onChange={(value) => {
@@ -237,6 +238,7 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnTwo.description}
 						onChange={(value) => {

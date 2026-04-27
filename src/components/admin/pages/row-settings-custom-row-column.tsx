@@ -340,6 +340,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 											) : (
 												<Form.Group className="mb-0">
 													<WysiwygBasic
+														toolbarPreset="page-builder"
 														height={420}
 														value={formValues.description}
 														onChange={(value) => {

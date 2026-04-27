@@ -25,6 +25,7 @@ interface PagePreviewProps {
 }
 
 const ROW_PADDING_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
+	[ROW_PADDING_ID.NONE]: '',
 	[ROW_PADDING_ID.SMALL]: 'py-12',
 	[ROW_PADDING_ID.MEDIUM]: 'py-16',
 	[ROW_PADDING_ID.LARGE]: 'py-20',

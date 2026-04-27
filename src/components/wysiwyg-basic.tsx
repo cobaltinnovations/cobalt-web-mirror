@@ -27,6 +27,17 @@ const customFontSizes = [
 	},
 ];
 
+const customHeaderStyles = [
+	{ title: 'Title 1', value: '1' },
+	{ title: 'Title 2', value: '2' },
+	{ title: 'Title 3', value: '3' },
+	{ title: 'Subtitle 1', value: '4' },
+	{ title: 'Subtitle 2', value: '5' },
+	{ title: 'Subtitle 3', value: '6' },
+];
+
+type WysiwygToolbarPreset = 'default' | 'page-builder';
+
 const useWysiwygStyles = createUseThemedStyles((theme) => ({
 	quill: {
 		'& .ql-toolbar': {
@@ -54,6 +65,30 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 				}),
 				{} as Record<string, object>
 			),
+			'& .ql-picker.ql-header .ql-picker-label:not([data-value])::before': {
+				content: '"Body" !important',
+			},
+			'& .ql-picker.ql-header .ql-picker-item:not([data-value])::before': {
+				content: '"Body" !important',
+			},
+			...customHeaderStyles.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[`& .ql-picker.ql-header .ql-picker-label[data-value="${currentValue.value}"]::before`]: {
+						content: `"${currentValue.title}" !important`,
+					},
+				}),
+				{} as Record<string, object>
+			),
+			...customHeaderStyles.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[`& .ql-picker.ql-header .ql-picker-item[data-value="${currentValue.value}"]::before`]: {
+						content: `"${currentValue.title}" !important`,
+					},
+				}),
+				{} as Record<string, object>
+			),
 		},
 		'& .ql-container': {
 			borderBottomLeftRadius: 8,
@@ -73,12 +108,13 @@ interface WysiwygProps {
 	disabled?: boolean;
 	className?: string;
 	height?: number;
+	toolbarPreset?: WysiwygToolbarPreset;
 }
 
 const SizeStyle = Quill.import('attributors/style/size');
 SizeStyle.whitelist = customFontSizes.map((cfs) => `${cfs.fontSize}px`);
 Quill.register(SizeStyle, true);
-const quillModules = {
+const defaultQuillModules = {
 	toolbar: [
 		[{ size: customFontSizes.map((cfs) => `${cfs.fontSize}px`) }],
 		['bold', 'italic', 'underline', 'strike'],
@@ -86,14 +122,39 @@ const quillModules = {
 		['link', 'clean'],
 	],
 };
+const pageBuilderQuillModules = {
+	toolbar: [
+		[{ header: ['', ...customHeaderStyles.map((customHeaderStyle) => customHeaderStyle.value)] }],
+		[{ size: customFontSizes.map((cfs) => `${cfs.fontSize}px`) }],
+		[{ align: [] }],
+		['bold', 'italic', 'underline', 'strike'],
+		[{ list: 'ordered' }, { list: 'bullet' }],
+		['link', 'clean'],
+	],
+};
+const defaultQuillFormats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
+const pageBuilderQuillFormats = [
+	'header',
+	'size',
+	'align',
+	'bold',
+	'italic',
+	'underline',
+	'strike',
+	'list',
+	'bullet',
+	'link',
+];
 
 const WysiwygBasic = React.forwardRef(
 	(
-		{ value, onChange, disabled, className, height }: WysiwygProps,
+		{ value, onChange, disabled, className, height, toolbarPreset = 'default' }: WysiwygProps,
 		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
 	) => {
 		const classes = useWysiwygStyles({ height });
 		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
+		const modules = toolbarPreset === 'page-builder' ? pageBuilderQuillModules : defaultQuillModules;
+		const formats = toolbarPreset === 'page-builder' ? pageBuilderQuillFormats : defaultQuillFormats;
 
 		return (
 			<ReactQuill
@@ -103,7 +164,8 @@ const WysiwygBasic = React.forwardRef(
 				theme="snow"
 				value={value}
 				onChange={onChange}
-				modules={quillModules}
+				modules={modules}
+				formats={formats}
 				readOnly={disabled}
 				bounds={`#${reactQuillId}`}
 			/>

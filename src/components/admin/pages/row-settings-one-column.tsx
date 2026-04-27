@@ -186,6 +186,7 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnOne.description}
 						onChange={(value) => {

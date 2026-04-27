@@ -122,6 +122,7 @@ export const SectionHeroSettingsForm = () => {
 				className="mb-4"
 				type="text"
 				label="Headline"
+				required
 				name="headline"
 				value={formValues.headline}
 				onChange={handleInputChange}
@@ -130,6 +131,7 @@ export const SectionHeroSettingsForm = () => {
 				className="mb-4"
 				as="textarea"
 				label="Description"
+				required
 				name="description"
 				value={formValues.description}
 				onChange={handleInputChange}

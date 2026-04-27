@@ -28,6 +28,7 @@ export enum BACKGROUND_COLOR_ID {
 }
 
 export enum ROW_PADDING_ID {
+	NONE = 'NONE',
 	SMALL = 'SMALL',
 	MEDIUM = 'MEDIUM',
 	LARGE = 'LARGE',

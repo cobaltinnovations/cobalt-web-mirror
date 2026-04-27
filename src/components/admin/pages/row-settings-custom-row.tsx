@@ -344,6 +344,7 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 				value={formValues.paddingId}
 				onChange={handleInputChange}
 			>
+				<option value={ROW_PADDING_ID.NONE}>None</option>
 				<option value={ROW_PADDING_ID.SMALL}>Small</option>
 				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
 				<option value={ROW_PADDING_ID.LARGE}>Large</option>

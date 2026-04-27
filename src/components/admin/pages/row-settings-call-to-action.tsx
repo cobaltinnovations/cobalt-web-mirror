@@ -216,13 +216,19 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 				value={formValues.paddingId}
 				onChange={handleInputChange}
 			>
+				<option value={ROW_PADDING_ID.NONE}>None</option>
 				<option value={ROW_PADDING_ID.SMALL}>Small</option>
 				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
 				<option value={ROW_PADDING_ID.LARGE}>Large</option>
 			</InputHelper>
 			<Form.Group className="mb-6">
 				<Form.Label className="mb-2">Description (optional)</Form.Label>
-				<WysiwygBasic value={formValues.description} height={180} onChange={handleDescriptionChange} />
+				<WysiwygBasic
+					toolbarPreset="page-builder"
+					value={formValues.description}
+					height={180}
+					onChange={handleDescriptionChange}
+				/>
 			</Form.Group>
 			<div className="mb-6">
 				<h5 className="mb-4">CTA Button</h5>
