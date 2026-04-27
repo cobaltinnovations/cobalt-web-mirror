@@ -102,9 +102,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'&.show': {
 			left: asideWidth,
 		},
-		'&.showShelf': {
-			left: asideWidth + 576,
-		},
 	},
 	previewPage: {
 		borderRadius: 8,
@@ -362,7 +359,6 @@ const PageBuilder = () => {
 				<div
 					className={classNames(classes.previewPane, {
 						show: showMenu,
-						showShelf: showMenu && !!currentPageSection,
 					})}
 				>
 					<div className={classes.previewPage}>
