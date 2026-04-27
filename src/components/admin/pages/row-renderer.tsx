@@ -55,6 +55,8 @@ import NoData from '@/components/no-data';
 import CallToActionBlock from '@/components/call-to-action-block';
 import { PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC } from './page-builder-placeholder';
 
+export type PagePreviewViewport = 'desktop' | 'mobile';
+
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageId: string;
 	pageRow: T;
@@ -62,8 +64,37 @@ interface RowRendererProps<T = PageRowUnionModel> {
 	tagsByTagId: Record<string, Tag>;
 	enableAnalytics: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
+	previewViewport?: PagePreviewViewport;
 	className?: string;
 }
+
+const mobileCarouselResponsive = {
+	externalMonitor: {
+		breakpoint: { max: 3000, min: 1201 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	desktopExtraLarge: {
+		breakpoint: { max: 1200, min: 993 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	desktop: {
+		breakpoint: { max: 992, min: 769 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	tablet: {
+		breakpoint: { max: 768, min: 575 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	mobile: {
+		breakpoint: { max: 575, min: 0 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+};
 
 const ResourcesRowRenderer = ({
 	pageId,
@@ -72,14 +103,23 @@ const ResourcesRowRenderer = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<ResourcesRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	return (
 		<Row className={className}>
 			{pageRow.contents.map((content) => {
 				const expired = content.contentStatusId !== ContentStatusId.LIVE;
 
 				return (
-					<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+					<Col
+						key={content.contentId}
+						xs={12}
+						md={forceMobileLayout ? undefined : 6}
+						lg={forceMobileLayout ? undefined : 4}
+						className="mb-8"
+					>
 						<ResourceLibraryCard
 							key={content.contentId}
 							expired={expired}
@@ -129,12 +169,14 @@ const GroupSessionsRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<GroupSessionsRowModel>) => {
 	const navigate = useNavigate();
+	const forceMobileLayout = previewViewport === 'mobile';
 
 	return (
 		<Row className={className}>
-			{pageRow.groupSessions.length < 3 ? (
+			{pageRow.groupSessions.length < 3 && !forceMobileLayout ? (
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
 					{pageRow.groupSessions.map((groupSession, groupSessionIndex) => {
 						const isLast = pageRow.groupSessions.length - 1 === groupSessionIndex;
@@ -184,7 +226,13 @@ const GroupSessionsRowRenderer = ({
 						const expired = groupSession.groupSessionStatusId !== GROUP_SESSION_STATUS_ID.ADDED;
 
 						return (
-							<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
+							<Col
+								key={groupSession.groupSessionId}
+								xs={12}
+								md={forceMobileLayout ? undefined : 6}
+								lg={forceMobileLayout ? undefined : 4}
+								className="mb-8"
+							>
 								<Link
 									className="d-block text-decoration-none h-100"
 									to={`/group-sessions/${groupSession.urlName}`}
@@ -222,10 +270,16 @@ const TagGroupRowRenderer = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<TagGroupRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	return (
 		<Row className={className}>
-			<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+			<Col
+				lg={forceMobileLayout ? undefined : 3}
+				className={classNames('pt-4 pb-2', { 'mb-10': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<ResourceLibrarySubtopicCard
 					className="h-100"
 					colorId={pageRow.tagGroup.colorId}
@@ -245,8 +299,11 @@ const TagGroupRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col lg={9}>
-				<Carousel responsive={resourceLibraryCarouselConfig} trackStyles={{ paddingTop: 16, paddingBottom: 8 }}>
+			<Col lg={forceMobileLayout ? undefined : 9}>
+				<Carousel
+					responsive={forceMobileLayout ? mobileCarouselResponsive : resourceLibraryCarouselConfig}
+					trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+				>
 					{(contentsByTagGroupId?.[pageRow.tagGroup.tagGroupId] ?? []).map((content) => {
 						return (
 							<ResourceLibraryCard
@@ -302,9 +359,11 @@ const TagRowRenderer = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<TagRowModel>) => {
 	const [content, setContent] = useState<Content[]>([]);
 	const tag = pageRow.tag;
+	const forceMobileLayout = previewViewport === 'mobile';
 
 	const fetchContent = useCallback(async () => {
 		if (!tag?.urlName) {
@@ -325,7 +384,10 @@ const TagRowRenderer = ({
 	return (
 		<AsyncWrapper fetchData={fetchContent}>
 			<Row className={className}>
-				<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+				<Col
+					lg={forceMobileLayout ? undefined : 3}
+					className={classNames('pt-4 pb-2', { 'mb-10': true, 'mb-lg-0': !forceMobileLayout })}
+				>
 					<ResourceLibrarySubtopicCard
 						className="h-100"
 						colorId={pageRow.tagGroupColorId}
@@ -345,9 +407,9 @@ const TagRowRenderer = ({
 						}}
 					/>
 				</Col>
-				<Col lg={9}>
+				<Col lg={forceMobileLayout ? undefined : 9}>
 					<Carousel
-						responsive={resourceLibraryCarouselConfig}
+						responsive={forceMobileLayout ? mobileCarouselResponsive : resourceLibraryCarouselConfig}
 						trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
 					>
 						{content.map((content) => {
@@ -408,10 +470,12 @@ const CustomRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<CustomRowModel>) => {
 	const columns = [...pageRow.columns].sort(
 		(leftColumn, rightColumn) => leftColumn.columnDisplayOrder - rightColumn.columnDisplayOrder
 	);
+	const forceMobileLayout = previewViewport === 'mobile';
 	const lgColumnSpan = columns.length === 1 ? 12 : columns.length === 2 ? 6 : columns.length === 3 ? 4 : 3;
 
 	if (columns.length === 0) {
@@ -424,9 +488,10 @@ const CustomRowRenderer = ({
 				<Col
 					key={column.pageRowColumnId}
 					xs={12}
-					lg={lgColumnSpan}
+					lg={forceMobileLayout ? undefined : lgColumnSpan}
 					className={classNames({
-						'mb-16 mb-lg-0': columnIndex !== columns.length - 1,
+						'mb-16': columnIndex !== columns.length - 1,
+						'mb-lg-0': !forceMobileLayout && columnIndex !== columns.length - 1,
 					})}
 				>
 					{(column.contentOrderId === CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE
@@ -496,11 +561,17 @@ const OneColRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<OneColumnImageRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	if (isOneColumnTextRow(pageRow)) {
 		return (
 			<Row className={className}>
-				<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }}>
+				<Col
+					md={forceMobileLayout ? undefined : { span: 10, offset: 1 }}
+					lg={forceMobileLayout ? undefined : { span: 8, offset: 2 }}
+				>
 					{pageRow.columnOne.headline && (
 						<h2 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
 							{pageRow.columnOne.headline}
@@ -534,9 +605,10 @@ const OneColRowRenderer = ({
 		<Row className={classNames('align-items-center', className)}>
 			<Col
 				xs={12}
-				lg={6}
-				className={classNames('mb-10 mb-lg-0', {
-					'order-lg-2': !imageFirst,
+				lg={forceMobileLayout ? undefined : 6}
+				className={classNames('mb-10', {
+					'mb-lg-0': !forceMobileLayout,
+					'order-lg-2': !forceMobileLayout && !imageFirst,
 				})}
 			>
 				{pageRow.columnOne.imageUrl && (
@@ -549,9 +621,9 @@ const OneColRowRenderer = ({
 			</Col>
 			<Col
 				xs={12}
-				lg={6}
+				lg={forceMobileLayout ? undefined : 6}
 				className={classNames({
-					'order-lg-1': !imageFirst,
+					'order-lg-1': !forceMobileLayout && !imageFirst,
 				})}
 			>
 				{pageRow.columnOne.headline && (
@@ -587,11 +659,18 @@ const TwoColRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<TwoColumnImageRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	if (isTwoColumnTextRow(pageRow)) {
 		return (
 			<Row className={className}>
-				<Col xs={12} lg={6} className="mb-16 mb-lg-0">
+				<Col
+					xs={12}
+					lg={forceMobileLayout ? undefined : 6}
+					className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+				>
 					{pageRow.columnOne.headline && <h3 className={classNames('mb-6')}>{pageRow.columnOne.headline}</h3>}
 					{pageRow.columnOne.description && (
 						<WysiwygDisplay
@@ -611,7 +690,7 @@ const TwoColRowRenderer = ({
 						/>
 					)}
 				</Col>
-				<Col xs={12} lg={6}>
+				<Col xs={12} lg={forceMobileLayout ? undefined : 6}>
 					{pageRow.columnTwo.headline && <h3 className={classNames('mb-6')}>{pageRow.columnTwo.headline}</h3>}
 					{pageRow.columnTwo.description && (
 						<WysiwygDisplay
@@ -637,7 +716,11 @@ const TwoColRowRenderer = ({
 
 	return (
 		<Row className={className}>
-			<Col xs={12} lg={6} className="mb-16 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 6}
+				className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnOne.imageUrl}
@@ -660,7 +743,7 @@ const TwoColRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col xs={12} lg={6}>
+			<Col xs={12} lg={forceMobileLayout ? undefined : 6}>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnTwo.imageUrl}
@@ -693,10 +776,17 @@ const ThreeColRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<ThreeColumnImageRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	return (
 		<Row className={className}>
-			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 4}
+				className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnOne.imageUrl}
@@ -720,7 +810,11 @@ const ThreeColRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 4}
+				className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnTwo.imageUrl}
@@ -744,7 +838,7 @@ const ThreeColRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col xs={12} lg={4}>
+			<Col xs={12} lg={forceMobileLayout ? undefined : 4}>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnThree.imageUrl}
@@ -778,6 +872,7 @@ const FullWidthCallToActionRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<CallToActionFullWidthRowModel>) => {
 	const handleButtonClick = () => {
 		if (enableAnalytics && pageRow.buttonUrl) {
@@ -840,7 +935,10 @@ const BlockCallToActionRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<CallToActionBlockRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	const handleButtonClick = () => {
 		if (enableAnalytics && pageRow.buttonUrl) {
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
@@ -862,6 +960,7 @@ const BlockCallToActionRowRenderer = ({
 			heading={pageRow.headline}
 			descriptionHtml={pageRow.description ?? ''}
 			imageUrl={pageRow.imageUrl ?? ''}
+			forceMobileLayout={forceMobileLayout}
 			primaryActionText={pageRow.buttonText}
 			onPrimaryActionClick={handleButtonClick}
 		/>
@@ -874,11 +973,13 @@ const MailingListRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<MailingListRowModel>) => {
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [inputValue, setInputValue] = useState('');
 	const [hasSubmitted, setHasSubmitted] = useState(false);
+	const forceMobileLayout = previewViewport === 'mobile';
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -908,7 +1009,11 @@ const MailingListRowRenderer = ({
 
 	return (
 		<Row className={className}>
-			<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
+			<Col
+				md={forceMobileLayout ? undefined : { span: 10, offset: 1 }}
+				lg={forceMobileLayout ? undefined : { span: 10, offset: 1 }}
+				xl={forceMobileLayout ? undefined : { span: 8, offset: 2 }}
+			>
 				{hasSubmitted ? (
 					<>
 						<h1 className="mb-6 text-center">You're subscribed!</h1>
@@ -953,6 +1058,7 @@ export const getRendererForPageRow = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: {
 	pageId: string;
 	pageRow: PageRowUnionModel;
@@ -960,6 +1066,7 @@ export const getRendererForPageRow = ({
 	tagsByTagId: Record<string, Tag>;
 	enableAnalytics: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
+	previewViewport?: PagePreviewViewport;
 }) => {
 	const rowTypeMap = [
 		{
@@ -972,6 +1079,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -985,6 +1093,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -998,6 +1107,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1011,6 +1121,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1024,6 +1135,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1037,6 +1149,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1050,6 +1163,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1063,6 +1177,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1076,6 +1191,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1089,6 +1205,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -1102,6 +1219,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},

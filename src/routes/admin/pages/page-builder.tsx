@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Badge, Button } from 'react-bootstrap';
+import { Badge, Button, Form } from 'react-bootstrap';
 import { CSSTransition } from 'react-transition-group';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -103,11 +103,65 @@ const useStyles = createUseThemedStyles((theme) => ({
 			left: asideWidth,
 		},
 	},
+	previewControls: {
+		display: 'flex',
+		marginBottom: 16,
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	previewToggle: {
+		display: 'flex',
+		gap: 12,
+		alignItems: 'center',
+		padding: '8px 12px',
+		borderRadius: 999,
+		border: `1px solid ${theme.colors.n100}`,
+		backgroundColor: theme.colors.n0,
+	},
+	previewToggleLabel: {
+		display: 'flex',
+		gap: 8,
+		alignItems: 'center',
+		marginBottom: 0,
+		color: theme.colors.n500,
+		fontWeight: 600,
+		transition: 'color 150ms ease',
+	},
+	previewToggleLabelActive: {
+		color: theme.colors.n900,
+	},
+	previewToggleSwitch: {
+		marginBottom: 0,
+		'& .form-check-input': {
+			cursor: 'pointer',
+			width: 40,
+			height: 22,
+			marginTop: 0,
+			borderColor: theme.colors.n300,
+			backgroundColor: theme.colors.n300,
+		},
+		'& .form-check-input:focus': {
+			borderColor: theme.colors.p500,
+			boxShadow: `0 0 0 0.2rem ${theme.colors.p100}`,
+		},
+		'& .form-check-input:checked': {
+			borderColor: theme.colors.p500,
+			backgroundColor: theme.colors.p500,
+		},
+	},
+	previewCanvas: {
+		display: 'flex',
+		justifyContent: 'center',
+	},
 	previewPage: {
+		width: '100%',
 		borderRadius: 8,
 		overflow: 'hidden',
 		backgroundColor: theme.colors.n50,
 		border: `1px solid ${theme.colors.n100}`,
+	},
+	previewPageMobile: {
+		maxWidth: 430,
 	},
 	'@global': {
 		'.menu-animation-enter': {
@@ -147,6 +201,7 @@ const PageBuilder = () => {
 	const [showMenu, setShowMenu] = useState(true);
 	const [showPublishModal, setShowPublishModal] = useState(false);
 	const [showUnpublishModal, setShowUnpublishModal] = useState(false);
+	const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
 
 	const fetchData = useCallback(async () => {
 		if (!pageId) {
@@ -361,8 +416,47 @@ const PageBuilder = () => {
 						show: showMenu,
 					})}
 				>
-					<div className={classes.previewPage}>
-						{page && <PagePreview page={page} enableAnalytics={false} />}
+					<div className={classes.previewControls}>
+						<h6 className="mb-0">Preview</h6>
+						<div className={classes.previewToggle}>
+							<div
+								className={classNames(classes.previewToggleLabel, {
+									[classes.previewToggleLabelActive]: previewViewport === 'desktop',
+								})}
+							>
+								<SvgIcon kit="far" icon="desktop" size={16} />
+								Desktop
+							</div>
+							<Form.Check
+								type="switch"
+								id="page-builder-preview-viewport"
+								className={classes.previewToggleSwitch}
+								aria-label="Toggle page preview viewport"
+								checked={previewViewport === 'mobile'}
+								onChange={({ currentTarget }) => {
+									setPreviewViewport(currentTarget.checked ? 'mobile' : 'desktop');
+								}}
+							/>
+							<div
+								className={classNames(classes.previewToggleLabel, {
+									[classes.previewToggleLabelActive]: previewViewport === 'mobile',
+								})}
+							>
+								<SvgIcon kit="far" icon="mobile" size={16} />
+								Mobile
+							</div>
+						</div>
+					</div>
+					<div className={classes.previewCanvas}>
+						<div
+							className={classNames(classes.previewPage, {
+								[classes.previewPageMobile]: previewViewport === 'mobile',
+							})}
+						>
+							{page && (
+								<PagePreview page={page} enableAnalytics={false} previewViewport={previewViewport} />
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

@@ -22,6 +22,7 @@ const cookieNameForPage = (pageId: string) => `ALREADY_SHOWED_SUB_MODAL_${pageId
 interface PagePreviewProps {
 	page: PageDetailModel;
 	enableAnalytics: boolean;
+	previewViewport?: 'desktop' | 'mobile';
 }
 
 const ROW_PADDING_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
@@ -31,7 +32,7 @@ const ROW_PADDING_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
 	[ROW_PADDING_ID.LARGE]: 'py-20',
 };
 
-export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
+export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop' }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
 	const livePageSiteLocationIdsRef = useRef(page.livePageSiteLocations.map((i) => i.siteLocationId));
 
@@ -110,6 +111,7 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 
 			<PageHeader
 				className="bg-p700 text-white"
+				forceMobileLayout={previewViewport === 'mobile'}
 				title={<h1>{page.headline ?? 'No hero headline'}</h1>}
 				descriptionHtml={page.description ?? 'No hero description'}
 				imageAlt={page.imageAltText ?? ''}
@@ -139,6 +141,7 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 							tagsByTagId: tagsByTagId ?? {},
 							enableAnalytics,
 							livePageSiteLocations: page.livePageSiteLocations,
+							previewViewport,
 						})}
 					</Container>
 				</Container>
