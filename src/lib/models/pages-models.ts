@@ -183,6 +183,7 @@ export interface PageRowColumnModel {
 	imageFileUploadId: string;
 	imageAltText: string;
 	imageUrl: string;
+	usePlaceholderImage: boolean;
 	columnDisplayOrder: number;
 	contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 }

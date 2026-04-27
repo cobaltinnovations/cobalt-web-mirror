@@ -7,6 +7,7 @@ import { PresignedUploadResponse } from '@/lib/models';
 
 export interface AdminFormImageInputProps {
 	imageSrc: string;
+	placeholderImageSrc?: string;
 	onSrcChange: (newId: string, newSrc: string) => void;
 	presignedUploadGetter: (blob: Blob, name: string) => () => Promise<PresignedUploadResponse>;
 	className?: string;
@@ -16,6 +17,7 @@ export interface AdminFormImageInputProps {
 
 export const AdminFormImageInput = ({
 	imageSrc,
+	placeholderImageSrc,
 	onSrcChange,
 	presignedUploadGetter,
 	className,
@@ -84,6 +86,7 @@ export const AdminFormImageInput = ({
 			<ImageUploadCard
 				className={className}
 				imagePreview={imagePreviewSrc}
+				placeholderImagePreview={placeholderImageSrc}
 				isUploading={isUploading}
 				progress={progress}
 				onChange={(file) => {

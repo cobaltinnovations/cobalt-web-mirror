@@ -279,6 +279,7 @@ export const pagesService = {
 			description?: string;
 			imageFileUploadId?: string;
 			imageAltText?: string;
+			usePlaceholderImage?: boolean;
 			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 		} = {}
 	) {
@@ -307,6 +308,7 @@ export const pagesService = {
 			description?: string;
 			imageFileUploadId?: string;
 			imageAltText?: string;
+			usePlaceholderImage?: boolean;
 			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 		}
 	) {

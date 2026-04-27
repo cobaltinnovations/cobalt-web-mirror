@@ -53,6 +53,7 @@ import InputHelper from '@/components/input-helper';
 import LoadingButton from '@/components/loading-button';
 import NoData from '@/components/no-data';
 import CallToActionBlock from '@/components/call-to-action-block';
+import { PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC } from './page-builder-placeholder';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageId: string;
@@ -434,7 +435,7 @@ const CustomRowRenderer = ({
 					)
 						.filter((sectionId) => {
 							if (sectionId === 'image') {
-								return !!column.imageUrl;
+								return !!column.imageUrl || !!column.usePlaceholderImage;
 							}
 
 							return !!(column.headline || column.description);
@@ -445,7 +446,11 @@ const CustomRowRenderer = ({
 								className={classNames({ 'mb-6': sectionIndex !== sectionIds.length - 1 })}
 							>
 								{sectionId === 'image' ? (
-									<img className="w-100" src={column.imageUrl} alt={column.imageAltText ?? ''} />
+									<img
+										className="w-100"
+										src={column.imageUrl || PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC}
+										alt={column.imageAltText ?? ''}
+									/>
 								) : (
 									<>
 										{column.headline && (

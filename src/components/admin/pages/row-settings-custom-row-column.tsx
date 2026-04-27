@@ -13,6 +13,7 @@ import WysiwygBasic from '@/components/wysiwyg-basic';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '@/components/svg-icon';
+import { PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC } from './page-builder-placeholder';
 
 interface RowSettingsCustomRowColumnProps {
 	pageRowColumnId: string;
@@ -73,6 +74,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 		imageFileUploadId: '',
 		imageUrl: '',
 		imageAltText: '',
+		usePlaceholderImage: false,
 		contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
 	});
 
@@ -86,6 +88,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 			imageFileUploadId: pageRowColumn.imageFileUploadId ?? '',
 			imageUrl: pageRowColumn.imageUrl ?? '',
 			imageAltText: pageRowColumn.imageAltText ?? '',
+			usePlaceholderImage: pageRowColumn.usePlaceholderImage ?? false,
 			contentOrderId: pageRowColumn.contentOrderId ?? CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
 		});
 	}, [pageRowColumn]);
@@ -97,6 +100,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 					description: fv.description,
 					imageFileUploadId: fv.imageFileUploadId,
 					imageAltText: fv.imageAltText,
+					usePlaceholderImage: fv.usePlaceholderImage,
 				})
 				.fetch();
 
@@ -112,6 +116,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 					description: fv.description,
 					imageFileUploadId: fv.imageFileUploadId,
 					imageAltText: fv.imageAltText,
+					usePlaceholderImage: fv.usePlaceholderImage,
 					contentOrderId: fv.contentOrderId,
 				})
 				.fetch();
@@ -189,6 +194,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 				const nextValue = {
 					...formValues,
 					imageFileUploadId,
+					usePlaceholderImage: false,
 				};
 
 				await persistColumnValues(pageRow, pageRowColumn.pageRowColumnId, nextValue);
@@ -207,6 +213,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 				...previousValue,
 				imageFileUploadId: nextId,
 				imageUrl: nextSrc,
+				usePlaceholderImage: false,
 			}));
 
 			if (!nextId && !nextSrc) {
@@ -317,6 +324,11 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 													<AdminFormImageInput
 														className="mb-4"
 														imageSrc={formValues.imageUrl}
+														placeholderImageSrc={
+															formValues.usePlaceholderImage
+																? PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC
+																: undefined
+														}
 														onSrcChange={(nextId, nextSrc) => {
 															handleImageChange({ nextId, nextSrc });
 														}}

@@ -116,7 +116,11 @@ export const RowSelectionForm = () => {
 	};
 
 	const handleCustomRowPresetButtonClick = async (
-		columnConfigs: Array<{ contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID }>
+		columnConfigs: Array<{
+			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
+			usePlaceholderImage?: boolean;
+			description?: string;
+		}>
 	) => {
 		setIsSaving(true);
 
@@ -138,15 +142,37 @@ export const RowSelectionForm = () => {
 
 			let latestPageRow = createdPageRow;
 
-			for (const columnConfig of columnConfigs) {
+			for (const [columnIndex, columnConfig] of columnConfigs.entries()) {
 				const { pageRow } = await pagesService
 					.createCustomRowColumn(createdPageRow.pageRowId, {
 						contentOrderId: columnConfig.contentOrderId,
+						usePlaceholderImage: columnConfig.usePlaceholderImage,
 					})
 					.fetch();
 
 				latestPageRow = pageRow;
 				updatePageRow(pageRow);
+
+				if (columnConfig.description !== undefined) {
+					const createdColumn = pageRow.columns.find((column) => column.columnDisplayOrder === columnIndex);
+
+					if (!createdColumn) {
+						throw new Error(`Could not find custom row column at display order ${columnIndex}.`);
+					}
+
+					const { pageRow: updatedPageRow } = await pagesService
+						.updateCustomRowColumn(createdPageRow.pageRowId, createdColumn.pageRowColumnId, {
+							description: columnConfig.description,
+							imageFileUploadId: createdColumn.imageFileUploadId,
+							imageAltText: createdColumn.imageAltText,
+							usePlaceholderImage: columnConfig.usePlaceholderImage ?? createdColumn.usePlaceholderImage,
+							contentOrderId: createdColumn.contentOrderId,
+						})
+						.fetch();
+
+					latestPageRow = updatedPageRow;
+					updatePageRow(updatedPageRow);
+				}
 			}
 
 			if (columnConfigs.length === 0) {
@@ -295,8 +321,14 @@ export const RowSelectionForm = () => {
 						preview="split-two"
 						onClick={() =>
 							handleCustomRowPresetButtonClick([
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE },
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									description: '',
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE,
+									usePlaceholderImage: false,
+								},
 							])
 						}
 					/>
