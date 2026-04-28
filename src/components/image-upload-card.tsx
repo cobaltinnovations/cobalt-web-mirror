@@ -37,6 +37,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface ImageUploadCardProps {
 	imagePreview?: string;
 	placeholderImagePreview?: string;
+	allowRemovePlaceholderImage?: boolean;
 	isUploading: boolean;
 	onChange(file: File): void;
 	onRemove(): void;
@@ -48,6 +49,7 @@ interface ImageUploadCardProps {
 const ImageUploadCard: FC<ImageUploadCardProps> = ({
 	imagePreview,
 	placeholderImagePreview,
+	allowRemovePlaceholderImage = false,
 	isUploading,
 	progress,
 	onChange,
@@ -60,6 +62,7 @@ const ImageUploadCard: FC<ImageUploadCardProps> = ({
 	});
 	const displayImagePreview = imagePreview || placeholderImagePreview;
 	const hasUploadedImage = !!imagePreview;
+	const hasRemovableImage = hasUploadedImage || (!!placeholderImagePreview && allowRemovePlaceholderImage);
 
 	return (
 		<Card bsPrefix="form-card" className={className}>
@@ -101,8 +104,8 @@ const ImageUploadCard: FC<ImageUploadCardProps> = ({
 						</div>
 					)}
 
-					{hasUploadedImage && (
-						<Button size="sm" variant="danger" className="" onClick={onRemove} disabled={disabled}>
+					{hasRemovableImage && (
+						<Button size="sm" variant="danger" className="mt-2" onClick={onRemove} disabled={disabled}>
 							Remove Image
 						</Button>
 					)}

@@ -8,6 +8,7 @@ import { PresignedUploadResponse } from '@/lib/models';
 export interface AdminFormImageInputProps {
 	imageSrc: string;
 	placeholderImageSrc?: string;
+	allowRemovePlaceholderImage?: boolean;
 	onSrcChange: (newId: string, newSrc: string) => void;
 	presignedUploadGetter: (blob: Blob, name: string) => () => Promise<PresignedUploadResponse>;
 	className?: string;
@@ -18,6 +19,7 @@ export interface AdminFormImageInputProps {
 export const AdminFormImageInput = ({
 	imageSrc,
 	placeholderImageSrc,
+	allowRemovePlaceholderImage = false,
 	onSrcChange,
 	presignedUploadGetter,
 	className,
@@ -87,6 +89,7 @@ export const AdminFormImageInput = ({
 				className={className}
 				imagePreview={imagePreviewSrc}
 				placeholderImagePreview={placeholderImageSrc}
+				allowRemovePlaceholderImage={allowRemovePlaceholderImage}
 				isUploading={isUploading}
 				progress={progress}
 				onChange={(file) => {

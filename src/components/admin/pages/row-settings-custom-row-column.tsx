@@ -329,6 +329,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 																? PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC
 																: undefined
 														}
+														allowRemovePlaceholderImage
 														onSrcChange={(nextId, nextSrc) => {
 															handleImageChange({ nextId, nextSrc });
 														}}
