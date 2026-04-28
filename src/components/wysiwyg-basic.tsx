@@ -175,7 +175,7 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 		padding: '8px 10px',
 		fontSize: 14,
 		textAlign: 'left',
-		float: 'none',
+		float: 'none !important',
 		display: 'block !important',
 		borderRadius: 6,
 		backgroundColor: 'transparent',
