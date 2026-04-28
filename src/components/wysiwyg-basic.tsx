@@ -170,6 +170,7 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 		boxShadow: theme.elevation.e200,
 	},
 	pageBuilderStyleMenuItem: {
+		height: 'auto !important',
 		width: '100% !important',
 		border: 0,
 		padding: '8px 10px',
@@ -187,6 +188,18 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 			backgroundColor: theme.colors.n75,
 			fontWeight: 600,
 		},
+	},
+	pageBuilderStyleMenuItemTitle1: {
+		...theme.fonts.h1.default,
+		...theme.fonts.headingBold,
+	},
+	pageBuilderStyleMenuItemTitle2: {
+		...theme.fonts.h2.default,
+		...theme.fonts.headingBold,
+	},
+	pageBuilderStyleMenuItemTitle3: {
+		...theme.fonts.h3.default,
+		...theme.fonts.headingBold,
 	},
 	pageBuilderStyleMenuDivider: {
 		margin: '6px 0',
@@ -280,6 +293,14 @@ const WysiwygBasic = React.forwardRef(
 		const activePageBuilderTextStyle = pageBuilderTextStyleOptions.find(
 			(pageBuilderTextStyleOption) => pageBuilderTextStyleOption.id === activePageBuilderTextStyleId
 		);
+		const pageBuilderTextStyleClassNameById: Record<PageBuilderTextStyleId, string | undefined> = {
+			TITLE_1: classes.pageBuilderStyleMenuItemTitle1,
+			TITLE_2: classes.pageBuilderStyleMenuItemTitle2,
+			TITLE_3: classes.pageBuilderStyleMenuItemTitle3,
+			BODY_SMALL: undefined,
+			BODY_NORMAL: undefined,
+			BODY_LARGE: undefined,
+		};
 
 		const setRefs = useCallback(
 			(instance: ReactQuill | null) => {
@@ -398,10 +419,15 @@ const WysiwygBasic = React.forwardRef(
 												<button
 													key={pageBuilderTextStyle.id}
 													type="button"
-													className={classNames(classes.pageBuilderStyleMenuItem, {
-														active:
-															pageBuilderTextStyle.id === activePageBuilderTextStyleId,
-													})}
+													className={classNames(
+														classes.pageBuilderStyleMenuItem,
+														pageBuilderTextStyleClassNameById[pageBuilderTextStyle.id],
+														{
+															active:
+																pageBuilderTextStyle.id ===
+																activePageBuilderTextStyleId,
+														}
+													)}
 													onClick={() => {
 														applyPageBuilderTextStyle(pageBuilderTextStyle.id);
 													}}
