@@ -248,26 +248,57 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 		[debouncedSubmission, pageRow]
 	);
 
-	const handleAddColumn = useCallback(() => {
+	const handleAddColumn = useCallback(async () => {
 		if (!pageRow || columns.length >= MAX_COLUMNS) {
 			return;
 		}
 
 		setIsSaving(true);
 
-		pagesService
-			.createCustomRowColumn(pageRow.pageRowId)
-			.fetch()
-			.then(({ pageRow: updatedPageRow }) => {
-				updatePageRow(updatedPageRow);
-			})
-			.catch((error) => {
-				handleError(error);
-			})
-			.finally(() => {
-				setIsSaving(false);
-			});
-	}, [columns.length, handleError, pageRow, setIsSaving, updatePageRow]);
+		try {
+			const existingColumnIds = new Set(columns.map((column) => column.pageRowColumnId));
+			const { pageRow: createdPageRow } = await pagesService
+				.createCustomRowColumn(pageRow.pageRowId, {
+					description: '',
+					usePlaceholderImage: false,
+				})
+				.fetch();
+			const createdColumn = createdPageRow.columns.find(
+				(column) => !existingColumnIds.has(column.pageRowColumnId)
+			);
+
+			if (
+				!createdColumn ||
+				!(
+					createdColumn.headline ||
+					createdColumn.description ||
+					createdColumn.imageFileUploadId ||
+					createdColumn.imageUrl ||
+					createdColumn.imageAltText ||
+					createdColumn.usePlaceholderImage
+				)
+			) {
+				updatePageRow(createdPageRow);
+				return;
+			}
+
+			const { pageRow: blankPageRow } = await pagesService
+				.updateCustomRowColumn(pageRow.pageRowId, createdColumn.pageRowColumnId, {
+					headline: '',
+					description: '',
+					imageFileUploadId: '',
+					imageAltText: '',
+					usePlaceholderImage: false,
+				})
+				.fetch();
+
+			updatePageRow(blankPageRow);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	}, [columns, handleError, pageRow, setIsSaving, updatePageRow]);
 
 	const handleDragEnd = useCallback(
 		async ({ source, destination }: DropResult) => {

@@ -34,13 +34,7 @@ export const AdminFormImageInput = ({
 	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
-		setImagePreviewSrc((previousValue) => {
-			if (!previousValue) {
-				return imageSrc;
-			}
-
-			return previousValue;
-		});
+		setImagePreviewSrc(imageSrc);
 	}, [imageSrc]);
 
 	return (

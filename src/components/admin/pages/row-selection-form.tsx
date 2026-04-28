@@ -18,6 +18,8 @@ import { BACKGROUND_COLOR_ID, CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID, PageDetailMode
 import InlineAlert from '@/components/inline-alert';
 
 const CUSTOM_ROW_NAME_PREFIX = 'Custom Row';
+const DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION =
+	'<h2>Title</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>';
 
 const getNextCustomRowName = (page?: PageDetailModel) => {
 	const maxCustomRowNumber =
@@ -142,37 +144,17 @@ export const RowSelectionForm = () => {
 
 			let latestPageRow = createdPageRow;
 
-			for (const [columnIndex, columnConfig] of columnConfigs.entries()) {
+			for (const columnConfig of columnConfigs) {
 				const { pageRow } = await pagesService
 					.createCustomRowColumn(createdPageRow.pageRowId, {
 						contentOrderId: columnConfig.contentOrderId,
 						usePlaceholderImage: columnConfig.usePlaceholderImage,
+						description: columnConfig.description,
 					})
 					.fetch();
 
 				latestPageRow = pageRow;
 				updatePageRow(pageRow);
-
-				if (columnConfig.description !== undefined) {
-					const createdColumn = pageRow.columns.find((column) => column.columnDisplayOrder === columnIndex);
-
-					if (!createdColumn) {
-						throw new Error(`Could not find custom row column at display order ${columnIndex}.`);
-					}
-
-					const { pageRow: updatedPageRow } = await pagesService
-						.updateCustomRowColumn(createdPageRow.pageRowId, createdColumn.pageRowColumnId, {
-							description: columnConfig.description,
-							imageFileUploadId: createdColumn.imageFileUploadId,
-							imageAltText: createdColumn.imageAltText,
-							usePlaceholderImage: columnConfig.usePlaceholderImage ?? createdColumn.usePlaceholderImage,
-							contentOrderId: createdColumn.contentOrderId,
-						})
-						.fetch();
-
-					latestPageRow = updatedPageRow;
-					updatePageRow(updatedPageRow);
-				}
 			}
 
 			if (columnConfigs.length === 0) {
@@ -323,11 +305,13 @@ export const RowSelectionForm = () => {
 							handleCustomRowPresetButtonClick([
 								{
 									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
 									description: '',
 								},
 								{
 									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE,
 									usePlaceholderImage: false,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
 								},
 							])
 						}
@@ -338,8 +322,16 @@ export const RowSelectionForm = () => {
 						preview="two-columns"
 						onClick={() =>
 							handleCustomRowPresetButtonClick([
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
 							])
 						}
 					/>
@@ -349,9 +341,21 @@ export const RowSelectionForm = () => {
 						preview="three-columns"
 						onClick={() =>
 							handleCustomRowPresetButtonClick([
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
-								{ contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT },
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
 							])
 						}
 					/>
