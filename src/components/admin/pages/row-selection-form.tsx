@@ -19,7 +19,7 @@ import InlineAlert from '@/components/inline-alert';
 
 const CUSTOM_ROW_NAME_PREFIX = 'Custom Row';
 const DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION =
-	'<h2>Title</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>';
+	'<h2>Title</h2><p><br></p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>';
 
 const getNextCustomRowName = (page?: PageDetailModel) => {
 	const maxCustomRowNumber =
