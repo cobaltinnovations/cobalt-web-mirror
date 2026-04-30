@@ -39,6 +39,14 @@ const ROW_PADDING_BOTTOM_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
 	[ROW_PADDING_ID.LARGE]: 'pb-20',
 };
 
+const getRowPaddingClassName = (paddingTopId?: ROW_PADDING_ID, paddingBottomId?: ROW_PADDING_ID) =>
+	[
+		ROW_PADDING_TOP_CLASS_BY_ID[paddingTopId ?? ROW_PADDING_ID.MEDIUM],
+		ROW_PADDING_BOTTOM_CLASS_BY_ID[paddingBottomId ?? ROW_PADDING_ID.MEDIUM],
+	]
+		.filter(Boolean)
+		.join(' ');
+
 export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop' }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
 	const livePageSiteLocationIdsRef = useRef(page.livePageSiteLocations.map((i) => i.siteLocationId));
@@ -134,20 +142,9 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 						: undefined
 				}
 			/>
-			{pageRows.map((pageRow) => (
-				<Container
-					key={pageRow.pageRowId}
-					fluid
-					className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
-				>
-					<Container
-						className={[
-							ROW_PADDING_TOP_CLASS_BY_ID[pageRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM],
-							ROW_PADDING_BOTTOM_CLASS_BY_ID[pageRow.paddingBottomId ?? ROW_PADDING_ID.MEDIUM],
-						]
-							.filter(Boolean)
-							.join(' ')}
-					>
+			{pageRows.map((pageRow) =>
+				pageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH ? (
+					<div key={pageRow.pageRowId}>
 						{getRendererForPageRow({
 							pageId: page.pageId,
 							pageRow,
@@ -156,10 +153,29 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 							enableAnalytics,
 							livePageSiteLocations: page.livePageSiteLocations,
 							previewViewport,
+							className: getRowPaddingClassName(pageRow.paddingTopId, pageRow.paddingBottomId),
 						})}
+					</div>
+				) : (
+					<Container
+						key={pageRow.pageRowId}
+						fluid
+						className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
+					>
+						<Container className={getRowPaddingClassName(pageRow.paddingTopId, pageRow.paddingBottomId)}>
+							{getRendererForPageRow({
+								pageId: page.pageId,
+								pageRow,
+								contentsByTagGroupId: contentsByTagGroupId ?? {},
+								tagsByTagId: tagsByTagId ?? {},
+								enableAnalytics,
+								livePageSiteLocations: page.livePageSiteLocations,
+								previewViewport,
+							})}
+						</Container>
 					</Container>
-				</Container>
-			))}
+				)
+			)}
 		</AsyncWrapper>
 	);
 };

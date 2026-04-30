@@ -51,8 +51,8 @@ import AsyncWrapper from '@/components/async-page';
 import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
 import InputHelper from '@/components/input-helper';
 import LoadingButton from '@/components/loading-button';
-import NoData from '@/components/no-data';
 import CallToActionBlock from '@/components/call-to-action-block';
+import CallToActionFullWidth from '@/components/call-to-action-full-width';
 import { PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC } from './page-builder-placeholder';
 
 export type PagePreviewViewport = 'desktop' | 'mobile';
@@ -890,13 +890,12 @@ const FullWidthCallToActionRowRenderer = ({
 	};
 
 	return (
-		<NoData
+		<CallToActionFullWidth
 			className={className}
-			title={pageRow.headline}
+			title={pageRow.headline ?? ''}
 			description={
 				pageRow.description ? (
 					<WysiwygDisplay
-						className="text-center"
 						html={pageRow.description}
 						onClick={({ linkUrl, linkText }) => {
 							if (!enableAnalytics) {
@@ -913,18 +912,9 @@ const FullWidthCallToActionRowRenderer = ({
 					/>
 				) : undefined
 			}
-			actions={
-				pageRow.buttonText
-					? [
-							{
-								variant: 'primary' as const,
-								title: pageRow.buttonText,
-								onClick: handleButtonClick,
-								disabled: !pageRow.buttonUrl,
-							},
-					  ]
-					: []
-			}
+			buttonText={pageRow.buttonText}
+			onButtonClick={handleButtonClick}
+			buttonDisabled={!pageRow.buttonUrl}
 		/>
 	);
 };

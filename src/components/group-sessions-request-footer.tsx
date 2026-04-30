@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
 
 import { groupSessionsService } from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
+import CallToActionFullWidth from '@/components/call-to-action-full-width';
 import InputHelper from '@/components/input-helper';
 
 const GroupSessionsRequestFooter = () => {
@@ -133,39 +134,14 @@ const GroupSessionsRequestFooter = () => {
 			</Modal>
 
 			{institution?.groupSessionRequestsEnabled && (
-				<Container fluid className="bg-n75">
-					<Container className="py-16 py-lg-24">
-						<Row>
-							<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
-								<h2 className="mb-6 text-center">Looking to schedule a group session for your team?</h2>
-								<p className="mb-6 fs-large text-center">
-									Request a session and we'll work with you to find a dedicated time for a
-									wellness-focused group session for your team.
-								</p>
-								<div className="text-center">
-									<Button
-										variant="primary"
-										className="me-1"
-										onClick={() => {
-											navigate('/group-sessions/request');
-										}}
-									>
-										Request a Session
-									</Button>
-									{/* <Button
-										variant="outline-primary"
-										className="ms-1"
-										onClick={() => {
-											setShowSuggestModal(true);
-										}}
-									>
-										Suggest a Session
-									</Button> */}
-								</div>
-							</Col>
-						</Row>
-					</Container>
-				</Container>
+				<CallToActionFullWidth
+					title="Looking to schedule a group session for your team?"
+					description="Request a session and we'll work with you to find a dedicated time for a wellness-focused group session for your team."
+					buttonText="Request a Session"
+					onButtonClick={() => {
+						navigate('/group-sessions/request');
+					}}
+				/>
 			)}
 		</>
 	);
