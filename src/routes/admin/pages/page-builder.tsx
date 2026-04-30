@@ -65,6 +65,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'& .aside-inner': {
 			width: asideWidth,
 			height: '100%',
+			display: 'flex',
+			overflowY: 'auto',
+			flexDirection: 'column',
 			opacity: 0,
 			pointerEvents: 'none',
 			transition: '200ms opacity',
