@@ -2,7 +2,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import { imageUploader } from '@/lib/services';
 import React, { useEffect, useState } from 'react';
 import ImageUploadCard from '../image-upload-card';
-import SessionCropModal from '../session-crop-modal';
+import SessionCropModal, { SIZE_SELECTIONS } from '../session-crop-modal';
 import { PresignedUploadResponse } from '@/lib/models';
 
 export interface AdminFormImageInputProps {
@@ -14,6 +14,8 @@ export interface AdminFormImageInputProps {
 	className?: string;
 	onUploadComplete?(fileUploadId: string): void;
 	cropImage?: boolean;
+	showSizeSelection?: boolean;
+	lockSizeSelection?: SIZE_SELECTIONS;
 }
 
 export const AdminFormImageInput = ({
@@ -25,6 +27,8 @@ export const AdminFormImageInput = ({
 	className,
 	onUploadComplete,
 	cropImage = true,
+	showSizeSelection = true,
+	lockSizeSelection,
 }: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -41,6 +45,8 @@ export const AdminFormImageInput = ({
 		<>
 			<SessionCropModal
 				cropImage={cropImage}
+				showSizeSelection={showSizeSelection}
+				lockSizeSelection={lockSizeSelection}
 				imageName={sessionCropModalImageConfig.name}
 				imageSource={sessionCropModalImageConfig.source}
 				show={isCropModalOpen}

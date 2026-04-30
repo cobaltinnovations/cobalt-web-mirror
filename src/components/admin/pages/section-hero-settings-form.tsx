@@ -6,6 +6,7 @@ import InputHelper from '@/components/input-helper';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import { PageDetailModel } from '@/lib/models';
+import { SIZE_SELECTIONS } from '@/components/session-crop-modal';
 
 export const HERO_SECTION_ID = 'HERO';
 
@@ -139,6 +140,8 @@ export const SectionHeroSettingsForm = () => {
 			<AdminFormImageInput
 				className="mb-4"
 				imageSrc={formValues.imageUrl}
+				showSizeSelection={false}
+				lockSizeSelection={SIZE_SELECTIONS.RECTANGLE}
 				onSrcChange={handleImageChange}
 				onUploadComplete={handleUploadComplete}
 				presignedUploadGetter={(blob, name) => {
