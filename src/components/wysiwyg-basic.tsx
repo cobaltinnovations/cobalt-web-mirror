@@ -201,6 +201,21 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 		...theme.fonts.h3.default,
 		...theme.fonts.headingBold,
 	},
+	pageBuilderStyleMenuItemBodySmall: {
+		...theme.fonts.bodyNormal,
+		fontSize: customFontSizes[0].fontSize,
+		lineHeight: `${customFontSizes[0].lineHeight}px`,
+	},
+	pageBuilderStyleMenuItemBodyNormal: {
+		...theme.fonts.bodyNormal,
+		fontSize: customFontSizes[1].fontSize,
+		lineHeight: `${customFontSizes[1].lineHeight}px`,
+	},
+	pageBuilderStyleMenuItemBodyLarge: {
+		...theme.fonts.bodyNormal,
+		fontSize: customFontSizes[2].fontSize,
+		lineHeight: `${customFontSizes[2].lineHeight}px`,
+	},
 	pageBuilderStyleMenuDivider: {
 		margin: '6px 0',
 		borderTop: `1px solid ${theme.colors.n100}`,
@@ -297,9 +312,9 @@ const WysiwygBasic = React.forwardRef(
 			TITLE_1: classes.pageBuilderStyleMenuItemTitle1,
 			TITLE_2: classes.pageBuilderStyleMenuItemTitle2,
 			TITLE_3: classes.pageBuilderStyleMenuItemTitle3,
-			BODY_SMALL: undefined,
-			BODY_NORMAL: undefined,
-			BODY_LARGE: undefined,
+			BODY_SMALL: classes.pageBuilderStyleMenuItemBodySmall,
+			BODY_NORMAL: classes.pageBuilderStyleMenuItemBodyNormal,
+			BODY_LARGE: classes.pageBuilderStyleMenuItemBodyLarge,
 		};
 
 		const setRefs = useCallback(

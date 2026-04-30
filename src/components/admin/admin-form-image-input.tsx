@@ -51,23 +51,27 @@ export const AdminFormImageInput = ({
 					setIsCropModalOpen(false);
 
 					let fileUploadId = '';
+					let previewImageUrl = '';
 
 					imageUploader(blob, presignedUploadGetter(blob, fileName))
-						.onBeforeUpload((previewImageUrl) => {
-							setImagePreviewSrc(previewImageUrl);
+						.onBeforeUpload((nextPreviewImageUrl) => {
+							previewImageUrl = nextPreviewImageUrl;
+							setImagePreviewSrc(nextPreviewImageUrl);
 						})
 						.onPresignedUploadObtained(({ fileUploadResult }) => {
 							fileUploadId = fileUploadResult.fileUploadId;
 
 							setIsUploading(true);
-							onSrcChange(fileUploadResult.fileUploadId, fileUploadResult.presignedUpload.accessUrl);
+							onSrcChange(
+								fileUploadResult.fileUploadId,
+								previewImageUrl || fileUploadResult.presignedUpload.accessUrl
+							);
 						})
 						.onProgress((percentage) => {
 							setProgress(percentage);
 						})
-						.onComplete((accessUrl) => {
+						.onComplete(() => {
 							setIsUploading(false);
-							setImagePreviewSrc(accessUrl);
 							onUploadComplete?.(fileUploadId);
 						})
 						.onError((error: any) => {
