@@ -20,10 +20,10 @@ function getCroppedImageAsBlob(
 		return;
 	}
 
-	const cropX = crop.x ?? 0;
-	const cropY = crop.y ?? 0;
-	const cropWidth = crop.width ?? 0;
-	const cropHeight = crop.height ?? 0;
+	const cropX = crop.unit === '%' ? ((crop.x ?? 0) * image.width) / 100 : crop.x ?? 0;
+	const cropY = crop.unit === '%' ? ((crop.y ?? 0) * image.height) / 100 : crop.y ?? 0;
+	const cropWidth = crop.unit === '%' ? ((crop.width ?? 0) * image.width) / 100 : crop.width ?? 0;
+	const cropHeight = crop.unit === '%' ? ((crop.height ?? 0) * image.height) / 100 : crop.height ?? 0;
 	const scaleX = image.naturalWidth / image.width;
 	const scaleY = image.naturalHeight / image.height;
 
@@ -103,9 +103,10 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 	sizeSelectionList: {
 		gap: 24,
 		display: 'flex',
-		marginTop: 24,
+		marginBottom: 16,
 		flexWrap: 'wrap',
 		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	sizeSelectionOption: {
 		marginBottom: 0,
@@ -124,14 +125,14 @@ const SIZE_SELECTION_OPTIONS: Array<{
 	aspect?: number;
 }> = [
 	{
-		label: 'Square',
-		value: SIZE_SELECTIONS.SQUARE,
-		aspect: 1,
-	},
-	{
 		label: 'Rectangle',
 		value: SIZE_SELECTIONS.RECTANGLE,
 		aspect: 16 / 9,
+	},
+	{
+		label: 'Square',
+		value: SIZE_SELECTIONS.SQUARE,
+		aspect: 1,
 	},
 	{
 		label: 'Freeform',
@@ -139,8 +140,7 @@ const SIZE_SELECTION_OPTIONS: Array<{
 	},
 ];
 
-const getDefaultSizeSelection = (cropImage: boolean) =>
-	cropImage ? SIZE_SELECTIONS.RECTANGLE : SIZE_SELECTIONS.FREEFORM;
+const getDefaultSizeSelection = () => SIZE_SELECTIONS.RECTANGLE;
 
 const getInitialCrop = (sizeSelection: SIZE_SELECTIONS, imageWidth?: number, imageHeight?: number): ReactCrop.Crop => {
 	const sizeSelectionOption = SIZE_SELECTION_OPTIONS.find((option) => option.value === sizeSelection);
@@ -211,7 +211,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
-	const defaultSizeSelection = getDefaultSizeSelection(cropImage);
+	const defaultSizeSelection = getDefaultSizeSelection();
 	const [sizeSelection, setSizeSelection] = useState<SIZE_SELECTIONS>(lockSizeSelection ?? defaultSizeSelection);
 	const effectiveSizeSelection = lockSizeSelection ?? sizeSelection;
 	const [crop, setCrop] = useState<ReactCrop.Crop>(() => getInitialCrop(lockSizeSelection ?? defaultSizeSelection));
@@ -309,14 +309,6 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 				<Modal.Title>crop image</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<ReactCrop
-					src={imageSource}
-					onImageLoaded={onLoad}
-					crop={crop}
-					onChange={handleCropChange}
-					onDragStart={handleDragStart}
-					onDragEnd={handleDragEnd}
-				/>
 				{showSizeSelection && (
 					<div className={classes.sizeSelectionList}>
 						{SIZE_SELECTION_OPTIONS.map((sizeSelectionOption) => (
@@ -337,6 +329,14 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 						))}
 					</div>
 				)}
+				<ReactCrop
+					src={imageSource}
+					onImageLoaded={onLoad}
+					crop={crop}
+					onChange={handleCropChange}
+					onDragStart={handleDragStart}
+					onDragEnd={handleDragEnd}
+				/>
 				<div className="d-flex mt-5 align-items-center">
 					<SvgIcon kit="fas" icon="triangle-exclamation" size={16} className={classes.infoIcon} />
 					<p className="mb-0 fs-small">Blurry images can occur if the image uploaded is too small.</p>
