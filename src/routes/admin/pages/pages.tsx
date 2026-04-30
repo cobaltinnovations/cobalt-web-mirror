@@ -294,8 +294,21 @@ export const Component = () => {
 					<Col>
 						<div className="mb-6 d-flex align-items-center justify-content-between gap-4">
 							<h2 className="mb-0">Pages</h2>
-							<div className="d-flex align-items-center gap-3">
+							<div className="d-flex align-items-center">
+								<Button
+									variant="primary"
+									size="sm"
+									className="d-flex align-items-center"
+									onClick={() => {
+										setShowAddPageModal(true);
+									}}
+								>
+									<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
+									Add Page
+								</Button>
 								<InputHelperSearch
+									className="ms-2"
+									style={{ width: 335 }}
 									placeholder="Search pages"
 									value={searchInputValue}
 									onChange={({ currentTarget }) => {
@@ -305,16 +318,6 @@ export const Component = () => {
 										setSearchInputValue('');
 									}}
 								/>
-								<Button
-									variant="primary"
-									className="d-flex align-items-center flex-shrink-0"
-									onClick={() => {
-										setShowAddPageModal(true);
-									}}
-								>
-									<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
-									Add Page
-								</Button>
 							</div>
 						</div>
 						<hr />
