@@ -145,6 +145,7 @@ export const RowSelectionForm = () => {
 			let latestPageRow = createdPageRow;
 
 			for (const columnConfig of columnConfigs) {
+				const previousPageRow = latestPageRow;
 				const { pageRow } = await pagesService
 					.createCustomRowColumn(createdPageRow.pageRowId, {
 						contentOrderId: columnConfig.contentOrderId,
@@ -153,8 +154,30 @@ export const RowSelectionForm = () => {
 					})
 					.fetch();
 
-				latestPageRow = pageRow;
-				updatePageRow(pageRow);
+				const createdColumn = pageRow.columns.find(
+					(column) =>
+						!previousPageRow.columns.some(
+							(previousColumn) => previousColumn.pageRowColumnId === column.pageRowColumnId
+						)
+				);
+
+				if (!createdColumn) {
+					throw new Error('Unable to determine created custom row column.');
+				}
+
+				const { pageRow: normalizedPageRow } = await pagesService
+					.updateCustomRowColumn(createdPageRow.pageRowId, createdColumn.pageRowColumnId, {
+						headline: '',
+						description: columnConfig.description ?? '',
+						imageFileUploadId: '',
+						imageAltText: '',
+						usePlaceholderImage: columnConfig.usePlaceholderImage ?? false,
+						contentOrderId: columnConfig.contentOrderId,
+					})
+					.fetch();
+
+				latestPageRow = normalizedPageRow;
+				updatePageRow(normalizedPageRow);
 			}
 
 			if (columnConfigs.length === 0) {
