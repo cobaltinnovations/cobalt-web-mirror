@@ -102,6 +102,12 @@ const useSessionCropModalStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+const getInitialCrop = (cropImage: boolean): ReactCrop.Crop => ({
+	width: 90,
+	...(cropImage ? { aspect: 16 / 9 } : { height: 90 }),
+	unit: '%' as '%',
+});
+
 interface SessionCropModalProps extends ModalProps {
 	imageSource: string;
 	imageName?: string;
@@ -121,11 +127,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
-	const [crop, setCrop] = useState<ReactCrop.Crop>({
-		width: 90,
-		...(cropImage && { aspect: 16 / 9 }),
-		unit: '%' as '%',
-	});
+	const [crop, setCrop] = useState<ReactCrop.Crop>(() => getInitialCrop(cropImage));
 	const [isDragging, setIsDragging] = useState(false);
 
 	const onLoad = useCallback((htmlImageElement: HTMLImageElement) => {
@@ -170,11 +172,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 	}, []);
 
 	const handleEntered = useCallback(() => {
-		setCrop({
-			width: 90,
-			...(cropImage && { aspect: 16 / 9 }),
-			unit: '%' as '%',
-		});
+		setCrop(getInitialCrop(cropImage));
 	}, [cropImage]);
 
 	const handleHide = useCallback(() => {
