@@ -575,6 +575,15 @@ const useWysiwygDisplayStyles = createUseThemedStyles((theme) => ({
 		'& a': {
 			...theme.fonts.bodyNormal,
 		},
+		'& .ql-align-center': {
+			textAlign: 'center',
+		},
+		'& .ql-align-right': {
+			textAlign: 'right',
+		},
+		'& .ql-align-justify': {
+			textAlign: 'justify',
+		},
 		'& .ql-size-small': {
 			fontSize: '0.9rem',
 		},
