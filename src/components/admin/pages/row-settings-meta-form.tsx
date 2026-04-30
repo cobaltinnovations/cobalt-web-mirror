@@ -17,7 +17,8 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 	const [formValues, setFormValues] = useState({
 		name: '',
 		backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
-		paddingId: ROW_PADDING_ID.MEDIUM,
+		paddingTopId: ROW_PADDING_ID.MEDIUM,
+		paddingBottomId: ROW_PADDING_ID.MEDIUM,
 	});
 
 	useEffect(() => {
@@ -28,7 +29,8 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 		setFormValues({
 			name: pageRow.name ?? '',
 			backgroundColorId: pageRow.backgroundColorId ?? BACKGROUND_COLOR_ID.WHITE,
-			paddingId: pageRow.paddingId ?? ROW_PADDING_ID.MEDIUM,
+			paddingTopId: pageRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM,
+			paddingBottomId: pageRow.paddingBottomId ?? ROW_PADDING_ID.MEDIUM,
 		});
 	}, [pageRow]);
 
@@ -40,7 +42,8 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 				.updatePageRow(pr.pageRowId, {
 					name: fv.name,
 					backgroundColorId: fv.backgroundColorId,
-					paddingId: fv.paddingId,
+					paddingTopId: fv.paddingTopId,
+					paddingBottomId: fv.paddingBottomId,
 				})
 				.fetch();
 
@@ -97,19 +100,38 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 				<option value={BACKGROUND_COLOR_ID.WHITE}>White</option>
 				<option value={BACKGROUND_COLOR_ID.NEUTRAL}>Neutral</option>
 			</InputHelper>
-			<InputHelper
-				className="mb-6"
-				as="select"
-				label="Padding"
-				name="paddingId"
-				value={formValues.paddingId}
-				onChange={handleInputChange}
-			>
-				<option value={ROW_PADDING_ID.NONE}>None</option>
-				<option value={ROW_PADDING_ID.SMALL}>Small</option>
-				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
-				<option value={ROW_PADDING_ID.LARGE}>Large</option>
-			</InputHelper>
+			<div className="d-flex gap-4 mb-6">
+				<div className="flex-grow-1">
+					<InputHelper
+						className="mb-0"
+						as="select"
+						label="Padding top"
+						name="paddingTopId"
+						value={formValues.paddingTopId}
+						onChange={handleInputChange}
+					>
+						<option value={ROW_PADDING_ID.NONE}>None</option>
+						<option value={ROW_PADDING_ID.SMALL}>Small</option>
+						<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+						<option value={ROW_PADDING_ID.LARGE}>Large</option>
+					</InputHelper>
+				</div>
+				<div className="flex-grow-1">
+					<InputHelper
+						className="mb-0"
+						as="select"
+						label="Padding bottom"
+						name="paddingBottomId"
+						value={formValues.paddingBottomId}
+						onChange={handleInputChange}
+					>
+						<option value={ROW_PADDING_ID.NONE}>None</option>
+						<option value={ROW_PADDING_ID.SMALL}>Small</option>
+						<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+						<option value={ROW_PADDING_ID.LARGE}>Large</option>
+					</InputHelper>
+				</div>
+			</div>
 			<hr />
 		</>
 	);

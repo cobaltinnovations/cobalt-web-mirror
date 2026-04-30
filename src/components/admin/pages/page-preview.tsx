@@ -25,11 +25,18 @@ interface PagePreviewProps {
 	previewViewport?: 'desktop' | 'mobile';
 }
 
-const ROW_PADDING_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
+const ROW_PADDING_TOP_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
 	[ROW_PADDING_ID.NONE]: '',
-	[ROW_PADDING_ID.SMALL]: 'py-12',
-	[ROW_PADDING_ID.MEDIUM]: 'py-16',
-	[ROW_PADDING_ID.LARGE]: 'py-20',
+	[ROW_PADDING_ID.SMALL]: 'pt-12',
+	[ROW_PADDING_ID.MEDIUM]: 'pt-16',
+	[ROW_PADDING_ID.LARGE]: 'pt-20',
+};
+
+const ROW_PADDING_BOTTOM_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
+	[ROW_PADDING_ID.NONE]: '',
+	[ROW_PADDING_ID.SMALL]: 'pb-12',
+	[ROW_PADDING_ID.MEDIUM]: 'pb-16',
+	[ROW_PADDING_ID.LARGE]: 'pb-20',
 };
 
 export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop' }: PagePreviewProps) => {
@@ -133,7 +140,14 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 					fluid
 					className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 				>
-					<Container className={ROW_PADDING_CLASS_BY_ID[pageRow.paddingId ?? ROW_PADDING_ID.MEDIUM]}>
+					<Container
+						className={[
+							ROW_PADDING_TOP_CLASS_BY_ID[pageRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM],
+							ROW_PADDING_BOTTOM_CLASS_BY_ID[pageRow.paddingBottomId ?? ROW_PADDING_ID.MEDIUM],
+						]
+							.filter(Boolean)
+							.join(' ')}
+					>
 						{getRendererForPageRow({
 							pageId: page.pageId,
 							pageRow,

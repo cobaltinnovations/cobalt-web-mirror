@@ -43,7 +43,8 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 		buttonUrl: '',
 		imageFileUploadId: '',
 		imageUrl: '',
-		paddingId: ROW_PADDING_ID.MEDIUM,
+		paddingTopId: ROW_PADDING_ID.MEDIUM,
+		paddingBottomId: ROW_PADDING_ID.MEDIUM,
 	});
 
 	useEffect(() => {
@@ -58,7 +59,8 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 			buttonUrl: callToActionRow.buttonUrl ?? '',
 			imageFileUploadId: callToActionRow.imageFileUploadId ?? '',
 			imageUrl: callToActionRow.imageUrl ?? '',
-			paddingId: callToActionRow.paddingId ?? ROW_PADDING_ID.MEDIUM,
+			paddingTopId: callToActionRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM,
+			paddingBottomId: callToActionRow.paddingBottomId ?? ROW_PADDING_ID.MEDIUM,
 		});
 	}, [callToActionRow]);
 
@@ -89,7 +91,8 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 				.updatePageRow(row.pageRowId, {
 					name: row.name,
 					backgroundColorId: row.backgroundColorId,
-					paddingId: values.paddingId,
+					paddingTopId: values.paddingTopId,
+					paddingBottomId: values.paddingBottomId,
 				})
 				.fetch();
 
@@ -208,19 +211,38 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 				value={formValues.headline}
 				onChange={handleInputChange}
 			/>
-			<InputHelper
-				className="mb-6"
-				as="select"
-				label="Padding"
-				name="paddingId"
-				value={formValues.paddingId}
-				onChange={handleInputChange}
-			>
-				<option value={ROW_PADDING_ID.NONE}>None</option>
-				<option value={ROW_PADDING_ID.SMALL}>Small</option>
-				<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
-				<option value={ROW_PADDING_ID.LARGE}>Large</option>
-			</InputHelper>
+			<div className="d-flex gap-4 mb-6">
+				<div className="flex-grow-1">
+					<InputHelper
+						className="mb-0"
+						as="select"
+						label="Padding top"
+						name="paddingTopId"
+						value={formValues.paddingTopId}
+						onChange={handleInputChange}
+					>
+						<option value={ROW_PADDING_ID.NONE}>None</option>
+						<option value={ROW_PADDING_ID.SMALL}>Small</option>
+						<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+						<option value={ROW_PADDING_ID.LARGE}>Large</option>
+					</InputHelper>
+				</div>
+				<div className="flex-grow-1">
+					<InputHelper
+						className="mb-0"
+						as="select"
+						label="Padding bottom"
+						name="paddingBottomId"
+						value={formValues.paddingBottomId}
+						onChange={handleInputChange}
+					>
+						<option value={ROW_PADDING_ID.NONE}>None</option>
+						<option value={ROW_PADDING_ID.SMALL}>Small</option>
+						<option value={ROW_PADDING_ID.MEDIUM}>Medium</option>
+						<option value={ROW_PADDING_ID.LARGE}>Large</option>
+					</InputHelper>
+				</div>
+			</div>
 			<Form.Group className="mb-6">
 				<Form.Label className="mb-2">Description (optional)</Form.Label>
 				<WysiwygBasic

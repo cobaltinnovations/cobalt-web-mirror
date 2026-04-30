@@ -532,7 +532,8 @@ export const pagesService = {
 		data: {
 			name: string;
 			backgroundColorId: BACKGROUND_COLOR_ID;
-			paddingId: ROW_PADDING_ID;
+			paddingTopId: ROW_PADDING_ID;
+			paddingBottomId: ROW_PADDING_ID;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
