@@ -32,6 +32,14 @@ const FooterNav = () => {
 					},
 			  ]
 			: []),
+		...(institution.continuingEducationUrl
+			? [
+					{
+						label: 'Continuing Education',
+						to: institution.continuingEducationUrl,
+					},
+			  ]
+			: []),
 		...(institution.featuresEnabled
 			? [
 					{
