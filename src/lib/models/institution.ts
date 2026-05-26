@@ -82,6 +82,7 @@ export interface Institution {
 	faqEnabled: boolean;
 	epicFhirEnabled: boolean;
 	externalContactUsUrl: string;
+	continuingEducationUrl?: string;
 	privacyPolicyUrl?: string;
 	secureFilesharingPlatformName?: string;
 	secureFilesharingPlatformUrl?: string;

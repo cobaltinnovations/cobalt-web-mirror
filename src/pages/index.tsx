@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useMemo } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useRevalidator } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
@@ -60,6 +60,7 @@ const Index: FC = () => {
 		useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
+	const revalidator = useRevalidator();
 	const { trackEvent } = useAnalytics();
 	const handleError = useHandleError();
 
@@ -183,7 +184,8 @@ const Index: FC = () => {
 	);
 	const handleOnboardingScreeningFlowComplete = useCallback(() => {
 		setShowOnboardingModal(false);
-	}, []);
+		revalidator.revalidate();
+	}, [revalidator]);
 
 	if (institution?.integratedCareEnabled) {
 		return <Navigate to="/ic" />;

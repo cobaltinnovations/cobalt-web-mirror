@@ -33,6 +33,8 @@ import { Helmet } from 'react-helmet';
 import { ReactComponent as AppointmentIllustration } from '@/assets/illustrations/appointment.svg';
 import SvgIcon from '@/components/svg-icon';
 import { contentSnippetFromLegacySharedContent, ContentSnippetModal } from '@/components/content-snippet';
+import InlineAlert from '@/components/inline-alert';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 type NormalizedFooterAction = {
 	label: string;
@@ -739,6 +741,21 @@ const ScreeningQuestionsPage = () => {
 												__html: confirmationPrompt.text,
 											}}
 										/>
+
+										{confirmationPrompt.callouts?.map((callout, calloutIndex) => (
+											<InlineAlert
+												key={calloutIndex}
+												className="mb-6"
+												title={callout.title ?? ''}
+												description={
+													callout.descriptionHtml ? (
+														<WysiwygDisplay html={callout.descriptionHtml} />
+													) : callout.url && callout.urlText ? (
+														<a href={callout.url}>{callout.urlText}</a>
+													) : undefined
+												}
+											/>
+										))}
 
 										<div
 											className={classNames('d-flex align-items-center', {

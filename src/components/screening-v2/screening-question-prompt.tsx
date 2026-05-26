@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { ScreeningConfirmationPrompt } from '@/lib/models';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
+import InlineAlert from '@/components/inline-alert';
 import classNames from 'classnames';
 import { WysiwygDisplay } from '../wysiwyg-basic';
 
@@ -33,6 +34,20 @@ export const ScreeningQuestionPrompt = ({
 				<h1 className="mb-6 text-center">{screeningConfirmationPrompt.titleText}</h1>
 			)}
 			<WysiwygDisplay className="mb-6 text-center" html={screeningConfirmationPrompt.text ?? ''} />
+			{screeningConfirmationPrompt.callouts?.map((callout, calloutIndex) => (
+				<InlineAlert
+					key={calloutIndex}
+					className="mb-6"
+					title={callout.title ?? ''}
+					description={
+						callout.descriptionHtml ? (
+							<WysiwygDisplay html={callout.descriptionHtml} />
+						) : callout.url && callout.urlText ? (
+							<a href={callout.url}>{callout.urlText}</a>
+						) : undefined
+					}
+				/>
+			))}
 			<div
 				className={classNames('d-flex align-items-center', {
 					'justify-content-center': !showPreviousButton,

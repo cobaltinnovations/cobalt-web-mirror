@@ -195,6 +195,14 @@ export interface ScreeningConfirmationPrompt {
 	text: string;
 	titleText?: string;
 	actionText: string;
+	callouts?: ScreeningConfirmationPromptCallout[];
+}
+
+export interface ScreeningConfirmationPromptCallout {
+	title?: string;
+	descriptionHtml?: string;
+	url?: string;
+	urlText?: string;
 }
 
 export interface ScreeningQuestionContextResponse {

@@ -31,6 +31,8 @@ const Reports = () => {
 			ACCOUNT_SIGNUP_UNVERIFIED: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_INCOMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_COMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
+			ACCOUNT_ONBOARDING_COMPLETE_V2: account?.accountCapabilityFlags.canViewAnalytics,
+			ACCOUNT_GEOLOCATION: account?.accountCapabilityFlags.canViewAnalytics,
 			COURSE_MCB_DOWNLOAD: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_TIMELINE: account?.accountCapabilityFlags.canViewAnalytics,
 		} as Record<string, boolean>;

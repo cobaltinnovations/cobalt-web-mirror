@@ -210,6 +210,16 @@ const Footer: FC = () => {
 												</Link>
 											</li>
 										)}
+										{institution.continuingEducationUrl && (
+											<li className="mb-3">
+												<Link
+													className="fw-normal text-decoration-none"
+													to={institution.continuingEducationUrl}
+												>
+													Continuing Education
+												</Link>
+											</li>
+										)}
 										{institution.faqEnabled && (
 											<li className="mb-3">
 												<Link className="fw-normal text-decoration-none" to="/faqs">
