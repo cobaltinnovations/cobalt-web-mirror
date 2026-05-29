@@ -7,9 +7,9 @@ import useAccount from '@/hooks/use-account';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import BackgroundImageContainer from '@/components/background-image-container';
 import { Link } from 'react-router-dom';
 import SvgIcon from '@/components/svg-icon';
+import mediaQueries from '@/jss/media-queries';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -18,6 +18,18 @@ const useStyles = createUseThemedStyles((theme) => ({
 		boxShadow: theme.elevation.e200,
 		backgroundColor: theme.colors.n0,
 		display: 'flex',
+	},
+	imageOuter: {
+		width: 120,
+		height: 120,
+		flexShrink: 0,
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+		backgroundRepeat: 'no-repeat',
+		[mediaQueries.md]: {
+			width: 64,
+			height: 64,
+		},
 	},
 	scheduleCtaOuter: {
 		padding: 16,
@@ -63,7 +75,7 @@ export const Component = () => {
 						<hr />
 					</Col>
 				</Row>
-				<Row className="mb-8">
+				<Row className="mb-6 mb-lg-8">
 					<Col>
 						<div className="d-flex">
 							<InputHelper
@@ -96,25 +108,24 @@ export const Component = () => {
 				</Row>
 				<Row>
 					<Col>
-						<p>
+						<p className="mb-6 mb-lg-10">
 							<strong>4 available _ for _ employees</strong>
 						</p>
 						<div className={classes.providerResult}>
 							<Row>
 								<Col xl={7}>
 									<div className="d-flex mb-6 mb-xl-0">
-										<BackgroundImageContainer
-											className="me-6"
-											size={120}
-											imageUrl={placeholderImage}
+										<div
+											className={classNames(classes.imageOuter, 'me-6')}
+											style={{ backgroundImage: `url(${placeholderImage})` }}
 										/>
 										<div>
 											<h3 className="mb-2">
 												<Link to="/#">Title</Link>
 											</h3>
 											<div className="mb-4 d-flex align-items-center">
-												<SvgIcon kit="far" icon="phone" size={16} className="me-1" />{' '}
-												<p className="mb-0">Contact Type</p>
+												<SvgIcon kit="far" icon="phone" size={16} className="me-2" />{' '}
+												<p className="mb-0">Phone</p>
 											</div>
 											<p className="mb-0 fs-large">
 												The Employee Assistance Program (EAP) offers up to 8 sessions of free,
