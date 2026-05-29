@@ -6,7 +6,8 @@ import useAccount from '@/hooks/use-account';
 
 import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
-import ProviderSearchResult from '@/components/provider-search-result';
+import ProviderSearchResult, { SCHEDULE_TYPE_ID } from '@/components/provider-search-result';
+import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 
 export const loader = () => {
 	return null;
@@ -15,6 +16,8 @@ export const loader = () => {
 export const Component = () => {
 	const { institution } = useAccount();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
+
+	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
 		<>
@@ -78,6 +81,33 @@ export const Component = () => {
 							<strong>4 available _ for _ employees</strong>
 						</p>
 						<ProviderSearchResult
+							className="mb-6"
+							imageUrl={placeholderImage}
+							title="Employee Assistance Program"
+							description="The Employee Assistance Program (EAP) offers up to 8 sessions of free, confidential, solution-focused counseling per issue. An 'issue' is the reason for seeking support, such as relationship challenges or grief."
+							scheduleAppointmentDescription="Your first appointment is a 30 minute phone call with a clinician to assess your needs and discuss potential resources."
+							scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_PREDETERMINED}
+							onTitleButtonClick={() => {
+								setShowProviderCanvas(true);
+							}}
+						/>
+						<ProviderSearchResult
+							className="mb-6"
+							imageUrl={placeholderImage}
+							title="Autism Clinic"
+							description="Autism Clinic diagnoses and treats patients as part of a 4-month long, outpatient program. Autism Clinic bills insurance for your visits"
+							scheduleAppointmentDescription="You will need to answer a few questions before scheduling to determine which type of appointment is right for you."
+							scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_UNDETERMINED}
+							onTitleButtonClick={() => {
+								setShowProviderCanvas(true);
+							}}
+						/>
+						<ProviderSearchResult
+							imageUrl={placeholderImage}
+							title="General Employee Assistance Program"
+							description="The General Health Employee Assistance Program (EAP offers eight (8) free confidential counseling sessions, as well as educational tools and referral services to help you manage life's challenges. The EAP is managed by Quest Behavioral Health, which provides access to a network of behavioral health providers in the community. Employees can contact Quest directly by calling 1-800-364-6352; all contacts are confidential."
+							scheduleAppointmentDescription="Available 24 hours a day/7 days a week for urgent clinical matters"
+							scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_BY_PHONE}
 							onTitleButtonClick={() => {
 								setShowProviderCanvas(true);
 							}}

@@ -2,12 +2,16 @@ import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-
 import SvgIcon from '@/components/svg-icon';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+
+export enum SCHEDULE_TYPE_ID {
+	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
+	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',
+	APPOINTMENT_BY_PHONE = 'APPOINTMENT_BY_PHONE',
+}
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -29,6 +33,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 			height: 64,
 		},
 	},
+	description: {
+		display: '-webkit-box',
+		'-webkit-line-clamp': 3,
+		'line-clamp': 3,
+		'-webkit-box-orient': 'vertical',
+		'box-orient': 'vertical',
+		overflow: 'hidden',
+	},
 	scheduleCtaOuter: {
 		padding: 16,
 		borderRadius: 8,
@@ -47,21 +59,34 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface ProviderSearchResultProps {
+	imageUrl: string;
+	title: string;
 	onTitleButtonClick(): void;
+	description: string;
+	scheduleAppointmentDescription: string;
+	scheduleTypeId: SCHEDULE_TYPE_ID;
+	className?: string;
 }
 
-const ProviderSearchResult = ({ onTitleButtonClick }: ProviderSearchResultProps) => {
+const ProviderSearchResult = ({
+	imageUrl,
+	title,
+	onTitleButtonClick,
+	description,
+	scheduleAppointmentDescription,
+	scheduleTypeId,
+	className,
+}: ProviderSearchResultProps) => {
 	const classes = useStyles();
-	const placeholderImage = useRandomPlaceholderImage();
 
 	return (
-		<div className={classes.providerResult}>
+		<div className={classNames(classes.providerResult, className)}>
 			<Row>
 				<Col xl={7}>
 					<div className="d-flex mb-6 mb-xl-0">
 						<div
 							className={classNames(classes.imageOuter, 'me-6')}
-							style={{ backgroundImage: `url(${placeholderImage})` }}
+							style={{ backgroundImage: `url(${imageUrl})` }}
 						/>
 						<div>
 							<h3 className="mb-2">
@@ -70,18 +95,14 @@ const ProviderSearchResult = ({ onTitleButtonClick }: ProviderSearchResultProps)
 									className="p-0 text-decoration-none fs-h3"
 									onClick={onTitleButtonClick}
 								>
-									Title
+									{title}
 								</Button>
 							</h3>
 							<div className="mb-4 d-flex align-items-center">
 								<SvgIcon kit="far" icon="phone" size={16} className="me-2" />{' '}
 								<p className="mb-0">Phone</p>
 							</div>
-							<p className="mb-0 fs-large">
-								The Employee Assistance Program (EAP) offers up to 8 sessions of free, confidential,
-								solution-focused counseling per issue. An 'issue' is the reason for seeking support,
-								such as relationship challenges or grief.
-							</p>
+							<p className={classNames(classes.description, 'mb-0 fs-large')}>{description}</p>
 						</div>
 					</div>
 					<hr className="mb-6 d-xl-none" />
@@ -90,46 +111,49 @@ const ProviderSearchResult = ({ onTitleButtonClick }: ProviderSearchResultProps)
 					<p className="mb-2 fs-large">
 						<strong>Schedule Appointment</strong>
 					</p>
-					<p className="mb-4">
-						Your first appointment is a 30 minute phone call with a clinician to assess your needs and
-						discuss potential resources.
-					</p>
-					<div className={classNames(classes.scheduleCtaOuter, 'mb-4')}>
-						<div className="d-md-flex justify-content-between">
-							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
-								<div className={classNames(classes.iconOuter, 'me-4')}>
-									<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+					<p className="mb-4">{scheduleAppointmentDescription}</p>
+					{scheduleTypeId === SCHEDULE_TYPE_ID.APPOINTMENT_PREDETERMINED && (
+						<div className={classNames(classes.scheduleCtaOuter, 'mb-4')}>
+							<div className="d-md-flex justify-content-between">
+								<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+									<div className={classNames(classes.iconOuter, 'me-4')}>
+										<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+									</div>
+									<div>
+										<p className="mb-0">First Available Appointment:</p>
+										<p className="mb-0">
+											<strong>Mon, May 4, 2:00PM</strong>
+										</p>
+									</div>
 								</div>
-								<div>
-									<p className="mb-0">First Available Appointment:</p>
-									<p className="mb-0">
-										<strong>Mon, May 4, 2:00PM</strong>
-									</p>
-								</div>
+								<Button variant="primary">Schedule Appointment</Button>
 							</div>
-							<Button variant="primary">Schedule Appointment</Button>
 						</div>
-					</div>
-					<div className={classNames(classes.scheduleCtaOuter, 'mb-4')}>
-						<Button variant="primary" className="d-block w-100">
-							Schedule Appointment
-						</Button>
-					</div>
-					<div className={classNames(classes.scheduleCtaOuter, 'mb-4')}>
-						<div className="d-md-flex justify-content-between">
-							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
-								<div className={classNames(classes.iconOuter, 'me-4')}>
-									<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
+					)}
+					{scheduleTypeId === SCHEDULE_TYPE_ID.APPOINTMENT_UNDETERMINED && (
+						<div className={classNames(classes.scheduleCtaOuter, 'mb-4')}>
+							<Button variant="primary" className="d-block w-100">
+								Schedule Appointment
+							</Button>
+						</div>
+					)}
+					{scheduleTypeId === SCHEDULE_TYPE_ID.APPOINTMENT_BY_PHONE && (
+						<div className={classNames(classes.scheduleCtaOuter, 'mb-4')}>
+							<div className="d-md-flex justify-content-between">
+								<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+									<div className={classNames(classes.iconOuter, 'me-4')}>
+										<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
+									</div>
+									<div>
+										<p className="mb-0">
+											<strong>Call (000) 000-0000 to schedule</strong>
+										</p>
+									</div>
 								</div>
-								<div>
-									<p className="mb-0">
-										<strong>Call (000) 000-0000 to schedule</strong>
-									</p>
-								</div>
+								<Button variant="primary">Call Clinic</Button>
 							</div>
-							<Button variant="primary">Call Clinic</Button>
 						</div>
-					</div>
+					)}
 					<Button variant="link" className="d-block w-100 text-decoration-none">
 						View more appointments
 					</Button>
