@@ -9,6 +9,7 @@ import { PreviewCanvas } from '@/components/preview-canvas';
 import ProviderSearchResult, { SCHEDULE_TYPE_ID } from '@/components/provider-search-result';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import ProviderScheduleModal from '@/components/provider-schedule-modal';
 
 export const loader = () => {
 	return null;
@@ -17,6 +18,7 @@ export const loader = () => {
 export const Component = () => {
 	const { institution } = useAccount();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
+	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 
 	const placeholderImage = useRandomPlaceholderImage();
 
@@ -138,6 +140,13 @@ export const Component = () => {
 				</Container>
 			</PreviewCanvas>
 
+			<ProviderScheduleModal
+				show={showProviderScheduleModal}
+				onHide={() => {
+					setShowProviderScheduleModal(false);
+				}}
+			/>
+
 			<Container className="pt-10 pb-16">
 				<Row className="mb-6">
 					<Col>
@@ -195,6 +204,9 @@ export const Component = () => {
 							onTitleButtonClick={() => {
 								setShowProviderCanvas(true);
 							}}
+							onViewAppointmentsButtonClick={() => {
+								setShowProviderScheduleModal(true);
+							}}
 						/>
 						<ProviderSearchResult
 							className="mb-6"
@@ -206,6 +218,9 @@ export const Component = () => {
 							onTitleButtonClick={() => {
 								setShowProviderCanvas(true);
 							}}
+							onViewAppointmentsButtonClick={() => {
+								setShowProviderScheduleModal(true);
+							}}
 						/>
 						<ProviderSearchResult
 							imageUrl={placeholderImage}
@@ -215,6 +230,9 @@ export const Component = () => {
 							scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_BY_PHONE}
 							onTitleButtonClick={() => {
 								setShowProviderCanvas(true);
+							}}
+							onViewAppointmentsButtonClick={() => {
+								setShowProviderScheduleModal(true);
 							}}
 						/>
 					</Col>

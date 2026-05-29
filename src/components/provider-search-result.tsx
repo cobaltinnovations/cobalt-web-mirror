@@ -65,6 +65,7 @@ interface ProviderSearchResultProps {
 	description: string;
 	scheduleAppointmentDescription: string;
 	scheduleTypeId: SCHEDULE_TYPE_ID;
+	onViewAppointmentsButtonClick(): void;
 	className?: string;
 }
 
@@ -75,6 +76,7 @@ const ProviderSearchResult = ({
 	description,
 	scheduleAppointmentDescription,
 	scheduleTypeId,
+	onViewAppointmentsButtonClick,
 	className,
 }: ProviderSearchResultProps) => {
 	const classes = useStyles();
@@ -154,7 +156,11 @@ const ProviderSearchResult = ({
 							</div>
 						</div>
 					)}
-					<Button variant="link" className="d-block w-100 text-decoration-none">
+					<Button
+						variant="link"
+						className="d-block w-100 text-decoration-none"
+						onClick={onViewAppointmentsButtonClick}
+					>
 						View more appointments
 					</Button>
 				</Col>
