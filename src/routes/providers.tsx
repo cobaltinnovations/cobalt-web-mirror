@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
@@ -10,6 +10,7 @@ import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import { Link } from 'react-router-dom';
 import SvgIcon from '@/components/svg-icon';
 import mediaQueries from '@/jss/media-queries';
+import { PreviewCanvas } from '@/components/preview-canvas';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -54,6 +55,7 @@ export const loader = () => {
 
 export const Component = () => {
 	const { institution } = useAccount();
+	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
 
 	const classes = useStyles();
 	const placeholderImage = useRandomPlaceholderImage();
@@ -63,6 +65,14 @@ export const Component = () => {
 			<Helmet>
 				<title>{institution.platformName ?? 'Cobalt'} | Providers</title>
 			</Helmet>
+
+			<PreviewCanvas
+				title={'Provider title'}
+				show={showProviderCanvas}
+				onHide={() => {
+					setShowProviderCanvas(false);
+				}}
+			/>
 
 			<Container className="pt-10 pb-16">
 				<Row className="mb-6">
@@ -121,7 +131,15 @@ export const Component = () => {
 										/>
 										<div>
 											<h3 className="mb-2">
-												<Link to="/#">Title</Link>
+												<Button
+													variant="link"
+													className="p-0 text-decoration-none fs-h3"
+													onClick={() => {
+														setShowProviderCanvas(true);
+													}}
+												>
+													Title
+												</Button>
 											</h3>
 											<div className="mb-4 d-flex align-items-center">
 												<SvgIcon kit="far" icon="phone" size={16} className="me-2" />{' '}
