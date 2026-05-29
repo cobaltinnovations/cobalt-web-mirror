@@ -767,6 +767,11 @@ export const routes: RouteObject[] = [
 						element: <RedirectToAdminPathOrRender pathname="analytics" element={<NoMatch />} />,
 					},
 					{
+						id: 'providers',
+						path: 'providers',
+						lazy: () => import('@/routes/providers'),
+					},
+					{
 						id: 'provider-detail',
 						path: 'providers/:urlName',
 						lazy: () => import('@/routes/provider-detail'),
