@@ -3,10 +3,11 @@ import { Button, Col, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import SvgIcon from '@/components/svg-icon';
-import ProviderNextAppointmentCard, { SCHEDULE_TYPE_ID } from '@/components/provider-next-appointment-card';
+import { SCHEDULE_TYPE_ID } from '@/components/provider-next-appointment-card';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import ProviderScheduleCard from './provider-schedule-card';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -90,18 +91,12 @@ const ProviderSearchResult = ({
 					<hr className="mb-6 d-xl-none" />
 				</Col>
 				<Col xl={5}>
-					<p className="mb-2 fs-large">
-						<strong>Schedule Appointment</strong>
-					</p>
-					<p className="mb-4">{scheduleAppointmentDescription}</p>
-					<ProviderNextAppointmentCard scheduleTypeId={scheduleTypeId} />
-					<Button
-						variant="link"
-						className="d-block w-100 text-decoration-none"
-						onClick={onViewAppointmentsButtonClick}
-					>
-						View more appointments
-					</Button>
+					<ProviderScheduleCard
+						showCardStyle={false}
+						scheduleAppointmentDescription={scheduleAppointmentDescription}
+						scheduleTypeId={scheduleTypeId}
+						onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
+					/>
 				</Col>
 			</Row>
 		</div>
