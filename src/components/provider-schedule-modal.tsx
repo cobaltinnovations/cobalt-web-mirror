@@ -176,13 +176,14 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 								[classes.datePickerDayNoSlots]: isNoSlotDate(date),
 							})
 						}
-						renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
+						renderCustomHeader={({ date, decreaseMonth, increaseMonth, prevMonthButtonDisabled }) => (
 							<div className={classNames(classes.calendarHeader)}>
 								<Button
 									type="button"
 									variant="transparent-secondary"
 									className={classes.monthNavButton}
 									aria-label="Previous month"
+									disabled={prevMonthButtonDisabled}
 									onClick={decreaseMonth}
 								>
 									<SvgIcon kit="far" icon="chevron-left" size={18} />
