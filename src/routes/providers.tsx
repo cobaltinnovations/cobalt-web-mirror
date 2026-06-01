@@ -6,10 +6,11 @@ import useAccount from '@/hooks/use-account';
 
 import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
-import ProviderSearchResult, { SCHEDULE_TYPE_ID } from '@/components/provider-search-result';
+import ProviderSearchResult from '@/components/provider-search-result';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
 import ProviderScheduleModal from '@/components/provider-schedule-modal';
+import ProviderInfoDetail from '@/components/provider-info-detail';
+import { SCHEDULE_TYPE_ID } from '@/components/provider-next-appointment-card';
 
 export const loader = () => {
 	return null;
@@ -35,109 +36,10 @@ export const Component = () => {
 					setShowProviderCanvas(false);
 				}}
 			>
-				<Container>
-					<Row>
-						<Col sx={7}>
-							<Row className="mb-10">
-								<Col>
-									<h3 className="mb-6">About</h3>
-									<p className="mb-6 fs-large">
-										Specifically for _ employees, the Employee Assistance Program (EAP) offers up to
-										8 sessions of free, confidential, solution-focused counseling per issue. An
-										'issue' is the reason for seeking support, such as relationship challenges or
-										grief.
-									</p>
-									<p className="mb-0 fs-large">
-										These counseling sessions and visits are not documented in MyChart.
-									</p>
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<hr />
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<h3 className="mb-6">Insurance</h3>
-									<p className="mb-0 fs-large">
-										The following is a list of accepted insurance plans.
-									</p>
-									<p className="mb-6 fs-large">
-										You will need to confirm your insurance before booking.
-									</p>
-									<Table>
-										<TableHead>
-											<TableRow>
-												<TableCell header>Health Insurance</TableCell>
-												<TableCell header className="text-right">
-													Behavioral Health Insurance
-												</TableCell>
-											</TableRow>
-										</TableHead>
-										<TableBody>
-											<TableRow>
-												<TableCell>Aetna Choice Point-of-Service (POS) II</TableCell>
-												<TableCell className="text-right">
-													Aetna Behavioral Health Network
-												</TableCell>
-											</TableRow>
-										</TableBody>
-									</Table>
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<hr />
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<h3 className="mb-6">Specialties / Expertise</h3>
-									<ul className="mb-0">
-										<li className="fs-large">Autism</li>
-									</ul>
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<hr />
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<h3 className="mb-6">Population Served</h3>
-									<ul className="mb-0">
-										<li className="fs-large">Age</li>
-										<li className="fs-large">Individuals</li>
-									</ul>
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<hr />
-								</Col>
-							</Row>
-
-							<Row className="mb-10">
-								<Col>
-									<h3 className="mb-6">Treatment Methods</h3>
-									<ul className="mb-0">
-										<li className="fs-large">Cognitive Behavorial (CBT)</li>
-									</ul>
-								</Col>
-							</Row>
-						</Col>
-						<Col sx={5}></Col>
-					</Row>
-				</Container>
+				<ProviderInfoDetail
+					scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
+					scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_PREDETERMINED}
+				/>
 			</PreviewCanvas>
 
 			<ProviderScheduleModal
