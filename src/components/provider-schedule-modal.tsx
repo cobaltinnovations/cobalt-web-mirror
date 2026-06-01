@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 
 import DatePicker from '@/components/date-picker';
@@ -15,7 +16,7 @@ type TimeSlotGroup = {
 
 const appointmentTitle = 'UPHS Employee Assistance Program';
 const appointmentSubtitle = '30 minute intake phone call';
-const defaultSelectedDate = new Date(2026, 4, 4);
+const defaultSelectedDate = moment('2026-05-04', 'YYYY-MM-DD').toDate();
 const defaultSelectedTime = '2:00PM';
 
 const noSlotDateKeys = new Set(['2026-05-14', '2026-05-20', '2026-05-21', '2026-05-30']);
@@ -26,23 +27,30 @@ const timeSlotGroups: TimeSlotGroup[] = [
 	{ label: 'Evening', slots: ['5:00PM', '5:30PM', '6:00PM'] },
 ];
 
-const formatDateKey = (date: Date) => {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, '0');
-	const day = String(date.getDate()).padStart(2, '0');
-
-	return `${year}-${month}-${day}`;
-};
-
-const formatDateLabel = (date: Date) => {
-	return date.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	});
-};
-
+const formatDateKey = (date: Date) => moment(date).format('YYYY-MM-DD');
+const formatDateLabel = (date: Date) => moment(date).format('MMMM D, YYYY');
 const isNoSlotDate = (date: Date) => noSlotDateKeys.has(formatDateKey(date));
+const isPastDate = (date: Date, minDate: Date) => moment(date).isBefore(minDate, 'day');
+const getNextSelectableDate = (date: Date) => {
+	const nextSelectableDate = moment(date).startOf('day');
+
+	while (isNoSlotDate(nextSelectableDate.toDate())) {
+		nextSelectableDate.add(1, 'day');
+	}
+
+	return nextSelectableDate.toDate();
+};
+
+const getInitialSelectedDate = () => {
+	const today = moment().startOf('day');
+	const initialDate = moment(defaultSelectedDate).startOf('day');
+
+	if (!initialDate.isBefore(today, 'day') && !isNoSlotDate(initialDate.toDate())) {
+		return initialDate.toDate();
+	}
+
+	return getNextSelectableDate(today.toDate());
+};
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerScheduleModal: {
@@ -128,17 +136,18 @@ interface ProviderScheduleModalProps extends ModalProps {}
 
 const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 	const classes = useStyles();
-	const [selectedDate, setSelectedDate] = useState(defaultSelectedDate);
+	const minSelectableDate = moment().startOf('day').toDate();
+	const [selectedDate, setSelectedDate] = useState(getInitialSelectedDate);
 	const [selectedTime, setSelectedTime] = useState(defaultSelectedTime);
 
 	const selectedDateLabel = formatDateLabel(selectedDate);
 
 	const handleDateSelect = (date: Date | null) => {
-		if (!date || isNoSlotDate(date)) {
+		if (!date || isPastDate(date, minSelectableDate) || isNoSlotDate(date)) {
 			return;
 		}
 
-		setSelectedDate(date);
+		setSelectedDate(moment(date).startOf('day').toDate());
 		setSelectedTime(defaultSelectedTime);
 	};
 
@@ -160,6 +169,7 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 						inline
 						selected={selectedDate}
 						onChange={handleDateSelect}
+						minDate={minSelectableDate}
 						calendarClassName={classes.inlineCalendar}
 						dayClassName={(date) =>
 							classNames({
@@ -177,12 +187,7 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 								>
 									<SvgIcon kit="far" icon="chevron-left" size={18} />
 								</Button>
-								<h5 className="mb-0">
-									{date.toLocaleDateString('en-US', {
-										month: 'long',
-										year: 'numeric',
-									})}
-								</h5>
+								<h5 className="mb-0">{moment(date).format('MMMM YYYY')}</h5>
 								<Button
 									type="button"
 									variant="transparent-secondary"
