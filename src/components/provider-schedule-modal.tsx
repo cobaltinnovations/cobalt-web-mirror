@@ -57,82 +57,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flexShrink: 0,
 		backgroundColor: theme.colors.n500,
 	},
-	datePickerWrapper: {
-		width: '100%',
-	},
 	inlineCalendar: {
-		width: '100%',
-		border: 0,
-		fontFamily: 'inherit',
-		backgroundColor: 'transparent',
-		'& .react-datepicker__month-container': {
-			float: 'none',
-			width: '100%',
-		},
+		padding: 16,
 		'& .react-datepicker__header': {
-			padding: 0,
-			borderBottom: 0,
 			backgroundColor: 'transparent',
-		},
-		'& .react-datepicker__day-names': {
-			display: 'grid',
-			marginBottom: 0,
-			gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
 		},
 		'& .react-datepicker__day-name': {
-			width: 'auto',
-			margin: 0,
-			...theme.fonts.small,
-			...theme.fonts.bodyBold,
-			lineHeight: '2rem',
 			color: theme.colors.n500,
 		},
-		'& .react-datepicker__month': {
-			margin: 0,
-		},
-		'& .react-datepicker__week': {
-			display: 'grid',
-			gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-		},
-		'& .react-datepicker__day': {
-			width: 44,
-			height: 46,
-			margin: 0,
-			padding: 0,
-			display: 'flex',
-			borderRadius: 500,
-			position: 'relative',
-			alignItems: 'center',
-			justifyContent: 'center',
-			color: theme.colors.n900,
-			...theme.fonts.default,
-			...theme.fonts.bodyMedium,
-			lineHeight: 'normal',
-			overflow: 'visible',
-			'&:hover': {
-				borderRadius: 500,
-				backgroundColor: theme.colors.n50,
-			},
-			[mediaQueries.sm]: {
-				width: 38,
-				height: 40,
-			},
-		},
-		'& .react-datepicker__day--outside-month': {
-			color: theme.colors.n500,
-		},
-		'& .react-datepicker__day--keyboard-selected': {
-			color: theme.colors.n900,
-			backgroundColor: 'transparent',
-		},
-		'& .react-datepicker__day--selected, & .react-datepicker__day--keyboard-selected.react-datepicker__day--selected':
-			{
-				color: theme.colors.n0,
-				backgroundColor: theme.colors.p500,
-				'&:hover': {
-					backgroundColor: theme.colors.p700,
-				},
-			},
 	},
 	calendarHeader: {
 		display: 'flex',
@@ -147,12 +79,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		display: 'inline-flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		color: theme.colors.n900,
-	},
-	monthTitle: {
-		margin: 0,
-		...theme.fonts.h5.default,
-		...theme.fonts.headingBold,
 		color: theme.colors.n900,
 	},
 	datePickerDayNoSlots: {
@@ -194,7 +120,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	slotPanel: {
-		paddingTop: 4,
+		paddingLeft: 40,
 	},
 }));
 
@@ -234,7 +160,6 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 						inline
 						selected={selectedDate}
 						onChange={handleDateSelect}
-						wrapperClass={classes.datePickerWrapper}
 						calendarClassName={classes.inlineCalendar}
 						dayClassName={(date) =>
 							classNames({
@@ -242,7 +167,7 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 							})
 						}
 						renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
-							<div className={classNames(classes.calendarHeader, 'mb-5')}>
+							<div className={classNames(classes.calendarHeader)}>
 								<Button
 									type="button"
 									variant="transparent-secondary"
@@ -252,12 +177,12 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 								>
 									<SvgIcon kit="far" icon="chevron-left" size={18} />
 								</Button>
-								<p className={classes.monthTitle}>
+								<h5 className="mb-0">
 									{date.toLocaleDateString('en-US', {
 										month: 'long',
 										year: 'numeric',
 									})}
-								</p>
+								</h5>
 								<Button
 									type="button"
 									variant="transparent-secondary"
