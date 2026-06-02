@@ -225,6 +225,15 @@ export const providerService = {
 		});
 	},
 
+	searchProviders(queryParams: { featureId?: string; institutionLocationId?: string }) {
+		const params = new URLSearchParams({ ...queryParams });
+
+		return httpSingleton.orchestrateRequest<{ providers: Provider[] }>({
+			method: 'get',
+			url: `/providers/search?${params.toString()}`,
+		});
+	},
+
 	fetchRecentProviders(): OrchestratedRequest<ProvidersRepsonse> {
 		return httpSingleton.orchestrateRequest<ProvidersRepsonse>({
 			method: 'get',
