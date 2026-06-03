@@ -113,3 +113,31 @@ export interface Specialty {
 	description: string;
 	specialtyId: string;
 }
+
+export type ProviderContactTypeId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
+
+export enum ProviderAppointmentSelectionTypeId {
+	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
+	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',
+	APPOINTMENT_BY_PHONE = 'APPOINTMENT_BY_PHONE',
+}
+
+export type ProviderSearchResultModal = Provider & {
+	description: string | null;
+	contactTypeIds: ProviderContactTypeId[];
+	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId | null;
+	appointmentDescription: string | null;
+	firstAvailableAppointment: {
+		date: string;
+		time: string;
+		dateTime: string;
+		timeDescription: string;
+		appointmentTypeId: string | null;
+		appointmentTypeIds: string[] | null;
+		appointmentDescription: string | null;
+		assessmentId: string | null;
+		epicDepartmentId: string | null;
+		epicAppointmentFhirId: string | null;
+	} | null;
+	hasMoreAppointments: boolean;
+};

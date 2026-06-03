@@ -1,9 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import ProviderNextAppointmentCard, { SCHEDULE_TYPE_ID } from '@/components/provider-next-appointment-card';
+import ProviderNextAppointmentCard from '@/components/provider-next-appointment-card';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Button } from 'react-bootstrap';
+import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
 
 interface useStylesProps {
 	showCardStyle?: boolean;
@@ -20,9 +21,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface ProviderScheduleCardProps {
 	scheduleAppointmentDescription: string;
-	scheduleTypeId: SCHEDULE_TYPE_ID;
+	scheduleTypeId: ProviderAppointmentSelectionTypeId;
 	onViewAppointmentsButtonClick(): void;
 	showCardStyle?: boolean;
+	showMoreAppointmentsButton?: boolean;
 	className?: string;
 }
 
@@ -31,6 +33,7 @@ const ProviderScheduleCard = ({
 	scheduleTypeId,
 	onViewAppointmentsButtonClick,
 	showCardStyle = true,
+	showMoreAppointmentsButton,
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
@@ -40,14 +43,16 @@ const ProviderScheduleCard = ({
 				<strong>Schedule Appointment</strong>
 			</p>
 			<p className="mb-4">{scheduleAppointmentDescription}</p>
-			<ProviderNextAppointmentCard className="mb-2" scheduleTypeId={scheduleTypeId} />
-			<Button
-				variant="link"
-				className="d-block w-100 text-decoration-none"
-				onClick={onViewAppointmentsButtonClick}
-			>
-				View more appointments
-			</Button>
+			<ProviderNextAppointmentCard scheduleTypeId={scheduleTypeId} />
+			{showMoreAppointmentsButton && (
+				<Button
+					variant="link"
+					className="mt-2 d-block w-100 text-decoration-none"
+					onClick={onViewAppointmentsButtonClick}
+				>
+					View more appointments
+				</Button>
+			)}
 		</div>
 	);
 };

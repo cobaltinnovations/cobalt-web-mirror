@@ -17,6 +17,7 @@ import {
 	Specialty,
 	ProviderVisitType,
 	FeatureId,
+	ProviderSearchResultModal,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -228,7 +229,7 @@ export const providerService = {
 	searchProviders(queryParams: { featureId?: string; institutionLocationId?: string }) {
 		const params = new URLSearchParams({ ...queryParams });
 
-		return httpSingleton.orchestrateRequest<{ providers: Provider[] }>({
+		return httpSingleton.orchestrateRequest<{ providers: ProviderSearchResultModal[] }>({
 			method: 'get',
 			url: `/providers/search?${params.toString()}`,
 		});

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Button } from 'react-bootstrap';
+import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerNextAppointmentCard: {
@@ -23,14 +24,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-export enum SCHEDULE_TYPE_ID {
-	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
-	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',
-	APPOINTMENT_BY_PHONE = 'APPOINTMENT_BY_PHONE',
-}
-
 interface ProviderNextAppointmentCardProps {
-	scheduleTypeId: SCHEDULE_TYPE_ID;
+	scheduleTypeId: ProviderAppointmentSelectionTypeId;
 	className?: string;
 }
 
@@ -38,7 +33,7 @@ const ProviderNextAppointmentCard = ({ scheduleTypeId, className }: ProviderNext
 	const classes = useStyles();
 	return (
 		<div className={classNames(classes.providerNextAppointmentCard, className)}>
-			{scheduleTypeId === SCHEDULE_TYPE_ID.APPOINTMENT_PREDETERMINED && (
+			{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
 				<div className="d-md-flex justify-content-between">
 					<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
 						<div className={classNames(classes.iconOuter, 'me-4')}>
@@ -54,12 +49,12 @@ const ProviderNextAppointmentCard = ({ scheduleTypeId, className }: ProviderNext
 					<Button variant="primary">Schedule Appointment</Button>
 				</div>
 			)}
-			{scheduleTypeId === SCHEDULE_TYPE_ID.APPOINTMENT_UNDETERMINED && (
+			{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
 				<Button variant="primary" className="d-block w-100">
 					Schedule Appointment
 				</Button>
 			)}
-			{scheduleTypeId === SCHEDULE_TYPE_ID.APPOINTMENT_BY_PHONE && (
+			{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && (
 				<div className="d-md-flex justify-content-between">
 					<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
 						<div className={classNames(classes.iconOuter, 'me-4')}>

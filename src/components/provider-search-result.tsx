@@ -1,13 +1,13 @@
 import React from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import SvgIcon from '@/components/svg-icon';
-import { SCHEDULE_TYPE_ID } from '@/components/provider-next-appointment-card';
 
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import ProviderScheduleCard from './provider-schedule-card';
+import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -45,8 +45,9 @@ interface ProviderSearchResultProps {
 	onTitleButtonClick(): void;
 	description: string;
 	scheduleAppointmentDescription: string;
-	scheduleTypeId: SCHEDULE_TYPE_ID;
+	scheduleTypeId: ProviderAppointmentSelectionTypeId;
 	onViewAppointmentsButtonClick(): void;
+	showMoreAppointmentsButton?: boolean;
 	className?: string;
 }
 
@@ -58,47 +59,51 @@ const ProviderSearchResult = ({
 	scheduleAppointmentDescription,
 	scheduleTypeId,
 	onViewAppointmentsButtonClick,
+	showMoreAppointmentsButton,
 	className,
 }: ProviderSearchResultProps) => {
 	const classes = useStyles();
 
 	return (
 		<div className={classNames(classes.providerResult, className)}>
-			<Row>
-				<Col xl={7}>
-					<div className="d-flex mb-6 mb-xl-0">
-						<div
-							className={classNames(classes.imageOuter, 'me-6')}
-							style={{ backgroundImage: `url(${imageUrl})` }}
-						/>
-						<div>
-							<h3 className="mb-2">
-								<Button
-									variant="link"
-									className="p-0 text-decoration-none fs-h3"
-									onClick={onTitleButtonClick}
-								>
-									{title}
-								</Button>
-							</h3>
-							<div className="mb-4 d-flex align-items-center">
-								<SvgIcon kit="far" icon="phone" size={16} className="me-2" />{' '}
-								<p className="mb-0">Phone</p>
+			<Container fluid className="overflow-visible">
+				<Row>
+					<Col xl={7}>
+						<div className="d-flex mb-6 mb-xl-0">
+							<div
+								className={classNames(classes.imageOuter, 'me-6')}
+								style={{ backgroundImage: `url(${imageUrl})` }}
+							/>
+							<div>
+								<h3 className="mb-2">
+									<Button
+										variant="link"
+										className="p-0 text-decoration-none fs-h3"
+										onClick={onTitleButtonClick}
+									>
+										{title}
+									</Button>
+								</h3>
+								<div className="mb-4 d-flex align-items-center">
+									<SvgIcon kit="far" icon="phone" size={16} className="me-2" />{' '}
+									<p className="mb-0">Phone</p>
+								</div>
+								<p className={classNames(classes.description, 'mb-0 fs-large')}>{description}</p>
 							</div>
-							<p className={classNames(classes.description, 'mb-0 fs-large')}>{description}</p>
 						</div>
-					</div>
-					<hr className="mb-6 d-xl-none" />
-				</Col>
-				<Col xl={5}>
-					<ProviderScheduleCard
-						showCardStyle={false}
-						scheduleAppointmentDescription={scheduleAppointmentDescription}
-						scheduleTypeId={scheduleTypeId}
-						onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
-					/>
-				</Col>
-			</Row>
+						<hr className="mb-6 d-xl-none" />
+					</Col>
+					<Col xl={5}>
+						<ProviderScheduleCard
+							showCardStyle={false}
+							scheduleAppointmentDescription={scheduleAppointmentDescription}
+							scheduleTypeId={scheduleTypeId}
+							onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
+							showMoreAppointmentsButton={showMoreAppointmentsButton}
+						/>
+					</Col>
+				</Row>
+			</Container>
 		</div>
 	);
 };

@@ -10,8 +10,7 @@ import ProviderSearchResult from '@/components/provider-search-result';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ProviderScheduleModal from '@/components/provider-schedule-modal';
 import ProviderInfoDetail from '@/components/provider-info-detail';
-import { SCHEDULE_TYPE_ID } from '@/components/provider-next-appointment-card';
-import { InstitutionLocation, Provider } from '@/lib/models';
+import { InstitutionLocation, ProviderAppointmentSelectionTypeId, ProviderSearchResultModal } from '@/lib/models';
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { useSearchParams } from 'react-router-dom';
@@ -51,7 +50,7 @@ export const Component = () => {
 	/* -------------------------------- */
 	/* List */
 	/* -------------------------------- */
-	const [providers, setProviders] = useState<Provider[]>([]);
+	const [providers, setProviders] = useState<ProviderSearchResultModal[]>([]);
 
 	/* -------------------------------- */
 	/* Modals */
@@ -116,7 +115,7 @@ export const Component = () => {
 			>
 				<ProviderInfoDetail
 					scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
-					scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_PREDETERMINED}
+					scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
 				/>
 			</PreviewCanvas>
 
@@ -197,9 +196,10 @@ export const Component = () => {
 									className="mb-6"
 									imageUrl={provider.imageUrl ?? placeholderImage}
 									title={provider.name}
-									description="The Employee Assistance Program (EAP) offers up to 8 sessions of free, confidential, solution-focused counseling per issue. An 'issue' is the reason for seeking support, such as relationship challenges or grief."
-									scheduleAppointmentDescription="Your first appointment is a 30 minute phone call with a clinician to assess your needs and discuss potential resources."
-									scheduleTypeId={SCHEDULE_TYPE_ID.APPOINTMENT_PREDETERMINED}
+									description={provider.description}
+									scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
+									scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
+									showMoreAppointmentsButton={provider.hasMoreAppointments}
 									onTitleButtonClick={() => {
 										setShowProviderCanvas(true);
 									}}
