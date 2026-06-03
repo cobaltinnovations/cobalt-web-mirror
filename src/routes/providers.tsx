@@ -39,6 +39,14 @@ export const Component = () => {
 	/* -------------------------------- */
 	const institutionFeatures = institution.features;
 	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
+	const selectedInstitutionLocation = useMemo(
+		() => institutionLocations.find((i) => i.institutionLocationId === institutionLocationId),
+		[institutionLocationId, institutionLocations]
+	);
+	const selectedInstitutionFeature = useMemo(
+		() => institutionFeatures.find((i) => i.featureId === featureId),
+		[featureId, institutionFeatures]
+	);
 
 	/* -------------------------------- */
 	/* List */
@@ -178,7 +186,9 @@ export const Component = () => {
 						<Col>
 							<p className="mb-6 mb-lg-10">
 								<strong>
-									{providers.length} available {featureId} for {institutionLocationId} employees
+									{providers.length} available {selectedInstitutionFeature?.name.toLocaleLowerCase()}{' '}
+									provider{providers.length === 1 ? '' : 's'} for {selectedInstitutionLocation?.name}{' '}
+									employees
 								</strong>
 							</p>
 							{providers.map((provider) => (

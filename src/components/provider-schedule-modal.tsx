@@ -63,6 +63,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		width: 56,
 		height: 56,
 		flexShrink: 0,
+		marginRight: 16,
 		backgroundColor: theme.colors.n500,
 	},
 	inlineCalendar: {
