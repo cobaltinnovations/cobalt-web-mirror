@@ -13,8 +13,8 @@ import ProviderInfoDetail from '@/components/provider-info-detail';
 import {
 	InstitutionFeature,
 	InstitutionLocation,
+	ProviderSearchResultModel,
 	ProviderAppointmentSelectionTypeId,
-	ProviderSearchResultModal,
 } from '@/lib/models';
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
@@ -58,12 +58,12 @@ export const Component = () => {
 	/* -------------------------------- */
 	/* List */
 	/* -------------------------------- */
-	const [providers, setProviders] = useState<ProviderSearchResultModal[]>([]);
+	const [providers, setProviders] = useState<ProviderSearchResultModel[]>([]);
 
 	/* -------------------------------- */
 	/* Modals */
 	/* -------------------------------- */
-	const [selectedProvider, setSelectedProvider] = useState<ProviderSearchResultModal>();
+	const [selectedProvider, setSelectedProvider] = useState<ProviderSearchResultModel>();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
 	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 
@@ -128,7 +128,7 @@ export const Component = () => {
 			>
 				{selectedProvider && (
 					<ProviderInfoDetail
-						urlName={selectedProvider.urlName ?? '/#'}
+						urlName={selectedProvider.imageUrl ?? '/#'}
 						scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
 						scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
 					/>
@@ -227,7 +227,7 @@ export const Component = () => {
 									key={provider.providerId}
 									className="mb-6"
 									imageUrl={provider.imageUrl ?? placeholderImage}
-									title={provider.name}
+									title={provider.name ?? ''}
 									description={provider.description ?? ''}
 									scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
 									scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}

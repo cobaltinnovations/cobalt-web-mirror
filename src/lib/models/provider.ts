@@ -121,44 +121,62 @@ export interface Specialty {
 	specialtyId: string;
 }
 
+type UUID = string;
+type ISODate = string; // e.g. "2026-06-05"
+type ISOTime = string; // e.g. "09:00"
+type ISODateTime = string; // e.g. "2026-06-05T09:00"
+
+export type ProviderSearchResultTypeId = 'PROVIDER' | 'CLINIC';
+
+export type ProviderAppointmentModalityId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
+
 export enum ProviderAppointmentSelectionTypeId {
 	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
 	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',
 	APPOINTMENT_BY_PHONE = 'APPOINTMENT_BY_PHONE',
 }
 
-enum ProviderBookingPreferenceId {
-	DIRECT = 'DIRECT',
-	CLINIC = 'CLINIC',
-	NONE = 'NONE',
+export interface ProviderSearchResponse {
+	providers: ProviderSearchResultModel[];
 }
 
-export type ProviderAppointmentModalityId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
+export interface ProviderSearchResultModel {
+	providerSearchResultTypeId: ProviderSearchResultTypeId;
+	providerSearchResultId: UUID;
 
-export interface ProviderAppointmentModalityApiResponse {
+	providerId: UUID | null;
+	clinicId: UUID | null;
+	institutionId: string | null;
+
+	name: string | null;
+	title: string | null;
+	description: string | null;
+	treatmentDescription: string | null;
+	imageUrl: string | null;
+	formattedPhoneNumber: string | null;
+
+	supportedAppointmentModalities: ProviderAppointmentModality[];
+	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId | null;
+	appointmentDescription: string | null;
+	firstAvailableAppointment: FirstAvailableAppointment | null;
+	hasMoreAppointments: boolean;
+}
+
+export interface ProviderAppointmentModality {
 	appointmentModalityId: ProviderAppointmentModalityId;
 	description: string;
 }
 
-export interface FirstAvailableAppointmentModel {
-	date: string;
-	time: string;
-	dateTime: string;
+export interface FirstAvailableAppointment {
+	date: ISODate;
+	time: ISOTime;
+	dateTime: ISODateTime;
 	timeDescription: string;
-	appointmentTypeId?: string;
-	appointmentTypeIds?: string[];
-	appointmentDescription?: string;
-	assessmentId?: string;
-	epicDepartmentId?: string;
-	epicAppointmentFhirId?: string;
-}
 
-export interface ProviderSearchResultModal extends Provider {
-	description?: string;
-	supportedAppointmentModalities: ProviderAppointmentModalityApiResponse[];
-	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
-	appointmentDescription?: string;
-	firstAvailableAppointment?: FirstAvailableAppointmentModel;
-	hasMoreAppointments: boolean;
-	bookingPreferenceId: ProviderBookingPreferenceId;
+	appointmentTypeId: UUID | null;
+	appointmentTypeIds: UUID[] | null;
+	appointmentDescription: string | null;
+	assessmentId: UUID | null;
+	epicDepartmentId: UUID | null;
+	epicAppointmentFhirId: string | null;
 }
