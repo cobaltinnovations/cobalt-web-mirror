@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -19,6 +19,7 @@ import {
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { useSearchParams } from 'react-router-dom';
+import NoData from '@/components/no-data';
 
 export const loader = () => {
 	return null;
@@ -30,6 +31,7 @@ export const Component = () => {
 	/* -------------------------------- */
 	const { institution } = useAccount();
 	const placeholderImage = useRandomPlaceholderImage();
+	const employerRef = useRef<HTMLInputElement>(null);
 
 	/* -------------------------------- */
 	/* Search Params */
@@ -172,6 +174,7 @@ export const Component = () => {
 									))}
 								</InputHelper>
 								<InputHelper
+									ref={employerRef}
 									as="select"
 									label="Employer"
 									value={institutionLocationId}
@@ -180,7 +183,7 @@ export const Component = () => {
 									<option value="" disabled>
 										Select...
 									</option>
-									<option value="N/A">I'm not sure / I'd rather not say</option>
+									<option value="na">I'm not sure / I'd rather not say</option>
 									{institutionLocations.map((institutionLocation) => (
 										<option
 											key={institutionLocation.institutionLocationId}
@@ -204,6 +207,21 @@ export const Component = () => {
 									employees
 								</strong>
 							</p>
+							{providers.length <= 0 && (
+								<NoData
+									title="Select your employer to see available providers"
+									description="Your employment information will not be shared."
+									actions={[
+										{
+											variant: 'primary',
+											title: 'Select Employer',
+											onClick: () => {
+												employerRef.current?.focus();
+											},
+										},
+									]}
+								/>
+							)}
 							{providers.map((provider) => (
 								<ProviderSearchResult
 									key={provider.providerId}
