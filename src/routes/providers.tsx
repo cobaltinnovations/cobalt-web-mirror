@@ -10,7 +10,12 @@ import ProviderSearchResult from '@/components/provider-search-result';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ProviderScheduleModal from '@/components/provider-schedule-modal';
 import ProviderInfoDetail from '@/components/provider-info-detail';
-import { InstitutionLocation, ProviderAppointmentSelectionTypeId, ProviderSearchResultModal } from '@/lib/models';
+import {
+	InstitutionFeature,
+	InstitutionLocation,
+	ProviderAppointmentSelectionTypeId,
+	ProviderSearchResultModal,
+} from '@/lib/models';
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { useSearchParams } from 'react-router-dom';
@@ -36,6 +41,7 @@ export const Component = () => {
 	/* -------------------------------- */
 	/* Filters */
 	/* -------------------------------- */
+	const [careTypes, setCareTypes] = useState<InstitutionFeature[]>([]);
 	const institutionFeatures = institution.features;
 	const [institutionLocations, setInstitutionLocations] = useState<InstitutionLocation[]>([]);
 	const selectedInstitutionLocation = useMemo(
@@ -55,11 +61,16 @@ export const Component = () => {
 	/* -------------------------------- */
 	/* Modals */
 	/* -------------------------------- */
+	const [selectedProvider, setSelectedProvider] = useState<ProviderSearchResultModal>();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
 	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 
 	const fetchFilters = useCallback(async () => {
-		const institutionLocationsResponse = await institutionService.getInstitutionLocations().fetch();
+		const [careTypesResponse, institutionLocationsResponse] = await Promise.all([
+			institutionService.getCareTypes().fetch(),
+			institutionService.getInstitutionLocations().fetch(),
+		]);
+		setCareTypes(careTypesResponse.careTypes);
 		setInstitutionLocations(institutionLocationsResponse.locations);
 	}, []);
 
@@ -113,10 +124,13 @@ export const Component = () => {
 					setShowProviderCanvas(false);
 				}}
 			>
-				<ProviderInfoDetail
-					scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
-					scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
-				/>
+				{selectedProvider && (
+					<ProviderInfoDetail
+						urlName={selectedProvider.urlName ?? '/#'}
+						scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
+						scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
+					/>
+				)}
 			</PreviewCanvas>
 
 			<ProviderScheduleModal
@@ -151,7 +165,7 @@ export const Component = () => {
 									<option value="" disabled>
 										Select...
 									</option>
-									{institutionFeatures.map((institutionFeature) => (
+									{careTypes.map((institutionFeature) => (
 										<option key={institutionFeature.featureId} value={institutionFeature.featureId}>
 											{institutionFeature.name}
 										</option>
@@ -196,11 +210,13 @@ export const Component = () => {
 									className="mb-6"
 									imageUrl={provider.imageUrl ?? placeholderImage}
 									title={provider.name}
-									description={provider.description}
+									description={provider.description ?? ''}
 									scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
 									scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
+									firstAvailableAppointment={provider.firstAvailableAppointment}
 									showMoreAppointmentsButton={provider.hasMoreAppointments}
 									onTitleButtonClick={() => {
+										setSelectedProvider(provider);
 										setShowProviderCanvas(true);
 									}}
 									onViewAppointmentsButtonClick={() => {

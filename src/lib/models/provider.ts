@@ -65,11 +65,17 @@ export interface SupportRole {
 	description: string;
 }
 
+enum ClinicBookingPreferenceId {
+	DIRECT = 'DIRECT',
+	NONE = 'NONE',
+}
+
 export interface Clinic {
 	clinicId: string;
 	description: string;
 	institutionId: string;
 	showIntakeAssessmentPrompt: boolean;
+	clinicBookingPreferenceId: ClinicBookingPreferenceId;
 }
 
 export interface Provider {
@@ -107,6 +113,7 @@ export interface Provider {
 	bioUrl?: string;
 	displayPhoneNumberOnlyForBooking: boolean;
 	description?: string;
+	urlName?: string;
 }
 
 export interface Specialty {
@@ -114,30 +121,44 @@ export interface Specialty {
 	specialtyId: string;
 }
 
-export type ProviderContactTypeId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
-
 export enum ProviderAppointmentSelectionTypeId {
 	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
 	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',
 	APPOINTMENT_BY_PHONE = 'APPOINTMENT_BY_PHONE',
 }
 
-export type ProviderSearchResultModal = Provider & {
-	description: string | null;
-	contactTypeIds: ProviderContactTypeId[];
-	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId | null;
-	appointmentDescription: string | null;
-	firstAvailableAppointment: {
-		date: string;
-		time: string;
-		dateTime: string;
-		timeDescription: string;
-		appointmentTypeId: string | null;
-		appointmentTypeIds: string[] | null;
-		appointmentDescription: string | null;
-		assessmentId: string | null;
-		epicDepartmentId: string | null;
-		epicAppointmentFhirId: string | null;
-	} | null;
+enum ProviderBookingPreferenceId {
+	DIRECT = 'DIRECT',
+	CLINIC = 'CLINIC',
+	NONE = 'NONE',
+}
+
+export type ProviderAppointmentModalityId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
+
+export interface ProviderAppointmentModalityApiResponse {
+	appointmentModalityId: ProviderAppointmentModalityId;
+	description: string;
+}
+
+export interface FirstAvailableAppointmentModel {
+	date: string;
+	time: string;
+	dateTime: string;
+	timeDescription: string;
+	appointmentTypeId?: string;
+	appointmentTypeIds?: string[];
+	appointmentDescription?: string;
+	assessmentId?: string;
+	epicDepartmentId?: string;
+	epicAppointmentFhirId?: string;
+}
+
+export interface ProviderSearchResultModal extends Provider {
+	description?: string;
+	supportedAppointmentModalities: ProviderAppointmentModalityApiResponse[];
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
+	appointmentDescription?: string;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	hasMoreAppointments: boolean;
-};
+	bookingPreferenceId: ProviderBookingPreferenceId;
+}

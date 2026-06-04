@@ -7,7 +7,7 @@ import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import ProviderScheduleCard from './provider-schedule-card';
-import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
+import { FirstAvailableAppointmentModel, ProviderAppointmentSelectionTypeId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -46,6 +46,7 @@ interface ProviderSearchResultProps {
 	description: string;
 	scheduleAppointmentDescription: string;
 	scheduleTypeId: ProviderAppointmentSelectionTypeId;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	onViewAppointmentsButtonClick(): void;
 	showMoreAppointmentsButton?: boolean;
 	className?: string;
