@@ -158,7 +158,7 @@ export interface ProviderSearchResultModel {
 	supportedAppointmentModalities: ProviderAppointmentModality[];
 	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId | null;
 	appointmentDescription: string | null;
-	firstAvailableAppointment: FirstAvailableAppointment | null;
+	firstAvailableAppointment: FirstAvailableAppointmentModel | null;
 	hasMoreAppointments: boolean;
 }
 
@@ -167,7 +167,7 @@ export interface ProviderAppointmentModality {
 	description: string;
 }
 
-export interface FirstAvailableAppointment {
+export interface FirstAvailableAppointmentModel {
 	date: ISODate;
 	time: ISOTime;
 	dateTime: ISODateTime;

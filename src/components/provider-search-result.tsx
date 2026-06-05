@@ -47,6 +47,7 @@ interface ProviderSearchResultProps {
 	scheduleAppointmentDescription: string;
 	scheduleTypeId: ProviderAppointmentSelectionTypeId;
 	firstAvailableAppointment?: FirstAvailableAppointmentModel;
+	onScheduleAppointmentButtonClick(): void;
 	onViewAppointmentsButtonClick(): void;
 	showMoreAppointmentsButton?: boolean;
 	className?: string;
@@ -59,6 +60,7 @@ const ProviderSearchResult = ({
 	description,
 	scheduleAppointmentDescription,
 	scheduleTypeId,
+	onScheduleAppointmentButtonClick,
 	onViewAppointmentsButtonClick,
 	showMoreAppointmentsButton,
 	className,
@@ -99,6 +101,7 @@ const ProviderSearchResult = ({
 							showCardStyle={false}
 							scheduleAppointmentDescription={scheduleAppointmentDescription}
 							scheduleTypeId={scheduleTypeId}
+							onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
 							onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
 							showMoreAppointmentsButton={showMoreAppointmentsButton}
 						/>

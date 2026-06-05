@@ -23,6 +23,7 @@ interface ProviderScheduleCardProps {
 	scheduleAppointmentDescription: string;
 	scheduleTypeId: ProviderAppointmentSelectionTypeId;
 	onViewAppointmentsButtonClick(): void;
+	onScheduleAppointmentButtonClick(): void;
 	showCardStyle?: boolean;
 	showMoreAppointmentsButton?: boolean;
 	className?: string;
@@ -32,6 +33,7 @@ const ProviderScheduleCard = ({
 	scheduleAppointmentDescription,
 	scheduleTypeId,
 	onViewAppointmentsButtonClick,
+	onScheduleAppointmentButtonClick,
 	showCardStyle = true,
 	showMoreAppointmentsButton,
 	className,
@@ -43,7 +45,10 @@ const ProviderScheduleCard = ({
 				<strong>Schedule Appointment</strong>
 			</p>
 			<p className="mb-4">{scheduleAppointmentDescription}</p>
-			<ProviderNextAppointmentCard scheduleTypeId={scheduleTypeId} />
+			<ProviderNextAppointmentCard
+				scheduleTypeId={scheduleTypeId}
+				onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
+			/>
 			{showMoreAppointmentsButton && (
 				<Button
 					variant="link"

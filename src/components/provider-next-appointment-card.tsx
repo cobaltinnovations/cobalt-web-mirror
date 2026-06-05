@@ -26,10 +26,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface ProviderNextAppointmentCardProps {
 	scheduleTypeId: ProviderAppointmentSelectionTypeId;
+	onScheduleAppointmentButtonClick(): void;
 	className?: string;
 }
 
-const ProviderNextAppointmentCard = ({ scheduleTypeId, className }: ProviderNextAppointmentCardProps) => {
+const ProviderNextAppointmentCard = ({
+	scheduleTypeId,
+	onScheduleAppointmentButtonClick,
+	className,
+}: ProviderNextAppointmentCardProps) => {
 	const classes = useStyles();
 	return (
 		<div className={classNames(classes.providerNextAppointmentCard, className)}>
@@ -46,11 +51,13 @@ const ProviderNextAppointmentCard = ({ scheduleTypeId, className }: ProviderNext
 							</p>
 						</div>
 					</div>
-					<Button variant="primary">Schedule Appointment</Button>
+					<Button variant="primary" onClick={onScheduleAppointmentButtonClick}>
+						Schedule Appointment
+					</Button>
 				</div>
 			)}
 			{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
-				<Button variant="primary" className="d-block w-100">
+				<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
 					Schedule Appointment
 				</Button>
 			)}

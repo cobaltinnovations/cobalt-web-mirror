@@ -18,7 +18,7 @@ import {
 } from '@/lib/models';
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import NoData from '@/components/no-data';
 
 export const loader = () => {
@@ -32,6 +32,7 @@ export const Component = () => {
 	const { institution } = useAccount();
 	const placeholderImage = useRandomPlaceholderImage();
 	const employerRef = useRef<HTMLInputElement>(null);
+	const navigate = useNavigate();
 
 	/* -------------------------------- */
 	/* Search Params */
@@ -231,7 +232,7 @@ export const Component = () => {
 									description={provider.description ?? ''}
 									scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
 									scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
-									firstAvailableAppointment={provider.firstAvailableAppointment}
+									firstAvailableAppointment={provider.firstAvailableAppointment ?? undefined}
 									showMoreAppointmentsButton={provider.hasMoreAppointments}
 									onTitleButtonClick={() => {
 										setSelectedProvider(provider);
@@ -239,6 +240,9 @@ export const Component = () => {
 									}}
 									onViewAppointmentsButtonClick={() => {
 										setShowProviderScheduleModal(true);
+									}}
+									onScheduleAppointmentButtonClick={() => {
+										navigate('/provider-confirm-appointment-time');
 									}}
 								/>
 							))}

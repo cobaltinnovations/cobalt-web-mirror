@@ -772,6 +772,11 @@ export const routes: RouteObject[] = [
 						lazy: () => import('@/routes/providers'),
 					},
 					{
+						id: 'provider-confirm-appointment-time',
+						path: 'provider-confirm-appointment-time',
+						lazy: () => import('@/routes/provider-confirm-appointment-time'),
+					},
+					{
 						id: 'provider-detail',
 						path: 'providers/:urlName',
 						lazy: () => import('@/routes/provider-detail'),
