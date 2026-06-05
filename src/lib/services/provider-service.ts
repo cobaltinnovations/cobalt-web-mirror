@@ -319,7 +319,15 @@ export const providerService = {
 	) {
 		const params = new URLSearchParams({ ...queryParams });
 
-		return httpSingleton.orchestrateRequest<void>({
+		return httpSingleton.orchestrateRequest<{
+			providerAvailability: {
+				appointmentTypes: [];
+				providerId: string;
+				providerName: string;
+				startDate: string;
+				endDate: string;
+			};
+		}>({
 			method: 'get',
 			url: `/providers/${providerId}/availability?${params}`,
 		});
@@ -330,7 +338,15 @@ export const providerService = {
 	) {
 		const params = new URLSearchParams({ ...queryParams });
 
-		return httpSingleton.orchestrateRequest<void>({
+		return httpSingleton.orchestrateRequest<{
+			clinicAvailability: {
+				appointmentTypes: [];
+				clinicId: string;
+				clinicDescription: string;
+				startDate: string;
+				endDate: string;
+			};
+		}>({
 			method: 'get',
 			url: `/clinics/${clinicId}/availability?${params}`,
 		});
