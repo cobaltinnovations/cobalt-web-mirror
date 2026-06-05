@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 
 import AppointmentDateTimePicker, { getDefaultAppointmentDateTime } from '@/components/appointment-date-time-picker';
 import InlineAlert from '@/components/inline-alert';
 import { createUseThemedStyles } from '@/jss/theme';
+import useHandleError from '@/hooks/use-handle-error';
+import { providerService } from '@/lib/services';
 
 const appointmentTitle = 'UPHS Employee Assistance Program';
 const appointmentSubtitle = '30 minute intake phone call';
@@ -24,16 +26,35 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-interface ProviderScheduleModalProps extends ModalProps {}
+interface ProviderScheduleModalProps extends ModalProps {
+	providerId?: string;
+}
 
-const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
+const ProviderScheduleModal = ({ providerId, ...props }: ProviderScheduleModalProps) => {
 	const classes = useStyles();
+	const handleError = useHandleError();
 	const [selectedAppointmentDateTime, setSelectedAppointmentDateTime] = useState(getDefaultAppointmentDateTime);
 	const selectedDateLabel = selectedAppointmentDateTime.format('MMMM D, YYYY');
 	const selectedTimeLabel = selectedAppointmentDateTime.format('h:mmA');
 
+	const handleEnter = useCallback(async () => {
+		try {
+			if (!providerId) {
+				throw new Error('providerId is undefined.');
+			}
+
+			await providerService
+				.findProviders({
+					providerId,
+				})
+				.fetch();
+		} catch (error) {
+			handleError(error);
+		}
+	}, [handleError, providerId]);
+
 	return (
-		<Modal {...props} dialogClassName={classes.providerScheduleModal} centered>
+		<Modal {...props} dialogClassName={classes.providerScheduleModal} centered onEntering={handleEnter}>
 			<Modal.Header closeButton>
 				<Modal.Title>Schedule Appointment</Modal.Title>
 			</Modal.Header>

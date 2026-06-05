@@ -6,6 +6,7 @@ import ProviderScheduleModal from './provider-schedule-modal';
 import { institutionReferrersService } from '@/lib/services';
 import AsyncWrapper from './async-page';
 import { InstitutionReferrer, ProviderAppointmentSelectionTypeId } from '@/lib/models';
+import { useNavigate } from 'react-router-dom';
 
 interface ProviderInfoDetailProps {
 	urlName: string;
@@ -14,6 +15,7 @@ interface ProviderInfoDetailProps {
 }
 
 const ProviderInfoDetail = ({ urlName, scheduleAppointmentDescription, scheduleTypeId }: ProviderInfoDetailProps) => {
+	const navigate = useNavigate();
 	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 	const [institutionReferrer, setinstitutionReferrer] = useState<InstitutionReferrer>();
 
@@ -48,6 +50,9 @@ const ProviderInfoDetail = ({ urlName, scheduleAppointmentDescription, scheduleT
 								scheduleTypeId={scheduleTypeId}
 								onViewAppointmentsButtonClick={() => {
 									setShowProviderScheduleModal(true);
+								}}
+								onScheduleAppointmentButtonClick={() => {
+									navigate('/provider-confirm-appointment-time');
 								}}
 							/>
 						</Col>

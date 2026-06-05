@@ -66,7 +66,7 @@ export const Component = () => {
 	/* -------------------------------- */
 	const [selectedProvider, setSelectedProvider] = useState<ProviderSearchResultModel>();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
-	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
+	const [selectedProviderId, setSelectedProviderId] = useState('');
 
 	const fetchFilters = useCallback(async () => {
 		const [careTypesResponse, institutionLocationsResponse] = await Promise.all([
@@ -137,9 +137,10 @@ export const Component = () => {
 			</PreviewCanvas>
 
 			<ProviderScheduleModal
-				show={showProviderScheduleModal}
+				providerId={selectedProviderId}
+				show={!!selectedProviderId}
 				onHide={() => {
-					setShowProviderScheduleModal(false);
+					setSelectedProviderId('');
 				}}
 			/>
 
@@ -239,7 +240,7 @@ export const Component = () => {
 										setShowProviderCanvas(true);
 									}}
 									onViewAppointmentsButtonClick={() => {
-										setShowProviderScheduleModal(true);
+										setSelectedProviderId(provider.providerId ?? '');
 									}}
 									onScheduleAppointmentButtonClick={() => {
 										navigate('/provider-confirm-appointment-time');
