@@ -1,86 +1,91 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import { Button } from 'react-bootstrap';
 
 import DatePicker from '@/components/date-picker';
+import Loader from '@/components/loader';
 import SvgIcon from '@/components/svg-icon';
 import TabBar from '@/components/tab-bar';
+import useHandleError from '@/hooks/use-handle-error';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
+import { AppointmentModality, AvailabilityTimeSlot, ProviderSearchResultTypeId } from '@/lib/models';
+import { providerService } from '@/lib/services';
 
 type TimeSlotGroup = {
 	label: 'Morning' | 'Afternoon' | 'Evening';
-	slots: string[];
+	slots: AvailabilityTimeSlot[];
 };
 
 export interface AppointmentDateTimePickerProps {
 	value: Moment;
 	onChange(value: Moment): void;
+	config?: AppointmentDateTimePickerConfig;
 }
 
-const defaultSelectedTime = '2:00PM';
-const seededFirstAvailableDateTime = moment('2026-05-04 2:00PM', 'YYYY-MM-DD h:mmA');
-const defaultAppointmentType = 'PHONE';
-
-const noSlotDateKeys = new Set(['2026-05-14', '2026-05-20', '2026-05-21', '2026-05-30']);
-
-const appointmentTypeTabs = [
-	{ value: 'IN_PERSON', title: 'In-Person Appointments' },
-	{ value: 'ONLINE', title: 'Online Appointments' },
-	{ value: 'PHONE', title: 'Phone Appointments' },
-];
-
-const timeSlotGroups: TimeSlotGroup[] = [
-	{ label: 'Morning', slots: [] },
-	{ label: 'Afternoon', slots: ['2:00PM', '2:30PM', '3:00PM'] },
-	{ label: 'Evening', slots: ['5:00PM', '5:30PM', '6:00PM'] },
-];
+export interface AppointmentDateTimePickerConfig {
+	featureId?: string;
+	clinicId?: string;
+	providerId?: string;
+	providerSearchResultTypeId: ProviderSearchResultTypeId;
+}
 
 export const getDefaultAppointmentDateTime = () => {
-	return getFirstAvailableAppointmentDateTime();
+	return moment();
 };
 
-const createAppointmentDateTime = (date: Date, time: string) => {
-	const timeMoment = moment(time, 'h:mmA');
+const createAppointmentDateTime = (date: string | Date, timeSlot: AvailabilityTimeSlot) => {
+	const dateKey = typeof date === 'string' ? date : moment(date).format('YYYY-MM-DD');
 
-	return moment(date).startOf('day').set({
-		hour: timeMoment.hour(),
-		minute: timeMoment.minute(),
-		second: 0,
-		millisecond: 0,
-	});
+	return moment(`${dateKey} ${timeSlot.time}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA']);
 };
 
 const formatDateKey = (date: Date) => moment(date).format('YYYY-MM-DD');
-const isNoSlotDate = (date: Date) => noSlotDateKeys.has(formatDateKey(date));
 const isPastDate = (date: Date, minDate: Date) => moment(date).isBefore(minDate, 'day');
-const getNextSelectableDate = (date: Date) => {
-	const nextSelectableDate = moment(date).startOf('day');
 
-	while (isNoSlotDate(nextSelectableDate.toDate())) {
-		nextSelectableDate.add(1, 'day');
-	}
+const getTimeSlotHour = (timeSlot: AvailabilityTimeSlot) =>
+	moment(timeSlot.time, ['HH:mm:ss', 'HH:mm', 'h:mmA']).hour();
 
-	return nextSelectableDate.toDate();
+const buildTimeSlotGroups = (timeSlots: AvailabilityTimeSlot[]): TimeSlotGroup[] => {
+	return [
+		{ label: 'Morning', slots: timeSlots.filter((timeSlot) => getTimeSlotHour(timeSlot) < 12) },
+		{
+			label: 'Afternoon',
+			slots: timeSlots.filter((timeSlot) => {
+				const hour = getTimeSlotHour(timeSlot);
+
+				return hour >= 12 && hour < 17;
+			}),
+		},
+		{ label: 'Evening', slots: timeSlots.filter((timeSlot) => getTimeSlotHour(timeSlot) >= 17) },
+	];
 };
 
-const getFirstAvailableAppointmentDateTime = () => {
-	const now = moment();
-	let nextAvailableDateTime = seededFirstAvailableDateTime.clone();
+const getFirstAvailableAppointment = (appointmentModality?: AppointmentModality) => {
+	const firstAvailability = appointmentModality?.availability[0];
+	const firstTimeSlot = firstAvailability?.times[0];
 
-	if (nextAvailableDateTime.isBefore(now) || isNoSlotDate(nextAvailableDateTime.toDate())) {
-		nextAvailableDateTime = createAppointmentDateTime(getNextSelectableDate(now.toDate()), defaultSelectedTime);
+	if (!firstAvailability || !firstTimeSlot) {
+		return;
 	}
 
-	while (nextAvailableDateTime.isBefore(now) || isNoSlotDate(nextAvailableDateTime.toDate())) {
-		nextAvailableDateTime = createAppointmentDateTime(
-			nextAvailableDateTime.clone().add(1, 'day').toDate(),
-			defaultSelectedTime
-		);
-	}
+	return {
+		date: firstAvailability.date,
+		timeSlot: firstTimeSlot,
+		dateTime: createAppointmentDateTime(firstAvailability.date, firstTimeSlot),
+	};
+};
 
-	return nextAvailableDateTime;
+const isDateTimeInAvailability = (dateTime: Moment, appointmentModality?: AppointmentModality) => {
+	const dateKey = dateTime.format('YYYY-MM-DD');
+	const selectedDateAvailability = appointmentModality?.availability.find(
+		(availability) => availability.date === dateKey
+	);
+
+	return !!selectedDateAvailability?.times.some((timeSlot) =>
+		createAppointmentDateTime(dateKey, timeSlot).isSame(dateTime, 'minute')
+	);
 };
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -190,61 +195,207 @@ const useStyles = createUseThemedStyles((theme) => ({
 	slotPanel: {
 		paddingLeft: 40,
 	},
+	loaderWrapper: {
+		minHeight: 420,
+		position: 'relative',
+	},
 }));
 
-const AppointmentDateTimePicker = ({ value, onChange }: AppointmentDateTimePickerProps) => {
+const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateTimePickerProps) => {
 	const classes = useStyles();
+	const handleError = useHandleError();
 	const minSelectableDate = moment().startOf('day').toDate();
-	const [selectedAppointmentType, setSelectedAppointmentType] = useState(defaultAppointmentType);
+	const [isLoading, setIsLoading] = useState(false);
+	const [appointmentModalities, setAppointmentModalities] = useState<AppointmentModality[]>([]);
+	const [selectedAppointmentModalityId, setSelectedAppointmentModalityId] = useState('');
 
+	const selectedAppointmentModality = useMemo(() => {
+		return appointmentModalities.find(
+			(appointmentModality) => appointmentModality.appointmentModalityId === selectedAppointmentModalityId
+		);
+	}, [appointmentModalities, selectedAppointmentModalityId]);
+
+	const appointmentTypeTabs = useMemo(() => {
+		return appointmentModalities.map((appointmentModality) => ({
+			value: appointmentModality.appointmentModalityId,
+			title: appointmentModality.description,
+		}));
+	}, [appointmentModalities]);
+
+	const availableDateKeys = useMemo(() => {
+		return new Set(
+			selectedAppointmentModality?.availability
+				.filter((availability) => availability.times.length > 0)
+				.map((availability) => availability.date) ?? []
+		);
+	}, [selectedAppointmentModality]);
+	const selectedDateAvailability = selectedAppointmentModality?.availability.find(
+		(availability) => availability.date === value.format('YYYY-MM-DD')
+	);
+	const timeSlotGroups = useMemo(
+		() => buildTimeSlotGroups(selectedDateAvailability?.times ?? []),
+		[selectedDateAvailability]
+	);
 	const selectedDateLabel = value.format('MMMM D, YYYY');
-	const selectedTime = value.format('h:mmA');
-	const firstAvailableDateTime = getFirstAvailableAppointmentDateTime();
-	const firstAvailableAppointmentLabel = `${firstAvailableDateTime.format(
-		'ddd, MMM D'
-	)}, ${firstAvailableDateTime.format('h:mmA')}`;
+	const firstAvailableAppointment = useMemo(
+		() => getFirstAvailableAppointment(selectedAppointmentModality),
+		[selectedAppointmentModality]
+	);
+	const firstAvailableAppointmentLabel = firstAvailableAppointment
+		? `${firstAvailableAppointment.dateTime.format('ddd, MMM D')}, ${
+				firstAvailableAppointment.timeSlot.timeDescription
+		  }`
+		: undefined;
+	const isNoSlotDate = (date: Date) => !availableDateKeys.has(formatDateKey(date));
 
 	const handleDateSelect = (date: Date | null) => {
 		if (!date || isPastDate(date, minSelectableDate) || isNoSlotDate(date)) {
 			return;
 		}
 
-		onChange(createAppointmentDateTime(date, defaultSelectedTime));
+		const selectedAvailability = selectedAppointmentModality?.availability.find(
+			(availability) => availability.date === formatDateKey(date)
+		);
+		const firstTimeSlot = selectedAvailability?.times[0];
+
+		if (firstTimeSlot) {
+			onChange(createAppointmentDateTime(date, firstTimeSlot));
+		}
 	};
 
-	const handleTimeSelect = (slot: string) => {
-		onChange(createAppointmentDateTime(value.toDate(), slot));
+	const handleTimeSelect = (timeSlot: AvailabilityTimeSlot) => {
+		onChange(createAppointmentDateTime(value.toDate(), timeSlot));
 	};
 
 	const handleFirstAvailableSelect = () => {
-		onChange(firstAvailableDateTime.clone());
+		if (firstAvailableAppointment) {
+			onChange(firstAvailableAppointment.dateTime.clone());
+		}
 	};
+
+	useEffect(() => {
+		let didCancel = false;
+
+		const fetchAvailability = async () => {
+			if (!config) {
+				setAppointmentModalities([]);
+				return;
+			}
+
+			setIsLoading(true);
+
+			try {
+				if (config.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
+					if (!config.clinicId) {
+						throw new Error('clinicId is required.');
+					}
+
+					const response = await providerService
+						.getClinicAvailability(config.clinicId, { featureId: config.featureId ?? '' })
+						.fetch();
+
+					if (!didCancel) {
+						setAppointmentModalities(response.clinicAvailability.appointmentModalities);
+					}
+
+					return;
+				}
+
+				if (config.providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER) {
+					if (!config.providerId) {
+						throw new Error('providerId is required.');
+					}
+
+					const response = await providerService
+						.getProviderAvailability(config.providerId, { featureId: config.featureId ?? '' })
+						.fetch();
+
+					if (!didCancel) {
+						setAppointmentModalities(response.providerAvailability.appointmentModalities);
+					}
+				}
+			} catch (error) {
+				handleError(error);
+			} finally {
+				if (!didCancel) {
+					setIsLoading(false);
+				}
+			}
+		};
+
+		fetchAvailability();
+
+		return () => {
+			didCancel = true;
+		};
+	}, [config, handleError]);
+
+	useEffect(() => {
+		const nextAppointmentType = appointmentTypeTabs[0]?.value;
+
+		if (
+			nextAppointmentType &&
+			!appointmentTypeTabs.some(
+				(appointmentTypeTab) => appointmentTypeTab.value === selectedAppointmentModalityId
+			)
+		) {
+			setSelectedAppointmentModalityId(nextAppointmentType);
+		}
+	}, [appointmentTypeTabs, selectedAppointmentModalityId]);
+
+	useEffect(() => {
+		if (!selectedAppointmentModality || isDateTimeInAvailability(value, selectedAppointmentModality)) {
+			return;
+		}
+
+		const firstAvailableAppointment = getFirstAvailableAppointment(selectedAppointmentModality);
+
+		if (firstAvailableAppointment) {
+			onChange(firstAvailableAppointment.dateTime.clone());
+		}
+	}, [onChange, selectedAppointmentModality, value]);
+
+	if (isLoading) {
+		return (
+			<div className={classes.loaderWrapper}>
+				<Loader />
+			</div>
+		);
+	}
 
 	return (
 		<>
-			<TabBar
-				value={selectedAppointmentType}
-				tabs={appointmentTypeTabs}
-				onTabClick={setSelectedAppointmentType}
-				className={classes.appointmentTypeTabs}
-				classNameInner={classes.appointmentTypeTabsInner}
-			/>
-			<div className={classes.firstAvailableCallout}>
-				<div className="d-flex align-items-center">
-					<div className={classNames(classes.firstAvailableIconOuter, 'me-4')}>
-						<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+			{appointmentTypeTabs.length > 0 && (
+				<TabBar
+					value={selectedAppointmentModalityId}
+					tabs={appointmentTypeTabs}
+					onTabClick={setSelectedAppointmentModalityId}
+					className={classes.appointmentTypeTabs}
+					classNameInner={classes.appointmentTypeTabsInner}
+				/>
+			)}
+			{firstAvailableAppointmentLabel && (
+				<div className={classes.firstAvailableCallout}>
+					<div className="d-flex align-items-center">
+						<div className={classNames(classes.firstAvailableIconOuter, 'me-4')}>
+							<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+						</div>
+						<p className="mb-0 fs-large fw-bold">
+							First Available {'{'}
+							{selectedAppointmentModality?.description}
+							{'}'} Appointment:
+						</p>
 					</div>
-					<p className="mb-0 fs-large fw-bold">First Available {'{In-Person}'} Appointment:</p>
+					<Button
+						type="button"
+						variant="primary"
+						className={classes.firstAvailableButton}
+						onClick={handleFirstAvailableSelect}
+					>
+						{firstAvailableAppointmentLabel}
+					</Button>
 				</div>
-				<Button
-					type="button"
-					variant="primary"
-					className={classes.firstAvailableButton}
-					onClick={handleFirstAvailableSelect}
-				>
-					{firstAvailableAppointmentLabel}
-				</Button>
-			</div>
+			)}
 			<div className="d-flex py-8 px-6">
 				<DatePicker
 					inline
@@ -310,18 +461,19 @@ const AppointmentDateTimePicker = ({ value, onChange }: AppointmentDateTimePicke
 								<p className="text-muted">No Appointment Slots</p>
 							) : (
 								<div className="d-flex">
-									{timeSlotGroup.slots.map((slot) => {
-										const isSelected = slot === selectedTime;
+									{timeSlotGroup.slots.map((timeSlot) => {
+										const timeSlotDateTime = createAppointmentDateTime(value.toDate(), timeSlot);
+										const isSelected = timeSlotDateTime.isSame(value, 'minute');
 
 										return (
 											<Button
-												key={slot}
+												key={timeSlot.time}
 												type="button"
 												variant={isSelected ? 'primary' : 'outline-primary'}
 												aria-pressed={isSelected}
-												onClick={() => handleTimeSelect(slot)}
+												onClick={() => handleTimeSelect(timeSlot)}
 											>
-												{slot}
+												{timeSlot.timeDescription}
 											</Button>
 										);
 									})}
