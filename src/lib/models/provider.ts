@@ -133,6 +133,12 @@ export enum ProviderSearchResultTypeId {
 
 export type ProviderAppointmentModalityId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
 
+export interface AppointmentModality {
+	appointmentModalityId: ProviderAppointmentModalityId;
+	availability: { date: string; times: AvailabilityTimeSlot[] }[];
+	description: string;
+}
+
 export enum ProviderAppointmentSelectionTypeId {
 	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
 	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',

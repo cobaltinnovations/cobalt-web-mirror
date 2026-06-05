@@ -18,6 +18,7 @@ import {
 	ProviderVisitType,
 	FeatureId,
 	ProviderSearchResultModel,
+	AppointmentModality,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -321,7 +322,7 @@ export const providerService = {
 
 		return httpSingleton.orchestrateRequest<{
 			providerAvailability: {
-				appointmentTypes: [];
+				appointmentModalities: AppointmentModality[];
 				providerId: string;
 				providerName: string;
 				startDate: string;
@@ -340,7 +341,7 @@ export const providerService = {
 
 		return httpSingleton.orchestrateRequest<{
 			clinicAvailability: {
-				appointmentTypes: [];
+				appointmentModalities: AppointmentModality[];
 				clinicId: string;
 				clinicDescription: string;
 				startDate: string;
