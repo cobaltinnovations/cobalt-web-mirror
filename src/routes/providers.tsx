@@ -233,7 +233,7 @@ export const Component = () => {
 									scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
 									scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
 									firstAvailableAppointment={provider.firstAvailableAppointment ?? undefined}
-									showMoreAppointmentsButton={provider.hasMoreAppointments}
+									showMoreAppointmentsButton={true} //provider.hasMoreAppointments
 									onTitleButtonClick={() => {
 										setSelectedProvider(provider);
 										setShowProviderCanvas(true);

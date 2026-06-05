@@ -6,6 +6,7 @@ import { Modal, Button, ModalProps } from 'react-bootstrap';
 import DatePicker from '@/components/date-picker';
 import InlineAlert from '@/components/inline-alert';
 import SvgIcon from '@/components/svg-icon';
+import TabBar from '@/components/tab-bar';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -18,8 +19,16 @@ const appointmentTitle = 'UPHS Employee Assistance Program';
 const appointmentSubtitle = '30 minute intake phone call';
 const defaultSelectedDate = moment('2026-05-04', 'YYYY-MM-DD').toDate();
 const defaultSelectedTime = '2:00PM';
+const firstAvailableAppointmentLabel = `${moment(defaultSelectedDate).format('ddd, MMM D')}, ${defaultSelectedTime}`;
+const defaultAppointmentType = 'PHONE';
 
 const noSlotDateKeys = new Set(['2026-05-14', '2026-05-20', '2026-05-21', '2026-05-30']);
+
+const appointmentTypeTabs = [
+	{ value: 'IN_PERSON', title: 'In-Person Appointments' },
+	{ value: 'ONLINE', title: 'Online Appointments' },
+	{ value: 'PHONE', title: 'Phone Appointments' },
+];
 
 const timeSlotGroups: TimeSlotGroup[] = [
 	{ label: 'Morning', slots: [] },
@@ -59,12 +68,53 @@ const useStyles = createUseThemedStyles((theme) => ({
 			padding: 0,
 		},
 	},
+	appointmentTypeTabs: {
+		'& ul': {
+			width: '100%',
+		},
+	},
+	appointmentTypeTabsInner: {
+		'& li': {
+			flex: 1,
+			textAlign: 'center',
+		},
+		'& li button': {
+			width: '100%',
+		},
+	},
 	imagePlaceholder: {
 		width: 56,
 		height: 56,
 		flexShrink: 0,
 		marginRight: 16,
 		backgroundColor: theme.colors.n500,
+	},
+	firstAvailableCallout: {
+		gap: 16,
+		display: 'flex',
+		margin: '32px 24px 0',
+		padding: '20px 24px',
+		borderRadius: 8,
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		border: `1px solid ${theme.colors.border}`,
+		[mediaQueries.sm]: {
+			alignItems: 'stretch',
+			flexDirection: 'column',
+		},
+	},
+	firstAvailableIconOuter: {
+		width: 36,
+		height: 36,
+		display: 'flex',
+		flexShrink: 0,
+		borderRadius: 500,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: theme.colors.p50,
+	},
+	firstAvailableButton: {
+		flexShrink: 0,
 	},
 	inlineCalendar: {
 		padding: 16,
@@ -138,6 +188,7 @@ interface ProviderScheduleModalProps extends ModalProps {}
 const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 	const classes = useStyles();
 	const minSelectableDate = moment().startOf('day').toDate();
+	const [selectedAppointmentType, setSelectedAppointmentType] = useState(defaultAppointmentType);
 	const [selectedDate, setSelectedDate] = useState(getInitialSelectedDate);
 	const [selectedTime, setSelectedTime] = useState(defaultSelectedTime);
 
@@ -149,6 +200,11 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 		}
 
 		setSelectedDate(moment(date).startOf('day').toDate());
+		setSelectedTime(defaultSelectedTime);
+	};
+
+	const handleFirstAvailableSelect = () => {
+		setSelectedDate(moment(defaultSelectedDate).startOf('day').toDate());
 		setSelectedTime(defaultSelectedTime);
 	};
 
@@ -164,6 +220,29 @@ const ProviderScheduleModal = ({ ...props }: ProviderScheduleModalProps) => {
 						<h4 className="mb-2">{appointmentTitle}</h4>
 						<h4 className="mb-0">{appointmentSubtitle}</h4>
 					</div>
+				</div>
+				<TabBar
+					value={selectedAppointmentType}
+					tabs={appointmentTypeTabs}
+					onTabClick={setSelectedAppointmentType}
+					className={classes.appointmentTypeTabs}
+					classNameInner={classes.appointmentTypeTabsInner}
+				/>
+				<div className={classes.firstAvailableCallout}>
+					<div className="d-flex align-items-center">
+						<div className={classNames(classes.firstAvailableIconOuter, 'me-4')}>
+							<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+						</div>
+						<p className="mb-0 fs-large fw-bold">First Available {'{In-Person}'} Appointment:</p>
+					</div>
+					<Button
+						type="button"
+						variant="primary"
+						className={classes.firstAvailableButton}
+						onClick={handleFirstAvailableSelect}
+					>
+						{firstAvailableAppointmentLabel}
+					</Button>
 				</div>
 				<div className="d-flex py-8 px-6">
 					<DatePicker
