@@ -126,7 +126,10 @@ type ISODate = string; // e.g. "2026-06-05"
 type ISOTime = string; // e.g. "09:00"
 type ISODateTime = string; // e.g. "2026-06-05T09:00"
 
-export type ProviderSearchResultTypeId = 'PROVIDER' | 'CLINIC';
+export enum ProviderSearchResultTypeId {
+	PROVIDER = 'PROVIDER',
+	CLINIC = 'CLINIC',
+}
 
 export type ProviderAppointmentModalityId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
 

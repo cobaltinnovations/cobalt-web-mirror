@@ -8,7 +8,7 @@ import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import ProviderSearchResult from '@/components/provider-search-result';
 import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
-import ProviderScheduleModal from '@/components/provider-schedule-modal';
+import ProviderScheduleModal, { ProviderScheduleModalConfig } from '@/components/provider-schedule-modal';
 import ProviderInfoDetail from '@/components/provider-info-detail';
 import {
 	InstitutionFeature,
@@ -66,7 +66,7 @@ export const Component = () => {
 	/* -------------------------------- */
 	const [selectedProvider, setSelectedProvider] = useState<ProviderSearchResultModel>();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
-	const [selectedProviderId, setSelectedProviderId] = useState('');
+	const [providerScheduleModalConfig, setProviderScheduleModalConfig] = useState<ProviderScheduleModalConfig>();
 
 	const fetchFilters = useCallback(async () => {
 		const [careTypesResponse, institutionLocationsResponse] = await Promise.all([
@@ -137,10 +137,10 @@ export const Component = () => {
 			</PreviewCanvas>
 
 			<ProviderScheduleModal
-				providerId={selectedProviderId}
-				show={!!selectedProviderId}
+				config={providerScheduleModalConfig}
+				show={!!providerScheduleModalConfig}
 				onHide={() => {
-					setSelectedProviderId('');
+					setProviderScheduleModalConfig(undefined);
 				}}
 			/>
 
@@ -240,7 +240,12 @@ export const Component = () => {
 										setShowProviderCanvas(true);
 									}}
 									onViewAppointmentsButtonClick={() => {
-										setSelectedProviderId(provider.providerId ?? '');
+										setProviderScheduleModalConfig({
+											featureId,
+											clinicId: provider.clinicId ?? undefined,
+											providerId: provider.providerId ?? undefined,
+											providerSearchResultTypeId: provider.providerSearchResultTypeId,
+										});
 									}}
 									onScheduleAppointmentButtonClick={() => {
 										navigate('/provider-confirm-appointment-time');

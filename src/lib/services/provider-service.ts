@@ -312,4 +312,27 @@ export const providerService = {
 			url: `/providers/${providerId}`,
 		});
 	},
+
+	getProviderAvailability(
+		providerId: string,
+		queryParams?: { featureId?: string; startDate?: string; endDate?: string }
+	) {
+		const params = new URLSearchParams({ ...queryParams });
+
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'get',
+			url: `/providers/${providerId}/availability?${params}`,
+		});
+	},
+	getClinicAvailability(
+		clinicId: string,
+		queryParams?: { featureId?: string; startDate?: string; endDate?: string }
+	) {
+		const params = new URLSearchParams({ ...queryParams });
+
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'get',
+			url: `/clinics/${clinicId}/availability?${params}`,
+		});
+	},
 };
