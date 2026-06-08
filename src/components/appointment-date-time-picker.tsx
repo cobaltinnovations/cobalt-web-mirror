@@ -10,7 +10,12 @@ import TabBar from '@/components/tab-bar';
 import useHandleError from '@/hooks/use-handle-error';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
-import { AppointmentModality, AvailabilityTimeSlot, ProviderSearchResultTypeId } from '@/lib/models';
+import {
+	AppointmentModality,
+	AvailabilityTimeSlot,
+	ProviderAppointmentModalityId,
+	ProviderSearchResultTypeId,
+} from '@/lib/models';
 import { providerService } from '@/lib/services';
 
 type TimeSlotGroup = {
@@ -19,9 +24,14 @@ type TimeSlotGroup = {
 };
 
 export interface AppointmentDateTimePickerProps {
-	value: Moment;
-	onChange(value: Moment): void;
+	value: AppointmentDateTimePickerValue;
+	onChange(value: AppointmentDateTimePickerValue): void;
 	config?: AppointmentDateTimePickerConfig;
+}
+
+export interface AppointmentDateTimePickerValue {
+	dateTime: Moment;
+	appointmentModalityId?: ProviderAppointmentModalityId;
 }
 
 export interface AppointmentDateTimePickerConfig {
@@ -31,8 +41,10 @@ export interface AppointmentDateTimePickerConfig {
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
 }
 
-export const getDefaultAppointmentDateTime = () => {
-	return moment();
+export const getDefaultAppointmentDateTimePickerValue = (): AppointmentDateTimePickerValue => {
+	return {
+		dateTime: moment(),
+	};
 };
 
 const createAppointmentDateTime = (date: string | Date, timeSlot: AvailabilityTimeSlot) => {
@@ -89,12 +101,12 @@ const isDateTimeInAvailability = (dateTime: Moment, appointmentModality?: Appoin
 };
 
 const useStyles = createUseThemedStyles((theme) => ({
-	appointmentTypeTabs: {
+	appointmentModalityTabs: {
 		'& ul': {
 			width: '100%',
 		},
 	},
-	appointmentTypeTabsInner: {
+	appointmentModalityTabsInner: {
 		'& li': {
 			flex: 1,
 			textAlign: 'center',
@@ -207,7 +219,8 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 	const minSelectableDate = moment().startOf('day').toDate();
 	const [isLoading, setIsLoading] = useState(false);
 	const [appointmentModalities, setAppointmentModalities] = useState<AppointmentModality[]>([]);
-	const [selectedAppointmentModalityId, setSelectedAppointmentModalityId] = useState('');
+	const selectedAppointmentDateTime = value.dateTime;
+	const selectedAppointmentModalityId = value.appointmentModalityId ?? '';
 
 	const selectedAppointmentModality = useMemo(() => {
 		return appointmentModalities.find(
@@ -215,7 +228,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 		);
 	}, [appointmentModalities, selectedAppointmentModalityId]);
 
-	const appointmentTypeTabs = useMemo(() => {
+	const appointmentModalityTabs = useMemo(() => {
 		return appointmentModalities.map((appointmentModality) => ({
 			value: appointmentModality.appointmentModalityId,
 			title: appointmentModality.description,
@@ -230,13 +243,13 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 		);
 	}, [selectedAppointmentModality]);
 	const selectedDateAvailability = selectedAppointmentModality?.availability.find(
-		(availability) => availability.date === value.format('YYYY-MM-DD')
+		(availability) => availability.date === selectedAppointmentDateTime.format('YYYY-MM-DD')
 	);
 	const timeSlotGroups = useMemo(
 		() => buildTimeSlotGroups(selectedDateAvailability?.times ?? []),
 		[selectedDateAvailability]
 	);
-	const selectedDateLabel = value.format('MMMM D, YYYY');
+	const selectedDateLabel = selectedAppointmentDateTime.format('MMMM D, YYYY');
 	const firstAvailableAppointment = useMemo(
 		() => getFirstAvailableAppointment(selectedAppointmentModality),
 		[selectedAppointmentModality]
@@ -259,17 +272,33 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 		const firstTimeSlot = selectedAvailability?.times[0];
 
 		if (firstTimeSlot) {
-			onChange(createAppointmentDateTime(date, firstTimeSlot));
+			onChange({
+				...value,
+				dateTime: createAppointmentDateTime(date, firstTimeSlot),
+			});
 		}
 	};
 
 	const handleTimeSelect = (timeSlot: AvailabilityTimeSlot) => {
-		onChange(createAppointmentDateTime(value.toDate(), timeSlot));
+		onChange({
+			...value,
+			dateTime: createAppointmentDateTime(selectedAppointmentDateTime.toDate(), timeSlot),
+		});
+	};
+
+	const handleAppointmentModalitySelect = (appointmentModalityId: string) => {
+		onChange({
+			...value,
+			appointmentModalityId: appointmentModalityId as ProviderAppointmentModalityId,
+		});
 	};
 
 	const handleFirstAvailableSelect = () => {
 		if (firstAvailableAppointment) {
-			onChange(firstAvailableAppointment.dateTime.clone());
+			onChange({
+				...value,
+				dateTime: firstAvailableAppointment.dateTime.clone(),
+			});
 		}
 	};
 
@@ -331,29 +360,40 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 	}, [config, handleError]);
 
 	useEffect(() => {
-		const nextAppointmentType = appointmentTypeTabs[0]?.value;
+		const nextAppointmentModalityId = appointmentModalityTabs[0]?.value as
+			| ProviderAppointmentModalityId
+			| undefined;
 
 		if (
-			nextAppointmentType &&
-			!appointmentTypeTabs.some(
-				(appointmentTypeTab) => appointmentTypeTab.value === selectedAppointmentModalityId
+			nextAppointmentModalityId &&
+			!appointmentModalityTabs.some(
+				(appointmentModalityTab) => appointmentModalityTab.value === selectedAppointmentModalityId
 			)
 		) {
-			setSelectedAppointmentModalityId(nextAppointmentType);
+			onChange({
+				...value,
+				appointmentModalityId: nextAppointmentModalityId,
+			});
 		}
-	}, [appointmentTypeTabs, selectedAppointmentModalityId]);
+	}, [appointmentModalityTabs, onChange, selectedAppointmentModalityId, value]);
 
 	useEffect(() => {
-		if (!selectedAppointmentModality || isDateTimeInAvailability(value, selectedAppointmentModality)) {
+		if (
+			!selectedAppointmentModality ||
+			isDateTimeInAvailability(selectedAppointmentDateTime, selectedAppointmentModality)
+		) {
 			return;
 		}
 
 		const firstAvailableAppointment = getFirstAvailableAppointment(selectedAppointmentModality);
 
 		if (firstAvailableAppointment) {
-			onChange(firstAvailableAppointment.dateTime.clone());
+			onChange({
+				...value,
+				dateTime: firstAvailableAppointment.dateTime.clone(),
+			});
 		}
-	}, [onChange, selectedAppointmentModality, value]);
+	}, [onChange, selectedAppointmentDateTime, selectedAppointmentModality, value]);
 
 	if (isLoading) {
 		return (
@@ -365,13 +405,13 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 
 	return (
 		<>
-			{appointmentTypeTabs.length > 0 && (
+			{appointmentModalityTabs.length > 0 && (
 				<TabBar
 					value={selectedAppointmentModalityId}
-					tabs={appointmentTypeTabs}
-					onTabClick={setSelectedAppointmentModalityId}
-					className={classes.appointmentTypeTabs}
-					classNameInner={classes.appointmentTypeTabsInner}
+					tabs={appointmentModalityTabs}
+					onTabClick={handleAppointmentModalitySelect}
+					className={classes.appointmentModalityTabs}
+					classNameInner={classes.appointmentModalityTabsInner}
 				/>
 			)}
 			{firstAvailableAppointmentLabel && (
@@ -399,7 +439,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 			<div className="d-flex py-8 px-6">
 				<DatePicker
 					inline
-					selected={value.toDate()}
+					selected={selectedAppointmentDateTime.toDate()}
 					onChange={handleDateSelect}
 					minDate={minSelectableDate}
 					calendarClassName={classes.inlineCalendar}
@@ -462,8 +502,14 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 							) : (
 								<div className="d-flex">
 									{timeSlotGroup.slots.map((timeSlot) => {
-										const timeSlotDateTime = createAppointmentDateTime(value.toDate(), timeSlot);
-										const isSelected = timeSlotDateTime.isSame(value, 'minute');
+										const timeSlotDateTime = createAppointmentDateTime(
+											selectedAppointmentDateTime.toDate(),
+											timeSlot
+										);
+										const isSelected = timeSlotDateTime.isSame(
+											selectedAppointmentDateTime,
+											'minute'
+										);
 
 										return (
 											<Button
