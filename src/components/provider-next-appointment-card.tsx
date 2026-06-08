@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Button } from 'react-bootstrap';
-import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
+import { FirstAvailableAppointmentModel, ProviderAppointmentSelectionTypeId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerNextAppointmentCard: {
@@ -26,12 +26,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface ProviderNextAppointmentCardProps {
 	scheduleTypeId: ProviderAppointmentSelectionTypeId;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	onScheduleAppointmentButtonClick(): void;
 	className?: string;
 }
 
 const ProviderNextAppointmentCard = ({
 	scheduleTypeId,
+	firstAvailableAppointment,
 	onScheduleAppointmentButtonClick,
 	className,
 }: ProviderNextAppointmentCardProps) => {
@@ -47,7 +49,9 @@ const ProviderNextAppointmentCard = ({
 						<div>
 							<p className="mb-0">First Available Appointment:</p>
 							<p className="mb-0">
-								<strong>Mon, May 4, 2:00PM</strong>
+								<strong>
+									{firstAvailableAppointment?.date} {firstAvailableAppointment?.timeDescription}
+								</strong>
 							</p>
 						</div>
 					</div>

@@ -60,6 +60,7 @@ const ProviderSearchResult = ({
 	description,
 	scheduleAppointmentDescription,
 	scheduleTypeId,
+	firstAvailableAppointment,
 	onScheduleAppointmentButtonClick,
 	onViewAppointmentsButtonClick,
 	showMoreAppointmentsButton,
@@ -101,6 +102,7 @@ const ProviderSearchResult = ({
 							showCardStyle={false}
 							scheduleAppointmentDescription={scheduleAppointmentDescription}
 							scheduleTypeId={scheduleTypeId}
+							firstAvailableAppointment={firstAvailableAppointment}
 							onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
 							onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
 							showMoreAppointmentsButton={showMoreAppointmentsButton}

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import ProviderNextAppointmentCard from '@/components/provider-next-appointment-card';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Button } from 'react-bootstrap';
-import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
+import { FirstAvailableAppointmentModel, ProviderAppointmentSelectionTypeId } from '@/lib/models';
 
 interface useStylesProps {
 	showCardStyle?: boolean;
@@ -23,6 +23,7 @@ interface ProviderScheduleCardProps {
 	scheduleAppointmentDescription: string;
 	scheduleTypeId: ProviderAppointmentSelectionTypeId;
 	onViewAppointmentsButtonClick(): void;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	onScheduleAppointmentButtonClick(): void;
 	showCardStyle?: boolean;
 	showMoreAppointmentsButton?: boolean;
@@ -33,6 +34,7 @@ const ProviderScheduleCard = ({
 	scheduleAppointmentDescription,
 	scheduleTypeId,
 	onViewAppointmentsButtonClick,
+	firstAvailableAppointment,
 	onScheduleAppointmentButtonClick,
 	showCardStyle = true,
 	showMoreAppointmentsButton,
@@ -47,6 +49,7 @@ const ProviderScheduleCard = ({
 			<p className="mb-4">{scheduleAppointmentDescription}</p>
 			<ProviderNextAppointmentCard
 				scheduleTypeId={scheduleTypeId}
+				firstAvailableAppointment={firstAvailableAppointment}
 				onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
 			/>
 			{showMoreAppointmentsButton && (
