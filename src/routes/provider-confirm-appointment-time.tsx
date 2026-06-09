@@ -24,6 +24,21 @@ const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = [
 	ProviderAppointmentModalityId.VIRTUAL,
 ];
 
+const bookAppointmentPath = '/provider-book-appointment';
+
+const buildProviderBookAppointmentUrl = (searchString: string, value: AppointmentDateTimePickerValue) => {
+	const params = new URLSearchParams(searchString);
+
+	if (value.appointmentModalityId) {
+		params.set('appointmentModalityId', value.appointmentModalityId);
+	}
+
+	params.set('date', value.dateTime.format('YYYY-MM-DD'));
+	params.set('time', value.dateTime.format('HH:mm:ss'));
+
+	return `${bookAppointmentPath}?${params.toString()}`;
+};
+
 const getAppointmentModalitySummary = (appointmentModalityId?: ProviderAppointmentModalityId) => {
 	if (appointmentModalityId === ProviderAppointmentModalityId.IN_PERSON) {
 		return {
@@ -152,7 +167,17 @@ export const Component = () => {
 							/>
 						</div>
 						<div className="text-right">
-							<Button className="d-inline-flex align-items-center">
+							<Button
+								className="d-inline-flex align-items-center"
+								onClick={() => {
+									navigate(
+										buildProviderBookAppointmentUrl(
+											searchString,
+											selectedAppointmentDateTimePickerValue
+										)
+									);
+								}}
+							>
 								Continue
 								<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-2" />
 							</Button>

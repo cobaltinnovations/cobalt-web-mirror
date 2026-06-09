@@ -781,6 +781,15 @@ export const routes: RouteObject[] = [
 						} as RouteHandle,
 					},
 					{
+						id: 'provider-book-appointment',
+						path: 'provider-book-appointment',
+						lazy: () => import('@/routes/provider-book-appointment'),
+						handle: {
+							hideHeader: true,
+							hideFooter: true,
+						} as RouteHandle,
+					},
+					{
 						id: 'provider-detail',
 						path: 'providers/:urlName',
 						lazy: () => import('@/routes/provider-detail'),
