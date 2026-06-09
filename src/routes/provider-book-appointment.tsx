@@ -37,6 +37,7 @@ export const Component = () => {
 			...formValues,
 			...Object.fromEntries(searchParams),
 		});
+		navigate('/provider-booking-complete');
 	};
 
 	return (
