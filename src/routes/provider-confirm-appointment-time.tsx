@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import moment from 'moment';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
+import FullscreenBar from '@/components/fullscreen-bar';
 import AppointmentDateTimePicker, {
 	AppointmentDateTimePickerConfig,
 	AppointmentDateTimePickerValue,
@@ -76,6 +77,7 @@ const getAppointmentDateTimePickerValueFromSearchParams = (
 
 export const Component = () => {
 	const { institution } = useAccount();
+	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const searchString = searchParams.toString();
 	const appointmentDateTimePickerConfig = useMemo(
@@ -98,6 +100,13 @@ export const Component = () => {
 				<title>{institution.platformName ?? 'Cobalt'} | Confirm Appointment Time</title>
 			</Helmet>
 
+			<FullscreenBar
+				title={'TODO Title, use API'}
+				onExit={() => {
+					navigate('/providers');
+				}}
+			/>
+
 			<Container className="pt-10 pb-16">
 				<Row className="mb-10">
 					<Col>
@@ -106,12 +115,15 @@ export const Component = () => {
 				</Row>
 				<Row>
 					<Col xs={8}>
-						<div className="bg-white border rounded">
+						<div className="mb-6 bg-white border rounded">
 							<AppointmentDateTimePicker
 								config={appointmentDateTimePickerConfig}
 								value={selectedAppointmentDateTimePickerValue}
 								onChange={setSelectedAppointmentDateTimePickerValue}
 							/>
+						</div>
+						<div className="text-right">
+							<Button>Continue</Button>
 						</div>
 					</Col>
 					<Col xs={4}></Col>
