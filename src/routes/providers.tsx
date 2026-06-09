@@ -7,14 +7,14 @@ import useAccount from '@/hooks/use-account';
 import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import ProviderSearchResult from '@/components/provider-search-result';
-import useRandomPlaceholderImage from '@/hooks/use-random-placeholder-image';
 import ProviderScheduleModal, { ProviderScheduleModalConfig } from '@/components/provider-schedule-modal';
 import ProviderInfoDetail from '@/components/provider-info-detail';
 import {
 	InstitutionFeature,
 	InstitutionLocation,
-	ProviderSearchResultModel,
 	ProviderAppointmentSelectionTypeId,
+	ProviderSearchResultModel,
+	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
@@ -25,12 +25,62 @@ export const loader = () => {
 	return null;
 };
 
+const providerConfirmAppointmentTimePath = '/provider-confirm-appointment-time';
+
+const buildProviderConfirmAppointmentTimeUrl = ({
+	featureId,
+	provider,
+}: {
+	featureId: string;
+	provider: ProviderSearchResultModel;
+}) => {
+	const firstAvailableAppointment = provider.firstAvailableAppointment;
+
+	if (!firstAvailableAppointment) {
+		return;
+	}
+
+	const params = new URLSearchParams();
+
+	if (featureId) {
+		params.set('featureId', featureId);
+	}
+
+	if (provider.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
+		if (!provider.clinicId) {
+			return;
+		}
+
+		params.set('clinicId', provider.clinicId);
+	}
+
+	if (provider.providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER) {
+		if (!provider.providerId) {
+			return;
+		}
+
+		params.set('providerId', provider.providerId);
+	}
+
+	params.set('providerSearchResultTypeId', provider.providerSearchResultTypeId);
+
+	const appointmentModalityId = provider.supportedAppointmentModalities[0]?.appointmentModalityId;
+
+	if (appointmentModalityId) {
+		params.set('appointmentModalityId', appointmentModalityId);
+	}
+
+	params.set('date', firstAvailableAppointment.date);
+	params.set('time', firstAvailableAppointment.time);
+
+	return `${providerConfirmAppointmentTimePath}?${params.toString()}`;
+};
+
 export const Component = () => {
 	/* -------------------------------- */
 	/* General */
 	/* -------------------------------- */
 	const { institution } = useAccount();
-	const placeholderImage = useRandomPlaceholderImage();
 	const employerRef = useRef<HTMLInputElement>(null);
 	const navigate = useNavigate();
 
@@ -228,13 +278,7 @@ export const Component = () => {
 								<ProviderSearchResult
 									key={provider.providerId}
 									className="mb-6"
-									imageUrl={provider.imageUrl ?? placeholderImage}
-									title={provider.name ?? ''}
-									description={provider.description ?? ''}
-									scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
-									scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
-									firstAvailableAppointment={provider.firstAvailableAppointment ?? undefined}
-									showMoreAppointmentsButton={true} //provider.hasMoreAppointments
+									provider={provider}
 									onTitleButtonClick={() => {
 										setSelectedProvider(provider);
 										setShowProviderCanvas(true);
@@ -248,7 +292,15 @@ export const Component = () => {
 										});
 									}}
 									onScheduleAppointmentButtonClick={() => {
-										navigate('/provider-confirm-appointment-time');
+										const providerConfirmAppointmentTimeUrl =
+											buildProviderConfirmAppointmentTimeUrl({
+												featureId,
+												provider,
+											});
+
+										if (providerConfirmAppointmentTimeUrl) {
+											navigate(providerConfirmAppointmentTimeUrl);
+										}
 									}}
 								/>
 							))}

@@ -7,7 +7,7 @@ import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import ProviderScheduleCard from './provider-schedule-card';
-import { FirstAvailableAppointmentModel, ProviderAppointmentSelectionTypeId } from '@/lib/models';
+import { ProviderAppointmentModalityId, ProviderSearchResultModel } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -40,33 +40,31 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface ProviderSearchResultProps {
-	imageUrl: string;
-	title: string;
+	provider: ProviderSearchResultModel;
 	onTitleButtonClick(): void;
-	description: string;
-	scheduleAppointmentDescription: string;
-	scheduleTypeId: ProviderAppointmentSelectionTypeId;
-	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	onScheduleAppointmentButtonClick(): void;
 	onViewAppointmentsButtonClick(): void;
-	showMoreAppointmentsButton?: boolean;
 	className?: string;
 }
 
 const ProviderSearchResult = ({
-	imageUrl,
-	title,
+	provider,
 	onTitleButtonClick,
-	description,
-	scheduleAppointmentDescription,
-	scheduleTypeId,
-	firstAvailableAppointment,
 	onScheduleAppointmentButtonClick,
 	onViewAppointmentsButtonClick,
-	showMoreAppointmentsButton,
 	className,
 }: ProviderSearchResultProps) => {
 	const classes = useStyles();
+
+	const getSupportedAppointmentModalityIconById = (providerAppointmentModalityId: ProviderAppointmentModalityId) => {
+		const iconMap: Record<ProviderAppointmentModalityId, JSX.Element> = {
+			[ProviderAppointmentModalityId.IN_PERSON]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+			[ProviderAppointmentModalityId.PHONE]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+			[ProviderAppointmentModalityId.VIRTUAL]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+		};
+
+		return iconMap[providerAppointmentModalityId];
+	};
 
 	return (
 		<div className={classNames(classes.providerResult, className)}>
@@ -76,7 +74,7 @@ const ProviderSearchResult = ({
 						<div className="d-flex mb-6 mb-xl-0">
 							<div
 								className={classNames(classes.imageOuter, 'me-6')}
-								style={{ backgroundImage: `url(${imageUrl})` }}
+								style={{ backgroundImage: `url(${provider.imageUrl})` }}
 							/>
 							<div>
 								<h3 className="mb-2">
@@ -85,14 +83,22 @@ const ProviderSearchResult = ({
 										className="p-0 text-decoration-none fs-h3"
 										onClick={onTitleButtonClick}
 									>
-										{title}
+										{provider.name}
 									</Button>
 								</h3>
 								<div className="mb-4 d-flex align-items-center">
-									<SvgIcon kit="far" icon="phone" size={16} className="me-2" />{' '}
-									<p className="mb-0">Phone</p>
+									{provider.supportedAppointmentModalities.map((supportedAppointmentModality) => (
+										<div className="d-inline-flex align-items-center">
+											{getSupportedAppointmentModalityIconById(
+												supportedAppointmentModality.appointmentModalityId
+											)}
+											<p className="mb-0">{supportedAppointmentModality.description}</p>
+										</div>
+									))}
 								</div>
-								<p className={classNames(classes.description, 'mb-0 fs-large')}>{description}</p>
+								<p className={classNames(classes.description, 'mb-0 fs-large')}>
+									{provider.description}
+								</p>
 							</div>
 						</div>
 						<hr className="mb-6 d-xl-none" />
@@ -100,12 +106,12 @@ const ProviderSearchResult = ({
 					<Col xl={5}>
 						<ProviderScheduleCard
 							showCardStyle={false}
-							scheduleAppointmentDescription={scheduleAppointmentDescription}
-							scheduleTypeId={scheduleTypeId}
-							firstAvailableAppointment={firstAvailableAppointment}
+							scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
+							scheduleTypeId={provider.appointmentSelectionTypeId}
+							firstAvailableAppointment={provider.firstAvailableAppointment ?? undefined}
 							onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
 							onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
-							showMoreAppointmentsButton={showMoreAppointmentsButton}
+							showMoreAppointmentsButton={provider.hasMoreAppointments}
 						/>
 					</Col>
 				</Row>

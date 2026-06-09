@@ -169,7 +169,7 @@ export interface ProviderSearchResultModel {
 	formattedPhoneNumber: string | null;
 
 	supportedAppointmentModalities: ProviderAppointmentModality[];
-	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId | null;
+	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
 	appointmentDescription: string | null;
 	firstAvailableAppointment: FirstAvailableAppointmentModel | null;
 	hasMoreAppointments: boolean;

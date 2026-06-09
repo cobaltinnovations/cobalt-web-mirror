@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import { Button } from 'react-bootstrap';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import DatePicker from '@/components/date-picker';
 import Loader from '@/components/loader';
@@ -22,24 +22,6 @@ type TimeSlotGroup = {
 	label: 'Morning' | 'Afternoon' | 'Evening';
 	slots: AvailabilityTimeSlot[];
 };
-
-export interface AppointmentDateTimePickerProps {
-	value: AppointmentDateTimePickerValue;
-	onChange(value: AppointmentDateTimePickerValue): void;
-	config?: AppointmentDateTimePickerConfig;
-}
-
-export interface AppointmentDateTimePickerValue {
-	dateTime: Moment;
-	appointmentModalityId?: ProviderAppointmentModalityId;
-}
-
-export interface AppointmentDateTimePickerConfig {
-	featureId?: string;
-	clinicId?: string;
-	providerId?: string;
-	providerSearchResultTypeId: ProviderSearchResultTypeId;
-}
 
 export const getDefaultAppointmentDateTimePickerValue = (): AppointmentDateTimePickerValue => {
 	return {
@@ -174,35 +156,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		width: '100%',
 		height: '100%',
 		display: 'flex',
-		position: 'relative',
 		alignItems: 'center',
 		justifyContent: 'center',
-		'&:hover $dayTooltip, &:focus-within $dayTooltip': {
-			opacity: 1,
-		},
-	},
-	dayTooltip: {
-		left: '50%',
-		top: '25%',
-		zIndex: 2,
-		width: 152,
-		opacity: 0,
-		padding: '10px 14px',
-		position: 'absolute',
-		marginTop: -4,
-		borderRadius: 8,
-		pointerEvents: 'none',
-		textAlign: 'center',
-		color: theme.colors.n0,
-		transform: 'translateX(-50%)',
-		backgroundColor: theme.colors.n700,
-		boxShadow: theme.elevation.e200,
-		...theme.fonts.default,
-		transition: 'opacity 160ms ease',
-		[mediaQueries.sm]: {
-			width: 190,
-			...theme.fonts.default,
-		},
 	},
 	slotPanel: {
 		flex: 1,
@@ -214,6 +169,24 @@ const useStyles = createUseThemedStyles((theme) => ({
 		position: 'relative',
 	},
 }));
+
+export interface AppointmentDateTimePickerValue {
+	dateTime: Moment;
+	appointmentModalityId?: ProviderAppointmentModalityId;
+}
+
+export interface AppointmentDateTimePickerConfig {
+	featureId?: string;
+	clinicId?: string;
+	providerId?: string;
+	providerSearchResultTypeId: ProviderSearchResultTypeId;
+}
+
+export interface AppointmentDateTimePickerProps {
+	value: AppointmentDateTimePickerValue;
+	onChange(value: AppointmentDateTimePickerValue): void;
+	config?: AppointmentDateTimePickerConfig;
+}
 
 const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateTimePickerProps) => {
 	const classes = useStyles();
@@ -244,18 +217,23 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 				.map((availability) => availability.date) ?? []
 		);
 	}, [selectedAppointmentModality]);
+
 	const selectedDateAvailability = selectedAppointmentModality?.availability.find(
 		(availability) => availability.date === selectedAppointmentDateTime.format('YYYY-MM-DD')
 	);
+
 	const timeSlotGroups = useMemo(
 		() => buildTimeSlotGroups(selectedDateAvailability?.times ?? []),
 		[selectedDateAvailability]
 	);
+
 	const selectedDateLabel = selectedAppointmentDateTime.format('MMMM D, YYYY');
+
 	const firstAvailableAppointment = useMemo(
 		() => getFirstAvailableAppointment(selectedAppointmentModality),
 		[selectedAppointmentModality]
 	);
+
 	const firstAvailableAppointmentLabel = firstAvailableAppointment
 		? `${firstAvailableAppointment.dateTime.format('ddd, MMM D')}, ${
 				firstAvailableAppointment.timeSlot.timeDescription
@@ -423,9 +401,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 							<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
 						</div>
 						<p className="mb-0 fs-large fw-bold">
-							First Available {'{'}
-							{selectedAppointmentModality?.description}
-							{'}'} Appointment:
+							First Available {selectedAppointmentModality?.description} Appointment:
 						</p>
 					</div>
 					<Button
@@ -476,16 +452,20 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 					)}
 					renderDayContents={(dayOfMonth, date) => {
 						const hasNoSlots = date ? isNoSlotDate(date) : false;
+						const dayContent = <span className={classes.datePickerDayInner}>{dayOfMonth}</span>;
+
+						if (!hasNoSlots) {
+							return dayContent;
+						}
 
 						return (
-							<span className={classes.datePickerDayInner}>
-								{dayOfMonth}
-								{hasNoSlots && (
-									<span className={classes.dayTooltip} role="tooltip">
-										There are no timeslots available for this day
-									</span>
-								)}
-							</span>
+							<OverlayTrigger
+								placement="top"
+								popperConfig={{ strategy: 'fixed' }}
+								overlay={<Tooltip>There are no timeslots available for this day</Tooltip>}
+							>
+								{dayContent}
+							</OverlayTrigger>
 						);
 					}}
 				/>
