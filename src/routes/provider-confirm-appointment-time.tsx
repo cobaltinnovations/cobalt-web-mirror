@@ -16,7 +16,11 @@ export const loader = () => {
 	return null;
 };
 
-const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = ['PHONE', 'IN_PERSON', 'VIRTUAL'];
+const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = [
+	ProviderAppointmentModalityId.IN_PERSON,
+	ProviderAppointmentModalityId.PHONE,
+	ProviderAppointmentModalityId.VIRTUAL,
+];
 
 const isProviderAppointmentModalityId = (value: string | null): value is ProviderAppointmentModalityId => {
 	return providerAppointmentModalityIds.includes(value as ProviderAppointmentModalityId);

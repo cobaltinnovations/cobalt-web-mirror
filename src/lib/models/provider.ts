@@ -131,7 +131,11 @@ export enum ProviderSearchResultTypeId {
 	CLINIC = 'CLINIC',
 }
 
-export type ProviderAppointmentModalityId = 'PHONE' | 'IN_PERSON' | 'VIRTUAL';
+export enum ProviderAppointmentModalityId {
+	PHONE = 'PHONE',
+	IN_PERSON = 'IN_PERSON',
+	VIRTUAL = 'VIRTUAL',
+}
 
 export interface AppointmentModality {
 	appointmentModalityId: ProviderAppointmentModalityId;

@@ -205,7 +205,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		},
 	},
 	slotPanel: {
+		flex: 1,
 		paddingLeft: 40,
+		overflow: 'hidden',
 	},
 	loaderWrapper: {
 		minHeight: 420,
@@ -487,6 +489,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 						);
 					}}
 				/>
+
 				<div className={classes.slotPanel}>
 					<h3 className="mb-5">{selectedDateLabel}</h3>
 					{timeSlotGroups.map((timeSlotGroup, timeSlotGroupIndex) => (
@@ -500,8 +503,8 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 							{timeSlotGroup.slots.length === 0 ? (
 								<p className="text-muted">No Appointment Slots</p>
 							) : (
-								<div className="d-flex">
-									{timeSlotGroup.slots.map((timeSlot) => {
+								<div className="w-100 d-flex overflow-auto">
+									{timeSlotGroup.slots.map((timeSlot, timeSlotIndex) => {
 										const timeSlotDateTime = createAppointmentDateTime(
 											selectedAppointmentDateTime.toDate(),
 											timeSlot
@@ -511,8 +514,11 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 											'minute'
 										);
 
+										const isLast = timeSlotIndex === timeSlotGroup.slots.length - 1;
+
 										return (
 											<Button
+												className={classNames({ 'me-2': !isLast })}
 												key={timeSlot.time}
 												type="button"
 												variant={isSelected ? 'primary' : 'outline-primary'}
