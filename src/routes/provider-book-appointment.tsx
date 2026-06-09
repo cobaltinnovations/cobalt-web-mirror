@@ -65,7 +65,7 @@ export const Component = () => {
 				<Row className="mb-10">
 					<Col lg={8} className="mb-6 mb-lg-0">
 						<div className="bg-white border rounded-4 py-8 px-6">
-							<h3 className="h4 mb-4">Additional Info</h3>
+							<h4 className="mb-4">Additional Info</h4>
 							<p className="mb-8 fs-large">
 								Message about why info is needed and who has access to it. Please make sure that your
 								information is entered correctly.
@@ -104,7 +104,7 @@ export const Component = () => {
 									value={formValues.phoneNumber}
 									onChange={handleFormValueChange}
 								/>
-								<p className="mb-8 text-muted">Required because...</p>
+								<p className="mb-8 text-muted small">Required because...</p>
 
 								<InlineAlert
 									variant="info"
@@ -123,8 +123,8 @@ export const Component = () => {
 								<SvgIcon
 									kit="far"
 									icon="location-dot"
-									size={18}
-									className="text-primary me-4 mt-1 flex-shrink-0"
+									size={16}
+									className="text-primary me-2 mt-1 flex-shrink-0"
 								/>
 								<div>
 									<p className="mb-1 fs-large fw-bold">[TODO]</p>
@@ -136,8 +136,8 @@ export const Component = () => {
 								<SvgIcon
 									kit="far"
 									icon="phone"
-									size={18}
-									className="text-primary me-4 mt-1 flex-shrink-0"
+									size={16}
+									className="text-primary me-2 mt-1 flex-shrink-0"
 								/>
 								<div>
 									<p className="mb-1 fs-large fw-bold">[TODO]</p>
@@ -149,8 +149,8 @@ export const Component = () => {
 								<SvgIcon
 									kit="far"
 									icon="calendar"
-									size={18}
-									className="text-primary me-4 mt-1 flex-shrink-0"
+									size={16}
+									className="text-primary me-2 mt-1 flex-shrink-0"
 								/>
 								<p className="mb-0 fs-large fw-bold">[TODO]</p>
 							</div>
