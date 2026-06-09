@@ -471,7 +471,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 				/>
 
 				<div className={classes.slotPanel}>
-					<h3 className="mb-5">{selectedDateLabel}</h3>
+					<h4 className="mb-4">{selectedDateLabel}</h4>
 					{timeSlotGroups.map((timeSlotGroup, timeSlotGroupIndex) => (
 						<div
 							key={timeSlotGroup.label}
@@ -479,7 +479,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 								'mb-6': timeSlotGroupIndex < timeSlotGroups.length - 1,
 							})}
 						>
-							<p className={'mb-2'}>{timeSlotGroup.label}</p>
+							<p className="mb-2">{timeSlotGroup.label}</p>
 							{timeSlotGroup.slots.length === 0 ? (
 								<p className="text-muted">No Appointment Slots</p>
 							) : (

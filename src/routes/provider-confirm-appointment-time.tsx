@@ -191,8 +191,8 @@ export const Component = () => {
 								<SvgIcon
 									kit="far"
 									icon="location-dot"
-									size={18}
-									className="text-primary me-4 mt-1 flex-shrink-0"
+									size={16}
+									className="text-primary me-2 mt-1 flex-shrink-0"
 								/>
 								<div>
 									<p className="mb-1 fs-large fw-bold">[TODO]: Need data</p>
@@ -204,8 +204,8 @@ export const Component = () => {
 								<SvgIcon
 									kit="far"
 									icon={appointmentModalitySummary.icon}
-									size={18}
-									className="text-primary me-4 mt-1 flex-shrink-0"
+									size={16}
+									className="text-primary me-2 mt-1 flex-shrink-0"
 								/>
 								<div>
 									<p className="mb-1 fs-large fw-bold">[TODO]: Need data</p>
