@@ -98,15 +98,23 @@ export const Component = () => {
 				<title>{institution.platformName ?? 'Cobalt'} | Confirm Appointment Time</title>
 			</Helmet>
 
-			<Container>
-				<Row>
+			<Container className="pt-10 pb-16">
+				<Row className="mb-10">
 					<Col>
-						<AppointmentDateTimePicker
-							config={appointmentDateTimePickerConfig}
-							value={selectedAppointmentDateTimePickerValue}
-							onChange={setSelectedAppointmentDateTimePickerValue}
-						/>
+						<h2 className="mb-0">Confirm Appointment Time</h2>
 					</Col>
+				</Row>
+				<Row>
+					<Col xs={8}>
+						<div className="bg-white border rounded">
+							<AppointmentDateTimePicker
+								config={appointmentDateTimePickerConfig}
+								value={selectedAppointmentDateTimePickerValue}
+								onChange={setSelectedAppointmentDateTimePickerValue}
+							/>
+						</div>
+					</Col>
+					<Col xs={4}></Col>
 				</Row>
 			</Container>
 		</>
