@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import moment from 'moment';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import FullscreenBar from '@/components/fullscreen-bar';
@@ -9,82 +8,21 @@ import InlineAlert from '@/components/inline-alert';
 import InputHelper from '@/components/input-helper';
 import SvgIcon from '@/components/svg-icon';
 import useAccount from '@/hooks/use-account';
-import { ProviderAppointmentModalityId } from '@/lib/models';
 
 export const loader = () => {
 	return null;
-};
-
-const providerSearchPath = '/providers';
-const confirmAppointmentTimePath = '/provider-confirm-appointment-time';
-const headerTitle = 'Appointment Scheduling - UPHS Employee Assistance Program';
-
-const getAppointmentModalitySummary = (appointmentModalityId: string | null) => {
-	if (appointmentModalityId === ProviderAppointmentModalityId.IN_PERSON) {
-		return {
-			icon: 'location-dot',
-			title: 'In-Person Appointment',
-			subtitle: '30 minute intake appointment',
-		} as const;
-	}
-
-	if (appointmentModalityId === ProviderAppointmentModalityId.VIRTUAL) {
-		return {
-			icon: 'video',
-			title: 'Online Appointment',
-			subtitle: '30 minute intake video call',
-		} as const;
-	}
-
-	return {
-		icon: 'phone',
-		title: 'Phone Appointment',
-		subtitle: '30 minute intake call',
-	} as const;
-};
-
-const getSelectedAppointmentDateTimeDescription = (searchParams: URLSearchParams) => {
-	const date = searchParams.get('date');
-	const time = searchParams.get('time');
-	const dateTime = date
-		? moment(`${date} ${time ?? ''}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA'])
-		: undefined;
-
-	return dateTime?.isValid() ? dateTime.format('dddd, MMMM D [at] h:mmA') : '[TODO]: Need data';
-};
-
-type FormValues = {
-	firstName: string;
-	lastName: string;
-	emailAddress: string;
-	phoneNumber: string;
-};
-
-const initialFormValues: FormValues = {
-	firstName: '',
-	lastName: '',
-	emailAddress: '',
-	phoneNumber: '',
 };
 
 export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const searchString = searchParams.toString();
-	const confirmAppointmentTimeUrl = searchString
-		? `${confirmAppointmentTimePath}?${searchString}`
-		: confirmAppointmentTimePath;
-	const appointmentModalitySummary = useMemo(
-		() => getAppointmentModalitySummary(searchParams.get('appointmentModalityId')),
-		[searchParams]
-	);
-	const selectedAppointmentDateTimeDescription = useMemo(
-		() => getSelectedAppointmentDateTimeDescription(new URLSearchParams(searchString)),
-		[searchString]
-	);
-
-	const [formValues, setFormValues] = useState<FormValues>(initialFormValues);
+	const [formValues, setFormValues] = useState({
+		firstName: '',
+		lastName: '',
+		emailAddress: '',
+		phoneNumber: '',
+	});
 
 	const handleFormValueChange = ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
 		setFormValues((previousFormValues) => ({
@@ -95,6 +33,10 @@ export const Component = () => {
 
 	const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		console.log({
+			...formValues,
+			...Object.fromEntries(searchParams),
+		});
 	};
 
 	return (
@@ -104,9 +46,9 @@ export const Component = () => {
 			</Helmet>
 
 			<FullscreenBar
-				title={headerTitle}
+				title="[TODO]: where does this come from"
 				onExit={() => {
-					navigate(providerSearchPath);
+					navigate('/providers');
 				}}
 			/>
 
@@ -129,7 +71,7 @@ export const Component = () => {
 								information is entered correctly.
 							</p>
 
-							<Form onSubmit={handleFormSubmit}>
+							<Form id="provider-book-appointment-form" onSubmit={handleFormSubmit}>
 								<InputHelper
 									className="mb-4"
 									name="firstName"
@@ -185,21 +127,21 @@ export const Component = () => {
 									className="text-primary me-4 mt-1 flex-shrink-0"
 								/>
 								<div>
-									<p className="mb-1 fs-large fw-bold">UPHS EAP</p>
-									<p className="mb-0 fs-large text-muted">More Info</p>
+									<p className="mb-1 fs-large fw-bold">[TODO]</p>
+									<p className="mb-0 fs-large text-muted">[TODO]</p>
 								</div>
 							</div>
 
 							<div className="d-flex align-items-start py-6 border-bottom">
 								<SvgIcon
 									kit="far"
-									icon={appointmentModalitySummary.icon}
+									icon="phone"
 									size={18}
 									className="text-primary me-4 mt-1 flex-shrink-0"
 								/>
 								<div>
-									<p className="mb-1 fs-large fw-bold">{appointmentModalitySummary.title}</p>
-									<p className="mb-0 fs-large text-muted">{appointmentModalitySummary.subtitle}</p>
+									<p className="mb-1 fs-large fw-bold">[TODO]</p>
+									<p className="mb-0 fs-large text-muted">[TODO]</p>
 								</div>
 							</div>
 
@@ -210,10 +152,10 @@ export const Component = () => {
 									size={18}
 									className="text-primary me-4 mt-1 flex-shrink-0"
 								/>
-								<p className="mb-0 fs-large fw-bold">{selectedAppointmentDateTimeDescription}</p>
+								<p className="mb-0 fs-large fw-bold">[TODO]</p>
 							</div>
 
-							<Button type="button" className="w-100 mt-6">
+							<Button type="submit" form="provider-book-appointment-form" className="w-100 mt-6">
 								Book Appointment
 							</Button>
 						</div>
@@ -225,7 +167,7 @@ export const Component = () => {
 					variant="outline-primary"
 					className="d-inline-flex align-items-center"
 					onClick={() => {
-						navigate(confirmAppointmentTimeUrl);
+						navigate(-1);
 					}}
 				>
 					<SvgIcon kit="far" icon="chevron-left" size={16} className="me-3" />
