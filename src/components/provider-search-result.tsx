@@ -56,16 +56,6 @@ const ProviderSearchResult = ({
 }: ProviderSearchResultProps) => {
 	const classes = useStyles();
 
-	const getSupportedAppointmentModalityIconById = (providerAppointmentModalityId: ProviderAppointmentModalityId) => {
-		const iconMap: Record<ProviderAppointmentModalityId, JSX.Element> = {
-			[ProviderAppointmentModalityId.IN_PERSON]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
-			[ProviderAppointmentModalityId.PHONE]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
-			[ProviderAppointmentModalityId.VIRTUAL]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
-		};
-
-		return iconMap[providerAppointmentModalityId];
-	};
-
 	return (
 		<div className={classNames(classes.providerResult, className)}>
 			<Container fluid className="overflow-visible">
@@ -88,7 +78,10 @@ const ProviderSearchResult = ({
 								</h3>
 								<div className="mb-4 d-flex align-items-center">
 									{provider.supportedAppointmentModalities.map((supportedAppointmentModality) => (
-										<div className="d-inline-flex align-items-center">
+										<div
+											key={supportedAppointmentModality.appointmentModalityId}
+											className="d-inline-flex align-items-center"
+										>
 											{getSupportedAppointmentModalityIconById(
 												supportedAppointmentModality.appointmentModalityId
 											)}
@@ -118,6 +111,16 @@ const ProviderSearchResult = ({
 			</Container>
 		</div>
 	);
+};
+
+const getSupportedAppointmentModalityIconById = (providerAppointmentModalityId: ProviderAppointmentModalityId) => {
+	const iconMap: Record<ProviderAppointmentModalityId, JSX.Element> = {
+		[ProviderAppointmentModalityId.IN_PERSON]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+		[ProviderAppointmentModalityId.PHONE]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+		[ProviderAppointmentModalityId.VIRTUAL]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+	};
+
+	return iconMap[providerAppointmentModalityId];
 };
 
 export default ProviderSearchResult;
