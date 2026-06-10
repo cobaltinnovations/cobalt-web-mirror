@@ -25,8 +25,6 @@ export const loader = () => {
 	return null;
 };
 
-const providerConfirmAppointmentTimePath = '/provider-confirm-appointment-time';
-
 const buildProviderConfirmAppointmentTimeUrl = ({
 	featureId,
 	provider,
@@ -73,7 +71,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	params.set('date', firstAvailableAppointment.date);
 	params.set('time', firstAvailableAppointment.time);
 
-	return `${providerConfirmAppointmentTimePath}?${params.toString()}`;
+	return `/provider-confirm-appointment-time?${params.toString()}`;
 };
 
 export const Component = () => {
@@ -81,6 +79,7 @@ export const Component = () => {
 	/* General */
 	/* -------------------------------- */
 	const { institution } = useAccount();
+	const careTypeRef = useRef<HTMLInputElement>(null);
 	const employerRef = useRef<HTMLInputElement>(null);
 	const navigate = useNavigate();
 
@@ -105,11 +104,85 @@ export const Component = () => {
 		() => institutionFeatures.find((i) => i.featureId === featureId),
 		[featureId, institutionFeatures]
 	);
+	const selectedInstitutionFeatureName = selectedInstitutionFeature?.name.toLocaleLowerCase() ?? 'matching';
+	const selectedInstitutionLocationName = selectedInstitutionLocation?.name ?? 'the selected employer';
 
 	/* -------------------------------- */
 	/* List */
 	/* -------------------------------- */
 	const [providers, setProviders] = useState<ProviderSearchResultModel[]>([]);
+	const providerNoDataConfig = useMemo(() => {
+		if (featureId && institutionLocationId && providers.length > 0) {
+			return;
+		}
+
+		if (!featureId && !institutionLocationId) {
+			return {
+				title: 'Select a care type and employer to see available providers',
+				description: 'Both care type and employer are required before providers can be shown.',
+				actions: [
+					{
+						variant: 'primary',
+						title: 'Select Care Type',
+						onClick: () => {
+							careTypeRef.current?.focus();
+						},
+					},
+					{
+						variant: 'primary',
+						title: 'Select Employer',
+						onClick: () => {
+							employerRef.current?.focus();
+						},
+					},
+				],
+			};
+		}
+
+		if (!featureId) {
+			return {
+				title: 'Select a care type to see available providers',
+				description: 'A care type is required before providers can be shown.',
+				actions: [
+					{
+						variant: 'primary',
+						title: 'Select Care Type',
+						onClick: () => {
+							careTypeRef.current?.focus();
+						},
+					},
+				],
+			};
+		}
+
+		if (!institutionLocationId) {
+			return {
+				title: 'Select your employer to see available providers',
+				description: 'Your employment information will not be shared.',
+				actions: [
+					{
+						variant: 'primary',
+						title: 'Select Employer',
+						onClick: () => {
+							employerRef.current?.focus();
+						},
+					},
+				],
+			};
+		}
+
+		return {
+			title: 'No providers available',
+			description: `No ${selectedInstitutionFeatureName} providers are available for ${selectedInstitutionLocationName} employees.`,
+			actions: [],
+		};
+	}, [
+		featureId,
+		institutionLocationId,
+		providers.length,
+		selectedInstitutionFeatureName,
+		selectedInstitutionLocationName,
+	]);
 
 	/* -------------------------------- */
 	/* Modals */
@@ -128,10 +201,15 @@ export const Component = () => {
 	}, []);
 
 	const fetchProviders = useCallback(async () => {
+		if (!featureId || !institutionLocationId) {
+			setProviders([]);
+			return;
+		}
+
 		const response = await providerService
 			.searchProviders({
-				...(featureId && { featureId }),
-				...(institutionLocationId && { institutionLocationId }),
+				featureId,
+				institutionLocationId,
 			})
 			.fetch();
 
@@ -210,6 +288,7 @@ export const Component = () => {
 						<AsyncWrapper fetchData={fetchFilters}>
 							<div className="d-flex">
 								<InputHelper
+									ref={careTypeRef}
 									className="me-6"
 									as="select"
 									label="Care Type"
@@ -252,58 +331,54 @@ export const Component = () => {
 				<AsyncWrapper fetchData={fetchProviders}>
 					<Row>
 						<Col>
-							<p className="mb-6 mb-lg-10">
-								<strong>
-									{providers.length} available {selectedInstitutionFeature?.name.toLocaleLowerCase()}{' '}
-									provider{providers.length === 1 ? '' : 's'} for {selectedInstitutionLocation?.name}{' '}
-									employees
-								</strong>
-							</p>
-							{providers.length <= 0 && (
+							{featureId && institutionLocationId && (
+								<p className="mb-7 mb-lg-9">
+									<strong>
+										{providers.length} available {selectedInstitutionFeatureName} provider
+										{providers.length === 1 ? '' : 's'} for {selectedInstitutionLocationName}{' '}
+										employees
+									</strong>
+								</p>
+							)}
+							{providerNoDataConfig && (
 								<NoData
-									title="Select your employer to see available providers"
-									description="Your employment information will not be shared."
-									actions={[
-										{
-											variant: 'primary',
-											title: 'Select Employer',
-											onClick: () => {
-												employerRef.current?.focus();
-											},
-										},
-									]}
+									title={providerNoDataConfig.title}
+									description={providerNoDataConfig.description}
+									actions={providerNoDataConfig.actions}
 								/>
 							)}
-							{providers.map((provider) => (
-								<ProviderSearchResult
-									key={provider.providerId}
-									className="mb-6"
-									provider={provider}
-									onTitleButtonClick={() => {
-										setSelectedProvider(provider);
-										setShowProviderCanvas(true);
-									}}
-									onViewAppointmentsButtonClick={() => {
-										setProviderScheduleModalConfig({
-											featureId,
-											clinicId: provider.clinicId ?? undefined,
-											providerId: provider.providerId ?? undefined,
-											providerSearchResultTypeId: provider.providerSearchResultTypeId,
-										});
-									}}
-									onScheduleAppointmentButtonClick={() => {
-										const providerConfirmAppointmentTimeUrl =
-											buildProviderConfirmAppointmentTimeUrl({
+							{featureId &&
+								institutionLocationId &&
+								providers.map((provider) => (
+									<ProviderSearchResult
+										key={provider.providerId}
+										className="mb-6"
+										provider={provider}
+										onTitleButtonClick={() => {
+											setSelectedProvider(provider);
+											setShowProviderCanvas(true);
+										}}
+										onViewAppointmentsButtonClick={() => {
+											setProviderScheduleModalConfig({
 												featureId,
-												provider,
+												clinicId: provider.clinicId ?? undefined,
+												providerId: provider.providerId ?? undefined,
+												providerSearchResultTypeId: provider.providerSearchResultTypeId,
 											});
+										}}
+										onScheduleAppointmentButtonClick={() => {
+											const providerConfirmAppointmentTimeUrl =
+												buildProviderConfirmAppointmentTimeUrl({
+													featureId,
+													provider,
+												});
 
-										if (providerConfirmAppointmentTimeUrl) {
-											navigate(providerConfirmAppointmentTimeUrl);
-										}
-									}}
-								/>
-							))}
+											if (providerConfirmAppointmentTimeUrl) {
+												navigate(providerConfirmAppointmentTimeUrl);
+											}
+										}}
+									/>
+								))}
 						</Col>
 					</Row>
 				</AsyncWrapper>
