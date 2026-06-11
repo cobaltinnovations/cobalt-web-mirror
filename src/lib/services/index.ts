@@ -7,6 +7,7 @@ export * from './assessment-service';
 export * from './calendar-events-service';
 export * from './call-to-action-service';
 export * from './care-resource-service';
+export * from './clinic-service';
 export * from './content-service';
 export * from './content-snippet-service';
 export * from './courses-service';
