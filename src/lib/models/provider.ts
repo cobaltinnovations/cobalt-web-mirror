@@ -121,11 +121,6 @@ export interface Specialty {
 	specialtyId: string;
 }
 
-type UUID = string;
-type ISODate = string; // e.g. "2026-06-05"
-type ISOTime = string; // e.g. "09:00"
-type ISODateTime = string; // e.g. "2026-06-05T09:00"
-
 export enum ProviderSearchResultTypeId {
 	PROVIDER = 'PROVIDER',
 	CLINIC = 'CLINIC',
@@ -154,25 +149,26 @@ export interface ProviderSearchResponse {
 }
 
 export interface ProviderSearchResultModel {
-	providerSearchResultTypeId: ProviderSearchResultTypeId;
-	providerSearchResultId: UUID;
-
-	providerId: UUID | null;
-	clinicId: UUID | null;
-	institutionId: string | null;
-
-	name: string | null;
-	title: string | null;
-	description: string | null;
-	treatmentDescription: string | null;
-	imageUrl: string | null;
-	formattedPhoneNumber: string | null;
-
-	supportedAppointmentModalities: ProviderAppointmentModality[];
+	appointmentBookingLevelId: string;
+	appointmentDescription?: string;
 	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
-	appointmentDescription: string | null;
-	firstAvailableAppointment: FirstAvailableAppointmentModel | null;
+	clinicId?: string;
+	description?: string;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
+	formattedPhoneNumber?: string;
 	hasMoreAppointments: boolean;
+	imageUrl?: string;
+	institutionId?: string;
+	name?: string;
+	phoneNumber: string;
+	phoneNumberDescription: string;
+	providerId?: string;
+	providerSearchResultId?: string;
+	providerSearchResultTypeId: ProviderSearchResultTypeId;
+	screeningRequirements: {};
+	supportedAppointmentModalities: ProviderAppointmentModality[];
+	title?: string;
+	treatmentDescription?: string;
 }
 
 export interface ProviderAppointmentModality {
@@ -181,15 +177,14 @@ export interface ProviderAppointmentModality {
 }
 
 export interface FirstAvailableAppointmentModel {
-	date: ISODate;
-	time: ISOTime;
-	dateTime: ISODateTime;
+	date: string;
+	time: string;
+	dateTime: string;
 	timeDescription: string;
-
-	appointmentTypeId: UUID | null;
-	appointmentTypeIds: UUID[] | null;
-	appointmentDescription: string | null;
-	assessmentId: UUID | null;
-	epicDepartmentId: UUID | null;
-	epicAppointmentFhirId: string | null;
+	appointmentTypeId?: string;
+	appointmentTypeIds?: string[];
+	appointmentDescription?: string;
+	assessmentId?: string;
+	epicDepartmentId?: string;
+	epicAppointmentFhirId?: string;
 }

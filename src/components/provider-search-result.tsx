@@ -115,9 +115,9 @@ const ProviderSearchResult = ({
 
 const getSupportedAppointmentModalityIconById = (providerAppointmentModalityId: ProviderAppointmentModalityId) => {
 	const iconMap: Record<ProviderAppointmentModalityId, JSX.Element> = {
-		[ProviderAppointmentModalityId.IN_PERSON]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+		[ProviderAppointmentModalityId.IN_PERSON]: <SvgIcon kit="far" icon="location-dot" size={16} className="me-2" />,
 		[ProviderAppointmentModalityId.PHONE]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
-		[ProviderAppointmentModalityId.VIRTUAL]: <SvgIcon kit="far" icon="phone" size={16} className="me-2" />,
+		[ProviderAppointmentModalityId.VIRTUAL]: <SvgIcon kit="far" icon="laptop-mobile" size={16} className="me-2" />,
 	};
 
 	return iconMap[providerAppointmentModalityId];

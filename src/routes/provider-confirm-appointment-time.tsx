@@ -24,8 +24,6 @@ const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = [
 	ProviderAppointmentModalityId.VIRTUAL,
 ];
 
-const bookAppointmentPath = '/provider-book-appointment';
-
 const buildProviderBookAppointmentUrl = (searchString: string, value: AppointmentDateTimePickerValue) => {
 	const params = new URLSearchParams(searchString);
 
@@ -36,31 +34,7 @@ const buildProviderBookAppointmentUrl = (searchString: string, value: Appointmen
 	params.set('date', value.dateTime.format('YYYY-MM-DD'));
 	params.set('time', value.dateTime.format('HH:mm:ss'));
 
-	return `${bookAppointmentPath}?${params.toString()}`;
-};
-
-const getAppointmentModalitySummary = (appointmentModalityId?: ProviderAppointmentModalityId) => {
-	if (appointmentModalityId === ProviderAppointmentModalityId.IN_PERSON) {
-		return {
-			icon: 'location-dot',
-			title: 'In-Person Appointment',
-			subtitle: '30 minute intake appointment',
-		} as const;
-	}
-
-	if (appointmentModalityId === ProviderAppointmentModalityId.VIRTUAL) {
-		return {
-			icon: 'video',
-			title: 'Online Appointment',
-			subtitle: '30 minute intake video call',
-		} as const;
-	}
-
-	return {
-		icon: 'phone',
-		title: 'Phone Appointment',
-		subtitle: '30 minute intake call',
-	} as const;
+	return `/provider-book-appointment?${params.toString()}`;
 };
 
 const isProviderAppointmentModalityId = (value: string | null): value is ProviderAppointmentModalityId => {
@@ -126,10 +100,6 @@ export const Component = () => {
 	);
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
 		getAppointmentDateTimePickerValueFromSearchParams(new URLSearchParams(searchString))
-	);
-	const appointmentModalitySummary = useMemo(
-		() => getAppointmentModalitySummary(selectedAppointmentDateTimePickerValue.appointmentModalityId),
-		[selectedAppointmentDateTimePickerValue.appointmentModalityId]
 	);
 
 	useEffect(() => {
@@ -203,7 +173,7 @@ export const Component = () => {
 							<div className="d-flex align-items-start py-6 border-bottom">
 								<SvgIcon
 									kit="far"
-									icon={appointmentModalitySummary.icon}
+									icon="phone"
 									size={16}
 									className="text-primary me-2 mt-1 flex-shrink-0"
 								/>

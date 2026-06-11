@@ -288,24 +288,8 @@ export const Component = () => {
 						<AsyncWrapper fetchData={fetchFilters}>
 							<div className="d-flex">
 								<InputHelper
-									ref={careTypeRef}
-									className="me-6"
-									as="select"
-									label="Care Type"
-									value={featureId}
-									onChange={handleCareTypeSelectChange}
-								>
-									<option value="" disabled>
-										Select...
-									</option>
-									{careTypes.map((institutionFeature) => (
-										<option key={institutionFeature.featureId} value={institutionFeature.featureId}>
-											{institutionFeature.name}
-										</option>
-									))}
-								</InputHelper>
-								<InputHelper
 									ref={employerRef}
+									className="me-6"
 									as="select"
 									label="Employer"
 									value={institutionLocationId}
@@ -321,6 +305,22 @@ export const Component = () => {
 											value={institutionLocation.institutionLocationId}
 										>
 											{institutionLocation.name}
+										</option>
+									))}
+								</InputHelper>
+								<InputHelper
+									ref={careTypeRef}
+									as="select"
+									label="Care Type"
+									value={featureId}
+									onChange={handleCareTypeSelectChange}
+								>
+									<option value="" disabled>
+										Select...
+									</option>
+									{careTypes.map((institutionFeature) => (
+										<option key={institutionFeature.featureId} value={institutionFeature.featureId}>
+											{institutionFeature.name}
 										</option>
 									))}
 								</InputHelper>
