@@ -173,6 +173,17 @@ export function useScreeningNavigation() {
 						}
 					);
 					return;
+				case ScreeningSessionDestinationId.APPOINTMENT_BOOKING_CONFIRMATION:
+					navigate(
+						{
+							pathname: '/provider-confirm-appointment-time',
+							search: new URLSearchParams(destination.context as Record<string, string>).toString(),
+						},
+						{
+							replace,
+						}
+					);
+					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
 					navigate(

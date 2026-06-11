@@ -18,7 +18,7 @@ import {
 } from '@/lib/models';
 import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import NoData from '@/components/no-data';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 
@@ -101,6 +101,7 @@ const ProviderSearchResultWithScreening = ({
 	onViewAppointmentsButtonClick,
 }: ProviderSearchResultWithScreeningProps) => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const screeningRequired =
 		provider.screeningRequirement?.screeningRequired &&
 		!provider.screeningRequirement?.screeningSatisfied &&
@@ -109,6 +110,10 @@ const ProviderSearchResultWithScreening = ({
 		screeningFlowId: provider.screeningRequirement?.screeningFlowId,
 		instantiateOnLoad: false,
 		disabled: !screeningRequired,
+		screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+		screeningQuestionSearch: new URLSearchParams({
+			returnTo: location.pathname + location.search,
+		}).toString(),
 	});
 
 	if (renderedPreScreeningLoader) {
