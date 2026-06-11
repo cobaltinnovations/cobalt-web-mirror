@@ -71,6 +71,10 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	params.set('date', firstAvailableAppointment.date);
 	params.set('time', firstAvailableAppointment.time);
 
+	if (firstAvailableAppointment.appointmentTypeId) {
+		params.set('appointmentTypeId', firstAvailableAppointment.appointmentTypeId);
+	}
+
 	return `/provider-confirm-appointment-time?${params.toString()}`;
 };
 

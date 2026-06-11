@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import moment from 'moment';
@@ -12,7 +12,9 @@ import AppointmentDateTimePicker, {
 	AppointmentDateTimePickerValue,
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
-import { ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
+import { Provider, ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
+import { providerService } from '@/lib/services';
+import AsyncWrapper from '@/components/async-page';
 
 export const loader = () => {
 	return null;
@@ -93,6 +95,13 @@ export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
+
+	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
+	const providerSearchResultTypeId = useMemo(
+		() => (searchParams.get('providerSearchResultTypeId') as ProviderSearchResultTypeId) ?? '',
+		[searchParams]
+	);
+
 	const searchString = searchParams.toString();
 	const appointmentDateTimePickerConfig = useMemo(
 		() => getAppointmentDateTimePickerConfigFromSearchParams(new URLSearchParams(searchString)),
@@ -101,6 +110,18 @@ export const Component = () => {
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
 		getAppointmentDateTimePickerValueFromSearchParams(new URLSearchParams(searchString))
 	);
+
+	const [provider, setProvider] = useState<Provider>();
+
+	const fetchData = useCallback(async () => {
+		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER) {
+			const response = await providerService.getProviderById(providerId).fetch();
+			setProvider(response.provider);
+		} else if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
+			const response = await providerService.getProviderById(providerId).fetch();
+			setProvider(response.provider);
+		}
+	}, [providerId, providerSearchResultTypeId]);
 
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(
@@ -114,78 +135,82 @@ export const Component = () => {
 				<title>{institution.platformName ?? 'Cobalt'} | Confirm Appointment Time</title>
 			</Helmet>
 
-			<FullscreenBar
-				title={'TODO Title, use API'}
-				onExit={() => {
-					navigate('/providers');
-				}}
-			/>
+			<AsyncWrapper fetchData={fetchData}>
+				<FullscreenBar
+					title={'TODO Title, use API'}
+					onExit={() => {
+						navigate('/providers');
+					}}
+				/>
 
-			<Container className="pt-10 pb-16">
-				<Row className="mb-10">
-					<Col>
-						<h2 className="mb-0">Confirm Appointment Time</h2>
-					</Col>
-				</Row>
-				<Row>
-					<Col lg={8} className="mb-6 mb-lg-0">
-						<div className="mb-6 bg-white border rounded-4">
-							<AppointmentDateTimePicker
-								config={appointmentDateTimePickerConfig}
-								value={selectedAppointmentDateTimePickerValue}
-								onChange={setSelectedAppointmentDateTimePickerValue}
-							/>
-						</div>
-						<div className="text-right">
-							<Button
-								className="d-inline-flex align-items-center"
-								onClick={() => {
-									navigate(
-										buildProviderBookAppointmentUrl(
-											searchString,
-											selectedAppointmentDateTimePickerValue
-										)
-									);
-								}}
-							>
-								Continue
-								<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-2" />
-							</Button>
-						</div>
-					</Col>
-					<Col lg={4}>
-						<div className="bg-white border rounded-4 shadow-lg py-8 px-6">
-							<h5 className="mb-6">Booking Summary</h5>
-
-							<div className="d-flex align-items-start pb-6 border-bottom">
-								<SvgIcon
-									kit="far"
-									icon="location-dot"
-									size={16}
-									className="text-primary me-2 mt-1 flex-shrink-0"
+				<Container className="pt-10 pb-16">
+					<Row className="mb-10">
+						<Col>
+							<h2 className="mb-0">Confirm Appointment Time</h2>
+						</Col>
+					</Row>
+					<Row>
+						<Col lg={8} className="mb-6 mb-lg-0">
+							<div className="mb-6 bg-white border rounded-4">
+								<AppointmentDateTimePicker
+									config={appointmentDateTimePickerConfig}
+									value={selectedAppointmentDateTimePickerValue}
+									onChange={setSelectedAppointmentDateTimePickerValue}
 								/>
-								<div>
-									<p className="mb-1 fs-large fw-bold">[TODO]: Need data</p>
-									<p className="mb-0 fs-large text-muted">[TODO]: Need data</p>
+							</div>
+							<div className="text-right">
+								<Button
+									className="d-inline-flex align-items-center"
+									onClick={() => {
+										navigate(
+											buildProviderBookAppointmentUrl(
+												searchString,
+												selectedAppointmentDateTimePickerValue
+											)
+										);
+									}}
+								>
+									Continue
+									<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-2" />
+								</Button>
+							</div>
+						</Col>
+						<Col lg={4}>
+							<div className="bg-white border rounded-4 shadow-lg py-8 px-6">
+								<h5 className="mb-6">Booking Summary</h5>
+
+								<div className="d-flex align-items-start pb-6 border-bottom">
+									<SvgIcon
+										kit="far"
+										icon="location-dot"
+										size={16}
+										className="text-primary me-2 mt-1 flex-shrink-0"
+									/>
+									<div>
+										<p className="mb-1 fs-large fw-bold">{provider?.name}</p>
+										{provider?.description && (
+											<p className="mb-0 fs-large text-muted">{provider.description}</p>
+										)}
+									</div>
+								</div>
+
+								<div className="d-flex align-items-start py-6 border-bottom">
+									<SvgIcon
+										kit="far"
+										icon="phone"
+										size={16}
+										className="text-primary me-2 mt-1 flex-shrink-0"
+									/>
+									<div>
+										<p className="mb-1 fs-large fw-bold">[TODO]: Need data</p>
+										<p className="mb-0 fs-large text-muted">[TODO]: Need data</p>
+									</div>
 								</div>
 							</div>
-
-							<div className="d-flex align-items-start py-6 border-bottom">
-								<SvgIcon
-									kit="far"
-									icon="phone"
-									size={16}
-									className="text-primary me-2 mt-1 flex-shrink-0"
-								/>
-								<div>
-									<p className="mb-1 fs-large fw-bold">[TODO]: Need data</p>
-									<p className="mb-0 fs-large text-muted">[TODO]: Need data</p>
-								</div>
-							</div>
-						</div>
-					</Col>
-				</Row>
-			</Container>
+						</Col>
+					</Row>
+				</Container>
+			</AsyncWrapper>
 		</>
 	);
 };
