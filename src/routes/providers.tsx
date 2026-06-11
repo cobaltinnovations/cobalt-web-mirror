@@ -20,6 +20,7 @@ import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import NoData from '@/components/no-data';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 
 export const loader = () => {
 	return null;
@@ -84,6 +85,65 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	return `/provider-confirm-appointment-time?${params.toString()}`;
 };
 
+interface ProviderSearchResultWithScreeningProps {
+	featureId: string;
+	institutionLocationId: string;
+	provider: ProviderSearchResultModel;
+	onTitleButtonClick(): void;
+	onViewAppointmentsButtonClick(): void;
+}
+
+const ProviderSearchResultWithScreening = ({
+	featureId,
+	institutionLocationId,
+	provider,
+	onTitleButtonClick,
+	onViewAppointmentsButtonClick,
+}: ProviderSearchResultWithScreeningProps) => {
+	const navigate = useNavigate();
+	const screeningRequired =
+		provider.screeningRequirement?.screeningRequired &&
+		!provider.screeningRequirement?.screeningSatisfied &&
+		!!provider.screeningRequirement?.screeningFlowId;
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
+		screeningFlowId: provider.screeningRequirement?.screeningFlowId,
+		instantiateOnLoad: false,
+		disabled: !screeningRequired,
+	});
+
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
+	return (
+		<>
+			{renderedCollectPhoneModal}
+			<ProviderSearchResult
+				className="mb-6"
+				provider={provider}
+				onTitleButtonClick={onTitleButtonClick}
+				onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
+				onScheduleAppointmentButtonClick={() => {
+					if (screeningRequired) {
+						startScreeningFlow();
+						return;
+					}
+
+					const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
+						featureId,
+						institutionLocationId,
+						provider,
+					});
+
+					if (providerConfirmAppointmentTimeUrl) {
+						navigate(providerConfirmAppointmentTimeUrl);
+					}
+				}}
+			/>
+		</>
+	);
+};
+
 export const Component = () => {
 	/* -------------------------------- */
 	/* General */
@@ -91,7 +151,6 @@ export const Component = () => {
 	const { institution } = useAccount();
 	const careTypeRef = useRef<HTMLInputElement>(null);
 	const employerRef = useRef<HTMLInputElement>(null);
-	const navigate = useNavigate();
 
 	/* -------------------------------- */
 	/* Search Params */
@@ -360,9 +419,10 @@ export const Component = () => {
 							{featureId &&
 								institutionLocationId &&
 								providers.map((provider) => (
-									<ProviderSearchResult
+									<ProviderSearchResultWithScreening
 										key={provider.providerId}
-										className="mb-6"
+										featureId={featureId}
+										institutionLocationId={institutionLocationId}
 										provider={provider}
 										onTitleButtonClick={() => {
 											setSelectedProvider(provider);
@@ -376,18 +436,6 @@ export const Component = () => {
 												providerId: provider.providerId ?? undefined,
 												providerSearchResultTypeId: provider.providerSearchResultTypeId,
 											});
-										}}
-										onScheduleAppointmentButtonClick={() => {
-											const providerConfirmAppointmentTimeUrl =
-												buildProviderConfirmAppointmentTimeUrl({
-													featureId,
-													institutionLocationId,
-													provider,
-												});
-
-											if (providerConfirmAppointmentTimeUrl) {
-												navigate(providerConfirmAppointmentTimeUrl);
-											}
 										}}
 									/>
 								))}

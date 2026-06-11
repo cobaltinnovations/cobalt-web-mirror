@@ -1,4 +1,5 @@
 import { AppointmentType } from './appointments';
+import { ScreeningSessionDestinationId } from './screening-models';
 
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/SupportRole.java#L18
 export enum SupportRoleId {
@@ -166,10 +167,17 @@ export interface ProviderSearchResultModel {
 	providerId?: string;
 	providerSearchResultId?: string;
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
-	screeningRequirements: {};
+	screeningRequirement: ScreeningRequirement;
 	supportedAppointmentModalities: ProviderAppointmentModality[];
 	title?: string;
 	treatmentDescription?: string;
+}
+
+interface ScreeningRequirement {
+	appointmentBookingRequirementsDestinationId: ScreeningSessionDestinationId;
+	screeningFlowId: string;
+	screeningRequired: boolean;
+	screeningSatisfied: boolean;
 }
 
 export interface ProviderAppointmentModality {
