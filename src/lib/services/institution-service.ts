@@ -68,6 +68,14 @@ export const institutionService = {
 			url: '/institution/locations',
 		});
 	},
+	getInstitutionLocationByIinstitutionLocationId(institutionLocationId: string) {
+		return httpSingleton.orchestrateRequest<{
+			location: InstitutionLocation;
+		}>({
+			method: 'GET',
+			url: `/institution/locations/${institutionLocationId}`,
+		});
+	},
 	dismissAlert(alertId: string) {
 		return httpSingleton.orchestrateRequest<any>({
 			method: 'POST',

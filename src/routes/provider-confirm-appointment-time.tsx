@@ -131,40 +131,31 @@ export const Component = () => {
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 
 	const fetchData = useCallback(async () => {
-		const setSelectedInstitutionLocation = (institutionLocationsResponse?: {
-			locations: InstitutionLocation[];
-		}) => {
-			setInstitutionLocation(
-				institutionLocationsResponse?.locations.find(
-					(location) => location.institutionLocationId === institutionLocationId
-				)
-			);
-		};
-		const institutionLocationsRequest = institutionLocationId
-			? institutionService.getInstitutionLocations().fetch()
+		const institutionLocationRequest = institutionLocationId
+			? institutionService.getInstitutionLocationByIinstitutionLocationId(institutionLocationId).fetch()
 			: Promise.resolve(undefined);
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
-			const [providerResponse, institutionLocationsResponse] = await Promise.all([
+			const [providerResponse, institutionLocationResponse] = await Promise.all([
 				providerService.getProviderById(providerId).fetch(),
-				institutionLocationsRequest,
+				institutionLocationRequest,
 			]);
 
 			setProvider(providerResponse.provider);
 			setClinic(undefined);
-			setSelectedInstitutionLocation(institutionLocationsResponse);
+			setInstitutionLocation(institutionLocationResponse?.location);
 			return;
 		}
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC && clinicId) {
-			const [clinicResponse, institutionLocationsResponse] = await Promise.all([
+			const [clinicResponse, institutionLocationResponse] = await Promise.all([
 				clinicService.getClinicByClinicId(clinicId).fetch(),
-				institutionLocationsRequest,
+				institutionLocationRequest,
 			]);
 
 			setProvider(undefined);
 			setClinic(clinicResponse.clinic);
-			setSelectedInstitutionLocation(institutionLocationsResponse);
+			setInstitutionLocation(institutionLocationResponse?.location);
 			return;
 		}
 
