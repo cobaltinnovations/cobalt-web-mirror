@@ -80,7 +80,7 @@ const ProviderSearchResult = ({
 									{provider.supportedAppointmentModalities.map((supportedAppointmentModality) => (
 										<div
 											key={supportedAppointmentModality.appointmentModalityId}
-											className="d-inline-flex align-items-center"
+											className="me-4 d-inline-flex align-items-center"
 										>
 											{getSupportedAppointmentModalityIconById(
 												supportedAppointmentModality.appointmentModalityId
@@ -105,6 +105,8 @@ const ProviderSearchResult = ({
 							onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
 							onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
 							showMoreAppointmentsButton={provider.hasMoreAppointments}
+							phoneNumber={provider.phoneNumber}
+							phoneNumberDescription={provider.phoneNumberDescription}
 						/>
 					</Col>
 				</Row>

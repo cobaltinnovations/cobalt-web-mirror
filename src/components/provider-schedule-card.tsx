@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import ProviderNextAppointmentCard from '@/components/provider-next-appointment-card';
+import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { Button } from 'react-bootstrap';
 import { FirstAvailableAppointmentModel, ProviderAppointmentSelectionTypeId } from '@/lib/models';
@@ -17,6 +17,26 @@ const useStyles = createUseThemedStyles((theme) => ({
 		boxShadow: ({ showCardStyle }: useStylesProps) => (showCardStyle ? theme.elevation.e200 : 'none'),
 		backgroundColor: ({ showCardStyle }: useStylesProps) => (showCardStyle ? theme.colors.n0 : 'transparent'),
 	},
+	providerNextAppointmentCard: {
+		padding: 16,
+		borderRadius: 8,
+		boxShadow: theme.elevation.e200,
+		backgroundColor: theme.colors.n0,
+	},
+	iconOuter: {
+		width: 36,
+		height: 36,
+		display: 'flex',
+		borderRadius: 500,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: theme.colors.p100,
+	},
+	callClinicButton: {
+		'&:hover': {
+			color: theme.colors.n0,
+		},
+	},
 }));
 
 interface ProviderScheduleCardProps {
@@ -25,8 +45,10 @@ interface ProviderScheduleCardProps {
 	onViewAppointmentsButtonClick(): void;
 	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	onScheduleAppointmentButtonClick(): void;
-	showCardStyle?: boolean;
+	phoneNumber?: string;
+	phoneNumberDescription?: string;
 	showMoreAppointmentsButton?: boolean;
+	showCardStyle?: boolean;
 	className?: string;
 }
 
@@ -36,8 +58,10 @@ const ProviderScheduleCard = ({
 	onViewAppointmentsButtonClick,
 	firstAvailableAppointment,
 	onScheduleAppointmentButtonClick,
-	showCardStyle = true,
+	phoneNumber,
+	phoneNumberDescription,
 	showMoreAppointmentsButton,
+	showCardStyle = true,
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
@@ -47,11 +71,56 @@ const ProviderScheduleCard = ({
 				<strong>Schedule Appointment</strong>
 			</p>
 			<p className="mb-4">{scheduleAppointmentDescription}</p>
-			<ProviderNextAppointmentCard
-				scheduleTypeId={scheduleTypeId}
-				firstAvailableAppointment={firstAvailableAppointment}
-				onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
-			/>
+			<div className={classes.providerNextAppointmentCard}>
+				{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
+					<div className="d-md-flex justify-content-between">
+						<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+							<div className={classNames(classes.iconOuter, 'me-4')}>
+								<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+							</div>
+							<div>
+								<p className="mb-0">First Available Appointment:</p>
+								<p className="mb-0">
+									<strong>
+										{firstAvailableAppointment?.date} {firstAvailableAppointment?.timeDescription}
+									</strong>
+								</p>
+							</div>
+						</div>
+						<Button variant="primary" onClick={onScheduleAppointmentButtonClick}>
+							Schedule Appointment
+						</Button>
+					</div>
+				)}
+				{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
+					<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
+						Schedule Appointment
+					</Button>
+				)}
+				{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && (
+					<div className="d-md-flex justify-content-between">
+						<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+							<div className={classNames(classes.iconOuter, 'me-4')}>
+								<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
+							</div>
+							<div>
+								<p className="mb-0">
+									<strong>Call {phoneNumberDescription} to schedule</strong>
+								</p>
+							</div>
+						</div>
+						<a
+							className={classNames(
+								'cobalt-button cobalt-button-primary text-decoration-none',
+								classes.callClinicButton
+							)}
+							href={`tel:${phoneNumber}`}
+						>
+							Call Clinic
+						</a>
+					</div>
+				)}
+			</div>
 			{showMoreAppointmentsButton && (
 				<Button
 					variant="link"
