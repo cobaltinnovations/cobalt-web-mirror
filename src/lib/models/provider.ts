@@ -76,6 +76,7 @@ export interface Clinic {
 	institutionId: string;
 	showIntakeAssessmentPrompt: boolean;
 	clinicBookingPreferenceId: ClinicBookingPreferenceId;
+	treatmentDescription?: string;
 }
 
 export interface Provider {

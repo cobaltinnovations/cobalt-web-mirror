@@ -12,8 +12,14 @@ import AppointmentDateTimePicker, {
 	AppointmentDateTimePickerValue,
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
-import { InstitutionLocation, Provider, ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
-import { institutionService, providerService } from '@/lib/services';
+import {
+	Clinic,
+	InstitutionLocation,
+	Provider,
+	ProviderAppointmentModalityId,
+	ProviderSearchResultTypeId,
+} from '@/lib/models';
+import { clinicService, institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 export const loader = () => {
@@ -121,35 +127,48 @@ export const Component = () => {
 	);
 
 	const [provider, setProvider] = useState<Provider>();
+	const [clinic, setClinic] = useState<Clinic>();
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 
 	const fetchData = useCallback(async () => {
-		const providerOrClinicRequest = (() => {
-			if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
-				return providerService.getProviderById(providerId).fetch();
-			}
-
-			if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC && clinicId) {
-				return Promise.resolve(undefined);
-			}
-
-			return Promise.resolve(undefined);
-		})();
+		const setSelectedInstitutionLocation = (institutionLocationsResponse?: {
+			locations: InstitutionLocation[];
+		}) => {
+			setInstitutionLocation(
+				institutionLocationsResponse?.locations.find(
+					(location) => location.institutionLocationId === institutionLocationId
+				)
+			);
+		};
 		const institutionLocationsRequest = institutionLocationId
 			? institutionService.getInstitutionLocations().fetch()
 			: Promise.resolve(undefined);
 
-		const [providerResponse, institutionLocationsResponse] = await Promise.all([
-			providerOrClinicRequest,
-			institutionLocationsRequest,
-		]);
+		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
+			const [providerResponse, institutionLocationsResponse] = await Promise.all([
+				providerService.getProviderById(providerId).fetch(),
+				institutionLocationsRequest,
+			]);
 
-		setProvider(providerResponse?.provider);
-		setInstitutionLocation(
-			institutionLocationsResponse?.locations.find(
-				(location) => location.institutionLocationId === institutionLocationId
-			)
-		);
+			setProvider(providerResponse.provider);
+			setClinic(undefined);
+			setSelectedInstitutionLocation(institutionLocationsResponse);
+			return;
+		}
+
+		if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC && clinicId) {
+			const [clinicResponse, institutionLocationsResponse] = await Promise.all([
+				clinicService.getClinicByClinicId(clinicId).fetch(),
+				institutionLocationsRequest,
+			]);
+
+			setProvider(undefined);
+			setClinic(clinicResponse.clinic);
+			setSelectedInstitutionLocation(institutionLocationsResponse);
+			return;
+		}
+
+		throw new Error('Required query parameters are undefined.');
 	}, [clinicId, institutionLocationId, providerId, providerSearchResultTypeId]);
 
 	useEffect(() => {
@@ -216,9 +235,12 @@ export const Component = () => {
 										className="text-primary me-2 mt-1 flex-shrink-0"
 									/>
 									<div>
-										<p className="mb-1 fs-large fw-bold">{provider?.name}</p>
+										<p className="mb-1 fs-large fw-bold">{provider?.name ?? clinic?.description}</p>
 										{provider?.description && (
 											<p className="mb-0 fs-large text-muted">{provider.description}</p>
+										)}
+										{clinic?.treatmentDescription && (
+											<p className="mb-0 fs-large text-muted">{clinic.treatmentDescription}</p>
 										)}
 									</div>
 								</div>
