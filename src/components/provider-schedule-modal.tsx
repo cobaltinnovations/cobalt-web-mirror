@@ -49,6 +49,10 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 		params.set('featureId', config.featureId);
 	}
 
+	if (config?.institutionLocationId) {
+		params.set('institutionLocationId', config.institutionLocationId);
+	}
+
 	if (config?.clinicId) {
 		params.set('clinicId', config.clinicId);
 	}

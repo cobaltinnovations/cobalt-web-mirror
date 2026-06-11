@@ -177,6 +177,7 @@ export interface AppointmentDateTimePickerValue {
 
 export interface AppointmentDateTimePickerConfig {
 	featureId?: string;
+	institutionLocationId?: string;
 	clinicId?: string;
 	providerId?: string;
 	providerSearchResultTypeId: ProviderSearchResultTypeId;

@@ -27,9 +27,11 @@ export const loader = () => {
 
 const buildProviderConfirmAppointmentTimeUrl = ({
 	featureId,
+	institutionLocationId,
 	provider,
 }: {
 	featureId: string;
+	institutionLocationId: string;
 	provider: ProviderSearchResultModel;
 }) => {
 	const firstAvailableAppointment = provider.firstAvailableAppointment;
@@ -42,6 +44,10 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 
 	if (featureId) {
 		params.set('featureId', featureId);
+	}
+
+	if (institutionLocationId) {
+		params.set('institutionLocationId', institutionLocationId);
 	}
 
 	if (provider.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
@@ -365,6 +371,7 @@ export const Component = () => {
 										onViewAppointmentsButtonClick={() => {
 											setProviderScheduleModalConfig({
 												featureId,
+												institutionLocationId,
 												clinicId: provider.clinicId ?? undefined,
 												providerId: provider.providerId ?? undefined,
 												providerSearchResultTypeId: provider.providerSearchResultTypeId,
@@ -374,6 +381,7 @@ export const Component = () => {
 											const providerConfirmAppointmentTimeUrl =
 												buildProviderConfirmAppointmentTimeUrl({
 													featureId,
+													institutionLocationId,
 													provider,
 												});
 

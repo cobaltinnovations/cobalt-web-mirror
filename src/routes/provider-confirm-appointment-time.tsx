@@ -12,8 +12,8 @@ import AppointmentDateTimePicker, {
 	AppointmentDateTimePickerValue,
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
-import { Provider, ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
-import { providerService } from '@/lib/services';
+import { InstitutionLocation, Provider, ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
+import { institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 export const loader = () => {
@@ -68,6 +68,7 @@ const getAppointmentDateTimePickerConfigFromSearchParams = (
 
 	return {
 		featureId: searchParams.get('featureId') ?? undefined,
+		institutionLocationId: searchParams.get('institutionLocationId') ?? undefined,
 		clinicId,
 		providerId,
 		providerSearchResultTypeId,
@@ -97,6 +98,8 @@ export const Component = () => {
 	const [searchParams] = useSearchParams();
 
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
+	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
+	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const providerSearchResultTypeId = useMemo(
 		() => (searchParams.get('providerSearchResultTypeId') as ProviderSearchResultTypeId) ?? '',
 		[searchParams]
@@ -112,16 +115,36 @@ export const Component = () => {
 	);
 
 	const [provider, setProvider] = useState<Provider>();
+	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 
 	const fetchData = useCallback(async () => {
-		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER) {
-			const response = await providerService.getProviderById(providerId).fetch();
-			setProvider(response.provider);
-		} else if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
-			const response = await providerService.getProviderById(providerId).fetch();
-			setProvider(response.provider);
-		}
-	}, [providerId, providerSearchResultTypeId]);
+		const providerOrClinicRequest = (() => {
+			if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
+				return providerService.getProviderById(providerId).fetch();
+			}
+
+			if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC && clinicId) {
+				return Promise.resolve(undefined);
+			}
+
+			return Promise.resolve(undefined);
+		})();
+		const institutionLocationsRequest = institutionLocationId
+			? institutionService.getInstitutionLocations().fetch()
+			: Promise.resolve(undefined);
+
+		const [providerResponse, institutionLocationsResponse] = await Promise.all([
+			providerOrClinicRequest,
+			institutionLocationsRequest,
+		]);
+
+		setProvider(providerResponse?.provider);
+		setInstitutionLocation(
+			institutionLocationsResponse?.locations.find(
+				(location) => location.institutionLocationId === institutionLocationId
+			)
+		);
+	}, [clinicId, institutionLocationId, providerId, providerSearchResultTypeId]);
 
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(
@@ -137,7 +160,7 @@ export const Component = () => {
 
 			<AsyncWrapper fetchData={fetchData}>
 				<FullscreenBar
-					title={'TODO Title, use API'}
+					title={`Appointment Scheduling - ${institutionLocation?.name}`}
 					onExit={() => {
 						navigate('/providers');
 					}}
