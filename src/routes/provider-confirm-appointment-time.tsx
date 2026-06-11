@@ -26,8 +26,14 @@ const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = [
 	ProviderAppointmentModalityId.VIRTUAL,
 ];
 
-const buildProviderBookAppointmentUrl = (searchString: string, value: AppointmentDateTimePickerValue) => {
-	const params = new URLSearchParams(searchString);
+const buildProviderBookAppointmentUrl = ({
+	currentSearchString,
+	value,
+}: {
+	currentSearchString: string;
+	value: AppointmentDateTimePickerValue;
+}) => {
+	const params = new URLSearchParams(currentSearchString);
 
 	if (value.appointmentModalityId) {
 		params.set('appointmentModalityId', value.appointmentModalityId);
@@ -186,10 +192,10 @@ export const Component = () => {
 									className="d-inline-flex align-items-center"
 									onClick={() => {
 										navigate(
-											buildProviderBookAppointmentUrl(
-												searchString,
-												selectedAppointmentDateTimePickerValue
-											)
+											buildProviderBookAppointmentUrl({
+												currentSearchString: searchString,
+												value: selectedAppointmentDateTimePickerValue,
+											})
 										);
 									}}
 								>
