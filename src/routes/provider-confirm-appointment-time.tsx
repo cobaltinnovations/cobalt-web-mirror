@@ -13,53 +13,15 @@ import AppointmentDateTimePicker, {
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
 import {
-	Clinic,
-	InstitutionLocation,
-	Provider,
-	ProviderAppointmentModalityId,
-	ProviderSearchResultTypeId,
-} from '@/lib/models';
+	getAppointmentModalitySummaryById,
+	isProviderAppointmentModalityId,
+} from '@/components/provider-appointment-modality-summary';
+import { Clinic, InstitutionLocation, Provider, ProviderSearchResultTypeId } from '@/lib/models';
 import { clinicService, institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 export const loader = () => {
 	return null;
-};
-
-const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = [
-	ProviderAppointmentModalityId.IN_PERSON,
-	ProviderAppointmentModalityId.PHONE,
-	ProviderAppointmentModalityId.VIRTUAL,
-];
-
-type AppointmentModalitySummary = {
-	icon: React.ComponentProps<typeof SvgIcon>['icon'];
-	title: string;
-	description: string;
-};
-
-const defaultAppointmentModalitySummary: AppointmentModalitySummary = {
-	icon: 'calendar',
-	title: 'Appointment Type',
-	description: 'Select an appointment type to continue.',
-};
-
-const appointmentModalitySummaryById: Record<ProviderAppointmentModalityId, AppointmentModalitySummary> = {
-	[ProviderAppointmentModalityId.IN_PERSON]: {
-		icon: 'location-dot',
-		title: 'In-Person Appointment',
-		description: 'Attend this appointment in person.',
-	},
-	[ProviderAppointmentModalityId.PHONE]: {
-		icon: 'phone',
-		title: 'Phone Appointment',
-		description: 'This appointment will take place by phone.',
-	},
-	[ProviderAppointmentModalityId.VIRTUAL]: {
-		icon: 'laptop-mobile',
-		title: 'Virtual Appointment',
-		description: 'This appointment will take place virtually.',
-	},
 };
 
 const buildProviderBookAppointmentUrl = ({
@@ -79,10 +41,6 @@ const buildProviderBookAppointmentUrl = ({
 	params.set('time', value.dateTime.format('HH:mm:ss'));
 
 	return `/provider-book-appointment?${params.toString()}`;
-};
-
-const isProviderAppointmentModalityId = (value: string | null): value is ProviderAppointmentModalityId => {
-	return providerAppointmentModalityIds.includes(value as ProviderAppointmentModalityId);
 };
 
 const isProviderSearchResultTypeId = (value: string | null): value is ProviderSearchResultTypeId => {
@@ -157,9 +115,7 @@ export const Component = () => {
 	);
 	const selectedAppointmentModalityId = selectedAppointmentDateTimePickerValue.appointmentModalityId;
 	const selectedAppointmentModalitySummary = useMemo(() => {
-		return selectedAppointmentModalityId
-			? appointmentModalitySummaryById[selectedAppointmentModalityId]
-			: defaultAppointmentModalitySummary;
+		return getAppointmentModalitySummaryById(selectedAppointmentModalityId);
 	}, [selectedAppointmentModalityId]);
 
 	const [provider, setProvider] = useState<Provider>();

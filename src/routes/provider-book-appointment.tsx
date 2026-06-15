@@ -8,6 +8,10 @@ import AsyncWrapper from '@/components/async-page';
 import FullscreenBar from '@/components/fullscreen-bar';
 import InlineAlert from '@/components/inline-alert';
 import InputHelper from '@/components/input-helper';
+import {
+	getAppointmentModalitySummaryById,
+	isProviderAppointmentModalityId,
+} from '@/components/provider-appointment-modality-summary';
 import SvgIcon from '@/components/svg-icon';
 import useAccount from '@/hooks/use-account';
 import { Clinic, InstitutionLocation, Provider, ProviderSearchResultTypeId } from '@/lib/models';
@@ -43,6 +47,14 @@ export const Component = () => {
 		() => getAppointmentDateTimeLabelFromSearchParams(searchParams),
 		[searchParams]
 	);
+	const appointmentModalityId = useMemo(() => {
+		const appointmentModalityId = searchParams.get('appointmentModalityId');
+
+		return isProviderAppointmentModalityId(appointmentModalityId) ? appointmentModalityId : undefined;
+	}, [searchParams]);
+	const selectedAppointmentModalitySummary = useMemo(() => {
+		return getAppointmentModalitySummaryById(appointmentModalityId);
+	}, [appointmentModalityId]);
 
 	const [formValues, setFormValues] = useState({
 		firstName: '',
@@ -99,7 +111,9 @@ export const Component = () => {
 			...formValues,
 			...Object.fromEntries(searchParams),
 		});
-		navigate('/provider-booking-complete');
+
+		const queryString = searchParams.toString();
+		navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
 	};
 
 	return (
@@ -201,13 +215,17 @@ export const Component = () => {
 								<div className="d-flex align-items-start py-6 border-bottom">
 									<SvgIcon
 										kit="far"
-										icon="phone"
+										icon={selectedAppointmentModalitySummary.icon}
 										size={16}
 										className="text-primary me-2 mt-1 flex-shrink-0"
 									/>
 									<div>
-										<p className="mb-1 fs-large fw-bold">[TODO]</p>
-										<p className="mb-0 fs-large text-muted">[TODO]</p>
+										<p className="mb-1 fs-large fw-bold">
+											{selectedAppointmentModalitySummary.title}
+										</p>
+										<p className="mb-0 fs-large text-muted">
+											{selectedAppointmentModalitySummary.description}
+										</p>
 									</div>
 								</div>
 
