@@ -53,6 +53,7 @@ export interface AvailabilityTimeSlot {
 	appointmentParticipantStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentTypeIds: string[];
+	appointmentTypeDescription: string;
 	epicAppointmentFhirId?: string;
 	epicDepartmentId?: string;
 	slotStatusCodesByAppointmentTypeId?: Record<string, string>;

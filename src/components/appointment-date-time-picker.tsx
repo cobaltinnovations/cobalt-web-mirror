@@ -16,7 +16,7 @@ import {
 	ProviderAppointmentModalityId,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { providerService } from '@/lib/services';
+import { AvailabilityModel, providerService } from '@/lib/services';
 
 type TimeSlotGroup = {
 	label: 'Morning' | 'Afternoon' | 'Evening';
@@ -71,13 +71,13 @@ const getFirstAvailableAppointment = (appointmentModality?: AppointmentModality)
 	};
 };
 
-const isDateTimeInAvailability = (dateTime: Moment, appointmentModality?: AppointmentModality) => {
+const getTimeSlotForDateTime = (dateTime: Moment, appointmentModality?: AppointmentModality) => {
 	const dateKey = dateTime.format('YYYY-MM-DD');
 	const selectedDateAvailability = appointmentModality?.availability.find(
 		(availability) => availability.date === dateKey
 	);
 
-	return !!selectedDateAvailability?.times.some((timeSlot) =>
+	return selectedDateAvailability?.times.find((timeSlot) =>
 		createAppointmentDateTime(dateKey, timeSlot).isSame(dateTime, 'minute')
 	);
 };
@@ -173,6 +173,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 export interface AppointmentDateTimePickerValue {
 	dateTime: Moment;
 	appointmentModalityId?: ProviderAppointmentModalityId;
+	appointmentTypeDescription?: string;
 }
 
 export interface AppointmentDateTimePickerConfig {
@@ -183,13 +184,21 @@ export interface AppointmentDateTimePickerConfig {
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
 }
 
+type AppointmentDateTimePickerFetchData = {
+	[x: string]: AvailabilityModel;
+};
+
 export interface AppointmentDateTimePickerProps {
 	value: AppointmentDateTimePickerValue;
 	onChange(value: AppointmentDateTimePickerValue): void;
 	config?: AppointmentDateTimePickerConfig;
+	fetchData?(): Promise<AppointmentDateTimePickerFetchData>;
 }
 
-const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateTimePickerProps) => {
+const getAppointmentModalitiesFromFetchData = (data: AppointmentDateTimePickerFetchData) =>
+	Object.values(data).flatMap((availability) => availability.appointmentModalities);
+
+const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: AppointmentDateTimePickerProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const minSelectableDate = moment().startOf('day').toDate();
@@ -256,6 +265,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 			onChange({
 				...value,
 				dateTime: createAppointmentDateTime(date, firstTimeSlot),
+				appointmentTypeDescription: firstTimeSlot.appointmentTypeDescription,
 			});
 		}
 	};
@@ -264,6 +274,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 		onChange({
 			...value,
 			dateTime: createAppointmentDateTime(selectedAppointmentDateTime.toDate(), timeSlot),
+			appointmentTypeDescription: timeSlot.appointmentTypeDescription,
 		});
 	};
 
@@ -279,6 +290,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 			onChange({
 				...value,
 				dateTime: firstAvailableAppointment.dateTime.clone(),
+				appointmentTypeDescription: firstAvailableAppointment.timeSlot.appointmentTypeDescription,
 			});
 		}
 	};
@@ -287,7 +299,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 		let didCancel = false;
 
 		const fetchAvailability = async () => {
-			if (!config) {
+			if (!fetchData && !config) {
 				setAppointmentModalities([]);
 				return;
 			}
@@ -295,6 +307,21 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 			setIsLoading(true);
 
 			try {
+				if (fetchData) {
+					const response = await fetchData();
+
+					if (!didCancel) {
+						setAppointmentModalities(getAppointmentModalitiesFromFetchData(response));
+					}
+
+					return;
+				}
+
+				if (!config) {
+					setAppointmentModalities([]);
+					return;
+				}
+
 				if (config.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
 					if (!config.clinicId) {
 						throw new Error('clinicId is required.');
@@ -338,7 +365,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 		return () => {
 			didCancel = true;
 		};
-	}, [config, handleError]);
+	}, [config, fetchData, handleError]);
 
 	useEffect(() => {
 		const nextAppointmentModalityId = appointmentModalityTabs[0]?.value as
@@ -359,10 +386,20 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 	}, [appointmentModalityTabs, onChange, selectedAppointmentModalityId, value]);
 
 	useEffect(() => {
-		if (
-			!selectedAppointmentModality ||
-			isDateTimeInAvailability(selectedAppointmentDateTime, selectedAppointmentModality)
-		) {
+		if (!selectedAppointmentModality) {
+			return;
+		}
+
+		const selectedTimeSlot = getTimeSlotForDateTime(selectedAppointmentDateTime, selectedAppointmentModality);
+
+		if (selectedTimeSlot) {
+			if (value.appointmentTypeDescription !== selectedTimeSlot.appointmentTypeDescription) {
+				onChange({
+					...value,
+					appointmentTypeDescription: selectedTimeSlot.appointmentTypeDescription,
+				});
+			}
+
 			return;
 		}
 
@@ -372,6 +409,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config }: AppointmentDateT
 			onChange({
 				...value,
 				dateTime: firstAvailableAppointment.dateTime.clone(),
+				appointmentTypeDescription: firstAvailableAppointment.timeSlot.appointmentTypeDescription,
 			});
 		}
 	}, [onChange, selectedAppointmentDateTime, selectedAppointmentModality, value]);

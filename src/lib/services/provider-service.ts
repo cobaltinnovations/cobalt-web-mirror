@@ -160,6 +160,16 @@ interface GetProviderByIdResponse {
 	provider: Provider;
 }
 
+export interface AvailabilityModel {
+	appointmentModalities: AppointmentModality[];
+	providerId?: string;
+	providerName?: string;
+	clinicId?: string;
+	clinicDescription?: string;
+	startDate: string;
+	endDate: string;
+}
+
 export const providerService = {
 	fetchFindOptions({
 		supportRoleIds,
@@ -316,18 +326,12 @@ export const providerService = {
 
 	getProviderAvailability(
 		providerId: string,
-		queryParams?: { featureId?: string; startDate?: string; endDate?: string }
+		queryParams?: { featureId?: string; startDate?: string; endDate?: string; appointmentTypeId?: string }
 	) {
 		const params = new URLSearchParams({ ...queryParams });
 
 		return httpSingleton.orchestrateRequest<{
-			providerAvailability: {
-				appointmentModalities: AppointmentModality[];
-				providerId: string;
-				providerName: string;
-				startDate: string;
-				endDate: string;
-			};
+			providerAvailability: AvailabilityModel;
 		}>({
 			method: 'get',
 			url: `/providers/${providerId}/availability?${params}`,
@@ -335,18 +339,12 @@ export const providerService = {
 	},
 	getClinicAvailability(
 		clinicId: string,
-		queryParams?: { featureId?: string; startDate?: string; endDate?: string }
+		queryParams?: { featureId?: string; startDate?: string; endDate?: string; appointmentTypeId?: string }
 	) {
 		const params = new URLSearchParams({ ...queryParams });
 
 		return httpSingleton.orchestrateRequest<{
-			clinicAvailability: {
-				appointmentModalities: AppointmentModality[];
-				clinicId: string;
-				clinicDescription: string;
-				startDate: string;
-				endDate: string;
-			};
+			clinicAvailability: AvailabilityModel;
 		}>({
 			method: 'get',
 			url: `/clinics/${clinicId}/availability?${params}`,

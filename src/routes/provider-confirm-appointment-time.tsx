@@ -17,7 +17,7 @@ import {
 	isProviderAppointmentModalityId,
 } from '@/components/provider-appointment-modality-summary';
 import { Clinic, InstitutionLocation, Provider, ProviderSearchResultTypeId } from '@/lib/models';
-import { clinicService, institutionService, providerService } from '@/lib/services';
+import { AvailabilityModel, clinicService, institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
 export const loader = () => {
@@ -92,6 +92,13 @@ const getAppointmentDateTimePickerValueFromSearchParams = (
 	};
 };
 
+type AppointmentAvailabilityData = {
+	[x: string]: AvailabilityModel;
+};
+
+const getAppointmentModalitiesFromAvailabilityData = (availabilityData?: AppointmentAvailabilityData) =>
+	Object.values(availabilityData ?? {}).flatMap((availability) => availability.appointmentModalities);
+
 export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
@@ -100,6 +107,7 @@ export const Component = () => {
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
+	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
 	const providerSearchResultTypeId = useMemo(
 		() => (searchParams.get('providerSearchResultTypeId') as ProviderSearchResultTypeId) ?? '',
 		[searchParams]
@@ -114,45 +122,86 @@ export const Component = () => {
 		getAppointmentDateTimePickerValueFromSearchParams(new URLSearchParams(searchString))
 	);
 	const selectedAppointmentModalityId = selectedAppointmentDateTimePickerValue.appointmentModalityId;
+	const selectedAppointmentTypeDescription = selectedAppointmentDateTimePickerValue.appointmentTypeDescription;
+	const [appointmentAvailabilityData, setAppointmentAvailabilityData] = useState<AppointmentAvailabilityData>();
+	const selectedAppointmentModality = useMemo(() => {
+		return getAppointmentModalitiesFromAvailabilityData(appointmentAvailabilityData).find(
+			(appointmentModality) => appointmentModality.appointmentModalityId === selectedAppointmentModalityId
+		);
+	}, [appointmentAvailabilityData, selectedAppointmentModalityId]);
 	const selectedAppointmentModalitySummary = useMemo(() => {
-		return getAppointmentModalitySummaryById(selectedAppointmentModalityId);
-	}, [selectedAppointmentModalityId]);
+		return getAppointmentModalitySummaryById(
+			selectedAppointmentModality?.appointmentModalityId ?? selectedAppointmentModalityId
+		);
+	}, [selectedAppointmentModality?.appointmentModalityId, selectedAppointmentModalityId]);
 
 	const [provider, setProvider] = useState<Provider>();
 	const [clinic, setClinic] = useState<Clinic>();
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 
-	const fetchData = useCallback(async () => {
+	const fetchData = useCallback(async (): Promise<AppointmentAvailabilityData> => {
 		const institutionLocationRequest = institutionLocationId
 			? institutionService.getInstitutionLocationByIinstitutionLocationId(institutionLocationId).fetch()
 			: Promise.resolve(undefined);
+		const featureId = appointmentDateTimePickerConfig?.featureId ?? '';
+		const availabilityQueryParams = {
+			featureId,
+			...(appointmentTypeId ? { appointmentTypeId } : {}),
+		};
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
-			const [providerResponse, institutionLocationResponse] = await Promise.all([
+			const [providerResponse, institutionLocationResponse, availabilityResponse] = await Promise.all([
 				providerService.getProviderById(providerId).fetch(),
 				institutionLocationRequest,
+				providerService.getProviderAvailability(providerId, availabilityQueryParams).fetch(),
 			]);
+			const nextAppointmentAvailabilityData = {
+				providerAvailability: availabilityResponse.providerAvailability,
+			};
 
 			setProvider(providerResponse.provider);
 			setClinic(undefined);
 			setInstitutionLocation(institutionLocationResponse?.location);
-			return;
+			setAppointmentAvailabilityData(nextAppointmentAvailabilityData);
+
+			return nextAppointmentAvailabilityData;
 		}
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC && clinicId) {
-			const [clinicResponse, institutionLocationResponse] = await Promise.all([
+			const [clinicResponse, institutionLocationResponse, availabilityResponse] = await Promise.all([
 				clinicService.getClinicByClinicId(clinicId).fetch(),
 				institutionLocationRequest,
+				providerService.getClinicAvailability(clinicId, availabilityQueryParams).fetch(),
 			]);
+			const nextAppointmentAvailabilityData = {
+				clinicAvailability: availabilityResponse.clinicAvailability,
+			};
 
 			setProvider(undefined);
 			setClinic(clinicResponse.clinic);
 			setInstitutionLocation(institutionLocationResponse?.location);
-			return;
+			setAppointmentAvailabilityData(nextAppointmentAvailabilityData);
+
+			return nextAppointmentAvailabilityData;
 		}
 
 		throw new Error('Required query parameters are undefined.');
-	}, [clinicId, institutionLocationId, providerId, providerSearchResultTypeId]);
+	}, [
+		appointmentDateTimePickerConfig?.featureId,
+		appointmentTypeId,
+		clinicId,
+		institutionLocationId,
+		providerId,
+		providerSearchResultTypeId,
+	]);
+
+	const fetchAppointmentAvailabilityData = useCallback(async (): Promise<AppointmentAvailabilityData> => {
+		if (appointmentAvailabilityData) {
+			return appointmentAvailabilityData;
+		}
+
+		return fetchData();
+	}, [appointmentAvailabilityData, fetchData]);
 
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(
@@ -185,6 +234,7 @@ export const Component = () => {
 							<div className="mb-6 bg-white border rounded-4">
 								<AppointmentDateTimePicker
 									config={appointmentDateTimePickerConfig}
+									fetchData={fetchAppointmentAvailabilityData}
 									value={selectedAppointmentDateTimePickerValue}
 									onChange={setSelectedAppointmentDateTimePickerValue}
 								/>
@@ -219,8 +269,8 @@ export const Component = () => {
 									/>
 									<div>
 										<p className="mb-1 fs-large fw-bold">{provider?.name ?? clinic?.description}</p>
-										{provider?.description && (
-											<p className="mb-0 fs-large text-muted">{provider.description}</p>
+										{provider?.treatmentDescription && (
+											<p className="mb-0 fs-large text-muted">{provider.treatmentDescription}</p>
 										)}
 										{clinic?.treatmentDescription && (
 											<p className="mb-0 fs-large text-muted">{clinic.treatmentDescription}</p>
@@ -240,7 +290,8 @@ export const Component = () => {
 											{selectedAppointmentModalitySummary.title}
 										</p>
 										<p className="mb-0 fs-large text-muted">
-											{selectedAppointmentModalitySummary.description}
+											{selectedAppointmentTypeDescription ??
+												selectedAppointmentModalitySummary.description}
 										</p>
 									</div>
 								</div>
