@@ -31,6 +31,24 @@ function resultScreenForKey(
 	return resultScreen;
 }
 
+function appendSearchParams(path: string, params: URLSearchParams) {
+	if (path.includes('?')) {
+		return path;
+	}
+
+	const queryString = params.toString();
+
+	if (queryString.length === 0) {
+		return path;
+	}
+
+	const hashIndex = path.indexOf('#');
+	const pathWithoutHash = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
+	const hash = hashIndex >= 0 ? path.slice(hashIndex) : '';
+
+	return `${pathWithoutHash}?${queryString}${hash}`;
+}
+
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const { urlName, resultKey } = params;
 
@@ -134,11 +152,7 @@ export const Component = () => {
 								<Button
 									type="button"
 									onClick={() => {
-										navigate(
-											bookingParams.toString().length > 0
-												? `${bookingPath}?${bookingParams.toString()}`
-												: bookingPath
-										);
+										navigate(appendSearchParams(bookingPath, bookingParams));
 									}}
 								>
 									{resultScreen.buttonText ?? 'Continue to Scheduling'}
