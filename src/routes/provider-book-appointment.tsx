@@ -14,21 +14,59 @@ import {
 } from '@/components/provider-appointment-modality-summary';
 import SvgIcon from '@/components/svg-icon';
 import useAccount from '@/hooks/use-account';
-import { Clinic, InstitutionLocation, Provider, ProviderSearchResultTypeId } from '@/lib/models';
-import { clinicService, institutionService, providerService } from '@/lib/services';
+import {
+	Clinic,
+	InstitutionLocation,
+	Provider,
+	ProviderAppointmentModalityId,
+	ProviderSearchResultTypeId,
+} from '@/lib/models';
+import { AvailabilityModel, clinicService, institutionService, providerService } from '@/lib/services';
 
 export const loader = () => {
 	return null;
 };
 
-const getAppointmentDateTimeLabelFromSearchParams = (searchParams: URLSearchParams) => {
+const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) => {
 	const date = searchParams.get('date');
 	const time = searchParams.get('time');
 	const dateTime = date
 		? moment(`${date} ${time ?? ''}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA'])
 		: undefined;
 
-	return dateTime?.isValid() ? dateTime.format('MMMM D, YYYY [at] h:mmA') : undefined;
+	return dateTime?.isValid() ? dateTime : undefined;
+};
+
+const getAppointmentTypeDescriptionFromAvailability = ({
+	appointmentDateTime,
+	appointmentModalityId,
+	availability,
+}: {
+	appointmentDateTime: ReturnType<typeof getAppointmentDateTimeFromSearchParams>;
+	appointmentModalityId?: ProviderAppointmentModalityId;
+	availability: AvailabilityModel;
+}) => {
+	if (!appointmentDateTime || !appointmentModalityId) {
+		return;
+	}
+
+	const selectedAppointmentModality = availability.appointmentModalities.find(
+		(appointmentModality) => appointmentModality.appointmentModalityId === appointmentModalityId
+	);
+	const selectedAvailability = selectedAppointmentModality?.availability.find(
+		(availability) => availability.date === appointmentDateTime.format('YYYY-MM-DD')
+	);
+	const selectedTimeSlot = selectedAvailability?.times.find((timeSlot) => {
+		const timeSlotDateTime = moment(`${selectedAvailability.date} ${timeSlot.time}`, [
+			'YYYY-MM-DD HH:mm:ss',
+			'YYYY-MM-DD HH:mm',
+			'YYYY-MM-DD h:mmA',
+		]);
+
+		return timeSlotDateTime.isSame(appointmentDateTime, 'minute');
+	});
+
+	return selectedTimeSlot?.appointmentTypeDescription;
 };
 
 export const Component = () => {
@@ -39,19 +77,23 @@ export const Component = () => {
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
+	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
+	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const providerSearchResultTypeId = useMemo(
 		() => (searchParams.get('providerSearchResultTypeId') as ProviderSearchResultTypeId) ?? '',
 		[searchParams]
 	);
+	const appointmentDateTime = useMemo(() => getAppointmentDateTimeFromSearchParams(searchParams), [searchParams]);
 	const appointmentDateTimeLabel = useMemo(
-		() => getAppointmentDateTimeLabelFromSearchParams(searchParams),
-		[searchParams]
+		() => appointmentDateTime?.format('MMMM D, YYYY [at] h:mmA'),
+		[appointmentDateTime]
 	);
 	const appointmentModalityId = useMemo(() => {
 		const appointmentModalityId = searchParams.get('appointmentModalityId');
 
 		return isProviderAppointmentModalityId(appointmentModalityId) ? appointmentModalityId : undefined;
 	}, [searchParams]);
+	const [selectedAppointmentTypeDescription, setSelectedAppointmentTypeDescription] = useState<string>();
 	const selectedAppointmentModalitySummary = useMemo(() => {
 		return getAppointmentModalitySummaryById(appointmentModalityId);
 	}, [appointmentModalityId]);
@@ -70,33 +112,62 @@ export const Component = () => {
 		const institutionLocationRequest = institutionLocationId
 			? institutionService.getInstitutionLocationByIinstitutionLocationId(institutionLocationId).fetch()
 			: Promise.resolve(undefined);
+		const availabilityQueryParams = {
+			featureId,
+			...(appointmentTypeId ? { appointmentTypeId } : {}),
+		};
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
-			const [providerResponse, institutionLocationResponse] = await Promise.all([
+			const [providerResponse, institutionLocationResponse, availabilityResponse] = await Promise.all([
 				providerService.getProviderById(providerId).fetch(),
 				institutionLocationRequest,
+				providerService.getProviderAvailability(providerId, availabilityQueryParams).fetch(),
 			]);
 
 			setProvider(providerResponse.provider);
 			setClinic(undefined);
 			setInstitutionLocation(institutionLocationResponse?.location);
+			setSelectedAppointmentTypeDescription(
+				getAppointmentTypeDescriptionFromAvailability({
+					appointmentDateTime,
+					appointmentModalityId,
+					availability: availabilityResponse.providerAvailability,
+				})
+			);
 			return;
 		}
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC && clinicId) {
-			const [clinicResponse, institutionLocationResponse] = await Promise.all([
+			const [clinicResponse, institutionLocationResponse, availabilityResponse] = await Promise.all([
 				clinicService.getClinicByClinicId(clinicId).fetch(),
 				institutionLocationRequest,
+				providerService.getClinicAvailability(clinicId, availabilityQueryParams).fetch(),
 			]);
 
 			setProvider(undefined);
 			setClinic(clinicResponse.clinic);
 			setInstitutionLocation(institutionLocationResponse?.location);
+			setSelectedAppointmentTypeDescription(
+				getAppointmentTypeDescriptionFromAvailability({
+					appointmentDateTime,
+					appointmentModalityId,
+					availability: availabilityResponse.clinicAvailability,
+				})
+			);
 			return;
 		}
 
 		throw new Error('Required query parameters are undefined.');
-	}, [clinicId, institutionLocationId, providerId, providerSearchResultTypeId]);
+	}, [
+		appointmentDateTime,
+		appointmentModalityId,
+		appointmentTypeId,
+		clinicId,
+		featureId,
+		institutionLocationId,
+		providerId,
+		providerSearchResultTypeId,
+	]);
 
 	const handleFormValueChange = ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
 		setFormValues((previousFormValues) => ({
@@ -206,8 +277,11 @@ export const Component = () => {
 									/>
 									<div>
 										<p className="mb-1 fs-large fw-bold">{provider?.name ?? clinic?.description}</p>
-										{provider?.description && (
-											<p className="mb-0 fs-large text-muted">{provider.description}</p>
+										{provider?.treatmentDescription && (
+											<p className="mb-0 fs-large text-muted">{provider.treatmentDescription}</p>
+										)}
+										{clinic?.treatmentDescription && (
+											<p className="mb-0 fs-large text-muted">{clinic.treatmentDescription}</p>
 										)}
 									</div>
 								</div>
@@ -224,7 +298,8 @@ export const Component = () => {
 											{selectedAppointmentModalitySummary.title}
 										</p>
 										<p className="mb-0 fs-large text-muted">
-											{selectedAppointmentModalitySummary.description}
+											{selectedAppointmentTypeDescription ??
+												selectedAppointmentModalitySummary.description}
 										</p>
 									</div>
 								</div>
