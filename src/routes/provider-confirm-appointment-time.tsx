@@ -32,6 +32,36 @@ const providerAppointmentModalityIds: ProviderAppointmentModalityId[] = [
 	ProviderAppointmentModalityId.VIRTUAL,
 ];
 
+type AppointmentModalitySummary = {
+	icon: React.ComponentProps<typeof SvgIcon>['icon'];
+	title: string;
+	description: string;
+};
+
+const defaultAppointmentModalitySummary: AppointmentModalitySummary = {
+	icon: 'calendar',
+	title: 'Appointment Type',
+	description: 'Select an appointment type to continue.',
+};
+
+const appointmentModalitySummaryById: Record<ProviderAppointmentModalityId, AppointmentModalitySummary> = {
+	[ProviderAppointmentModalityId.IN_PERSON]: {
+		icon: 'location-dot',
+		title: 'In-Person Appointment',
+		description: 'Attend this appointment in person.',
+	},
+	[ProviderAppointmentModalityId.PHONE]: {
+		icon: 'phone',
+		title: 'Phone Appointment',
+		description: 'This appointment will take place by phone.',
+	},
+	[ProviderAppointmentModalityId.VIRTUAL]: {
+		icon: 'laptop-mobile',
+		title: 'Virtual Appointment',
+		description: 'This appointment will take place virtually.',
+	},
+};
+
 const buildProviderBookAppointmentUrl = ({
 	currentSearchString,
 	value,
@@ -125,6 +155,12 @@ export const Component = () => {
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
 		getAppointmentDateTimePickerValueFromSearchParams(new URLSearchParams(searchString))
 	);
+	const selectedAppointmentModalityId = selectedAppointmentDateTimePickerValue.appointmentModalityId;
+	const selectedAppointmentModalitySummary = useMemo(() => {
+		return selectedAppointmentModalityId
+			? appointmentModalitySummaryById[selectedAppointmentModalityId]
+			: defaultAppointmentModalitySummary;
+	}, [selectedAppointmentModalityId]);
 
 	const [provider, setProvider] = useState<Provider>();
 	const [clinic, setClinic] = useState<Clinic>();
@@ -239,13 +275,17 @@ export const Component = () => {
 								<div className="d-flex align-items-start py-6 border-bottom">
 									<SvgIcon
 										kit="far"
-										icon="phone"
+										icon={selectedAppointmentModalitySummary.icon}
 										size={16}
 										className="text-primary me-2 mt-1 flex-shrink-0"
 									/>
 									<div>
-										<p className="mb-1 fs-large fw-bold">[TODO]: Need data</p>
-										<p className="mb-0 fs-large text-muted">[TODO]: Need data</p>
+										<p className="mb-1 fs-large fw-bold">
+											{selectedAppointmentModalitySummary.title}
+										</p>
+										<p className="mb-0 fs-large text-muted">
+											{selectedAppointmentModalitySummary.description}
+										</p>
 									</div>
 								</div>
 							</div>
