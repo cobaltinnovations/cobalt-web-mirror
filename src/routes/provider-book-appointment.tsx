@@ -11,7 +11,13 @@ import {
 	ProviderAppointmentModalityId,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { AvailabilityModel, clinicService, institutionService, providerService } from '@/lib/services';
+import {
+	appointmentService,
+	AvailabilityModel,
+	clinicService,
+	institutionService,
+	providerService,
+} from '@/lib/services';
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import FullscreenBar from '@/components/fullscreen-bar';
@@ -19,6 +25,7 @@ import InlineAlert from '@/components/inline-alert';
 import InputHelper from '@/components/input-helper';
 import { getAppointmentModalitySummaryById } from '@/components/provider-appointment-modality-summary';
 import SvgIcon from '@/components/svg-icon';
+import useHandleError from '@/hooks/use-handle-error';
 
 const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) => {
 	const date = searchParams.get('date');
@@ -67,8 +74,9 @@ export const loader = () => {
 };
 
 export const Component = () => {
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 	const navigate = useNavigate();
+	const handleError = useHandleError();
 
 	const [searchParams] = useSearchParams();
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
@@ -169,12 +177,30 @@ export const Component = () => {
 		}));
 	};
 
-	const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		console.log({
 			...formValues,
 			...Object.fromEntries(searchParams),
 		});
+
+		try {
+			const response = await appointmentService
+				.createAppointment({
+					providerId: '',
+					accountId: account?.accountId,
+					firstName: formValues.firstName,
+					lastName: formValues.lastName,
+					date: appointmentDateTime?.format('YYYY-MM-DD') ?? '',
+					time: appointmentDateTime?.format('HH:mm') ?? '',
+					emailAddress: formValues.emailAddress,
+					phoneNumber: formValues.phoneNumber,
+					appointmentTypeId: appointmentTypeId,
+				})
+				.fetch();
+		} catch (error) {
+			handleError(error);
+		}
 
 		const queryString = searchParams.toString();
 		navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
