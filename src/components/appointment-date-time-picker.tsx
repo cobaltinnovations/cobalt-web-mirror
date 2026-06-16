@@ -71,15 +71,16 @@ const getFirstAvailableAppointment = (appointmentModality?: AppointmentModality)
 	};
 };
 
-const getTimeSlotForDateTime = (dateTime: Moment, appointmentModality?: AppointmentModality) => {
+const getTimeSlotForDateTime = (dateTime: Moment, appointmentModality?: AppointmentModality, providerId?: string) => {
 	const dateKey = dateTime.format('YYYY-MM-DD');
 	const selectedDateAvailability = appointmentModality?.availability.find(
 		(availability) => availability.date === dateKey
 	);
-
-	return selectedDateAvailability?.times.find((timeSlot) =>
+	const matchingTimeSlots = selectedDateAvailability?.times.filter((timeSlot) =>
 		createAppointmentDateTime(dateKey, timeSlot).isSame(dateTime, 'minute')
 	);
+
+	return matchingTimeSlots?.find((timeSlot) => timeSlot.providerId === providerId) ?? matchingTimeSlots?.[0];
 };
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -174,6 +175,7 @@ export interface AppointmentDateTimePickerValue {
 	dateTime: Moment;
 	appointmentModalityId?: ProviderAppointmentModalityId;
 	appointmentTypeDescription?: string;
+	providerId?: string;
 }
 
 export interface AppointmentDateTimePickerConfig {
@@ -266,6 +268,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 				...value,
 				dateTime: createAppointmentDateTime(date, firstTimeSlot),
 				appointmentTypeDescription: firstTimeSlot.appointmentTypeDescription,
+				providerId: firstTimeSlot.providerId,
 			});
 		}
 	};
@@ -275,6 +278,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 			...value,
 			dateTime: createAppointmentDateTime(selectedAppointmentDateTime.toDate(), timeSlot),
 			appointmentTypeDescription: timeSlot.appointmentTypeDescription,
+			providerId: timeSlot.providerId,
 		});
 	};
 
@@ -282,6 +286,8 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 		onChange({
 			...value,
 			appointmentModalityId: appointmentModalityId as ProviderAppointmentModalityId,
+			appointmentTypeDescription: undefined,
+			providerId: undefined,
 		});
 	};
 
@@ -291,6 +297,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 				...value,
 				dateTime: firstAvailableAppointment.dateTime.clone(),
 				appointmentTypeDescription: firstAvailableAppointment.timeSlot.appointmentTypeDescription,
+				providerId: firstAvailableAppointment.timeSlot.providerId,
 			});
 		}
 	};
@@ -390,13 +397,21 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 			return;
 		}
 
-		const selectedTimeSlot = getTimeSlotForDateTime(selectedAppointmentDateTime, selectedAppointmentModality);
+		const selectedTimeSlot = getTimeSlotForDateTime(
+			selectedAppointmentDateTime,
+			selectedAppointmentModality,
+			value.providerId
+		);
 
 		if (selectedTimeSlot) {
-			if (value.appointmentTypeDescription !== selectedTimeSlot.appointmentTypeDescription) {
+			if (
+				value.appointmentTypeDescription !== selectedTimeSlot.appointmentTypeDescription ||
+				value.providerId !== selectedTimeSlot.providerId
+			) {
 				onChange({
 					...value,
 					appointmentTypeDescription: selectedTimeSlot.appointmentTypeDescription,
+					providerId: selectedTimeSlot.providerId,
 				});
 			}
 
@@ -410,6 +425,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 				...value,
 				dateTime: firstAvailableAppointment.dateTime.clone(),
 				appointmentTypeDescription: firstAvailableAppointment.timeSlot.appointmentTypeDescription,
+				providerId: firstAvailableAppointment.timeSlot.providerId,
 			});
 		}
 	}, [onChange, selectedAppointmentDateTime, selectedAppointmentModality, value]);
@@ -528,17 +544,18 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 											selectedAppointmentDateTime.toDate(),
 											timeSlot
 										);
-										const isSelected = timeSlotDateTime.isSame(
-											selectedAppointmentDateTime,
-											'minute'
-										);
+										const isSelected =
+											timeSlotDateTime.isSame(selectedAppointmentDateTime, 'minute') &&
+											(!value.providerId ||
+												!timeSlot.providerId ||
+												timeSlot.providerId === value.providerId);
 
 										const isLast = timeSlotIndex === timeSlotGroup.slots.length - 1;
 
 										return (
 											<Button
 												className={classNames({ 'me-2': !isLast })}
-												key={timeSlot.time}
+												key={`${timeSlot.providerId ?? ''}-${timeSlot.time}`}
 												type="button"
 												variant={isSelected ? 'primary' : 'outline-primary'}
 												aria-pressed={isSelected}

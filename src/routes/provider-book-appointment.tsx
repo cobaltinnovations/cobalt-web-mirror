@@ -80,6 +80,10 @@ export const Component = () => {
 
 	const [searchParams] = useSearchParams();
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
+	const providerIdToSchedule = useMemo(
+		() => searchParams.get('providerIdToSchedule') ?? providerId,
+		[providerId, searchParams]
+	);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
@@ -179,15 +183,15 @@ export const Component = () => {
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		console.log({
-			...formValues,
-			...Object.fromEntries(searchParams),
-		});
 
 		try {
-			const response = await appointmentService
+			if (!providerIdToSchedule) {
+				throw new Error('Provider ID to schedule is undefined.');
+			}
+
+			await appointmentService
 				.createAppointment({
-					providerId: '',
+					providerId: providerIdToSchedule,
 					accountId: account?.accountId,
 					firstName: formValues.firstName,
 					lastName: formValues.lastName,
@@ -198,12 +202,12 @@ export const Component = () => {
 					appointmentTypeId: appointmentTypeId,
 				})
 				.fetch();
+
+			const queryString = searchParams.toString();
+			navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
 		} catch (error) {
 			handleError(error);
 		}
-
-		const queryString = searchParams.toString();
-		navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
 	};
 
 	return (

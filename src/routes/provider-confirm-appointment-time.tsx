@@ -24,17 +24,31 @@ export const loader = () => {
 	return null;
 };
 
+const providerIdToScheduleSearchParam = 'providerIdToSchedule';
+
 const buildProviderBookAppointmentUrl = ({
 	currentSearchString,
+	providerId,
+	providerSearchResultTypeId,
 	value,
 }: {
 	currentSearchString: string;
+	providerId: string;
+	providerSearchResultTypeId: ProviderSearchResultTypeId;
 	value: AppointmentDateTimePickerValue;
 }) => {
 	const params = new URLSearchParams(currentSearchString);
+	const providerIdToSchedule =
+		value.providerId ?? (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER ? providerId : '');
 
 	if (value.appointmentModalityId) {
 		params.set('appointmentModalityId', value.appointmentModalityId);
+	}
+
+	if (providerIdToSchedule) {
+		params.set(providerIdToScheduleSearchParam, providerIdToSchedule);
+	} else {
+		params.delete(providerIdToScheduleSearchParam);
 	}
 
 	params.set('date', value.dateTime.format('YYYY-MM-DD'));
@@ -82,6 +96,7 @@ const getAppointmentDateTimePickerValueFromSearchParams = (
 	const date = searchParams.get('date');
 	const time = searchParams.get('time');
 	const appointmentModalityId = searchParams.get('appointmentModalityId');
+	const providerIdToSchedule = searchParams.get(providerIdToScheduleSearchParam) ?? undefined;
 	const dateTime = date
 		? moment(`${date} ${time ?? ''}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA'])
 		: undefined;
@@ -89,6 +104,7 @@ const getAppointmentDateTimePickerValueFromSearchParams = (
 	return {
 		dateTime: dateTime?.isValid() ? dateTime : defaultValue.dateTime,
 		...(isProviderAppointmentModalityId(appointmentModalityId) && { appointmentModalityId }),
+		...(providerIdToSchedule && { providerId: providerIdToSchedule }),
 	};
 };
 
@@ -102,10 +118,11 @@ const getAppointmentModalitiesFromAvailabilityData = (availabilityData?: Appoint
 export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
+	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
 	const providerSearchResultTypeId = useMemo(
@@ -114,10 +131,31 @@ export const Component = () => {
 	);
 
 	const searchString = searchParams.toString();
-	const appointmentDateTimePickerConfig = useMemo(
-		() => getAppointmentDateTimePickerConfigFromSearchParams(new URLSearchParams(searchString)),
-		[searchString]
-	);
+	const appointmentDateTimePickerConfig = useMemo(() => {
+		const params = new URLSearchParams();
+
+		if (featureId) {
+			params.set('featureId', featureId);
+		}
+
+		if (institutionLocationId) {
+			params.set('institutionLocationId', institutionLocationId);
+		}
+
+		if (clinicId) {
+			params.set('clinicId', clinicId);
+		}
+
+		if (providerId) {
+			params.set('providerId', providerId);
+		}
+
+		if (providerSearchResultTypeId) {
+			params.set('providerSearchResultTypeId', providerSearchResultTypeId);
+		}
+
+		return getAppointmentDateTimePickerConfigFromSearchParams(params);
+	}, [clinicId, featureId, institutionLocationId, providerId, providerSearchResultTypeId]);
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
 		getAppointmentDateTimePickerValueFromSearchParams(new URLSearchParams(searchString))
 	);
@@ -143,9 +181,8 @@ export const Component = () => {
 		const institutionLocationRequest = institutionLocationId
 			? institutionService.getInstitutionLocationByIinstitutionLocationId(institutionLocationId).fetch()
 			: Promise.resolve(undefined);
-		const featureId = appointmentDateTimePickerConfig?.featureId ?? '';
 		const availabilityQueryParams = {
-			featureId,
+			featureId: appointmentDateTimePickerConfig?.featureId ?? '',
 			...(appointmentTypeId ? { appointmentTypeId } : {}),
 		};
 
@@ -203,6 +240,43 @@ export const Component = () => {
 		return fetchData();
 	}, [appointmentAvailabilityData, fetchData]);
 
+	const syncAppointmentDateTimePickerValueToSearchParams = useCallback(
+		(value: AppointmentDateTimePickerValue) => {
+			const params = new URLSearchParams(searchString);
+			const providerIdToSchedule =
+				value.providerId ??
+				(providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER ? providerId : '');
+
+			if (value.appointmentModalityId) {
+				params.set('appointmentModalityId', value.appointmentModalityId);
+			} else {
+				params.delete('appointmentModalityId');
+			}
+
+			if (providerIdToSchedule) {
+				params.set(providerIdToScheduleSearchParam, providerIdToSchedule);
+			} else {
+				params.delete(providerIdToScheduleSearchParam);
+			}
+
+			params.set('date', value.dateTime.format('YYYY-MM-DD'));
+			params.set('time', value.dateTime.format('HH:mm:ss'));
+
+			if (params.toString() !== searchString) {
+				setSearchParams(params, { replace: true });
+			}
+		},
+		[providerId, providerSearchResultTypeId, searchString, setSearchParams]
+	);
+
+	const handleAppointmentDateTimePickerChange = useCallback(
+		(value: AppointmentDateTimePickerValue) => {
+			setSelectedAppointmentDateTimePickerValue(value);
+			syncAppointmentDateTimePickerValueToSearchParams(value);
+		},
+		[syncAppointmentDateTimePickerValueToSearchParams]
+	);
+
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(
 			getAppointmentDateTimePickerValueFromSearchParams(new URLSearchParams(searchString))
@@ -236,7 +310,7 @@ export const Component = () => {
 									config={appointmentDateTimePickerConfig}
 									fetchData={fetchAppointmentAvailabilityData}
 									value={selectedAppointmentDateTimePickerValue}
-									onChange={setSelectedAppointmentDateTimePickerValue}
+									onChange={handleAppointmentDateTimePickerChange}
 								/>
 							</div>
 							<div className="text-right">
@@ -246,6 +320,8 @@ export const Component = () => {
 										navigate(
 											buildProviderBookAppointmentUrl({
 												currentSearchString: searchString,
+												providerId,
+												providerSearchResultTypeId,
 												value: selectedAppointmentDateTimePickerValue,
 											})
 										);

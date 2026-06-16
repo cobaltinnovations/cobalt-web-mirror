@@ -56,6 +56,7 @@ export interface AvailabilityTimeSlot {
 	appointmentTypeDescription: string;
 	epicAppointmentFhirId?: string;
 	epicDepartmentId?: string;
+	providerId?: string;
 	slotStatusCodesByAppointmentTypeId?: Record<string, string>;
 	status: string;
 	time: string;
