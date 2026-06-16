@@ -20,10 +20,6 @@ import { Clinic, InstitutionLocation, Provider, ProviderSearchResultTypeId } fro
 import { AvailabilityModel, clinicService, institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 
-export const loader = () => {
-	return null;
-};
-
 const providerIdToScheduleSearchParam = 'providerIdToSchedule';
 
 const buildProviderBookAppointmentUrl = ({
@@ -114,6 +110,10 @@ type AppointmentAvailabilityData = {
 
 const getAppointmentModalitiesFromAvailabilityData = (availabilityData?: AppointmentAvailabilityData) =>
 	Object.values(availabilityData ?? {}).flatMap((availability) => availability.appointmentModalities);
+
+export const loader = () => {
+	return null;
+};
 
 export const Component = () => {
 	const { institution } = useAccount();
