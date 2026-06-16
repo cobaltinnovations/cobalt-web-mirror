@@ -1,19 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import moment from 'moment';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import AsyncWrapper from '@/components/async-page';
-import FullscreenBar from '@/components/fullscreen-bar';
-import InlineAlert from '@/components/inline-alert';
-import InputHelper from '@/components/input-helper';
-import {
-	getAppointmentModalitySummaryById,
-	isProviderAppointmentModalityId,
-} from '@/components/provider-appointment-modality-summary';
-import SvgIcon from '@/components/svg-icon';
-import useAccount from '@/hooks/use-account';
 import {
 	Clinic,
 	InstitutionLocation,
@@ -22,10 +12,13 @@ import {
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { AvailabilityModel, clinicService, institutionService, providerService } from '@/lib/services';
-
-export const loader = () => {
-	return null;
-};
+import useAccount from '@/hooks/use-account';
+import AsyncWrapper from '@/components/async-page';
+import FullscreenBar from '@/components/fullscreen-bar';
+import InlineAlert from '@/components/inline-alert';
+import InputHelper from '@/components/input-helper';
+import { getAppointmentModalitySummaryById } from '@/components/provider-appointment-modality-summary';
+import SvgIcon from '@/components/svg-icon';
 
 const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) => {
 	const date = searchParams.get('date');
@@ -69,44 +62,44 @@ const getAppointmentTypeDescriptionFromAvailability = ({
 	return selectedTimeSlot?.appointmentTypeDescription;
 };
 
+export const loader = () => {
+	return null;
+};
+
 export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
 
+	const [searchParams] = useSearchParams();
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
+	const appointmentModalityId = useMemo(
+		() => (searchParams.get('appointmentModalityId') as ProviderAppointmentModalityId) ?? '',
+		[searchParams]
+	);
 	const providerSearchResultTypeId = useMemo(
 		() => (searchParams.get('providerSearchResultTypeId') as ProviderSearchResultTypeId) ?? '',
 		[searchParams]
 	);
 	const appointmentDateTime = useMemo(() => getAppointmentDateTimeFromSearchParams(searchParams), [searchParams]);
-	const appointmentDateTimeLabel = useMemo(
-		() => appointmentDateTime?.format('MMMM D, YYYY [at] h:mmA'),
-		[appointmentDateTime]
-	);
-	const appointmentModalityId = useMemo(() => {
-		const appointmentModalityId = searchParams.get('appointmentModalityId');
 
-		return isProviderAppointmentModalityId(appointmentModalityId) ? appointmentModalityId : undefined;
-	}, [searchParams]);
-	const [selectedAppointmentTypeDescription, setSelectedAppointmentTypeDescription] = useState<string>();
 	const selectedAppointmentModalitySummary = useMemo(() => {
 		return getAppointmentModalitySummaryById(appointmentModalityId);
 	}, [appointmentModalityId]);
 
+	const [provider, setProvider] = useState<Provider>();
+	const [clinic, setClinic] = useState<Clinic>();
+	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
+	const [selectedAppointmentTypeDescription, setSelectedAppointmentTypeDescription] = useState<string>();
 	const [formValues, setFormValues] = useState({
 		firstName: '',
 		lastName: '',
 		emailAddress: '',
 		phoneNumber: '',
 	});
-	const [provider, setProvider] = useState<Provider>();
-	const [clinic, setClinic] = useState<Clinic>();
-	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 
 	const fetchData = useCallback(async () => {
 		const institutionLocationRequest = institutionLocationId
@@ -311,7 +304,9 @@ export const Component = () => {
 										size={16}
 										className="text-primary me-2 mt-1 flex-shrink-0"
 									/>
-									<p className="mb-0 fs-large fw-bold">{appointmentDateTimeLabel}</p>
+									<p className="mb-0 fs-large fw-bold">
+										{appointmentDateTime?.format('MMMM D, YYYY [at] h:mmA')}
+									</p>
 								</div>
 
 								<Button type="submit" form="provider-book-appointment-form" className="w-100 mt-6">
