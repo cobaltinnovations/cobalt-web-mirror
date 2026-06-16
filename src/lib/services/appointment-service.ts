@@ -15,6 +15,7 @@ export interface CreateAppointmentData {
 	patientOrderId?: string;
 	firstName?: string;
 	lastName?: string;
+	appointmentModalityId?: string;
 }
 
 export interface CreateFollowupDate {

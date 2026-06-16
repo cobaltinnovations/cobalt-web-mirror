@@ -200,6 +200,7 @@ export const Component = () => {
 					emailAddress: formValues.emailAddress,
 					phoneNumber: formValues.phoneNumber,
 					appointmentTypeId: appointmentTypeId,
+					appointmentModalityId,
 				})
 				.fetch();
 
