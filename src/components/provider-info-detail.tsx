@@ -8,16 +8,15 @@ import {
 	Clinic,
 	Provider,
 	ProviderAppointmentModalityId,
-	ProviderSearchResultModel,
+	ProviderAppointmentSelectionTypeId,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { clinicService, providerService } from '@/lib/services';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AvailabilityModel, clinicService, providerService } from '@/lib/services';
 import SvgIcon from './svg-icon';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
-import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
@@ -48,64 +47,52 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 	const [provider, setProvider] = useState<Provider>();
 	const [clinic, setClinic] = useState<Clinic>();
-	const [providerSearchResult, setProviderSearchResult] = useState<ProviderSearchResultModel>();
+	const [availability, setAvailability] = useState<AvailabilityModel>();
 
 	const providerScheduleModalConfig = useMemo(() => {
-		if (!providerSearchResult) {
+		if (!availability) {
 			return;
 		}
 
 		return {
 			featureId,
 			institutionLocationId,
-			clinicId: providerSearchResult.clinicId ?? undefined,
-			providerId: providerSearchResult.providerId ?? undefined,
-			providerSearchResultTypeId: providerSearchResult.providerSearchResultTypeId,
+			clinicId,
+			providerId,
+			providerSearchResultTypeId: providerId
+				? ProviderSearchResultTypeId.PROVIDER
+				: ProviderSearchResultTypeId.CLINIC,
 		};
-	}, [featureId, institutionLocationId, providerSearchResult]);
+	}, [availability, clinicId, featureId, institutionLocationId, providerId]);
 
 	const fetchData = useCallback(async () => {
 		if (!providerId && !clinicId) {
 			throw new Error('providerId and clinicId are undefined.');
 		}
 
-		const providerSearchResultsRequest = providerService
-			.searchProviders({
-				...(featureId ? { featureId } : {}),
-				...(institutionLocationId ? { institutionLocationId } : {}),
-			})
-			.fetch();
+		const availabilityQueryParams = {
+			...(featureId ? { featureId } : {}),
+			...(institutionLocationId ? { institutionLocationId } : {}),
+		};
 
 		if (providerId) {
-			const [providerResponse, providerSearchResultsResponse] = await Promise.all([
+			const [providerResponse, availabilityResponse] = await Promise.all([
 				providerService.getProviderById(providerId).fetch(),
-				providerSearchResultsRequest,
+				providerService.getProviderAvailability(providerId, availabilityQueryParams).fetch(),
 			]);
 
 			setProvider(providerResponse.provider);
 			setClinic(undefined);
-			setProviderSearchResult(
-				providerSearchResultsResponse.providers.find(
-					(providerSearchResult) =>
-						providerSearchResult.providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER &&
-						providerSearchResult.providerId === providerId
-				)
-			);
+			setAvailability(availabilityResponse.providerAvailability);
 		} else if (clinicId) {
-			const [clinicResponse, providerSearchResultsResponse] = await Promise.all([
+			const [clinicResponse, availabilityResponse] = await Promise.all([
 				clinicService.getClinicByClinicId(clinicId).fetch(),
-				providerSearchResultsRequest,
+				providerService.getClinicAvailability(clinicId, availabilityQueryParams).fetch(),
 			]);
 
 			setProvider(undefined);
 			setClinic(clinicResponse.clinic);
-			setProviderSearchResult(
-				providerSearchResultsResponse.providers.find(
-					(providerSearchResult) =>
-						providerSearchResult.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC &&
-						providerSearchResult.clinicId === clinicId
-				)
-			);
+			setAvailability(availabilityResponse.clinicAvailability);
 		}
 	}, [clinicId, featureId, institutionLocationId, providerId]);
 
@@ -156,11 +143,14 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 							</Row>
 						</Col>
 						<Col xs={12} xl={5}>
-							{providerSearchResult && (
+							{availability && (
 								<ProviderInfoDetailSchedule
 									featureId={featureId}
 									institutionLocationId={institutionLocationId}
-									providerSearchResult={providerSearchResult}
+									provider={provider}
+									availability={availability}
+									providerId={providerId}
+									clinicId={clinicId}
 									onViewAppointmentsButtonClick={() => {
 										setShowProviderScheduleModal(true);
 									}}
@@ -177,20 +167,27 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 interface ProviderInfoDetailScheduleProps {
 	featureId?: string;
 	institutionLocationId?: string;
-	providerSearchResult: ProviderSearchResultModel;
+	provider?: Provider;
+	availability: AvailabilityModel;
+	providerId?: string;
+	clinicId?: string;
 	onViewAppointmentsButtonClick(): void;
 }
 
 const buildProviderConfirmAppointmentTimeUrl = ({
 	featureId,
 	institutionLocationId,
-	providerSearchResult,
+	availability,
+	providerId,
+	clinicId,
 }: {
 	featureId?: string;
 	institutionLocationId?: string;
-	providerSearchResult: ProviderSearchResultModel;
+	availability: AvailabilityModel;
+	providerId?: string;
+	clinicId?: string;
 }) => {
-	const firstAvailableAppointment = providerSearchResult.firstAvailableAppointment;
+	const firstAvailableAppointment = availability.firstAvailableAppointment;
 
 	if (!firstAvailableAppointment) {
 		return;
@@ -206,25 +203,17 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 		params.set('institutionLocationId', institutionLocationId);
 	}
 
-	if (providerSearchResult.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
-		if (!providerSearchResult.clinicId) {
-			return;
-		}
-
-		params.set('clinicId', providerSearchResult.clinicId);
+	if (clinicId) {
+		params.set('clinicId', clinicId);
+		params.set('providerSearchResultTypeId', ProviderSearchResultTypeId.CLINIC);
+	} else if (providerId) {
+		params.set('providerId', providerId);
+		params.set('providerSearchResultTypeId', ProviderSearchResultTypeId.PROVIDER);
+	} else {
+		return;
 	}
 
-	if (providerSearchResult.providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER) {
-		if (!providerSearchResult.providerId) {
-			return;
-		}
-
-		params.set('providerId', providerSearchResult.providerId);
-	}
-
-	params.set('providerSearchResultTypeId', providerSearchResult.providerSearchResultTypeId);
-
-	const appointmentModalityId = providerSearchResult.supportedAppointmentModalities[0]?.appointmentModalityId;
+	const appointmentModalityId = availability.appointmentModalities[0]?.appointmentModalityId;
 
 	if (appointmentModalityId) {
 		params.set('appointmentModalityId', appointmentModalityId);
@@ -240,49 +229,84 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	return `/provider-confirm-appointment-time?${params.toString()}`;
 };
 
+const getAvailabilityAppointmentCount = (availability: AvailabilityModel) => {
+	const appointmentKeys = new Set<string>();
+
+	for (const appointmentModality of availability.appointmentModalities) {
+		for (const appointmentDate of appointmentModality.availability) {
+			for (const timeSlot of appointmentDate.times) {
+				appointmentKeys.add(
+					[
+						appointmentDate.date,
+						timeSlot.time,
+						timeSlot.providerId ?? '',
+						...(timeSlot.appointmentTypeIds ?? []),
+					].join('|')
+				);
+			}
+		}
+	}
+
+	return appointmentKeys.size;
+};
+
+const getAppointmentSelectionTypeId = ({
+	availability,
+	phoneNumber,
+}: {
+	availability: AvailabilityModel;
+	phoneNumber?: string;
+}) => {
+	const firstAvailableAppointment = availability.firstAvailableAppointment;
+
+	if (!firstAvailableAppointment) {
+		return phoneNumber
+			? ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE
+			: ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED;
+	}
+
+	const appointmentTypeIds =
+		firstAvailableAppointment.appointmentTypeIds ??
+		(firstAvailableAppointment.appointmentTypeId ? [firstAvailableAppointment.appointmentTypeId] : []);
+
+	return appointmentTypeIds.length <= 1
+		? ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED
+		: ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED;
+};
+
 const ProviderInfoDetailSchedule = ({
 	featureId,
 	institutionLocationId,
-	providerSearchResult,
+	provider,
+	availability,
+	providerId,
+	clinicId,
 	onViewAppointmentsButtonClick,
 }: ProviderInfoDetailScheduleProps) => {
 	const navigate = useNavigate();
-	const location = useLocation();
-	const screeningRequired =
-		providerSearchResult.screeningRequirement?.screeningRequired &&
-		!providerSearchResult.screeningRequirement?.screeningSatisfied &&
-		!!providerSearchResult.screeningRequirement?.screeningFlowId;
-	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
-		screeningFlowId: providerSearchResult.screeningRequirement?.screeningFlowId,
-		instantiateOnLoad: false,
-		disabled: !screeningRequired,
-		screeningQuestionPathPrefix: '/screening-questions-fullscreen',
-		screeningQuestionSearch: new URLSearchParams({
-			returnTo: location.pathname + location.search,
-		}).toString(),
+	const phoneNumber = provider?.phoneNumber;
+	const phoneNumberDescription = provider?.formattedPhoneNumber ?? provider?.phoneNumber;
+	const scheduleTypeId = getAppointmentSelectionTypeId({
+		availability,
+		phoneNumber,
 	});
-
-	if (renderedPreScreeningLoader) {
-		return renderedPreScreeningLoader;
-	}
+	const firstAvailableAppointment = availability.firstAvailableAppointment;
+	const scheduleAppointmentDescription = firstAvailableAppointment?.appointmentDescription ?? '';
+	const showMoreAppointmentsButton = getAvailabilityAppointmentCount(availability) > 1;
 
 	return (
 		<>
-			{renderedCollectPhoneModal}
 			<ProviderScheduleCard
-				scheduleAppointmentDescription={providerSearchResult.appointmentDescription ?? ''}
-				scheduleTypeId={providerSearchResult.appointmentSelectionTypeId}
-				firstAvailableAppointment={providerSearchResult.firstAvailableAppointment ?? undefined}
+				scheduleAppointmentDescription={scheduleAppointmentDescription}
+				scheduleTypeId={scheduleTypeId}
+				firstAvailableAppointment={firstAvailableAppointment ?? undefined}
 				onScheduleAppointmentButtonClick={() => {
-					if (screeningRequired) {
-						startScreeningFlow();
-						return;
-					}
-
 					const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
 						featureId,
 						institutionLocationId,
-						providerSearchResult,
+						availability,
+						providerId,
+						clinicId,
 					});
 
 					if (providerConfirmAppointmentTimeUrl) {
@@ -290,9 +314,9 @@ const ProviderInfoDetailSchedule = ({
 					}
 				}}
 				onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
-				showMoreAppointmentsButton={providerSearchResult.hasMoreAppointments}
-				phoneNumber={providerSearchResult.phoneNumber}
-				phoneNumberDescription={providerSearchResult.phoneNumberDescription}
+				showMoreAppointmentsButton={showMoreAppointmentsButton}
+				phoneNumber={phoneNumber}
+				phoneNumberDescription={phoneNumberDescription}
 			/>
 		</>
 	);

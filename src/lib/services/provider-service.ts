@@ -19,6 +19,7 @@ import {
 	FeatureId,
 	ProviderSearchResultModel,
 	AppointmentModality,
+	FirstAvailableAppointmentModel,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -168,6 +169,7 @@ export interface AvailabilityModel {
 	clinicDescription?: string;
 	startDate: string;
 	endDate: string;
+	firstAvailableAppointment: FirstAvailableAppointmentModel;
 }
 
 export const providerService = {
