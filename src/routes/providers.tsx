@@ -12,7 +12,6 @@ import ProviderInfoDetail from '@/components/provider-info-detail';
 import {
 	InstitutionFeature,
 	InstitutionLocation,
-	ProviderAppointmentSelectionTypeId,
 	ProviderSearchResultModel,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
@@ -261,7 +260,10 @@ export const Component = () => {
 	/* -------------------------------- */
 	/* Modals */
 	/* -------------------------------- */
-	const [selectedProvider, setSelectedProvider] = useState<ProviderSearchResultModel>();
+	const [selectedProviderIds, setSelectedProviderIds] = useState<{
+		providerId?: string;
+		clinicId?: string;
+	}>();
 	const [showProviderCanvas, setShowProviderCanvas] = useState(false);
 	const [providerScheduleModalConfig, setProviderScheduleModalConfig] = useState<ProviderScheduleModalConfig>();
 
@@ -329,12 +331,12 @@ export const Component = () => {
 					setShowProviderCanvas(false);
 				}}
 			>
-				{selectedProvider && (
+				{selectedProviderIds && (
 					<ProviderInfoDetail
-						providerId={selectedProvider.providerId}
-						clinicId={selectedProvider.clinicId}
-						scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
-						scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
+						providerId={selectedProviderIds.providerId}
+						clinicId={selectedProviderIds.clinicId}
+						featureId={featureId}
+						institutionLocationId={institutionLocationId}
 					/>
 				)}
 			</PreviewCanvas>
@@ -431,7 +433,10 @@ export const Component = () => {
 										institutionLocationId={institutionLocationId}
 										provider={provider}
 										onTitleButtonClick={() => {
-											setSelectedProvider(provider);
+											setSelectedProviderIds({
+												providerId: provider.providerId,
+												clinicId: provider.clinicId,
+											});
 											setShowProviderCanvas(true);
 										}}
 										onViewAppointmentsButtonClick={() => {
