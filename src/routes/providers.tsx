@@ -335,8 +335,6 @@ export const Component = () => {
 					<ProviderInfoDetail
 						providerId={selectedProviderIds.providerId}
 						clinicId={selectedProviderIds.clinicId}
-						featureId={featureId}
-						institutionLocationId={institutionLocationId}
 					/>
 				)}
 			</PreviewCanvas>

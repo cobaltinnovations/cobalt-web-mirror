@@ -11,7 +11,7 @@ import {
 	ProviderSearchResultModel,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { clinicService, providerService } from '@/lib/services';
 import SvgIcon from './svg-icon';
 import classNames from 'classnames';
@@ -37,12 +37,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface ProviderInfoDetailProps {
 	providerId?: string;
 	clinicId?: string;
-	featureId: string;
-	institutionLocationId: string;
 }
 
-const ProviderInfoDetail = ({ providerId, clinicId, featureId, institutionLocationId }: ProviderInfoDetailProps) => {
+const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) => {
 	const classes = useStyles();
+	const [searchParams] = useSearchParams();
+	const featureId = useMemo(() => searchParams.get('featureId') ?? undefined, [searchParams]);
+	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? undefined, [searchParams]);
 
 	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 	const [provider, setProvider] = useState<Provider>();
@@ -70,8 +71,8 @@ const ProviderInfoDetail = ({ providerId, clinicId, featureId, institutionLocati
 
 		const providerSearchResultsRequest = providerService
 			.searchProviders({
-				featureId,
-				institutionLocationId,
+				...(featureId ? { featureId } : {}),
+				...(institutionLocationId ? { institutionLocationId } : {}),
 			})
 			.fetch();
 
@@ -174,8 +175,8 @@ const ProviderInfoDetail = ({ providerId, clinicId, featureId, institutionLocati
 };
 
 interface ProviderInfoDetailScheduleProps {
-	featureId: string;
-	institutionLocationId: string;
+	featureId?: string;
+	institutionLocationId?: string;
 	providerSearchResult: ProviderSearchResultModel;
 	onViewAppointmentsButtonClick(): void;
 }
@@ -185,8 +186,8 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	institutionLocationId,
 	providerSearchResult,
 }: {
-	featureId: string;
-	institutionLocationId: string;
+	featureId?: string;
+	institutionLocationId?: string;
 	providerSearchResult: ProviderSearchResultModel;
 }) => {
 	const firstAvailableAppointment = providerSearchResult.firstAvailableAppointment;
@@ -197,8 +198,13 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 
 	const params = new URLSearchParams();
 
-	params.set('featureId', featureId);
-	params.set('institutionLocationId', institutionLocationId);
+	if (featureId) {
+		params.set('featureId', featureId);
+	}
+
+	if (institutionLocationId) {
+		params.set('institutionLocationId', institutionLocationId);
+	}
 
 	if (providerSearchResult.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
 		if (!providerSearchResult.clinicId) {
