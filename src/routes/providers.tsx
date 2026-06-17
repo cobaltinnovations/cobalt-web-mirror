@@ -121,7 +121,7 @@ const ProviderSearchResultWithScreening = ({
 	}
 
 	return (
-		<>
+		<React.Fragment>
 			{renderedCollectPhoneModal}
 			<ProviderSearchResult
 				className="mb-6"
@@ -145,7 +145,7 @@ const ProviderSearchResultWithScreening = ({
 					}
 				}}
 			/>
-		</>
+		</React.Fragment>
 	);
 };
 
@@ -331,7 +331,8 @@ export const Component = () => {
 			>
 				{selectedProvider && (
 					<ProviderInfoDetail
-						urlName={selectedProvider.imageUrl ?? '/#'}
+						providerId={selectedProvider.providerId}
+						clinicId={selectedProvider.clinicId}
 						scheduleAppointmentDescription="Your first appointment is a {30 minute} {phone call} with a clinician to assess your needs and discuss potential resources."
 						scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
 					/>

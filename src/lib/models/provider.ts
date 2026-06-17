@@ -118,6 +118,8 @@ export interface Provider {
 	displayPhoneNumberOnlyForBooking: boolean;
 	description?: string;
 	urlName?: string;
+
+	supportedAppointmentModalities: AppointmentModality[];
 }
 
 export interface Specialty {
