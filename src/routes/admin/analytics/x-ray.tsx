@@ -39,6 +39,13 @@ ChartJS.register(
 	TimeScale
 );
 const dateOptions = adminAnalyticsService.getDateOptions();
+const providerStatusOptions = [
+	{ label: 'All users', value: '' },
+	{ label: 'Providers', value: 'true' },
+	{ label: 'Non-providers', value: 'false' },
+] as const;
+
+type BehaviorBridgeProviderFilter = (typeof providerStatusOptions)[number]['value'];
 
 type AdminAnalyticsLayoutLoaderData = {
 	analyticsReportGroups: AnalyticsReportGroup[];
@@ -75,6 +82,11 @@ export const Component = () => {
 		() => searchParams.get('endDate') ?? dateOptions[DATE_OPTION_KEYS.LAST_7_DAYS].endDate,
 		[searchParams]
 	);
+	const behaviorBridgeProvider = useMemo<BehaviorBridgeProviderFilter>(() => {
+		const value = searchParams.get('behaviorBridgeProvider');
+
+		return value === 'true' || value === 'false' ? value : '';
+	}, [searchParams]);
 
 	const selectedDateOption = useMemo(
 		() =>
@@ -91,11 +103,12 @@ export const Component = () => {
 			.getAnalyticsReportGroupWidgetsById(analyticsReportGroupId, {
 				startDate,
 				endDate,
+				behaviorBridgeProvider: behaviorBridgeProvider || undefined,
 			})
 			.fetch();
 
 		setWidgets(response.widgets);
-	}, [analyticsReportGroupId, endDate, startDate]);
+	}, [analyticsReportGroupId, behaviorBridgeProvider, endDate, startDate]);
 
 	return (
 		<>
@@ -144,6 +157,30 @@ export const Component = () => {
 								})}
 
 								<option value="CUSTOM">Custom</option>
+							</InputHelper>
+							<InputHelper
+								style={{ width: 180 }}
+								className="me-2"
+								as="select"
+								label="Provider Status"
+								value={behaviorBridgeProvider}
+								onChange={({ currentTarget }) => {
+									if (currentTarget.value) {
+										searchParams.set('behaviorBridgeProvider', currentTarget.value);
+									} else {
+										searchParams.delete('behaviorBridgeProvider');
+									}
+
+									setSearchParams(searchParams);
+								}}
+							>
+								{providerStatusOptions.map((option) => {
+									return (
+										<option key={option.label} value={option.value}>
+											{option.label}
+										</option>
+									);
+								})}
 							</InputHelper>
 							<div style={{ width: 160 }} className="me-2">
 								<DatePicker
@@ -195,7 +232,12 @@ export const Component = () => {
 								title: arg.name,
 								to: {
 									pathname: '/admin/x-ray',
-									search: `?analyticsReportGroupId=${arg.analyticsReportGroupId}`,
+									search: (() => {
+										const nextSearchParams = new URLSearchParams(searchParams);
+										nextSearchParams.set('analyticsReportGroupId', arg.analyticsReportGroupId);
+
+										return `?${nextSearchParams.toString()}`;
+									})(),
 								},
 							}))}
 						/>
