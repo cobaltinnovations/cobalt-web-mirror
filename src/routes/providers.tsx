@@ -261,6 +261,7 @@ export const Component = () => {
 	/* Modals */
 	/* -------------------------------- */
 	const [selectedProviderIds, setSelectedProviderIds] = useState<{
+		selectedTitle?: string;
 		providerId?: string;
 		clinicId?: string;
 	}>();
@@ -325,7 +326,7 @@ export const Component = () => {
 			</Helmet>
 
 			<PreviewCanvas
-				title={'Provider title'}
+				title={selectedProviderIds?.selectedTitle ?? ''}
 				show={showProviderCanvas}
 				onHide={() => {
 					setShowProviderCanvas(false);
@@ -432,6 +433,7 @@ export const Component = () => {
 										provider={provider}
 										onTitleButtonClick={() => {
 											setSelectedProviderIds({
+												selectedTitle: provider.name,
 												providerId: provider.providerId,
 												clinicId: provider.clinicId,
 											});

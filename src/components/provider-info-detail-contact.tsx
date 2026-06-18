@@ -41,8 +41,13 @@ const ProviderInfoDetailContact = ({
 	className,
 }: ProviderInfoDetailContactProps) => {
 	const classes = useStyles({ showCardStyle });
+	const source = provider ?? clinic;
+	const phoneNumber = source?.phoneNumber;
+	const phoneNumberDescription = source?.formattedPhoneNumber ?? source?.phoneNumber;
+	const locations = source?.locations ?? [];
+	const websiteUrl = source?.websiteUrl;
 
-	if (!provider && !clinic) {
+	if (!phoneNumber && locations.length === 0 && !websiteUrl) {
 		return null;
 	}
 
@@ -50,30 +55,43 @@ const ProviderInfoDetailContact = ({
 		<div className={classNames(classes.providerInfoDetailContact, className)}>
 			<h5 className="mb-0">Contact</h5>
 
-			{provider?.phoneNumber && (
+			{phoneNumber && (
 				<div className={classNames('pt-6 d-flex align-items-center')}>
 					<div className="me-4 p-3 bg-p50 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
 						<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
 					</div>
-					<a
-						className="d-block mb-0 fw-bold text-dark text-decoration-none"
-						href={`tel:${provider?.phoneNumber}`}
-					>
-						{provider?.phoneNumber}
+					<a className="d-block mb-0 fw-bold text-primary text-decoration-none" href={`tel:${phoneNumber}`}>
+						{phoneNumberDescription}
 					</a>
 				</div>
 			)}
 
-			{clinic?.phoneNumber && (
+			{locations.map((location, locationIndex) => (
+				<div key={locationIndex} className={classNames('pt-6 d-flex align-items-center')}>
+					<div className="me-4 p-3 bg-p50 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
+						<SvgIcon kit="far" icon="location-dot" size={16} className="text-primary" />
+					</div>
+					<div>
+						<p className="mb-1 fw-bold">{location.address?.streetAddress1}</p>
+						<p className="mb-0 text-muted">
+							{location.address?.locality}, {location.address?.region} {location.address?.postalCode}
+						</p>
+					</div>
+				</div>
+			))}
+
+			{websiteUrl && (
 				<div className={classNames('pt-6 d-flex align-items-center')}>
 					<div className="me-4 p-3 bg-p50 rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0">
-						<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
+						<SvgIcon kit="far" icon="globe" size={16} className="text-primary" />
 					</div>
 					<a
-						className="d-block mb-0 fw-bold text-dark text-decoration-none"
-						href={`tel:${clinic?.phoneNumber}`}
+						className="d-block mb-0 fw-bold text-primary text-decoration-none"
+						href={websiteUrl}
+						target="_blank"
+						rel="noreferrer"
 					>
-						{clinic?.phoneNumber}
+						Website
 					</a>
 				</div>
 			)}
