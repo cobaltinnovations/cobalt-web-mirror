@@ -20,6 +20,7 @@ import {
 	ProviderSearchResultModel,
 	AppointmentModality,
 	FirstAvailableAppointmentModel,
+	ScreeningRequirement,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -170,6 +171,7 @@ export interface AvailabilityModel {
 	startDate: string;
 	endDate: string;
 	firstAvailableAppointment: FirstAvailableAppointmentModel;
+	screeningRequirement: ScreeningRequirement;
 }
 
 export const providerService = {

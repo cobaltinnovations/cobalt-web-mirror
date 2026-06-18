@@ -187,7 +187,7 @@ export interface ProviderSearchResultModel {
 	treatmentDescription?: string;
 }
 
-interface ScreeningRequirement {
+export interface ScreeningRequirement {
 	appointmentBookingRequirementsDestinationId: ScreeningSessionDestinationId;
 	screeningFlowId: string;
 	screeningRequired: boolean;

@@ -11,13 +11,14 @@ import {
 	ProviderAppointmentSelectionTypeId,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { AvailabilityModel, clinicService, providerService } from '@/lib/services';
 import SvgIcon from './svg-icon';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import ProviderInfoDetailContact from './provider-info-detail-contact';
+import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
@@ -289,6 +290,7 @@ const ProviderInfoDetailSchedule = ({
 	onViewAppointmentsButtonClick,
 }: ProviderInfoDetailScheduleProps) => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const phoneNumber = provider?.phoneNumber ?? clinic?.phoneNumber;
 	const phoneNumberDescription =
 		provider?.formattedPhoneNumber ?? clinic?.formattedPhoneNumber ?? provider?.phoneNumber ?? clinic?.phoneNumber;
@@ -299,14 +301,41 @@ const ProviderInfoDetailSchedule = ({
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 	const scheduleAppointmentDescription = firstAvailableAppointment?.appointmentDescription ?? '';
 	const showMoreAppointmentsButton = getAvailabilityAppointmentCount(availability) > 1;
+	const screeningRequirement = availability.screeningRequirement;
+	const screeningRequired = Boolean(
+		screeningRequirement?.screeningRequired &&
+			!screeningRequirement?.screeningSatisfied &&
+			screeningRequirement?.screeningFlowId
+	);
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
+		useScreeningFlow({
+			screeningFlowId: screeningRequirement?.screeningFlowId,
+			instantiateOnLoad: false,
+			disabled: !screeningRequired,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch: new URLSearchParams({
+				returnTo: location.pathname + location.search,
+			}).toString(),
+		});
+
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
 
 	return (
 		<>
+			{renderedCollectPhoneModal}
+			{renderedAccountSourcesModal}
 			<ProviderScheduleCard
 				scheduleAppointmentDescription={scheduleAppointmentDescription}
 				scheduleTypeId={scheduleTypeId}
 				firstAvailableAppointment={firstAvailableAppointment ?? undefined}
 				onScheduleAppointmentButtonClick={() => {
+					if (screeningRequired) {
+						startScreeningFlow();
+						return;
+					}
+
 					const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
 						featureId,
 						institutionLocationId,
