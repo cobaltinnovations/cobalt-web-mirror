@@ -139,7 +139,9 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 					</Row>
 					<Row>
 						<Col xs={12} xl={7}>
-							<div dangerouslySetInnerHTML={{ __html: provider?.bio ?? clinic?.description ?? '' }} />
+							<div
+								dangerouslySetInnerHTML={{ __html: provider?.detailsHtml ?? clinic?.detailsHtml ?? '' }}
+							/>
 						</Col>
 						<Col xs={12} xl={5}>
 							{availability && (

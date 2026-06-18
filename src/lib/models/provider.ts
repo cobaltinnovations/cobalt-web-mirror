@@ -86,6 +86,7 @@ export interface Clinic {
 	formattedPhoneNumber?: string;
 	locations: ResourcePacketLocation[];
 	websiteUrl: string;
+	detailsHtml: string;
 }
 
 export interface Provider {
@@ -128,6 +129,7 @@ export interface Provider {
 	supportedAppointmentModalities: AppointmentModality[];
 	locations: ResourcePacketLocation[];
 	websiteUrl: string;
+	detailsHtml: string;
 }
 
 export interface Specialty {
