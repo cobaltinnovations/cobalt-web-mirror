@@ -17,6 +17,7 @@ import SvgIcon from './svg-icon';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
+import ProviderInfoDetailContact from './provider-info-detail-contact';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
@@ -108,39 +109,37 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 
 			<AsyncWrapper fetchData={fetchData}>
 				<Container>
-					<Row>
-						<Col xs={12} xl={7}>
-							<Row>
-								<div className="d-flex align-items-center">
-									<div
-										className={classNames(classes.imageOuter, 'me-6')}
-										style={{ backgroundImage: `url(${provider?.imageUrl ?? ''})` }}
-									/>
-									<div>
-										<h3 className="mb-2">{provider?.name ?? clinic?.description}</h3>
-										<div className="d-flex align-items-center">
-											{(provider?.supportedAppointmentModalities ?? []).map(
-												(supportedAppointmentModality) => (
-													<div
-														key={supportedAppointmentModality.appointmentModalityId}
-														className="me-4 d-inline-flex align-items-center"
-													>
-														{getSupportedAppointmentModalityIconById(
-															supportedAppointmentModality.appointmentModalityId
-														)}
-														<p className="mb-0">
-															{supportedAppointmentModality.description}
-														</p>
-													</div>
-												)
-											)}
-										</div>
+					<Row className="mb-8">
+						<Col>
+							<div className="d-flex align-items-center">
+								<div
+									className={classNames(classes.imageOuter, 'me-6')}
+									style={{ backgroundImage: `url(${provider?.imageUrl ?? ''})` }}
+								/>
+								<div>
+									<h3 className="mb-2">{provider?.name ?? clinic?.description}</h3>
+									<div className="d-flex align-items-center">
+										{(provider?.supportedAppointmentModalities ?? []).map(
+											(supportedAppointmentModality) => (
+												<div
+													key={supportedAppointmentModality.appointmentModalityId}
+													className="me-4 d-inline-flex align-items-center"
+												>
+													{getSupportedAppointmentModalityIconById(
+														supportedAppointmentModality.appointmentModalityId
+													)}
+													<p className="mb-0">{supportedAppointmentModality.description}</p>
+												</div>
+											)
+										)}
 									</div>
 								</div>
-							</Row>
-							<Row>
-								<div dangerouslySetInnerHTML={{ __html: provider?.bio ?? clinic?.description ?? '' }} />
-							</Row>
+							</div>
+						</Col>
+					</Row>
+					<Row>
+						<Col xs={12} xl={7}>
+							<div dangerouslySetInnerHTML={{ __html: provider?.bio ?? clinic?.description ?? '' }} />
 						</Col>
 						<Col xs={12} xl={5}>
 							{availability && (
@@ -148,6 +147,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 									featureId={featureId}
 									institutionLocationId={institutionLocationId}
 									provider={provider}
+									clinic={clinic}
 									availability={availability}
 									providerId={providerId}
 									clinicId={clinicId}
@@ -156,6 +156,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 									}}
 								/>
 							)}
+							<ProviderInfoDetailContact provider={provider} clinic={clinic} />
 						</Col>
 					</Row>
 				</Container>
@@ -168,6 +169,7 @@ interface ProviderInfoDetailScheduleProps {
 	featureId?: string;
 	institutionLocationId?: string;
 	provider?: Provider;
+	clinic?: Clinic;
 	availability: AvailabilityModel;
 	providerId?: string;
 	clinicId?: string;
@@ -278,14 +280,16 @@ const ProviderInfoDetailSchedule = ({
 	featureId,
 	institutionLocationId,
 	provider,
+	clinic,
 	availability,
 	providerId,
 	clinicId,
 	onViewAppointmentsButtonClick,
 }: ProviderInfoDetailScheduleProps) => {
 	const navigate = useNavigate();
-	const phoneNumber = provider?.phoneNumber;
-	const phoneNumberDescription = provider?.formattedPhoneNumber ?? provider?.phoneNumber;
+	const phoneNumber = provider?.phoneNumber ?? clinic?.phoneNumber;
+	const phoneNumberDescription =
+		provider?.formattedPhoneNumber ?? clinic?.formattedPhoneNumber ?? provider?.phoneNumber ?? clinic?.phoneNumber;
 	const scheduleTypeId = getAppointmentSelectionTypeId({
 		availability,
 		phoneNumber,

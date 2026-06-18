@@ -80,6 +80,9 @@ export interface Clinic {
 	showIntakeAssessmentPrompt: boolean;
 	clinicBookingPreferenceId: ClinicBookingPreferenceId;
 	treatmentDescription?: string;
+	phoneNumber?: string;
+	phoneNumberDescription?: string;
+	formattedPhoneNumber?: string;
 }
 
 export interface Provider {
