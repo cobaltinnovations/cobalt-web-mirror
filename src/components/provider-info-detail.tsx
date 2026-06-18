@@ -156,7 +156,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 									}}
 								/>
 							)}
-							<ProviderInfoDetailContact provider={provider} clinic={clinic} />
+							<ProviderInfoDetailContact className="mt-6" provider={provider} clinic={clinic} />
 						</Col>
 					</Row>
 				</Container>
