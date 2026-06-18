@@ -107,10 +107,10 @@ export const Component = () => {
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 	const [selectedAppointmentTypeDescription, setSelectedAppointmentTypeDescription] = useState<string>();
 	const [formValues, setFormValues] = useState({
-		firstName: '',
-		lastName: '',
-		emailAddress: '',
-		phoneNumber: '',
+		firstName: account?.firstName,
+		lastName: account?.lastName,
+		emailAddress: account?.emailAddress,
+		phoneNumber: account?.phoneNumber,
 	});
 
 	const fetchData = useCallback(async () => {
