@@ -246,6 +246,7 @@ export const Component = () => {
 
 								<Form id="provider-book-appointment-form" onSubmit={handleFormSubmit}>
 									<InputHelper
+										required
 										className="mb-4"
 										name="firstName"
 										label="First Name"
@@ -261,6 +262,7 @@ export const Component = () => {
 										onChange={handleFormValueChange}
 									/>
 									<InputHelper
+										required
 										className="mb-4"
 										type="email"
 										name="emailAddress"
