@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -15,14 +15,25 @@ import {
 	ProviderSearchResultModel,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { institutionService, providerService } from '@/lib/services';
+import { accountService, institutionService, providerService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import NoData from '@/components/no-data';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
+import useHandleError from '@/hooks/use-handle-error';
 
 export const loader = () => {
 	return null;
+};
+
+const ALL_INSTITUTION_LOCATIONS_ID = 'na';
+
+const isAllInstitutionLocationsId = (institutionLocationId: string) => {
+	return institutionLocationId.toLowerCase() === ALL_INSTITUTION_LOCATIONS_ID;
+};
+
+const getAccountInstitutionLocationId = (institutionLocationId: string) => {
+	return isAllInstitutionLocationsId(institutionLocationId) ? '' : institutionLocationId;
 };
 
 const buildProviderConfirmAppointmentTimeUrl = ({
@@ -152,7 +163,8 @@ export const Component = () => {
 	/* -------------------------------- */
 	/* General */
 	/* -------------------------------- */
-	const { institution } = useAccount();
+	const handleError = useHandleError();
+	const { account, institution } = useAccount();
 	const careTypeRef = useRef<HTMLInputElement>(null);
 	const employerRef = useRef<HTMLInputElement>(null);
 
@@ -162,6 +174,19 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
+	const forceLocation = useMemo(() => {
+		const v = searchParams.get('forceLocation');
+		return v?.toLowerCase() === 'true';
+	}, [searchParams]);
+	useEffect(() => {
+		if (!account?.institutionLocationId || institutionLocationId) {
+			return;
+		}
+
+		const nextSearchParams = new URLSearchParams(searchParams);
+		nextSearchParams.set('institutionLocationId', account.institutionLocationId);
+		setSearchParams(nextSearchParams, { replace: true });
+	}, [account?.institutionLocationId, institutionLocationId, searchParams, setSearchParams]);
 
 	/* -------------------------------- */
 	/* Filters */
@@ -179,6 +204,41 @@ export const Component = () => {
 	);
 	const selectedInstitutionFeatureName = selectedInstitutionFeature?.name.toLocaleLowerCase() ?? 'matching';
 	const selectedInstitutionLocationName = selectedInstitutionLocation?.name ?? 'the selected employer';
+
+	const shouldPersistForcedLocation = account && forceLocation && institutionLocationId;
+	const persistForcedLocation = useCallback(async () => {
+		if (!account || !institutionLocationId) {
+			return;
+		}
+
+		try {
+			const accountInstitutionLocationId = getAccountInstitutionLocationId(institutionLocationId);
+			const response = await accountService
+				.setAccountLocation(account.accountId, {
+					accountId: account.accountId,
+					institutionLocationId: accountInstitutionLocationId,
+				})
+				.fetch();
+
+			if (response.account.institutionLocationId) {
+				searchParams.set('institutionLocationId', response.account.institutionLocationId);
+			} else if (isAllInstitutionLocationsId(institutionLocationId)) {
+				searchParams.set('institutionLocationId', ALL_INSTITUTION_LOCATIONS_ID);
+			} else {
+				searchParams.delete('institutionLocationId');
+			}
+
+			setSearchParams(searchParams);
+		} catch (error) {
+			handleError(error);
+		}
+	}, [account, handleError, institutionLocationId, searchParams, setSearchParams]);
+	useEffect(() => {
+		if (shouldPersistForcedLocation) {
+			persistForcedLocation();
+			return;
+		}
+	}, [persistForcedLocation, shouldPersistForcedLocation]);
 
 	/* -------------------------------- */
 	/* List */
@@ -309,14 +369,34 @@ export const Component = () => {
 	const handleEmployerSelectChange = useCallback(
 		async ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
 			if (currentTarget.value) {
-				searchParams.set('institutionLocationId', currentTarget.value);
+				try {
+					if (account) {
+						const response = await accountService
+							.setAccountLocation(account.accountId, {
+								accountId: account.accountId,
+								institutionLocationId: getAccountInstitutionLocationId(currentTarget.value),
+							})
+							.fetch();
+
+						if (response.account.institutionLocationId) {
+							searchParams.set('institutionLocationId', response.account.institutionLocationId);
+						} else {
+							searchParams.set('institutionLocationId', currentTarget.value);
+						}
+					} else {
+						searchParams.set('institutionLocationId', currentTarget.value);
+					}
+				} catch (error) {
+					handleError(error);
+				} finally {
+					setSearchParams(searchParams, { replace: true });
+				}
 			} else {
 				searchParams.delete('institutionLocationId');
+				setSearchParams(searchParams, { replace: true });
 			}
-
-			setSearchParams(searchParams, { replace: true });
 		},
-		[searchParams, setSearchParams]
+		[account, handleError, searchParams, setSearchParams]
 	);
 
 	return (
@@ -374,7 +454,9 @@ export const Component = () => {
 									<option value="" disabled>
 										Select...
 									</option>
-									<option value="na">I'm not sure / I'd rather not say</option>
+									<option value={ALL_INSTITUTION_LOCATIONS_ID}>
+										I'm not sure / I'd rather not say
+									</option>
 									{institutionLocations.map((institutionLocation) => (
 										<option
 											key={institutionLocation.institutionLocationId}
