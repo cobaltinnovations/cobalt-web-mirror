@@ -1,10 +1,11 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useRevalidator } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Button, Container, Row, Col } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 
+import { config } from '@/config';
 import useAccount from '@/hooks/use-account';
 
 import AsyncPage from '@/components/async-page';
@@ -54,6 +55,7 @@ import FeatureScreeningCta from '@/components/feature-screening-cta';
 import { CourseContinue } from '@/components/courses';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import { ScreeningFlow } from '@/components/screening-v2';
+import ImageRepository from '@/components/image-repository/image-repository';
 
 const Index: FC = () => {
 	const { featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
@@ -75,6 +77,7 @@ const Index: FC = () => {
 	const [completedCourses, setCompletedCourses] = useState<CourseModel[]>([]);
 	const [institutionBlurbs, setInstitutionBlurbs] = useState<Record<INSTITUTION_BLURB_TYPE_ID, InstitutionBlurb>>();
 	const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+	const [showImageRepositoryModal, setShowImageRepositoryModal] = useState(false);
 
 	const featuresScreeningFlow = useScreeningFlow({
 		screeningFlowId: institution?.featureScreeningFlowId,
@@ -204,6 +207,28 @@ const Index: FC = () => {
 			<Helmet>
 				<title>{institution.platformName ?? 'Cobalt'}</title>
 			</Helmet>
+
+			{config.showDebug && (
+				<>
+					<div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 1030 }}>
+						<Button
+							size="sm"
+							variant="outline-primary"
+							onClick={() => {
+								setShowImageRepositoryModal(true);
+							}}
+						>
+							Image Repository
+						</Button>
+					</div>
+					<ImageRepository
+						show={showImageRepositoryModal}
+						onHide={() => {
+							setShowImageRepositoryModal(false);
+						}}
+					/>
+				</>
+			)}
 
 			<PreviewCanvas title={institution.name} show={showOnboardingModal}>
 				{showOnboardingModal && institution.onboardingScreeningFlowId && (
