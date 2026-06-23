@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { FC, ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
@@ -28,6 +28,12 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, ...props }) => {
 	const handleNavigate = useCallback((nextScreenId: IMAGE_REPOSITORY_SCREEN_ID) => {
 		setActiveScreenId(nextScreenId);
 	}, []);
+
+	useEffect(() => {
+		if (props.show) {
+			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
+		}
+	}, [props.show]);
 
 	const screenByScreenId = useMemo<Record<IMAGE_REPOSITORY_SCREEN_ID, ReactNode>>(
 		() => ({
