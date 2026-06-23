@@ -16,6 +16,7 @@ interface PostApointmentTypeRequest {
 	visitTypeId: string;
 	durationInMinutes: number;
 	hexColor: string;
+	screeningFlowId?: string | null;
 	patientIntakeQuestions: PatientIntakeQuestion[];
 	screeningQuestions: IntakeScreeningQuestion[];
 }

@@ -20,6 +20,7 @@ export interface AppointmentType {
 	visitTypeId: string;
 	hexColor?: string;
 	assessmentId?: string;
+	screeningFlowId?: string | null;
 }
 
 export interface EpicDepartment {

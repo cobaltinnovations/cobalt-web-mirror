@@ -140,8 +140,8 @@ export const AppointmentTypeFormModal = ({
 				setDurationInMinutes(appointmentType.durationInMinutes);
 			}
 
-			setPatientIntakeQuestions(appointmentType.patientIntakeQuestions);
-			setScreeningQuestions(appointmentType.screeningQuestions);
+			setPatientIntakeQuestions(appointmentType.patientIntakeQuestions ?? []);
+			setScreeningQuestions(appointmentType.screeningQuestions ?? []);
 		} catch (error) {
 			handleError(error);
 		}
@@ -170,7 +170,8 @@ export const AppointmentTypeFormModal = ({
 				visitTypeId,
 				durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
 				hexColor: color,
-				patientIntakeQuestions,
+				screeningFlowId: institution.bookingV2Enabled && screeningQuestions.length === 0 ? null : undefined,
+				patientIntakeQuestions: institution.bookingV2Enabled ? [] : patientIntakeQuestions,
 				screeningQuestions,
 			};
 			let response;
@@ -192,6 +193,7 @@ export const AppointmentTypeFormModal = ({
 		duration,
 		durationInMinutes,
 		handleError,
+		institution.bookingV2Enabled,
 		onSave,
 		patientIntakeQuestions,
 		screeningQuestions,
