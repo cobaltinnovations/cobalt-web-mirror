@@ -1,7 +1,7 @@
 export enum IMAGE_REPOSITORY_SCREEN_ID {
-	SCREEN_ONE = 'screenOne',
-	SCREEN_TWO = 'screenTwo',
-	SCREEN_THREE = 'screenThree',
+	BROWSE_IMAGES = 'BROWSE_IMAGES',
+	ADD_IMAGE = 'ADD_IMAGE',
+	SELECTED_IMAGE = 'SELECTED_IMAGE',
 }
 
 export interface ImageRepositoryScreenProps {
