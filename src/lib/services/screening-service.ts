@@ -22,7 +22,7 @@ export type ScreeningFlowParams = {
 	patientOrderId?: string;
 	groupSessionId?: string;
 	courseSessionId?: string;
-	metadata?: {
+	metadata?: Record<string, unknown> & {
 		modifiedAssessment?: boolean;
 		modifiedAssessmentType?: ModifiedAssessmentTypeId;
 	};

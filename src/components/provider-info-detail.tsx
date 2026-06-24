@@ -234,6 +234,59 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	return `/provider-confirm-appointment-time?${params.toString()}`;
 };
 
+const appointmentBookingContextForProviderAvailability = ({
+	featureId,
+	institutionLocationId,
+	availability,
+	providerId,
+	clinicId,
+}: {
+	featureId: string;
+	institutionLocationId: string;
+	availability: AvailabilityModel;
+	providerId?: string;
+	clinicId?: string;
+}) => {
+	const firstAvailableAppointment = availability.firstAvailableAppointment;
+
+	const context: Record<string, string> = {};
+
+	if (featureId) {
+		context.featureId = featureId;
+	}
+
+	if (institutionLocationId) {
+		context.institutionLocationId = institutionLocationId;
+	}
+
+	if (clinicId) {
+		context.clinicId = clinicId;
+		context.providerSearchResultTypeId = ProviderSearchResultTypeId.CLINIC;
+	} else if (providerId) {
+		context.providerId = providerId;
+		context.providerSearchResultTypeId = ProviderSearchResultTypeId.PROVIDER;
+	} else {
+		return;
+	}
+
+	const appointmentModalityId = availability.appointmentModalities[0]?.appointmentModalityId;
+
+	if (appointmentModalityId) {
+		context.appointmentModalityId = appointmentModalityId;
+	}
+
+	if (firstAvailableAppointment) {
+		context.date = firstAvailableAppointment.date;
+		context.time = firstAvailableAppointment.time;
+
+		if (firstAvailableAppointment.appointmentTypeId) {
+			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
+		}
+	}
+
+	return context;
+};
+
 const getAvailabilityAppointmentCount = (availability: AvailabilityModel) => {
 	const appointmentKeys = new Set<string>();
 
@@ -307,6 +360,17 @@ const ProviderInfoDetailSchedule = ({
 			!screeningRequirement?.screeningSatisfied &&
 			screeningRequirement?.screeningFlowId
 	);
+	const appointmentBookingContext = useMemo(
+		() =>
+			appointmentBookingContextForProviderAvailability({
+				featureId,
+				institutionLocationId,
+				availability,
+				providerId,
+				clinicId,
+			}),
+		[availability, clinicId, featureId, institutionLocationId, providerId]
+	);
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
 		useScreeningFlow({
 			screeningFlowId: screeningRequirement?.screeningFlowId,
@@ -316,6 +380,7 @@ const ProviderInfoDetailSchedule = ({
 			screeningQuestionSearch: new URLSearchParams({
 				returnTo: location.pathname + location.search,
 			}).toString(),
+			...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
 		});
 
 	if (renderedPreScreeningLoader) {
@@ -332,7 +397,7 @@ const ProviderInfoDetailSchedule = ({
 				firstAvailableAppointment={firstAvailableAppointment ?? undefined}
 				onScheduleAppointmentButtonClick={() => {
 					if (screeningRequired) {
-						startScreeningFlow();
+						startScreeningFlow(true);
 						return;
 					}
 

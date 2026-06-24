@@ -95,6 +95,62 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	return `/provider-confirm-appointment-time?${params.toString()}`;
 };
 
+const appointmentBookingContextForProviderSearchResult = ({
+	featureId,
+	institutionLocationId,
+	provider,
+}: {
+	featureId: string;
+	institutionLocationId: string;
+	provider: ProviderSearchResultModel;
+}) => {
+	const context: Record<string, string> = {};
+	const firstAvailableAppointment = provider.firstAvailableAppointment;
+
+	if (featureId) {
+		context.featureId = featureId;
+	}
+
+	if (institutionLocationId) {
+		context.institutionLocationId = institutionLocationId;
+	}
+
+	if (provider.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
+		if (!provider.clinicId) {
+			return;
+		}
+
+		context.clinicId = provider.clinicId;
+	}
+
+	if (provider.providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER) {
+		if (!provider.providerId) {
+			return;
+		}
+
+		context.providerId = provider.providerId;
+	}
+
+	context.providerSearchResultTypeId = provider.providerSearchResultTypeId;
+
+	const appointmentModalityId = provider.supportedAppointmentModalities[0]?.appointmentModalityId;
+
+	if (appointmentModalityId) {
+		context.appointmentModalityId = appointmentModalityId;
+	}
+
+	if (firstAvailableAppointment) {
+		context.date = firstAvailableAppointment.date;
+		context.time = firstAvailableAppointment.time;
+
+		if (firstAvailableAppointment.appointmentTypeId) {
+			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
+		}
+	}
+
+	return context;
+};
+
 interface ProviderSearchResultWithScreeningProps {
 	featureId: string;
 	institutionLocationId: string;
@@ -116,6 +172,15 @@ const ProviderSearchResultWithScreening = ({
 		provider.screeningRequirement?.screeningRequired &&
 		!provider.screeningRequirement?.screeningSatisfied &&
 		!!provider.screeningRequirement?.screeningFlowId;
+	const appointmentBookingContext = useMemo(
+		() =>
+			appointmentBookingContextForProviderSearchResult({
+				featureId,
+				institutionLocationId,
+				provider,
+			}),
+		[featureId, institutionLocationId, provider]
+	);
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
 		screeningFlowId: provider.screeningRequirement?.screeningFlowId,
 		instantiateOnLoad: false,
@@ -124,6 +189,7 @@ const ProviderSearchResultWithScreening = ({
 		screeningQuestionSearch: new URLSearchParams({
 			returnTo: location.pathname + location.search,
 		}).toString(),
+		...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
 	});
 
 	if (renderedPreScreeningLoader) {
@@ -140,7 +206,7 @@ const ProviderSearchResultWithScreening = ({
 				onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
 				onScheduleAppointmentButtonClick={() => {
 					if (screeningRequired) {
-						startScreeningFlow();
+						startScreeningFlow(true);
 						return;
 					}
 

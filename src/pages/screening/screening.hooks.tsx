@@ -229,6 +229,7 @@ export function useScreeningFlow({
 	disabled = false,
 	screeningQuestionPathPrefix,
 	screeningQuestionSearch,
+	metadata: screeningSessionMetadata,
 }: {
 	screeningFlowId?: string;
 	groupSessionId?: string;
@@ -238,6 +239,7 @@ export function useScreeningFlow({
 	disabled?: boolean;
 	screeningQuestionPathPrefix?: string;
 	screeningQuestionSearch?: string;
+	metadata?: Record<string, unknown>;
 }) {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
@@ -300,20 +302,24 @@ export function useScreeningFlow({
 			setIsCreatingScreeningSession(true);
 
 			const isModifiedAssessment = modifiedAssessmentType ? true : Boolean(modifiedAssessment);
-			const metadata =
+			const modifiedAssessmentMetadata =
 				isModifiedAssessment || modifiedAssessmentType
 					? {
 							modifiedAssessment: isModifiedAssessment,
 							...(modifiedAssessmentType && { modifiedAssessmentType }),
 					  }
 					: undefined;
+			const metadata = {
+				...(screeningSessionMetadata ?? {}),
+				...(modifiedAssessmentMetadata ?? {}),
+			};
 
 			return screeningService
 				.createScreeningSession({
 					screeningFlowVersionId: activeFlowVersion?.screeningFlowVersionId,
 					groupSessionId,
 					patientOrderId,
-					...(metadata && { metadata }),
+					...(Object.keys(metadata).length > 0 && { metadata }),
 				})
 				.fetch()
 				.then((sessionResponse) => {
@@ -333,6 +339,7 @@ export function useScreeningFlow({
 			handleError,
 			navigateToNext,
 			patientOrderId,
+			screeningSessionMetadata,
 		]
 	);
 
