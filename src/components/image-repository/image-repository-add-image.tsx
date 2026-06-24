@@ -5,7 +5,7 @@ import { adminService } from '@/lib/services';
 import ImageRepositoryUploader from './image-repository-uploader';
 import { ImageRepositoryScreenProps } from './image-repository.types';
 
-const ImageRepositoryAddImage: FC<ImageRepositoryScreenProps> = () => {
+const ImageRepositoryAddImage: FC<ImageRepositoryScreenProps> = ({ onImageUploaded }) => {
 	return (
 		<ImageRepositoryUploader
 			presignedUploadGetter={(blob, name) => {
@@ -14,6 +14,14 @@ const ImageRepositoryAddImage: FC<ImageRepositoryScreenProps> = () => {
 					filename: name,
 					filesize: blob.size,
 				}).fetch;
+			}}
+			onUploadComplete={(fileUploadId, imageUrl, imageName) => {
+				onImageUploaded?.({
+					fileUploadId,
+					imageName,
+					imageUrl,
+					imageAltText: '',
+				});
 			}}
 		/>
 	);

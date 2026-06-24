@@ -89,7 +89,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface ImageRepositoryUploaderProps {
 	presignedUploadGetter(blob: Blob, name: string): () => Promise<PresignedUploadResponse>;
-	onUploadComplete?(fileUploadId: string, accessUrl: string): void;
+	onUploadComplete?(fileUploadId: string, accessUrl: string, fileName: string): void;
 	className?: string;
 	disabled?: boolean;
 }
@@ -136,7 +136,7 @@ const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
 				.onComplete((accessUrl) => {
 					setProgress(100);
 					setIsUploading(false);
-					onUploadComplete?.(fileUploadId, accessUrl);
+					onUploadComplete?.(fileUploadId, accessUrl, file.name);
 				})
 				.onError((error) => {
 					setProgress(0);
