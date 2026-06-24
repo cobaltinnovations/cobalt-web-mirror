@@ -3,6 +3,8 @@ import React, { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 
 import { Button, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
+import SvgIcon from '@/components/svg-icon';
+
 import ImageRepositoryAddImage from './image-repository-add-image';
 import ImageRepositoryBrowseImages from './image-repository-browse-images';
 import ImageRepositorySelectedImage from './image-repository-selected-image';
@@ -15,11 +17,17 @@ const useStyles = createUseStyles({
 	},
 });
 
+const modalTitleByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string> = {
+	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: 'Image Repository',
+	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: 'Add Image',
+	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'Image Repository',
+};
+
 interface ImageRepositoryProps extends ModalProps {
 	//
 }
 
-const ImageRepository: FC<ImageRepositoryProps> = ({ children, ...props }) => {
+const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, onHide, show, ...modalProps }) => {
 	const classes = useStyles();
 	const [activeScreenId, setActiveScreenId] = useState<IMAGE_REPOSITORY_SCREEN_ID>(
 		IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES
@@ -30,10 +38,10 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, ...props }) => {
 	}, []);
 
 	useEffect(() => {
-		if (props.show) {
+		if (show) {
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
 		}
-	}, [props.show]);
+	}, [show]);
 
 	const screenByScreenId = useMemo<Record<IMAGE_REPOSITORY_SCREEN_ID, ReactNode>>(
 		() => ({
@@ -44,20 +52,57 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, ...props }) => {
 		[handleNavigate]
 	);
 
+	const footerByScreenId = useMemo<Record<IMAGE_REPOSITORY_SCREEN_ID, ReactNode>>(
+		() => ({
+			[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: (
+				<Button variant="outline-primary" onClick={() => onHide?.()}>
+					Cancel
+				</Button>
+			),
+			[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: (
+				<Button
+					className="d-flex align-items-center"
+					variant="outline-primary"
+					onClick={() => {
+						handleNavigate(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
+					}}
+				>
+					<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
+					Library
+				</Button>
+			),
+			[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: (
+				<Button
+					className="d-flex align-items-center"
+					variant="outline-primary"
+					onClick={() => {
+						handleNavigate(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
+					}}
+				>
+					<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
+					Library
+				</Button>
+			),
+		}),
+		[handleNavigate, onHide]
+	);
+
 	return (
-		<Modal {...props} centered dialogClassName={classNames(classes.imageRepositoryModal, props.dialogClassName)}>
+		<Modal
+			{...modalProps}
+			show={show}
+			onHide={onHide}
+			centered
+			dialogClassName={classNames(classes.imageRepositoryModal, dialogClassName)}
+		>
 			<Modal.Header closeButton>
-				<Modal.Title>Image Repository</Modal.Title>
+				<Modal.Title>{modalTitleByScreenId[activeScreenId]}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				{screenByScreenId[activeScreenId]}
 				{children}
 			</Modal.Body>
-			<Modal.Footer className="justify-content-start">
-				<Button variant="outline-primary" onClick={() => props.onHide?.()}>
-					Cancel
-				</Button>
-			</Modal.Footer>
+			<Modal.Footer className="justify-content-start">{footerByScreenId[activeScreenId]}</Modal.Footer>
 		</Modal>
 	);
 };

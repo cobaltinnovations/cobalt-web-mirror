@@ -184,6 +184,14 @@ const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
 		}
 	}, []);
 
+	const handleUploadTextClick = useCallback(
+		(event: React.MouseEvent<HTMLButtonElement>) => {
+			event.stopPropagation();
+			handleUploadButtonClick();
+		},
+		[handleUploadButtonClick]
+	);
+
 	const progressOffset = progressCircumference - (progress / 100) * progressCircumference;
 
 	if (isUploading) {
@@ -250,13 +258,14 @@ const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
 				event.preventDefault();
 			}}
 			onDrop={handleDrop}
+			onClick={handleUploadButtonClick}
 		>
 			<input ref={inputRef} className="d-none" type="file" accept="image/*" onChange={handleInputChange} />
 			<div>
 				<SvgIcon className={classes.uploadIcon} kit="far" icon="cloud-arrow-up" size={36} />
 				<p className={classes.uploadInstruction}>
 					Drop a file here or{' '}
-					<button className={classes.uploadButton} type="button" onClick={handleUploadButtonClick}>
+					<button className={classes.uploadButton} type="button" onClick={handleUploadTextClick}>
 						click to upload
 					</button>
 				</p>
