@@ -1,5 +1,5 @@
 import { AppointmentType } from './appointments';
-import { ResourcePacketLocation } from './care-resource-models';
+import { ResourcePacketAddress } from './care-resource-models';
 import { ScreeningSessionDestinationId } from './screening-models';
 
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/SupportRole.java#L18
@@ -74,6 +74,13 @@ enum ClinicBookingPreferenceId {
 	NONE = 'NONE',
 }
 
+export interface ProviderLocation {
+	locationId: string;
+	name?: string;
+	shortName?: string;
+	address?: ResourcePacketAddress;
+}
+
 export interface Clinic {
 	clinicId: string;
 	description: string;
@@ -84,7 +91,8 @@ export interface Clinic {
 	phoneNumber?: string;
 	phoneNumberDescription?: string;
 	formattedPhoneNumber?: string;
-	locations: ResourcePacketLocation[];
+	emailAddress?: string;
+	locations: ProviderLocation[];
 	websiteUrl: string;
 	detailsHtml: string;
 }
@@ -127,7 +135,7 @@ export interface Provider {
 	urlName?: string;
 
 	supportedAppointmentModalities: AppointmentModality[];
-	locations: ResourcePacketLocation[];
+	locations: ProviderLocation[];
 	websiteUrl: string;
 	detailsHtml: string;
 }
