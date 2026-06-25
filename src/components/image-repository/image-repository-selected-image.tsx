@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
 
@@ -6,7 +6,7 @@ import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 
 import 'react-image-crop/dist/ReactCrop.css';
-import { ImageRepositoryScreenProps } from './image-repository.types';
+import { ImageRepositoryCroppedImage, ImageRepositoryScreenProps } from './image-repository.types';
 
 enum IMAGE_REPOSITORY_CROP_RATIO {
 	SIXTEEN_NINE = '16:9',
@@ -29,6 +29,126 @@ const getInitialCrop = (cropRatio: IMAGE_REPOSITORY_CROP_RATIO): ReactCrop.Crop 
 		aspect: aspectByCropRatio[cropRatio],
 	};
 };
+
+function stripExtension(filename: string): string {
+	const lastDotIndex = filename.lastIndexOf('.');
+
+	if (lastDotIndex <= 0) {
+		return filename;
+	}
+
+	return filename.slice(0, lastDotIndex);
+}
+
+function resolvePixelCrop(image: HTMLImageElement, crop: ReactCrop.Crop): ReactCrop.Crop {
+	const isPercentCrop = crop.unit === '%';
+	const x = crop.x ?? 0;
+	const y = crop.y ?? 0;
+	const width = crop.width ?? 0;
+	const height = crop.height ?? (crop.aspect && width ? width / crop.aspect : 0);
+
+	if (!isPercentCrop) {
+		return {
+			...crop,
+			x,
+			y,
+			width,
+			height,
+		};
+	}
+
+	const pixelWidth = (width / 100) * image.width;
+	const pixelHeight = crop.height
+		? ((crop.height ?? 0) / 100) * image.height
+		: crop.aspect
+		? pixelWidth / crop.aspect
+		: 0;
+
+	return {
+		...crop,
+		unit: 'px' as 'px',
+		x: (x / 100) * image.width,
+		y: (y / 100) * image.height,
+		width: pixelWidth,
+		height: pixelHeight,
+	};
+}
+
+function getCroppedImageAsBlob(
+	image: HTMLImageElement,
+	crop: ReactCrop.Crop
+): Promise<{ blob: Blob; extension: string }> | undefined {
+	const canvas = document.createElement('canvas');
+	const ctx = canvas.getContext('2d');
+
+	if (!ctx) {
+		return;
+	}
+
+	const pixelCrop = resolvePixelCrop(image, crop);
+	const cropX = pixelCrop.x ?? 0;
+	const cropY = pixelCrop.y ?? 0;
+	const cropWidth = pixelCrop.width ?? 0;
+	const cropHeight = pixelCrop.height ?? 0;
+	const scaleX = image.naturalWidth / image.width;
+	const scaleY = image.naturalHeight / image.height;
+
+	canvas.width = cropWidth * scaleX;
+	canvas.height = cropHeight * scaleY;
+
+	ctx.drawImage(
+		image,
+		cropX * scaleX,
+		cropY * scaleY,
+		cropWidth * scaleX,
+		cropHeight * scaleY,
+		0,
+		0,
+		cropWidth * scaleX,
+		cropHeight * scaleY
+	);
+
+	return new Promise((resolve, reject) => {
+		let hasTransparency = false;
+
+		try {
+			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			const data = imageData.data;
+
+			for (let i = 3; i < data.length; i += 4) {
+				if (data[i] < 255) {
+					hasTransparency = true;
+					break;
+				}
+			}
+		} catch (err) {
+			hasTransparency = false;
+		}
+
+		const mimeType = hasTransparency ? 'image/png' : 'image/jpeg';
+		const extension = hasTransparency ? 'png' : 'jpg';
+		const quality = hasTransparency ? 1.0 : 0.9;
+
+		canvas.toBlob(
+			(blob) => {
+				if (!blob) {
+					return reject({
+						code: 400,
+						message: 'Error cropping image, please recrop your image and try again.',
+					});
+				}
+
+				resolve({ blob, extension });
+			},
+			mimeType,
+			quality
+		);
+	});
+}
+
+export interface ImageRepositorySelectedImageRef {
+	getCroppedImage(): Promise<ImageRepositoryCroppedImage | undefined>;
+}
 
 const useStyles = createUseThemedStyles((theme) => ({
 	selectedImageScreen: {
@@ -116,88 +236,116 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const ImageRepositorySelectedImage: FC<ImageRepositoryScreenProps> = ({ selectedImage, onSelectedImageChange }) => {
-	const classes = useStyles();
-	const imageRef = useRef<HTMLImageElement>();
-	const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
-	const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE));
+const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef, ImageRepositoryScreenProps>(
+	({ selectedImage, onSelectedImageChange }, ref) => {
+		const classes = useStyles();
+		const imageRef = useRef<HTMLImageElement>();
+		const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+		const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE));
 
-	useEffect(() => {
-		setCrop(getInitialCrop(cropRatio));
-	}, [cropRatio, selectedImage?.imageUrl]);
+		useEffect(() => {
+			setCrop(getInitialCrop(cropRatio));
+		}, [cropRatio, selectedImage?.imageUrl]);
 
-	const handleImageLoaded = useCallback((image: HTMLImageElement) => {
-		imageRef.current = image;
-		return true;
-	}, []);
+		const handleImageLoaded = useCallback((image: HTMLImageElement) => {
+			imageRef.current = image;
+			return true;
+		}, []);
 
-	if (!selectedImage) {
-		return null;
-	}
+		useImperativeHandle(
+			ref,
+			() => ({
+				async getCroppedImage() {
+					if (!selectedImage || !imageRef.current) {
+						return;
+					}
 
-	return (
-		<div className={classes.selectedImageScreen}>
-			<div className={classes.cropperColumn}>
-				<div className={classes.cropperStage}>
-					<ReactCrop
-						key={selectedImage.imageUrl}
-						src={selectedImage.imageUrl}
-						imageAlt={selectedImage.imageAltText}
-						crop={crop}
-						onImageLoaded={handleImageLoaded}
-						onChange={(nextCrop, nextPercentCrop) => {
-							setCrop(nextPercentCrop ?? nextCrop);
+					const cropResult = await getCroppedImageAsBlob(imageRef.current, crop);
+
+					if (!cropResult) {
+						return;
+					}
+
+					return {
+						blob: cropResult.blob,
+						imageName: `${stripExtension(selectedImage.imageName)}.${cropResult.extension}`,
+						imageAltText: selectedImage.imageAltText,
+					};
+				},
+			}),
+			[crop, selectedImage]
+		);
+
+		if (!selectedImage) {
+			return null;
+		}
+
+		return (
+			<div className={classes.selectedImageScreen}>
+				<div className={classes.cropperColumn}>
+					<div className={classes.cropperStage}>
+						<ReactCrop
+							key={selectedImage.imageUrl}
+							src={selectedImage.imageUrl}
+							imageAlt={selectedImage.imageAltText}
+							crop={crop}
+							onImageLoaded={handleImageLoaded}
+							onChange={(nextCrop) => {
+								setCrop(nextCrop);
+							}}
+						/>
+					</div>
+					<div className={classes.ratioControls}>
+						<p className={classes.ratioLabel}>Ratio:</p>
+						{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
+							<Form.Check
+								key={ratio}
+								inline
+								className={classes.ratioOption}
+								type="radio"
+								name="image-repository-crop-ratio"
+								id={`image-repository-crop-ratio-${ratio}`}
+								label={ratio}
+								checked={cropRatio === ratio}
+								onChange={() => {
+									setCropRatio(ratio);
+								}}
+							/>
+						))}
+					</div>
+				</div>
+				<div className={classes.metadataPanel}>
+					<h3 className={classes.metadataTitle}>Image Metadata</h3>
+					<InputHelper
+						className="mb-4"
+						required
+						label="Image Name"
+						value={selectedImage.imageName}
+						onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+							onSelectedImageChange?.({
+								...selectedImage,
+								imageName: event.target.value,
+							});
+						}}
+					/>
+					<InputHelper
+						as="textarea"
+						label="Image alt text"
+						placeholder="Describe the image for screen readers"
+						value={selectedImage.imageAltText}
+						onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+							onSelectedImageChange?.({
+								...selectedImage,
+								imageAltText: event.target.value,
+							});
 						}}
 					/>
 				</div>
-				<div className={classes.ratioControls}>
-					<p className={classes.ratioLabel}>Ratio:</p>
-					{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
-						<Form.Check
-							key={ratio}
-							inline
-							className={classes.ratioOption}
-							type="radio"
-							name="image-repository-crop-ratio"
-							id={`image-repository-crop-ratio-${ratio}`}
-							label={ratio}
-							checked={cropRatio === ratio}
-							onChange={() => {
-								setCropRatio(ratio);
-							}}
-						/>
-					))}
-				</div>
 			</div>
-			<div className={classes.metadataPanel}>
-				<h3 className={classes.metadataTitle}>Image Metadata</h3>
-				<InputHelper
-					className="mb-4"
-					required
-					label="Image Name"
-					value={selectedImage.imageName}
-					onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-						onSelectedImageChange?.({
-							...selectedImage,
-							imageName: event.target.value,
-						});
-					}}
-				/>
-				<InputHelper
-					as="textarea"
-					label="Image alt text"
-					placeholder="Describe the image for screen readers"
-					value={selectedImage.imageAltText}
-					onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-						onSelectedImageChange?.({
-							...selectedImage,
-							imageAltText: event.target.value,
-						});
-					}}
-				/>
-			</div>
-		</div>
-	);
-};
+		);
+	}
+);
+
+ImageRepositorySelectedImage.displayName = 'ImageRepositorySelectedImage';
 
 export default ImageRepositorySelectedImage;

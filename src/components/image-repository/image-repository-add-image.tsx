@@ -1,30 +1,10 @@
 import React, { FC } from 'react';
 
-import { adminService } from '@/lib/services';
-
-import ImageRepositoryUploader from './image-repository-uploader';
+import ImageRepositoryFileInput from './image-repository-file-input';
 import { ImageRepositoryScreenProps } from './image-repository.types';
 
-const ImageRepositoryAddImage: FC<ImageRepositoryScreenProps> = ({ onImageUploaded }) => {
-	return (
-		<ImageRepositoryUploader
-			presignedUploadGetter={(blob, name) => {
-				return adminService.getPresignedUploadUrl({
-					contentType: blob.type,
-					filename: name,
-					filesize: blob.size,
-				}).fetch;
-			}}
-			onUploadComplete={(fileUploadId, imageUrl, imageName) => {
-				onImageUploaded?.({
-					fileUploadId,
-					imageName,
-					imageUrl,
-					imageAltText: '',
-				});
-			}}
-		/>
-	);
+const ImageRepositoryAddImage: FC<ImageRepositoryScreenProps> = ({ onFileSelected }) => {
+	return <ImageRepositoryFileInput onFileSelected={(file) => onFileSelected?.(file)} />;
 };
 
 export default ImageRepositoryAddImage;

@@ -1,0 +1,167 @@
+import classNames from 'classnames';
+import React, { FC, useCallback, useRef, useState } from 'react';
+
+import SvgIcon from '@/components/svg-icon';
+import useHandleError from '@/hooks/use-handle-error';
+import { createUseThemedStyles } from '@/jss/theme';
+
+const maxFileSizeDescription = '200 MB';
+
+const useStyles = createUseThemedStyles((theme) => ({
+	fileInputSurface: {
+		width: '100%',
+		minHeight: 520,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 8,
+		border: `1px dashed ${theme.colors.n300}`,
+		backgroundColor: theme.colors.n0,
+		cursor: 'pointer',
+		textAlign: 'center',
+		color: theme.colors.n900,
+	},
+	fileInputSurfaceActive: {
+		backgroundColor: theme.colors.n50,
+		borderColor: theme.colors.p500,
+	},
+	uploadIcon: {
+		marginBottom: 28,
+		color: theme.colors.n500,
+	},
+	uploadInstruction: {
+		margin: 0,
+		fontSize: 16,
+		lineHeight: 1.4,
+	},
+	uploadButton: {
+		padding: 0,
+		border: 0,
+		color: theme.colors.p500,
+		backgroundColor: 'transparent',
+	},
+	uploadRequirement: {
+		margin: '8px 0 0',
+		fontSize: 16,
+		lineHeight: 1.4,
+		color: theme.colors.n700,
+	},
+}));
+
+interface ImageRepositoryFileInputProps {
+	onFileSelected(file: File): void;
+	className?: string;
+	disabled?: boolean;
+}
+
+const ImageRepositoryFileInput: FC<ImageRepositoryFileInputProps> = ({
+	onFileSelected,
+	className,
+	disabled = false,
+}) => {
+	const classes = useStyles();
+	const handleError = useHandleError();
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [isDragging, setIsDragging] = useState(false);
+
+	const handleFileSelected = useCallback(
+		(file: File) => {
+			if (disabled) {
+				return;
+			}
+
+			if (!file.type.startsWith('image/')) {
+				handleError({
+					message: 'Please upload an image file.',
+				});
+				return;
+			}
+
+			onFileSelected(file);
+		},
+		[disabled, handleError, onFileSelected]
+	);
+
+	const handleInputChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files?.[0];
+
+			if (!file) {
+				return;
+			}
+
+			handleFileSelected(file);
+		},
+		[handleFileSelected]
+	);
+
+	const handleDrop = useCallback(
+		(event: React.DragEvent<HTMLDivElement>) => {
+			event.preventDefault();
+			setIsDragging(false);
+
+			const file = event.dataTransfer.files?.[0];
+
+			if (!file) {
+				return;
+			}
+
+			handleFileSelected(file);
+		},
+		[handleFileSelected]
+	);
+
+	const handleUploadButtonClick = useCallback(() => {
+		if (disabled || !inputRef.current) {
+			return;
+		}
+
+		inputRef.current.value = '';
+		inputRef.current.click();
+	}, [disabled]);
+
+	const handleUploadTextClick = useCallback(
+		(event: React.MouseEvent<HTMLButtonElement>) => {
+			event.stopPropagation();
+			handleUploadButtonClick();
+		},
+		[handleUploadButtonClick]
+	);
+
+	return (
+		<div
+			className={classNames(classes.fileInputSurface, className, {
+				[classes.fileInputSurfaceActive]: isDragging,
+			})}
+			onDragEnter={(event) => {
+				event.preventDefault();
+				setIsDragging(true);
+			}}
+			onDragLeave={(event) => {
+				event.preventDefault();
+				setIsDragging(false);
+			}}
+			onDragOver={(event) => {
+				event.preventDefault();
+			}}
+			onDrop={handleDrop}
+			onClick={handleUploadButtonClick}
+		>
+			<input ref={inputRef} className="d-none" type="file" accept="image/*" onChange={handleInputChange} />
+			<div>
+				<SvgIcon className={classes.uploadIcon} kit="far" icon="cloud-arrow-up" size={36} />
+				<p className={classes.uploadInstruction}>
+					Drop a file here or{' '}
+					<button className={classes.uploadButton} type="button" onClick={handleUploadTextClick}>
+						click to upload
+					</button>
+				</p>
+				<p className={classes.uploadRequirement}>
+					File must be a SVG, PNG, JPG or GIF, no larger than {maxFileSizeDescription}
+				</p>
+			</div>
+		</div>
+	);
+};
+
+export default ImageRepositoryFileInput;
