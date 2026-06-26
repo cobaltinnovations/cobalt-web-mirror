@@ -4,9 +4,14 @@ import ReactCrop from 'react-image-crop';
 
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
+import { FILE_UPLOAD_TYPE_ID } from '@/lib/services/media-service';
 
 import 'react-image-crop/dist/ReactCrop.css';
-import { ImageRepositoryCroppedImage, ImageRepositoryScreenProps } from './image-repository.types';
+import {
+	ImageRepositoryCroppedImage,
+	ImageRepositoryScreenProps,
+	ImageRepositoryUploadPayload,
+} from './image-repository.types';
 
 enum IMAGE_REPOSITORY_CROP_RATIO {
 	SIXTEEN_NINE = '16:9',
@@ -18,6 +23,36 @@ const aspectByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, number> = {
 	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: 16 / 9,
 	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: 4 / 3,
 	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: 1,
+};
+
+const fileUploadTypeIdByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, FILE_UPLOAD_TYPE_ID> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
+};
+
+const thumbnailFileUploadTypeIdByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, FILE_UPLOAD_TYPE_ID> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_16X9,
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_4X3,
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_1X1,
+};
+
+const ratioDimensionsByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, { width: number; height: number }> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: { width: 16, height: 9 },
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: { width: 4, height: 3 },
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: { width: 1, height: 1 },
+};
+
+const thumbnailWidthByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, number> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: 320,
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: 320,
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: 320,
+};
+
+const fileNameSuffixByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, string> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: '16x9',
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: '4x3',
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: '1x1',
 };
 
 const getInitialCrop = (cropRatio: IMAGE_REPOSITORY_CROP_RATIO): ReactCrop.Crop => {
@@ -74,51 +109,21 @@ function resolvePixelCrop(image: HTMLImageElement, crop: ReactCrop.Crop): ReactC
 	};
 }
 
-function getCroppedImageAsBlob(
-	image: HTMLImageElement,
-	crop: ReactCrop.Crop
-): Promise<{ blob: Blob; extension: string }> | undefined {
-	const canvas = document.createElement('canvas');
-	const ctx = canvas.getContext('2d');
-
-	if (!ctx) {
-		return;
-	}
-
-	const pixelCrop = resolvePixelCrop(image, crop);
-	const cropX = pixelCrop.x ?? 0;
-	const cropY = pixelCrop.y ?? 0;
-	const cropWidth = pixelCrop.width ?? 0;
-	const cropHeight = pixelCrop.height ?? 0;
-	const scaleX = image.naturalWidth / image.width;
-	const scaleY = image.naturalHeight / image.height;
-
-	canvas.width = cropWidth * scaleX;
-	canvas.height = cropHeight * scaleY;
-
-	ctx.drawImage(
-		image,
-		cropX * scaleX,
-		cropY * scaleY,
-		cropWidth * scaleX,
-		cropHeight * scaleY,
-		0,
-		0,
-		cropWidth * scaleX,
-		cropHeight * scaleY
-	);
-
+function getCanvasBlob(canvas: HTMLCanvasElement): Promise<{ blob: Blob; extension: string }> {
 	return new Promise((resolve, reject) => {
+		const ctx = canvas.getContext('2d');
 		let hasTransparency = false;
 
 		try {
-			const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-			const data = imageData.data;
+			if (ctx) {
+				const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+				const data = imageData.data;
 
-			for (let i = 3; i < data.length; i += 4) {
-				if (data[i] < 255) {
-					hasTransparency = true;
-					break;
+				for (let i = 3; i < data.length; i += 4) {
+					if (data[i] < 255) {
+						hasTransparency = true;
+						break;
+					}
 				}
 			}
 		} catch (err) {
@@ -146,8 +151,109 @@ function getCroppedImageAsBlob(
 	});
 }
 
+function getAspectOutputDimensions(
+	sourceWidth: number,
+	sourceHeight: number,
+	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
+): { width: number; height: number } {
+	const ratioDimensions = ratioDimensionsByCropRatio[cropRatio];
+	let width = Math.max(
+		ratioDimensions.width,
+		Math.floor(sourceWidth / ratioDimensions.width) * ratioDimensions.width
+	);
+	let height = (width / ratioDimensions.width) * ratioDimensions.height;
+
+	if (height > sourceHeight) {
+		height = Math.max(
+			ratioDimensions.height,
+			Math.floor(sourceHeight / ratioDimensions.height) * ratioDimensions.height
+		);
+		width = (height / ratioDimensions.height) * ratioDimensions.width;
+	}
+
+	return {
+		width: Math.round(width),
+		height: Math.round(height),
+	};
+}
+
+async function getCroppedImageAsset(
+	image: HTMLImageElement,
+	imageName: string,
+	crop: ReactCrop.Crop,
+	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
+): Promise<ImageRepositoryCroppedImage | undefined> {
+	const cropCanvas = document.createElement('canvas');
+	const ctx = cropCanvas.getContext('2d');
+
+	if (!ctx) {
+		return;
+	}
+
+	const pixelCrop = resolvePixelCrop(image, crop);
+	const cropX = pixelCrop.x ?? 0;
+	const cropY = pixelCrop.y ?? 0;
+	const cropWidth = pixelCrop.width ?? 0;
+	const cropHeight = pixelCrop.height ?? 0;
+	const scaleX = image.naturalWidth / image.width;
+	const scaleY = image.naturalHeight / image.height;
+	const sourceWidth = cropWidth * scaleX;
+	const sourceHeight = cropHeight * scaleY;
+	const outputDimensions = getAspectOutputDimensions(sourceWidth, sourceHeight, cropRatio);
+
+	cropCanvas.width = outputDimensions.width;
+	cropCanvas.height = outputDimensions.height;
+
+	ctx.drawImage(
+		image,
+		cropX * scaleX,
+		cropY * scaleY,
+		sourceWidth,
+		sourceHeight,
+		0,
+		0,
+		outputDimensions.width,
+		outputDimensions.height
+	);
+
+	const cropBlobResult = await getCanvasBlob(cropCanvas);
+	const thumbnailCanvas = document.createElement('canvas');
+	const thumbnailCtx = thumbnailCanvas.getContext('2d');
+
+	if (!thumbnailCtx) {
+		return;
+	}
+
+	const thumbnailWidth = thumbnailWidthByCropRatio[cropRatio];
+	const ratioDimensions = ratioDimensionsByCropRatio[cropRatio];
+	const thumbnailHeight = (thumbnailWidth / ratioDimensions.width) * ratioDimensions.height;
+
+	thumbnailCanvas.width = thumbnailWidth;
+	thumbnailCanvas.height = thumbnailHeight;
+	thumbnailCtx.drawImage(cropCanvas, 0, 0, thumbnailWidth, thumbnailHeight);
+
+	const thumbnailBlobResult = await getCanvasBlob(thumbnailCanvas);
+	const baseImageName = stripExtension(imageName);
+	const fileNameSuffix = fileNameSuffixByCropRatio[cropRatio];
+
+	return {
+		blob: cropBlobResult.blob,
+		imageName: `${baseImageName}-${fileNameSuffix}.${cropBlobResult.extension}`,
+		width: outputDimensions.width,
+		height: outputDimensions.height,
+		fileUploadTypeId: fileUploadTypeIdByCropRatio[cropRatio],
+		thumbnail: {
+			blob: thumbnailBlobResult.blob,
+			imageName: `${baseImageName}-${fileNameSuffix}-thumbnail.${thumbnailBlobResult.extension}`,
+			width: thumbnailCanvas.width,
+			height: thumbnailCanvas.height,
+			fileUploadTypeId: thumbnailFileUploadTypeIdByCropRatio[cropRatio],
+		},
+	};
+}
+
 export interface ImageRepositorySelectedImageRef {
-	getCroppedImage(): Promise<ImageRepositoryCroppedImage | undefined>;
+	getUploadPayload(): Promise<ImageRepositoryUploadPayload | undefined>;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -244,8 +350,9 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 		const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE));
 
 		useEffect(() => {
-			setCrop(getInitialCrop(cropRatio));
-		}, [cropRatio, selectedImage?.imageUrl]);
+			setCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+			setCrop(getInitialCrop(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE));
+		}, [selectedImage?.imageUrl]);
 
 		const handleImageLoaded = useCallback((image: HTMLImageElement) => {
 			imageRef.current = image;
@@ -255,25 +362,35 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 		useImperativeHandle(
 			ref,
 			() => ({
-				async getCroppedImage() {
+				async getUploadPayload() {
 					if (!selectedImage || !imageRef.current) {
 						return;
 					}
 
-					const cropResult = await getCroppedImageAsBlob(imageRef.current, crop);
+					const croppedImage = await getCroppedImageAsset(
+						imageRef.current,
+						selectedImage.imageName,
+						crop,
+						cropRatio
+					);
 
-					if (!cropResult) {
+					if (!croppedImage) {
 						return;
 					}
 
 					return {
-						blob: cropResult.blob,
-						imageName: `${stripExtension(selectedImage.imageName)}.${cropResult.extension}`,
+						rawImage: {
+							blob: selectedImage.file,
+							imageName: selectedImage.imageName,
+							width: imageRef.current.naturalWidth,
+							height: imageRef.current.naturalHeight,
+						},
+						croppedImage,
 						imageAltText: selectedImage.imageAltText,
 					};
 				},
 			}),
-			[crop, selectedImage]
+			[crop, cropRatio, selectedImage]
 		);
 
 		if (!selectedImage) {
@@ -309,6 +426,7 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 								checked={cropRatio === ratio}
 								onChange={() => {
 									setCropRatio(ratio);
+									setCrop(getInitialCrop(ratio));
 								}}
 							/>
 						))}

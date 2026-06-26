@@ -1,17 +1,14 @@
 import classNames from 'classnames';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 
-import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { PresignedUploadResponse } from '@/lib/models';
-import { imageUploader } from '@/lib/services';
 
 const progressSize = 58;
 const progressStrokeWidth = 4;
 const progressRadius = (progressSize - progressStrokeWidth) / 2;
 const progressCircumference = 2 * Math.PI * progressRadius;
 
-enum IMAGE_REPOSITORY_UPLOAD_STATUS {
+export enum IMAGE_REPOSITORY_UPLOAD_STATUS {
 	UPLOADING = 'UPLOADING',
 	COMPLETE = 'COMPLETE',
 	ERROR = 'ERROR',
@@ -62,73 +59,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 interface ImageRepositoryUploaderProps {
-	blob: Blob;
-	fileName: string;
-	presignedUploadGetter(blob: Blob, name: string): () => Promise<PresignedUploadResponse>;
-	onUploadComplete?(fileUploadId: string, accessUrl: string, fileName: string): void;
-	onUploadStatusChange?(isUploading: boolean): void;
+	progress: number;
+	uploadStatus: IMAGE_REPOSITORY_UPLOAD_STATUS;
 	className?: string;
 }
 
-const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
-	blob,
-	fileName,
-	presignedUploadGetter,
-	onUploadComplete,
-	onUploadStatusChange,
-	className,
-}) => {
+const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({ progress, uploadStatus, className }) => {
 	const classes = useStyles();
-	const handleError = useHandleError();
-	const [progress, setProgress] = useState(0);
-	const [uploadStatus, setUploadStatus] = useState<IMAGE_REPOSITORY_UPLOAD_STATUS>(
-		IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING
-	);
-
-	useEffect(() => {
-		let fileUploadId = '';
-		let isMounted = true;
-
-		setProgress(0);
-		setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING);
-		onUploadStatusChange?.(true);
-
-		imageUploader(blob, presignedUploadGetter(blob, fileName))
-			.onBeforeUpload(() => {})
-			.onPresignedUploadObtained(({ fileUploadResult }) => {
-				if (isMounted) {
-					fileUploadId = fileUploadResult.fileUploadId;
-				}
-			})
-			.onProgress((percentage) => {
-				if (isMounted) {
-					setProgress(percentage);
-				}
-			})
-			.onComplete((accessUrl) => {
-				if (isMounted) {
-					setProgress(100);
-					setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE);
-					onUploadStatusChange?.(false);
-					onUploadComplete?.(fileUploadId, accessUrl, fileName);
-				}
-			})
-			.onError((error) => {
-				if (isMounted) {
-					setProgress(0);
-					setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.ERROR);
-					onUploadStatusChange?.(false);
-					handleError(error);
-				}
-			})
-			.start();
-
-		return () => {
-			isMounted = false;
-			onUploadStatusChange?.(false);
-		};
-	}, [blob, fileName, handleError, onUploadComplete, onUploadStatusChange, presignedUploadGetter]);
-
 	const progressOffset = progressCircumference - (progress / 100) * progressCircumference;
 	const isComplete = uploadStatus === IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE;
 	const hasError = uploadStatus === IMAGE_REPOSITORY_UPLOAD_STATUS.ERROR;

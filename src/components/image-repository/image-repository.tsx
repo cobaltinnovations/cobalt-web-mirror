@@ -12,8 +12,8 @@ import ImageRepositorySelectedImage, { ImageRepositorySelectedImageRef } from '.
 import ImageRepositoryUploadImage from './image-repository-upload-image';
 import {
 	IMAGE_REPOSITORY_SCREEN_ID,
-	ImageRepositoryCroppedImage,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
+	ImageRepositoryUploadPayload,
 } from './image-repository.types';
 
 const useStyles = createUseStyles({
@@ -50,7 +50,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES
 	);
 	const [selectedImage, setSelectedImage] = useState<ImageRepositorySelectedImageModel>();
-	const [croppedImage, setCroppedImage] = useState<ImageRepositoryCroppedImage>();
+	const [imageUploadPayload, setImageUploadPayload] = useState<ImageRepositoryUploadPayload>();
 	const [isPreparingCrop, setIsPreparingCrop] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -66,7 +66,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	const resetFlow = useCallback(() => {
 		revokeSelectedImageUrl();
 		setSelectedImage(undefined);
-		setCroppedImage(undefined);
+		setImageUploadPayload(undefined);
 		setIsPreparingCrop(false);
 		setIsUploadingImage(false);
 	}, [revokeSelectedImageUrl]);
@@ -98,7 +98,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				imageUrl,
 				imageAltText: '',
 			});
-			setCroppedImage(undefined);
+			setImageUploadPayload(undefined);
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
 		},
 		[revokeSelectedImageUrl]
@@ -119,13 +119,13 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 
 		try {
 			setIsPreparingCrop(true);
-			const nextCroppedImage = await selectedImageCropperRef.current.getCroppedImage();
+			const nextImageUploadPayload = await selectedImageCropperRef.current.getUploadPayload();
 
-			if (!nextCroppedImage) {
+			if (!nextImageUploadPayload) {
 				return;
 			}
 
-			setCroppedImage(nextCroppedImage);
+			setImageUploadPayload(nextImageUploadPayload);
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE);
 		} catch (error) {
 			handleError(error);
@@ -154,12 +154,12 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	}, [activeScreenId, selectedImage]);
 
 	useEffect(() => {
-		if (activeScreenId === IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE && !croppedImage) {
+		if (activeScreenId === IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE && !imageUploadPayload) {
 			setActiveScreenId(
 				selectedImage ? IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE : IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE
 			);
 		}
-	}, [activeScreenId, croppedImage, selectedImage]);
+	}, [activeScreenId, imageUploadPayload, selectedImage]);
 
 	const screenByScreenId = useMemo<Record<IMAGE_REPOSITORY_SCREEN_ID, ReactNode>>(
 		() => ({
@@ -187,16 +187,16 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 					onImageUploaded={handleImageUploaded}
 					onUploadStatusChange={setIsUploadingImage}
 					selectedImage={selectedImage}
-					croppedImage={croppedImage}
+					imageUploadPayload={imageUploadPayload}
 				/>
 			),
 		}),
 		[
-			croppedImage,
 			handleFileSelected,
 			handleImageUploaded,
 			handleNavigate,
 			handleSelectedImageChange,
+			imageUploadPayload,
 			selectedImage,
 		]
 	);
