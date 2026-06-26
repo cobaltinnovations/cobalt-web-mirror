@@ -85,4 +85,10 @@ export const mediaService = {
 			url: '/media/images/',
 		});
 	},
+	getImage(imageId: string) {
+		return httpSingleton.orchestrateRequest<{ image: ImageModel; variants: ImageModel[] }>({
+			method: 'GET',
+			url: `/media/images/${imageId}`,
+		});
+	},
 };
