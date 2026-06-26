@@ -59,6 +59,12 @@ export interface MediaImageUploadResult {
 	};
 }
 
+export interface ImageListModel {
+	thumbnail: ImageModel;
+	sourceImageId: string;
+	variants: ImageModel[];
+}
+
 export const mediaService = {
 	getPresignedUpload(data: GetPresignedUploadRequestBody) {
 		return httpSingleton.orchestrateRequest<{ mediaImageUploadResult: MediaImageUploadResult }>({
@@ -71,6 +77,12 @@ export const mediaService = {
 		return httpSingleton.orchestrateRequest<{ image: ImageModel }>({
 			method: 'POST',
 			url: `/media/images/${imageId}/uploaded`,
+		});
+	},
+	getImages() {
+		return httpSingleton.orchestrateRequest<{ images: ImageListModel[] }>({
+			method: 'GET',
+			url: '/media/images/',
 		});
 	},
 };

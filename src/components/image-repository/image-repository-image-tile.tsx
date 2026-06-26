@@ -19,8 +19,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'center',
 		aspectRatio: '16 / 9',
-		color: theme.colors.n0,
 		backgroundColor: theme.colors.n500,
+	},
+	imageTilePreviewImage: {
+		width: '100%',
+		height: '100%',
+		display: 'block',
+		objectFit: 'cover',
 	},
 	imageTileNameOuter: {
 		padding: '14px 14px 16px',
@@ -32,14 +37,17 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface ImageRepositoryImageTileProps {
 	imageName: string;
+	imageUrl?: string;
 }
 
-const ImageRepositoryImageTile: FC<ImageRepositoryImageTileProps> = ({ imageName }) => {
+const ImageRepositoryImageTile: FC<ImageRepositoryImageTileProps> = ({ imageName, imageUrl }) => {
 	const classes = useStyles();
 
 	return (
 		<div className={classes.imageTile}>
-			<div className={classes.imageTilePreview} />
+			<div className={classes.imageTilePreview}>
+				{imageUrl && <img className={classes.imageTilePreviewImage} src={imageUrl} alt={imageName} />}
+			</div>
 			<div className={classes.imageTileNameOuter}>
 				<p className={`${classes.imageTileName} m-0`}>{imageName}</p>
 			</div>
