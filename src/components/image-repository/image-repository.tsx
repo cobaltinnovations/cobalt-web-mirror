@@ -13,7 +13,6 @@ import ImageRepositoryUploadImage from './image-repository-upload-image';
 import {
 	IMAGE_REPOSITORY_SCREEN_ID,
 	ImageRepositoryCroppedImage,
-	ImageRepositoryImage,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
 } from './image-repository.types';
 
@@ -52,7 +51,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	);
 	const [selectedImage, setSelectedImage] = useState<ImageRepositorySelectedImageModel>();
 	const [croppedImage, setCroppedImage] = useState<ImageRepositoryCroppedImage>();
-	const [uploadedImage, setUploadedImage] = useState<ImageRepositoryImage>();
 	const [isPreparingCrop, setIsPreparingCrop] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -69,7 +67,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		revokeSelectedImageUrl();
 		setSelectedImage(undefined);
 		setCroppedImage(undefined);
-		setUploadedImage(undefined);
 		setIsPreparingCrop(false);
 		setIsUploadingImage(false);
 	}, [revokeSelectedImageUrl]);
@@ -85,6 +82,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 
 	const handleHide = useCallback(() => {
 		resetFlow();
+		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
 		onHide?.();
 	}, [onHide, resetFlow]);
 
@@ -101,15 +99,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				imageAltText: '',
 			});
 			setCroppedImage(undefined);
-			setUploadedImage(undefined);
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
 		},
 		[revokeSelectedImageUrl]
 	);
 
-	const handleImageUploaded = useCallback((image: ImageRepositoryImage) => {
-		setUploadedImage(image);
-	}, []);
+	const handleImageUploaded = useCallback(() => {
+		handleHide();
+	}, [handleHide]);
 
 	const handleSelectedImageChange = useCallback((image: ImageRepositorySelectedImageModel) => {
 		setSelectedImage(image);
@@ -129,7 +126,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 			}
 
 			setCroppedImage(nextCroppedImage);
-			setUploadedImage(undefined);
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE);
 		} catch (error) {
 			handleError(error);
@@ -238,22 +234,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 					className="d-flex align-items-center"
 					variant="outline-primary"
 					onClick={handleReturnToLibrary}
-					disabled={isUploadingImage && !uploadedImage}
+					disabled={isUploadingImage}
 				>
 					<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
 					Library
 				</Button>
 			),
 		}),
-		[
-			handleCropComplete,
-			handleHide,
-			handleReturnToLibrary,
-			isPreparingCrop,
-			isUploadingImage,
-			selectedImage,
-			uploadedImage,
-		]
+		[handleCropComplete, handleHide, handleReturnToLibrary, isPreparingCrop, isUploadingImage, selectedImage]
 	);
 
 	return (
