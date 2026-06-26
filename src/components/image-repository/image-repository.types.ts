@@ -4,7 +4,30 @@ export enum IMAGE_REPOSITORY_SCREEN_ID {
 	BROWSE_IMAGES = 'BROWSE_IMAGES',
 	ADD_IMAGE = 'ADD_IMAGE',
 	SELECTED_IMAGE = 'SELECTED_IMAGE',
-	UPLOAD_IMAGE = 'UPLOAD_IMAGE',
+}
+
+export enum IMAGE_REPOSITORY_CROP_RATIO {
+	SIXTEEN_NINE = '16:9',
+	FOUR_THREE = '4:3',
+	ONE_ONE = '1:1',
+}
+
+export interface ImageRepositoryCrop {
+	aspect?: number;
+	x: number;
+	y: number;
+	width: number;
+	height?: number;
+	unit?: 'px' | '%';
+}
+
+export interface ImageRepositoryCropSelection {
+	crop: ImageRepositoryCrop;
+	cropRatio: IMAGE_REPOSITORY_CROP_RATIO;
+	imageRenderedWidth: number;
+	imageRenderedHeight: number;
+	imageNaturalWidth: number;
+	imageNaturalHeight: number;
 }
 
 export interface ImageRepositorySelectedImage {
@@ -41,5 +64,4 @@ export interface ImageRepositoryScreenProps {
 	onSelectedImageChange?(image: ImageRepositorySelectedImage): void;
 	onUploadStatusChange?(isUploading: boolean): void;
 	selectedImage?: ImageRepositorySelectedImage;
-	imageUploadPayload?: ImageRepositoryUploadPayload;
 }

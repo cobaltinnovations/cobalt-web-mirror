@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { FC } from 'react';
+import { Button } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
 
@@ -9,22 +10,13 @@ const progressRadius = (progressSize - progressStrokeWidth) / 2;
 const progressCircumference = 2 * Math.PI * progressRadius;
 
 export enum IMAGE_REPOSITORY_UPLOAD_STATUS {
+	PREPARING = 'PREPARING',
 	UPLOADING = 'UPLOADING',
 	COMPLETE = 'COMPLETE',
 	ERROR = 'ERROR',
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
-	uploaderSurface: {
-		width: '100%',
-		minHeight: 520,
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderRadius: 8,
-		border: `1px dashed ${theme.colors.n300}`,
-		backgroundColor: theme.colors.n0,
-	},
 	progressContent: {
 		textAlign: 'center',
 	},
@@ -56,70 +48,84 @@ const useStyles = createUseThemedStyles((theme) => ({
 		lineHeight: 1.4,
 		color: theme.colors.n700,
 	},
+	cancelButton: {
+		marginTop: 24,
+		borderColor: theme.colors.d500,
+		color: theme.colors.d500,
+		fontWeight: 700,
+		'&:hover, &:focus': {
+			borderColor: theme.colors.d500,
+			backgroundColor: theme.colors.d500,
+			color: theme.colors.n0,
+		},
+	},
 }));
 
 interface ImageRepositoryUploaderProps {
 	progress: number;
 	uploadStatus: IMAGE_REPOSITORY_UPLOAD_STATUS;
+	onCancelUpload?(): void;
 	className?: string;
 }
 
-const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({ progress, uploadStatus, className }) => {
+const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
+	progress,
+	uploadStatus,
+	onCancelUpload,
+	className,
+}) => {
 	const classes = useStyles();
 	const progressOffset = progressCircumference - (progress / 100) * progressCircumference;
 	const isComplete = uploadStatus === IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE;
 	const hasError = uploadStatus === IMAGE_REPOSITORY_UPLOAD_STATUS.ERROR;
 
 	return (
-		<div className={classNames(classes.uploaderSurface, className)}>
-			<div className={classes.progressContent}>
-				<svg
-					className={classes.progressSvg}
-					width={progressSize}
-					height={progressSize}
-					viewBox={`0 0 ${progressSize} ${progressSize}`}
-				>
-					<circle
-						className={classes.progressTrack}
-						cx={progressSize / 2}
-						cy={progressSize / 2}
-						r={progressRadius}
-						fill="none"
-						strokeWidth={progressStrokeWidth}
-					/>
-					<circle
-						className={classes.progressIndicator}
-						cx={progressSize / 2}
-						cy={progressSize / 2}
-						r={progressRadius}
-						fill="none"
-						strokeWidth={progressStrokeWidth}
-						strokeDasharray={progressCircumference}
-						strokeDashoffset={progressOffset}
-						strokeLinecap="round"
-						transform={`rotate(-90 ${progressSize / 2} ${progressSize / 2})`}
-					/>
-					<text
-						className={classes.progressLabel}
-						x="50%"
-						y="50%"
-						textAnchor="middle"
-						dominantBaseline="central"
-					>
-						{progress}%
-					</text>
-				</svg>
-				<p className={classes.progressTitle}>
-					{isComplete && 'Upload Complete'}
-					{hasError && 'Upload Failed'}
-					{!isComplete && !hasError && 'Uploading File'}
-				</p>
-				<p className={classes.progressDescription}>
-					{isComplete && 'Your image has been uploaded.'}
-					{hasError && 'Please return to the library and try again.'}
-					{!isComplete && !hasError && 'This may take a couple minutes'}
-				</p>
-			</div>
+		<div className={classNames(classes.progressContent, className)}>
+			<svg
+				className={classes.progressSvg}
+				width={progressSize}
+				height={progressSize}
+				viewBox={`0 0 ${progressSize} ${progressSize}`}
+			>
+				<circle
+					className={classes.progressTrack}
+					cx={progressSize / 2}
+					cy={progressSize / 2}
+					r={progressRadius}
+					fill="none"
+					strokeWidth={progressStrokeWidth}
+				/>
+				<circle
+					className={classes.progressIndicator}
+					cx={progressSize / 2}
+					cy={progressSize / 2}
+					r={progressRadius}
+					fill="none"
+					strokeWidth={progressStrokeWidth}
+					strokeDasharray={progressCircumference}
+					strokeDashoffset={progressOffset}
+					strokeLinecap="round"
+					transform={`rotate(-90 ${progressSize / 2} ${progressSize / 2})`}
+				/>
+				<text className={classes.progressLabel} x="50%" y="50%" textAnchor="middle" dominantBaseline="central">
+					{progress}%
+				</text>
+			</svg>
+			<p className={classes.progressTitle}>
+				{isComplete && 'Upload Complete'}
+				{hasError && 'Upload Failed'}
+				{!isComplete && !hasError && 'Uploading File'}
+			</p>
+			<p className={classes.progressDescription}>
+				{isComplete && 'Your image has been uploaded.'}
+				{hasError && 'Please return to the library and try again.'}
+				{!isComplete && !hasError && 'This may take a couple minutes'}
+			</p>
+			{onCancelUpload && !isComplete && !hasError && (
+				<Button className={classes.cancelButton} variant="outline-danger" onClick={onCancelUpload}>
+					Cancel Upload
+				</Button>
+			)}
 		</div>
 	);
 };

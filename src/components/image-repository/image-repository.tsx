@@ -4,16 +4,13 @@ import { Button, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import SvgIcon from '@/components/svg-icon';
-import useHandleError from '@/hooks/use-handle-error';
 
 import ImageRepositoryAddImage from './image-repository-add-image';
 import ImageRepositoryBrowseImages from './image-repository-browse-images';
 import ImageRepositorySelectedImage, { ImageRepositorySelectedImageRef } from './image-repository-selected-image';
-import ImageRepositoryUploadImage from './image-repository-upload-image';
 import {
 	IMAGE_REPOSITORY_SCREEN_ID,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
-	ImageRepositoryUploadPayload,
 } from './image-repository.types';
 
 const useStyles = createUseStyles({
@@ -27,14 +24,12 @@ const modalTitleByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string> = {
 	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: 'Image Repository',
 	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: 'Add Image',
 	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'Add Image',
-	[IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE]: 'Add Image',
 };
 
 const modalBodyClassNameByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string | undefined> = {
 	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'p-0',
-	[IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE]: undefined,
 };
 
 interface ImageRepositoryProps extends ModalProps {
@@ -43,15 +38,12 @@ interface ImageRepositoryProps extends ModalProps {
 
 const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, onHide, show, ...modalProps }) => {
 	const classes = useStyles();
-	const handleError = useHandleError();
 	const selectedImageCropperRef = useRef<ImageRepositorySelectedImageRef>(null);
 	const selectedImageUrlRef = useRef<string>();
 	const [activeScreenId, setActiveScreenId] = useState<IMAGE_REPOSITORY_SCREEN_ID>(
 		IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES
 	);
 	const [selectedImage, setSelectedImage] = useState<ImageRepositorySelectedImageModel>();
-	const [imageUploadPayload, setImageUploadPayload] = useState<ImageRepositoryUploadPayload>();
-	const [isPreparingCrop, setIsPreparingCrop] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 
 	const revokeSelectedImageUrl = useCallback(() => {
@@ -66,8 +58,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	const resetFlow = useCallback(() => {
 		revokeSelectedImageUrl();
 		setSelectedImage(undefined);
-		setImageUploadPayload(undefined);
-		setIsPreparingCrop(false);
 		setIsUploadingImage(false);
 	}, [revokeSelectedImageUrl]);
 
@@ -98,7 +88,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				imageUrl,
 				imageAltText: '',
 			});
-			setImageUploadPayload(undefined);
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
 		},
 		[revokeSelectedImageUrl]
@@ -112,27 +101,13 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		setSelectedImage(image);
 	}, []);
 
-	const handleCropComplete = useCallback(async () => {
+	const handleCropComplete = useCallback(() => {
 		if (!selectedImageCropperRef.current) {
 			return;
 		}
 
-		try {
-			setIsPreparingCrop(true);
-			const nextImageUploadPayload = await selectedImageCropperRef.current.getUploadPayload();
-
-			if (!nextImageUploadPayload) {
-				return;
-			}
-
-			setImageUploadPayload(nextImageUploadPayload);
-			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsPreparingCrop(false);
-		}
-	}, [handleError]);
+		selectedImageCropperRef.current.startUpload();
+	}, []);
 
 	useEffect(() => {
 		if (show) {
@@ -153,14 +128,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		}
 	}, [activeScreenId, selectedImage]);
 
-	useEffect(() => {
-		if (activeScreenId === IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE && !imageUploadPayload) {
-			setActiveScreenId(
-				selectedImage ? IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE : IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE
-			);
-		}
-	}, [activeScreenId, imageUploadPayload, selectedImage]);
-
 	const screenByScreenId = useMemo<Record<IMAGE_REPOSITORY_SCREEN_ID, ReactNode>>(
 		() => ({
 			[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: (
@@ -177,28 +144,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				<ImageRepositorySelectedImage
 					ref={selectedImageCropperRef}
 					onNavigate={handleNavigate}
-					onSelectedImageChange={handleSelectedImageChange}
-					selectedImage={selectedImage}
-				/>
-			),
-			[IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE]: (
-				<ImageRepositoryUploadImage
-					onNavigate={handleNavigate}
 					onImageUploaded={handleImageUploaded}
+					onSelectedImageChange={handleSelectedImageChange}
 					onUploadStatusChange={setIsUploadingImage}
 					selectedImage={selectedImage}
-					imageUploadPayload={imageUploadPayload}
 				/>
 			),
 		}),
-		[
-			handleFileSelected,
-			handleImageUploaded,
-			handleNavigate,
-			handleSelectedImageChange,
-			imageUploadPayload,
-			selectedImage,
-		]
+		[handleFileSelected, handleImageUploaded, handleNavigate, handleSelectedImageChange, selectedImage]
 	);
 
 	const footerByScreenId = useMemo<Record<IMAGE_REPOSITORY_SCREEN_ID, ReactNode>>(
@@ -220,28 +173,22 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 						className="d-flex align-items-center"
 						variant="outline-primary"
 						onClick={handleReturnToLibrary}
+						disabled={isUploadingImage}
 					>
 						<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
 						Library
 					</Button>
-					<Button variant="primary" onClick={handleCropComplete} disabled={!selectedImage || isPreparingCrop}>
+					<Button
+						variant="primary"
+						onClick={handleCropComplete}
+						disabled={!selectedImage || isUploadingImage}
+					>
 						Add Image
 					</Button>
 				</div>
 			),
-			[IMAGE_REPOSITORY_SCREEN_ID.UPLOAD_IMAGE]: (
-				<Button
-					className="d-flex align-items-center"
-					variant="outline-primary"
-					onClick={handleReturnToLibrary}
-					disabled={isUploadingImage}
-				>
-					<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
-					Library
-				</Button>
-			),
 		}),
-		[handleCropComplete, handleHide, handleReturnToLibrary, isPreparingCrop, isUploadingImage, selectedImage]
+		[handleCropComplete, handleHide, handleReturnToLibrary, isUploadingImage, selectedImage]
 	);
 
 	return (

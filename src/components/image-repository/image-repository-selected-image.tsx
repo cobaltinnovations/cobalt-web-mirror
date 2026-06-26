@@ -3,21 +3,25 @@ import { Form } from 'react-bootstrap';
 import ReactCrop from 'react-image-crop';
 
 import InputHelper from '@/components/input-helper';
+import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { FILE_UPLOAD_TYPE_ID } from '@/lib/services/media-service';
+import { PresignedUploadModel } from '@/lib/models';
+import { FILE_UPLOAD_TYPE_ID, ImageModel, mediaService } from '@/lib/services/media-service';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import {
+	IMAGE_REPOSITORY_CROP_RATIO,
+	ImageRepositoryCrop,
+	ImageRepositoryCropSelection,
 	ImageRepositoryCroppedImage,
 	ImageRepositoryScreenProps,
+	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
+	ImageRepositoryUploadAsset,
 	ImageRepositoryUploadPayload,
 } from './image-repository.types';
+import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
 
-enum IMAGE_REPOSITORY_CROP_RATIO {
-	SIXTEEN_NINE = '16:9',
-	FOUR_THREE = '4:3',
-	ONE_ONE = '1:1',
-}
+const uploadStepsCount = 3;
 
 const aspectByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, number> = {
 	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: 16 / 9,
@@ -65,6 +69,33 @@ const getInitialCrop = (cropRatio: IMAGE_REPOSITORY_CROP_RATIO): ReactCrop.Crop 
 	};
 };
 
+function waitForNextFrame(): Promise<void> {
+	return new Promise((resolve) => {
+		window.requestAnimationFrame(() => {
+			resolve();
+		});
+	});
+}
+
+function loadImage(imageUrl: string): Promise<HTMLImageElement> {
+	return new Promise((resolve, reject) => {
+		const image = new Image();
+
+		image.onload = () => {
+			resolve(image);
+		};
+
+		image.onerror = () => {
+			reject({
+				code: 'IMAGE_LOAD_ERROR',
+				message: 'There was an error preparing your image.',
+			});
+		};
+
+		image.src = imageUrl;
+	});
+}
+
 function stripExtension(filename: string): string {
 	const lastDotIndex = filename.lastIndexOf('.');
 
@@ -75,7 +106,7 @@ function stripExtension(filename: string): string {
 	return filename.slice(0, lastDotIndex);
 }
 
-function resolvePixelCrop(image: HTMLImageElement, crop: ReactCrop.Crop): ReactCrop.Crop {
+function resolvePixelCrop(crop: ImageRepositoryCrop, cropSelection: ImageRepositoryCropSelection): ImageRepositoryCrop {
 	const isPercentCrop = crop.unit === '%';
 	const x = crop.x ?? 0;
 	const y = crop.y ?? 0;
@@ -85,6 +116,7 @@ function resolvePixelCrop(image: HTMLImageElement, crop: ReactCrop.Crop): ReactC
 	if (!isPercentCrop) {
 		return {
 			...crop,
+			unit: 'px',
 			x,
 			y,
 			width,
@@ -92,18 +124,18 @@ function resolvePixelCrop(image: HTMLImageElement, crop: ReactCrop.Crop): ReactC
 		};
 	}
 
-	const pixelWidth = (width / 100) * image.width;
+	const pixelWidth = (width / 100) * cropSelection.imageRenderedWidth;
 	const pixelHeight = crop.height
-		? ((crop.height ?? 0) / 100) * image.height
+		? ((crop.height ?? 0) / 100) * cropSelection.imageRenderedHeight
 		: crop.aspect
 		? pixelWidth / crop.aspect
 		: 0;
 
 	return {
 		...crop,
-		unit: 'px' as 'px',
-		x: (x / 100) * image.width,
-		y: (y / 100) * image.height,
+		unit: 'px',
+		x: (x / 100) * cropSelection.imageRenderedWidth,
+		y: (y / 100) * cropSelection.imageRenderedHeight,
 		width: pixelWidth,
 		height: pixelHeight,
 	};
@@ -180,8 +212,7 @@ function getAspectOutputDimensions(
 async function getCroppedImageAsset(
 	image: HTMLImageElement,
 	imageName: string,
-	crop: ReactCrop.Crop,
-	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
+	cropSelection: ImageRepositoryCropSelection
 ): Promise<ImageRepositoryCroppedImage | undefined> {
 	const cropCanvas = document.createElement('canvas');
 	const ctx = cropCanvas.getContext('2d');
@@ -190,16 +221,16 @@ async function getCroppedImageAsset(
 		return;
 	}
 
-	const pixelCrop = resolvePixelCrop(image, crop);
+	const pixelCrop = resolvePixelCrop(cropSelection.crop, cropSelection);
 	const cropX = pixelCrop.x ?? 0;
 	const cropY = pixelCrop.y ?? 0;
 	const cropWidth = pixelCrop.width ?? 0;
 	const cropHeight = pixelCrop.height ?? 0;
-	const scaleX = image.naturalWidth / image.width;
-	const scaleY = image.naturalHeight / image.height;
+	const scaleX = cropSelection.imageNaturalWidth / cropSelection.imageRenderedWidth;
+	const scaleY = cropSelection.imageNaturalHeight / cropSelection.imageRenderedHeight;
 	const sourceWidth = cropWidth * scaleX;
 	const sourceHeight = cropHeight * scaleY;
-	const outputDimensions = getAspectOutputDimensions(sourceWidth, sourceHeight, cropRatio);
+	const outputDimensions = getAspectOutputDimensions(sourceWidth, sourceHeight, cropSelection.cropRatio);
 
 	cropCanvas.width = outputDimensions.width;
 	cropCanvas.height = outputDimensions.height;
@@ -224,8 +255,8 @@ async function getCroppedImageAsset(
 		return;
 	}
 
-	const thumbnailWidth = thumbnailWidthByCropRatio[cropRatio];
-	const ratioDimensions = ratioDimensionsByCropRatio[cropRatio];
+	const thumbnailWidth = thumbnailWidthByCropRatio[cropSelection.cropRatio];
+	const ratioDimensions = ratioDimensionsByCropRatio[cropSelection.cropRatio];
 	const thumbnailHeight = (thumbnailWidth / ratioDimensions.width) * ratioDimensions.height;
 
 	thumbnailCanvas.width = thumbnailWidth;
@@ -234,30 +265,137 @@ async function getCroppedImageAsset(
 
 	const thumbnailBlobResult = await getCanvasBlob(thumbnailCanvas);
 	const baseImageName = stripExtension(imageName);
-	const fileNameSuffix = fileNameSuffixByCropRatio[cropRatio];
+	const fileNameSuffix = fileNameSuffixByCropRatio[cropSelection.cropRatio];
 
 	return {
 		blob: cropBlobResult.blob,
 		imageName: `${baseImageName}-${fileNameSuffix}.${cropBlobResult.extension}`,
 		width: outputDimensions.width,
 		height: outputDimensions.height,
-		fileUploadTypeId: fileUploadTypeIdByCropRatio[cropRatio],
+		fileUploadTypeId: fileUploadTypeIdByCropRatio[cropSelection.cropRatio],
 		thumbnail: {
 			blob: thumbnailBlobResult.blob,
 			imageName: `${baseImageName}-${fileNameSuffix}-thumbnail.${thumbnailBlobResult.extension}`,
 			width: thumbnailCanvas.width,
 			height: thumbnailCanvas.height,
-			fileUploadTypeId: thumbnailFileUploadTypeIdByCropRatio[cropRatio],
+			fileUploadTypeId: thumbnailFileUploadTypeIdByCropRatio[cropSelection.cropRatio],
 		},
 	};
 }
 
+async function getImageUploadPayload(
+	selectedImage: ImageRepositorySelectedImageModel,
+	cropSelection: ImageRepositoryCropSelection
+): Promise<ImageRepositoryUploadPayload | undefined> {
+	const image = await loadImage(selectedImage.imageUrl);
+	const croppedImage = await getCroppedImageAsset(image, selectedImage.imageName, cropSelection);
+
+	if (!croppedImage) {
+		return;
+	}
+
+	return {
+		rawImage: {
+			blob: selectedImage.file,
+			imageName: selectedImage.imageName,
+			width: cropSelection.imageNaturalWidth,
+			height: cropSelection.imageNaturalHeight,
+		},
+		croppedImage,
+		imageAltText: selectedImage.imageAltText,
+	};
+}
+
+function uploadBlobToPresignedUrl(
+	blob: Blob,
+	presignedUpload: PresignedUploadModel,
+	onProgress: (percentage: number) => void,
+	onXhrCreated: (xhr: XMLHttpRequest) => void
+): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		onXhrCreated(xhr);
+
+		xhr.upload.addEventListener('progress', (event) => {
+			if (event.lengthComputable) {
+				onProgress(Math.round((event.loaded * 100) / event.total));
+			}
+		});
+
+		xhr.addEventListener('load', () => {
+			resolve(presignedUpload.accessUrl);
+		});
+
+		xhr.addEventListener('error', () => {
+			reject({
+				code: 'UPLOAD_ERROR',
+				message: 'There was an error uploading your image.',
+			});
+		});
+
+		xhr.addEventListener('abort', () => {
+			reject({
+				code: 'UPLOAD_ABORTED',
+				message: 'The image upload was aborted.',
+			});
+		});
+
+		xhr.open(presignedUpload.httpMethod, presignedUpload.url, true);
+
+		for (let httpHeaderName in presignedUpload.httpHeaders) {
+			xhr.setRequestHeader(httpHeaderName, presignedUpload.httpHeaders[httpHeaderName]);
+		}
+
+		xhr.send(blob);
+	});
+}
+
+interface UploadMediaImageAssetOptions {
+	asset: ImageRepositoryUploadAsset;
+	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
+	sourceImageId?: string;
+	onProgress(percentage: number): void;
+	onXhrCreated(xhr: XMLHttpRequest): void;
+}
+
+async function uploadMediaImageAsset({
+	asset,
+	fileUploadTypeId,
+	sourceImageId,
+	onProgress,
+	onXhrCreated,
+}: UploadMediaImageAssetOptions): Promise<ImageModel> {
+	const { mediaImageUploadResult } = await mediaService
+		.getPresignedUpload({
+			fileUploadTypeId,
+			filename: asset.imageName,
+			contentType: asset.blob.type,
+			filesize: asset.blob.size,
+			width: asset.width,
+			height: asset.height,
+			sourceImageId,
+		})
+		.fetch();
+
+	await uploadBlobToPresignedUrl(
+		asset.blob,
+		mediaImageUploadResult.fileUploadResult.presignedUpload,
+		onProgress,
+		onXhrCreated
+	);
+
+	const { image } = await mediaService.setImageAsUploaded(mediaImageUploadResult.imageId).fetch();
+
+	return image;
+}
+
 export interface ImageRepositorySelectedImageRef {
-	getUploadPayload(): Promise<ImageRepositoryUploadPayload | undefined>;
+	startUpload(): void;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
 	selectedImageScreen: {
+		position: 'relative',
 		display: 'grid',
 		gridTemplateColumns: 'minmax(0, 1fr) 296px',
 		minHeight: 575,
@@ -340,57 +478,203 @@ const useStyles = createUseThemedStyles((theme) => ({
 		lineHeight: 1.4,
 		color: theme.colors.n900,
 	},
+	uploadOverlay: {
+		position: 'absolute',
+		inset: 0,
+		zIndex: 2,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		pointerEvents: 'auto',
+		'&::before': {
+			content: '""',
+			position: 'absolute',
+			inset: 0,
+			backgroundColor: theme.colors.n0,
+			opacity: 0.82,
+		},
+	},
+	uploadOverlayContent: {
+		position: 'relative',
+		zIndex: 1,
+	},
 }));
 
 const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef, ImageRepositoryScreenProps>(
-	({ selectedImage, onSelectedImageChange }, ref) => {
+	({ selectedImage, onImageUploaded, onSelectedImageChange, onUploadStatusChange }, ref) => {
 		const classes = useStyles();
+		const handleError = useHandleError();
 		const imageRef = useRef<HTMLImageElement>();
+		const uploadRunIdRef = useRef(0);
+		const activeUploadXhrRef = useRef<XMLHttpRequest>();
 		const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
 		const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE));
+		const [progress, setProgress] = useState(0);
+		const [uploadStatus, setUploadStatus] = useState<IMAGE_REPOSITORY_UPLOAD_STATUS>(
+			IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING
+		);
+		const [isUploading, setIsUploading] = useState(false);
 
 		useEffect(() => {
 			setCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
 			setCrop(getInitialCrop(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE));
+			setProgress(0);
+			setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING);
+			setIsUploading(false);
 		}, [selectedImage?.imageUrl]);
+
+		useEffect(() => {
+			return () => {
+				uploadRunIdRef.current += 1;
+				activeUploadXhrRef.current?.abort();
+				onUploadStatusChange?.(false);
+			};
+		}, [onUploadStatusChange]);
 
 		const handleImageLoaded = useCallback((image: HTMLImageElement) => {
 			imageRef.current = image;
 			return true;
 		}, []);
 
+		const getCropSelection = useCallback((): ImageRepositoryCropSelection | undefined => {
+			if (!selectedImage || !imageRef.current) {
+				return;
+			}
+
+			return {
+				crop: { ...crop },
+				cropRatio,
+				imageRenderedWidth: imageRef.current.width,
+				imageRenderedHeight: imageRef.current.height,
+				imageNaturalWidth: imageRef.current.naturalWidth,
+				imageNaturalHeight: imageRef.current.naturalHeight,
+			};
+		}, [crop, cropRatio, selectedImage]);
+
+		const handleCancelUpload = useCallback(() => {
+			uploadRunIdRef.current += 1;
+			activeUploadXhrRef.current?.abort();
+			activeUploadXhrRef.current = undefined;
+			setIsUploading(false);
+			setProgress(0);
+			setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING);
+			onUploadStatusChange?.(false);
+		}, [onUploadStatusChange]);
+
+		const startUpload = useCallback(async () => {
+			if (isUploading || !selectedImage) {
+				return;
+			}
+
+			const cropSelection = getCropSelection();
+
+			if (!cropSelection) {
+				return;
+			}
+
+			const uploadRunId = uploadRunIdRef.current + 1;
+			uploadRunIdRef.current = uploadRunId;
+			activeUploadXhrRef.current = undefined;
+
+			const isCurrentUpload = () => uploadRunIdRef.current === uploadRunId;
+			const setStepProgress = (stepIndex: number, stepProgress: number) => {
+				if (!isCurrentUpload()) {
+					return;
+				}
+
+				setProgress(Math.round(((stepIndex + stepProgress / 100) / uploadStepsCount) * 100));
+			};
+			const handleXhrCreated = (xhr: XMLHttpRequest) => {
+				if (isCurrentUpload()) {
+					activeUploadXhrRef.current = xhr;
+				}
+			};
+
+			try {
+				setProgress(0);
+				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING);
+				setIsUploading(true);
+				onUploadStatusChange?.(true);
+				await waitForNextFrame();
+				await waitForNextFrame();
+
+				const imageUploadPayload = await getImageUploadPayload(selectedImage, cropSelection);
+
+				if (!isCurrentUpload()) {
+					return;
+				}
+
+				if (!imageUploadPayload) {
+					throw new Error('There was an error preparing your image.');
+				}
+
+				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING);
+
+				const rawImage = await uploadMediaImageAsset({
+					asset: imageUploadPayload.rawImage,
+					fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_RAW,
+					onProgress: (percentage) => {
+						setStepProgress(0, percentage);
+					},
+					onXhrCreated: handleXhrCreated,
+				});
+
+				if (!isCurrentUpload()) {
+					return;
+				}
+
+				const croppedImage = await uploadMediaImageAsset({
+					asset: imageUploadPayload.croppedImage,
+					fileUploadTypeId: imageUploadPayload.croppedImage.fileUploadTypeId,
+					sourceImageId: rawImage.imageId,
+					onProgress: (percentage) => {
+						setStepProgress(1, percentage);
+					},
+					onXhrCreated: handleXhrCreated,
+				});
+
+				if (!isCurrentUpload()) {
+					return;
+				}
+
+				await uploadMediaImageAsset({
+					asset: imageUploadPayload.croppedImage.thumbnail,
+					fileUploadTypeId: imageUploadPayload.croppedImage.thumbnail.fileUploadTypeId,
+					sourceImageId: croppedImage.imageId,
+					onProgress: (percentage) => {
+						setStepProgress(2, percentage);
+					},
+					onXhrCreated: handleXhrCreated,
+				});
+
+				if (isCurrentUpload()) {
+					activeUploadXhrRef.current = undefined;
+					setProgress(100);
+					setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE);
+					setIsUploading(false);
+					onUploadStatusChange?.(false);
+					onImageUploaded?.();
+				}
+			} catch (error) {
+				if (!isCurrentUpload()) {
+					return;
+				}
+
+				activeUploadXhrRef.current = undefined;
+				setProgress(0);
+				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.ERROR);
+				setIsUploading(false);
+				onUploadStatusChange?.(false);
+				handleError(error);
+			}
+		}, [getCropSelection, handleError, isUploading, onImageUploaded, onUploadStatusChange, selectedImage]);
+
 		useImperativeHandle(
 			ref,
 			() => ({
-				async getUploadPayload() {
-					if (!selectedImage || !imageRef.current) {
-						return;
-					}
-
-					const croppedImage = await getCroppedImageAsset(
-						imageRef.current,
-						selectedImage.imageName,
-						crop,
-						cropRatio
-					);
-
-					if (!croppedImage) {
-						return;
-					}
-
-					return {
-						rawImage: {
-							blob: selectedImage.file,
-							imageName: selectedImage.imageName,
-							width: imageRef.current.naturalWidth,
-							height: imageRef.current.naturalHeight,
-						},
-						croppedImage,
-						imageAltText: selectedImage.imageAltText,
-					};
-				},
+				startUpload,
 			}),
-			[crop, cropRatio, selectedImage]
+			[startUpload]
 		);
 
 		if (!selectedImage) {
@@ -406,6 +690,7 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 							src={selectedImage.imageUrl}
 							imageAlt={selectedImage.imageAltText}
 							crop={crop}
+							disabled={isUploading}
 							onImageLoaded={handleImageLoaded}
 							onChange={(nextCrop) => {
 								setCrop(nextCrop);
@@ -424,6 +709,7 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 								id={`image-repository-crop-ratio-${ratio}`}
 								label={ratio}
 								checked={cropRatio === ratio}
+								disabled={isUploading}
 								onChange={() => {
 									setCropRatio(ratio);
 									setCrop(getInitialCrop(ratio));
@@ -439,6 +725,7 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 						required
 						label="Image Name"
 						value={selectedImage.imageName}
+						disabled={isUploading}
 						onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 							onSelectedImageChange?.({
 								...selectedImage,
@@ -451,6 +738,7 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 						label="Image alt text"
 						placeholder="Describe the image for screen readers"
 						value={selectedImage.imageAltText}
+						disabled={isUploading}
 						onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
 							onSelectedImageChange?.({
 								...selectedImage,
@@ -459,6 +747,16 @@ const ImageRepositorySelectedImage = forwardRef<ImageRepositorySelectedImageRef,
 						}}
 					/>
 				</div>
+				{isUploading && (
+					<div className={classes.uploadOverlay}>
+						<ImageRepositoryUploader
+							className={classes.uploadOverlayContent}
+							progress={progress}
+							uploadStatus={uploadStatus}
+							onCancelUpload={handleCancelUpload}
+						/>
+					</div>
+				)}
 			</div>
 		);
 	}
