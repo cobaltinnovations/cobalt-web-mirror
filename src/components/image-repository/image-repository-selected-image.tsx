@@ -16,16 +16,24 @@ import {
 
 import { IMAGE_REPOSITORY_CROP_RATIO, ImageRepositoryScreenProps } from './image-repository.types';
 
-const fileUploadTypeIdByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, FILE_UPLOAD_TYPE_ID> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
-};
+interface CropRatioConfig {
+	aspectRatio: string;
+	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
+}
 
-const aspectRatioByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, string> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: '16 / 9',
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: '4 / 3',
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: '1 / 1',
+const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: {
+		aspectRatio: '16 / 9',
+		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
+	},
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: {
+		aspectRatio: '4 / 3',
+		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
+	},
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: {
+		aspectRatio: '1 / 1',
+		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
+	},
 };
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -54,15 +62,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		gap: 18,
 	},
-	ratioOption: {
-		display: 'flex',
-		alignItems: 'center',
-		gap: 8,
-		margin: 0,
-		'& .form-check-input': {
-			marginRight: 0,
-		},
-	},
 	imagePreviewOuter: {
 		flex: 1,
 		display: 'flex',
@@ -77,7 +76,8 @@ const useStyles = createUseThemedStyles((theme) => ({
 		alignItems: 'center',
 		justifyContent: 'center',
 		overflow: 'hidden',
-		aspectRatio: ({ cropRatio }: { cropRatio: IMAGE_REPOSITORY_CROP_RATIO }) => aspectRatioByCropRatio[cropRatio],
+		aspectRatio: ({ cropRatio }: { cropRatio: IMAGE_REPOSITORY_CROP_RATIO }) =>
+			cropRatioConfigByCropRatio[cropRatio].aspectRatio,
 		backgroundColor: theme.colors.n500,
 	},
 	imagePreviewImage: {
@@ -103,7 +103,9 @@ function getImageVariantForRatio(
 	variants: ImageModel[],
 	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
 ): ImageModel | undefined {
-	return variants.find((variant) => variant.fileUploadTypeId === fileUploadTypeIdByCropRatio[cropRatio]);
+	return variants.find(
+		(variant) => variant.fileUploadTypeId === cropRatioConfigByCropRatio[cropRatio].fileUploadTypeId
+	);
 }
 
 type ImageRepositorySelectedImageProps = Pick<
@@ -191,7 +193,6 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 									<Form.Check
 										key={ratio}
 										inline
-										className={classes.ratioOption}
 										type="radio"
 										name="image-repository-selected-image-ratio"
 										id={`image-repository-selected-image-ratio-${ratio}`}
