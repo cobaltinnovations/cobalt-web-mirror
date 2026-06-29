@@ -444,39 +444,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderTop: `1px solid ${theme.colors.border}`,
 		backgroundColor: theme.colors.n0,
 	},
-	ratioLabel: {
-		margin: 0,
-		color: theme.colors.n500,
-		fontSize: 16,
-		fontWeight: 700,
-		lineHeight: 1.2,
-		textTransform: 'uppercase',
-	},
-	ratioOption: {
-		display: 'flex',
-		alignItems: 'center',
-		gap: 8,
-		margin: 0,
-		'& .form-check-input': {
-			marginRight: 0,
-		},
-		'& .form-check-label': {
-			color: theme.colors.n900,
-			fontSize: 18,
-			fontWeight: 600,
-			lineHeight: 1.2,
-		},
-	},
 	metadataPanel: {
 		padding: 24,
 		backgroundColor: theme.colors.n0,
-	},
-	metadataTitle: {
-		margin: '0 0 24px',
-		fontSize: 16,
-		fontWeight: 600,
-		lineHeight: 1.4,
-		color: theme.colors.n900,
 	},
 	uploadOverlay: {
 		position: 'absolute',
@@ -716,16 +686,16 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 						/>
 					</div>
 					<div className={classes.ratioControls}>
-						<p className={classes.ratioLabel}>Ratio:</p>
+						<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
 						{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
 							<Form.Check
 								key={ratio}
 								inline
-								className={classes.ratioOption}
+								className="mb-0"
 								type="radio"
 								name="image-repository-crop-ratio"
 								id={`image-repository-crop-ratio-${ratio}`}
-								label={ratio}
+								label={<span className="fs-large fw-semibold">{ratio}</span>}
 								checked={cropRatio === ratio}
 								disabled={isUploading}
 								onChange={() => {
@@ -737,7 +707,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 					</div>
 				</div>
 				<div className={classes.metadataPanel}>
-					<h3 className={classes.metadataTitle}>Image Metadata</h3>
+					<h3 className="mb-4 fs-default fw-semibold">Image Metadata</h3>
 					<InputHelper
 						className="mb-4"
 						required
