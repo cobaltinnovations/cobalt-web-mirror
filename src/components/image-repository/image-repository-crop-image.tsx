@@ -5,6 +5,7 @@ import ReactCrop from 'react-image-crop';
 import InputHelper from '@/components/input-helper';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
+import { CobaltError } from '@/lib/http-client';
 import { PresignedUploadModel } from '@/lib/models';
 import { FILE_UPLOAD_TYPE_ID, ImageModel, mediaService } from '@/lib/services/media-service';
 
@@ -85,10 +86,7 @@ function loadImage(imageUrl: string): Promise<HTMLImageElement> {
 		};
 
 		image.onerror = () => {
-			reject({
-				code: 'IMAGE_LOAD_ERROR',
-				message: 'There was an error preparing your image.',
-			});
+			reject(CobaltError.fromValidationFailed('There was an error preparing your image.'));
 		};
 
 		image.src = imageUrl;
@@ -157,7 +155,7 @@ function getCanvasBlob(canvas: HTMLCanvasElement): Promise<{ blob: Blob; extensi
 					}
 				}
 			}
-		} catch (err) {
+		} catch {
 			hasTransparency = false;
 		}
 
@@ -168,10 +166,11 @@ function getCanvasBlob(canvas: HTMLCanvasElement): Promise<{ blob: Blob; extensi
 		canvas.toBlob(
 			(blob) => {
 				if (!blob) {
-					return reject({
-						code: 400,
-						message: 'Error cropping image, please recrop your image and try again.',
-					});
+					return reject(
+						CobaltError.fromValidationFailed(
+							'Error cropping image, please recrop your image and try again.'
+						)
+					);
 				}
 
 				resolve({ blob, extension });
@@ -329,22 +328,16 @@ function uploadBlobToPresignedUrl(
 		});
 
 		xhr.addEventListener('error', () => {
-			reject({
-				code: 'UPLOAD_ERROR',
-				message: 'There was an error uploading your image.',
-			});
+			reject(CobaltError.fromValidationFailed('There was an error uploading your image.'));
 		});
 
 		xhr.addEventListener('abort', () => {
-			reject({
-				code: 'UPLOAD_ABORTED',
-				message: 'The image upload was aborted.',
-			});
+			reject(CobaltError.fromCancelledRequest());
 		});
 
 		xhr.open(presignedUpload.httpMethod, presignedUpload.url, true);
 
-		for (let httpHeaderName in presignedUpload.httpHeaders) {
+		for (const httpHeaderName in presignedUpload.httpHeaders) {
 			xhr.setRequestHeader(httpHeaderName, presignedUpload.httpHeaders[httpHeaderName]);
 		}
 
@@ -394,6 +387,11 @@ async function uploadMediaImageAsset({
 export interface ImageRepositoryCropImageRef {
 	startUpload(): void;
 }
+
+type ImageRepositoryCropImageProps = Pick<
+	ImageRepositoryScreenProps,
+	'initialCropRatio' | 'selectedImage' | 'onImageUploaded' | 'onSelectedImageChange' | 'onUploadStatusChange'
+>;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	selectedImageScreen: {
@@ -502,7 +500,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRepositoryScreenProps>(
+const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRepositoryCropImageProps>(
 	({ initialCropRatio, selectedImage, onImageUploaded, onSelectedImageChange, onUploadStatusChange }, ref) => {
 		const classes = useStyles();
 		const handleError = useHandleError();
@@ -604,7 +602,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 				}
 
 				if (!imageUploadPayload) {
-					throw new Error('There was an error preparing your image.');
+					throw CobaltError.fromValidationFailed('There was an error preparing your image.');
 				}
 
 				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING);
@@ -638,7 +636,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 				}
 
 				if (!sourceImageId) {
-					throw new Error('There was an error preparing your image.');
+					throw CobaltError.fromValidationFailed('There was an error preparing your image.');
 				}
 
 				const croppedImage = await uploadMediaImageAsset({

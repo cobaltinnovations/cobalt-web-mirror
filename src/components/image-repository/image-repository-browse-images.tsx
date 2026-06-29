@@ -3,10 +3,13 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { createUseThemedStyles } from '@/jss/theme';
 import { mediaService, type ImageListModel } from '@/lib/services/media-service';
 
-import ImageRepositoryImageTile from './image-repository-image-tile';
-import ImageRepositoryUploadImageTile from './image-repository-upload-image-tile';
-import { IMAGE_REPOSITORY_SCREEN_ID, ImageRepositoryScreenProps } from './image-repository.types';
-import AsyncWrapper from '../async-page';
+import AsyncWrapper from '@/components/async-page';
+import {
+	IMAGE_REPOSITORY_SCREEN_ID,
+	ImageRepositoryScreenProps,
+} from '@/components/image-repository/image-repository.types';
+import ImageRepositoryImageTile from '@/components/image-repository/image-repository-image-tile';
+import ImageRepositoryUploadImageTile from '@/components/image-repository/image-repository-upload-image-tile';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageTileGrid: {

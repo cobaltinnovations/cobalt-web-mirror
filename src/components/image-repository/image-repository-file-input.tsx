@@ -4,8 +4,10 @@ import React, { FC, useCallback, useRef, useState } from 'react';
 import SvgIcon from '@/components/svg-icon';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
+import { CobaltError } from '@/lib/http-client';
 
 const maxFileSizeDescription = '200 MB';
+const maxFileSizeInBytes = 200000000;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	fileInputSurface: {
@@ -71,9 +73,12 @@ const ImageRepositoryFileInput: FC<ImageRepositoryFileInputProps> = ({
 			}
 
 			if (!file.type.startsWith('image/')) {
-				handleError({
-					message: 'Please upload an image file.',
-				});
+				handleError(CobaltError.fromValidationFailed('Please upload an image file.'));
+				return;
+			}
+
+			if (file.size > maxFileSizeInBytes) {
+				handleError(CobaltError.fromValidationFailed(`File size exceeds limit of ${maxFileSizeDescription}.`));
 				return;
 			}
 

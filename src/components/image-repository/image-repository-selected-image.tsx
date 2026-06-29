@@ -1,11 +1,11 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
+import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
 import InlineAlert from '@/components/inline-alert';
 import Loader from '@/components/loader';
 import NoData from '@/components/no-data';
-import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import {
 	FILE_UPLOAD_TYPE_ID,
@@ -106,58 +106,38 @@ function getImageVariantForRatio(
 	return variants.find((variant) => variant.fileUploadTypeId === fileUploadTypeIdByCropRatio[cropRatio]);
 }
 
-const ImageRepositorySelectedImage: FC<ImageRepositoryScreenProps> = ({
+type ImageRepositorySelectedImageProps = Pick<
+	ImageRepositoryScreenProps,
+	'onRepositoryImageRecrop' | 'onRepositoryImageVariantAvailabilityChange' | 'repositoryImageId'
+>;
+
+const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 	onRepositoryImageRecrop,
 	onRepositoryImageVariantAvailabilityChange,
 	repositoryImageId,
 }) => {
 	const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
 	const [imageDetails, setImageDetails] = useState<ImageDetailModel>();
-	const [isLoading, setIsLoading] = useState(false);
 	const classes = useStyles({ cropRatio });
-	const handleError = useHandleError();
 
-	useEffect(() => {
+	const request = useMemo(() => {
 		if (!repositoryImageId) {
-			setImageDetails(undefined);
 			return;
 		}
 
-		let isMounted = true;
-		const request = mediaService.getImage(repositoryImageId);
+		return mediaService.getImage(repositoryImageId);
+	}, [repositoryImageId]);
 
+	const fetchData = useCallback(async () => {
 		setImageDetails(undefined);
-		setIsLoading(true);
 
-		request
-			.fetch()
-			.then((response) => {
-				if (!isMounted) {
-					return;
-				}
+		if (!request) {
+			return;
+		}
 
-				setImageDetails(response);
-			})
-			.catch((error) => {
-				if (!isMounted) {
-					return;
-				}
-
-				handleError(error);
-			})
-			.finally(() => {
-				if (!isMounted) {
-					return;
-				}
-
-				setIsLoading(false);
-			});
-
-		return () => {
-			isMounted = false;
-			request.abort();
-		};
-	}, [handleError, repositoryImageId]);
+		const response = await request.fetch();
+		setImageDetails(response);
+	}, [request]);
 
 	const displayImage = useMemo(() => {
 		if (!imageDetails || imageDetails.image.imageId !== repositoryImageId) {
@@ -171,7 +151,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositoryScreenProps> = ({
 		onRepositoryImageVariantAvailabilityChange?.(!!displayImage);
 	}, [displayImage, onRepositoryImageVariantAvailabilityChange]);
 
-	const handleRecrop = () => {
+	const handleRecrop = useCallback(() => {
 		if (!imageDetails) {
 			return;
 		}
@@ -185,85 +165,93 @@ const ImageRepositorySelectedImage: FC<ImageRepositoryScreenProps> = ({
 			},
 			cropRatio
 		);
-	};
+	}, [cropRatio, imageDetails, onRepositoryImageRecrop]);
 
-	if (isLoading || !imageDetails) {
-		return (
-			<div className={classes.loadingState}>
-				<Loader className="position-static d-inline-flex" />
-			</div>
-		);
+	if (!repositoryImageId) {
+		return null;
 	}
 
 	return (
-		<div className={classes.selectedImageScreen}>
-			<div className={classes.imagePanel}>
-				<div className={classes.imagePanelHeader}>
-					<div className={classes.ratioControls}>
-						<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
-						{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
-							<Form.Check
-								key={ratio}
-								inline
-								className={classes.ratioOption}
-								type="radio"
-								name="image-repository-selected-image-ratio"
-								id={`image-repository-selected-image-ratio-${ratio}`}
-								label={<span className="fs-large fw-semibold">{ratio}</span>}
-								checked={cropRatio === ratio}
-								onChange={() => {
-									setCropRatio(ratio);
-								}}
-							/>
-						))}
-					</div>
-					<Button variant="outline-primary" type="button" onClick={handleRecrop}>
-						Re-crop {cropRatio}
-					</Button>
+		<AsyncWrapper
+			fetchData={fetchData}
+			abortFetch={request?.abort}
+			loadingComponent={
+				<div className={classes.loadingState}>
+					<Loader className="position-static d-inline-flex" />
 				</div>
-				<div className={classes.imagePreviewOuter}>
-					{displayImage?.url ? (
-						<div className={classes.imagePreview}>
-							<img
-								className={classes.imagePreviewImage}
-								src={displayImage.url}
-								alt={imageDetails.image.imageAltText ?? imageDetails.image.filename}
-							/>
+			}
+		>
+			{imageDetails && (
+				<div className={classes.selectedImageScreen}>
+					<div className={classes.imagePanel}>
+						<div className={classes.imagePanelHeader}>
+							<div className={classes.ratioControls}>
+								<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
+								{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
+									<Form.Check
+										key={ratio}
+										inline
+										className={classes.ratioOption}
+										type="radio"
+										name="image-repository-selected-image-ratio"
+										id={`image-repository-selected-image-ratio-${ratio}`}
+										label={<span className="fs-large fw-semibold">{ratio}</span>}
+										checked={cropRatio === ratio}
+										onChange={() => {
+											setCropRatio(ratio);
+										}}
+									/>
+								))}
+							</div>
+							<Button variant="outline-primary" type="button" onClick={handleRecrop}>
+								Re-crop {cropRatio}
+							</Button>
 						</div>
-					) : (
-						<NoData
-							title={`No ${cropRatio} image available`}
-							description="This image has not been cropped to the selected ratio yet."
-							actions={[]}
+						<div className={classes.imagePreviewOuter}>
+							{displayImage?.url ? (
+								<div className={classes.imagePreview}>
+									<img
+										className={classes.imagePreviewImage}
+										src={displayImage.url}
+										alt={imageDetails.image.imageAltText ?? imageDetails.image.filename}
+									/>
+								</div>
+							) : (
+								<NoData
+									title={`No ${cropRatio} image available`}
+									description="This image has not been cropped to the selected ratio yet."
+									actions={[]}
+								/>
+							)}
+						</div>
+					</div>
+					<div className={classes.metadataPanel}>
+						<h3 className="mb-4 fs-default fw-semibold">Image Metadata</h3>
+						<InlineAlert
+							className="mb-4"
+							variant="warning"
+							title="Updating this information will update it everywhere the image is used on Cobalt"
 						/>
-					)}
+						<InputHelper
+							className="mb-4"
+							required
+							label="Image Name"
+							value={imageDetails.image.filename}
+							readOnly
+						/>
+						<InputHelper
+							as="textarea"
+							label="Image alt text"
+							placeholder="Describe the image for screen readers"
+							value={imageDetails.image.imageAltText ?? ''}
+							readOnly
+						/>
+						<h3 className="mt-7 mb-4 fs-default fw-semibold">Where is this image used?</h3>
+						<p className="mb-0 text-muted">Usage data is not available yet.</p>
+					</div>
 				</div>
-			</div>
-			<div className={classes.metadataPanel}>
-				<h3 className="mb-4 fs-default fw-semibold">Image Metadata</h3>
-				<InlineAlert
-					className="mb-4"
-					variant="warning"
-					title="Updating this information will update it everywhere the image is used on Cobalt"
-				/>
-				<InputHelper
-					className="mb-4"
-					required
-					label="Image Name"
-					value={imageDetails.image.filename}
-					readOnly
-				/>
-				<InputHelper
-					as="textarea"
-					label="Image alt text"
-					placeholder="Describe the image for screen readers"
-					value={imageDetails.image.imageAltText ?? ''}
-					readOnly
-				/>
-				<h3 className="mt-7 mb-4 fs-default fw-semibold">Where is this image used?</h3>
-				<p className="mb-0 text-muted">Usage data is not available yet.</p>
-			</div>
-		</div>
+			)}
+		</AsyncWrapper>
 	);
 };
 

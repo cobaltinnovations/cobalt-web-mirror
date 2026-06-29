@@ -16,6 +16,25 @@ export enum IMAGE_REPOSITORY_UPLOAD_STATUS {
 	ERROR = 'ERROR',
 }
 
+const contentByUploadStatus: Record<IMAGE_REPOSITORY_UPLOAD_STATUS, { title: string; description: string }> = {
+	[IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING]: {
+		title: 'Uploading File',
+		description: 'This may take a couple minutes',
+	},
+	[IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING]: {
+		title: 'Uploading File',
+		description: 'This may take a couple minutes',
+	},
+	[IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE]: {
+		title: 'Upload Complete',
+		description: 'Your image has been uploaded.',
+	},
+	[IMAGE_REPOSITORY_UPLOAD_STATUS.ERROR]: {
+		title: 'Upload Failed',
+		description: 'Please return to the library and try again.',
+	},
+};
+
 const useStyles = createUseThemedStyles((theme) => ({
 	progressContent: {
 		textAlign: 'center',
@@ -67,6 +86,7 @@ const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
 	const progressOffset = progressCircumference - (progress / 100) * progressCircumference;
 	const isComplete = uploadStatus === IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE;
 	const hasError = uploadStatus === IMAGE_REPOSITORY_UPLOAD_STATUS.ERROR;
+	const uploadStatusContent = contentByUploadStatus[uploadStatus];
 
 	return (
 		<div className={classNames(classes.progressContent, className)}>
@@ -100,16 +120,8 @@ const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
 					{progress}%
 				</text>
 			</svg>
-			<p className={classes.progressTitle}>
-				{isComplete && 'Upload Complete'}
-				{hasError && 'Upload Failed'}
-				{!isComplete && !hasError && 'Uploading File'}
-			</p>
-			<p className={classes.progressDescription}>
-				{isComplete && 'Your image has been uploaded.'}
-				{hasError && 'Please return to the library and try again.'}
-				{!isComplete && !hasError && 'This may take a couple minutes'}
-			</p>
+			<p className={classes.progressTitle}>{uploadStatusContent.title}</p>
+			<p className={classes.progressDescription}>{uploadStatusContent.description}</p>
 			{onCancelUpload && !isComplete && !hasError && (
 				<Button variant="outline-danger" onClick={onCancelUpload}>
 					Cancel Upload

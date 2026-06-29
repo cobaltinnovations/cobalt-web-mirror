@@ -104,10 +104,6 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		[revokeSelectedImageUrl]
 	);
 
-	const handleImageUploaded = useCallback(() => {
-		handleHide();
-	}, [handleHide]);
-
 	const handleRepositoryImageSelected = useCallback((nextRepositoryImageId: string) => {
 		setRepositoryImageId(nextRepositoryImageId);
 		setIsSelectedRepositoryImageVariantAvailable(false);
@@ -167,21 +163,13 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				<ImageRepositoryBrowseImages
 					onNavigate={handleNavigate}
 					onRepositoryImageSelected={handleRepositoryImageSelected}
-					selectedImage={selectedImage}
 				/>
 			),
-			[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: (
-				<ImageRepositoryAddImage
-					onNavigate={handleNavigate}
-					onFileSelected={handleFileSelected}
-					selectedImage={selectedImage}
-				/>
-			),
+			[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: <ImageRepositoryAddImage onFileSelected={handleFileSelected} />,
 			[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: (
 				<ImageRepositoryCropImage
 					ref={cropImageRef}
-					onNavigate={handleNavigate}
-					onImageUploaded={handleImageUploaded}
+					onImageUploaded={handleHide}
 					onSelectedImageChange={handleSelectedImageChange}
 					onUploadStatusChange={setIsUploadingImage}
 					initialCropRatio={initialCropRatio}
@@ -190,17 +178,15 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 			),
 			[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: (
 				<ImageRepositorySelectedImage
-					onNavigate={handleNavigate}
 					onRepositoryImageRecrop={handleRepositoryImageRecrop}
 					onRepositoryImageVariantAvailabilityChange={setIsSelectedRepositoryImageVariantAvailable}
 					repositoryImageId={repositoryImageId}
-					selectedImage={selectedImage}
 				/>
 			),
 		}),
 		[
 			handleFileSelected,
-			handleImageUploaded,
+			handleHide,
 			handleNavigate,
 			handleRepositoryImageRecrop,
 			handleRepositoryImageSelected,

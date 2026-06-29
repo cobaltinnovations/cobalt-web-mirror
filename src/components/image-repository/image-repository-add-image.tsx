@@ -1,10 +1,13 @@
 import React, { FC } from 'react';
 
 import ImageRepositoryFileInput from './image-repository-file-input';
-import { ImageRepositoryScreenProps } from './image-repository.types';
 
-const ImageRepositoryAddImage: FC<ImageRepositoryScreenProps> = ({ onFileSelected }) => {
-	return <ImageRepositoryFileInput onFileSelected={(file) => onFileSelected?.(file)} />;
+interface ImageRepositoryAddImageProps {
+	onFileSelected(file: File): void;
+}
+
+const ImageRepositoryAddImage: FC<ImageRepositoryAddImageProps> = ({ onFileSelected }) => {
+	return <ImageRepositoryFileInput onFileSelected={onFileSelected} />;
 };
 
 export default ImageRepositoryAddImage;
