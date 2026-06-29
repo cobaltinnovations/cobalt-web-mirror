@@ -22,40 +22,43 @@ import {
 } from './image-repository.types';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
 
-const aspectByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, number> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: 16 / 9,
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: 4 / 3,
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: 1,
-};
+interface CropRatioConfig {
+	aspect: number;
+	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
+	thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID;
+	ratioDimensions: {
+		width: number;
+		height: number;
+	};
+	thumbnailWidth: number;
+	fileNameSuffix: string;
+}
 
-const fileUploadTypeIdByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, FILE_UPLOAD_TYPE_ID> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
-};
-
-const thumbnailFileUploadTypeIdByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, FILE_UPLOAD_TYPE_ID> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_16X9,
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_4X3,
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_1X1,
-};
-
-const ratioDimensionsByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, { width: number; height: number }> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: { width: 16, height: 9 },
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: { width: 4, height: 3 },
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: { width: 1, height: 1 },
-};
-
-const thumbnailWidthByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, number> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: 320,
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: 320,
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: 320,
-};
-
-const fileNameSuffixByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, string> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: '16x9',
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: '4x3',
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: '1x1',
+const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
+	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: {
+		aspect: 16 / 9,
+		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
+		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_16X9,
+		ratioDimensions: { width: 16, height: 9 },
+		thumbnailWidth: 320,
+		fileNameSuffix: '16x9',
+	},
+	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: {
+		aspect: 4 / 3,
+		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
+		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_4X3,
+		ratioDimensions: { width: 4, height: 3 },
+		thumbnailWidth: 320,
+		fileNameSuffix: '4x3',
+	},
+	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: {
+		aspect: 1,
+		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
+		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_1X1,
+		ratioDimensions: { width: 1, height: 1 },
+		thumbnailWidth: 320,
+		fileNameSuffix: '1x1',
+	},
 };
 
 const getInitialCrop = (cropRatio: IMAGE_REPOSITORY_CROP_RATIO): ReactCrop.Crop => {
@@ -64,7 +67,7 @@ const getInitialCrop = (cropRatio: IMAGE_REPOSITORY_CROP_RATIO): ReactCrop.Crop 
 		x: 15,
 		y: 15,
 		width: 70,
-		aspect: aspectByCropRatio[cropRatio],
+		aspect: cropRatioConfigByCropRatio[cropRatio].aspect,
 	};
 };
 
@@ -186,7 +189,7 @@ function getAspectOutputDimensions(
 	sourceHeight: number,
 	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
 ): { width: number; height: number } {
-	const ratioDimensions = ratioDimensionsByCropRatio[cropRatio];
+	const ratioDimensions = cropRatioConfigByCropRatio[cropRatio].ratioDimensions;
 	let width = Math.max(
 		ratioDimensions.width,
 		Math.floor(sourceWidth / ratioDimensions.width) * ratioDimensions.width
@@ -229,6 +232,7 @@ async function getCroppedImageAsset(
 	const sourceWidth = cropWidth * scaleX;
 	const sourceHeight = cropHeight * scaleY;
 	const outputDimensions = getAspectOutputDimensions(sourceWidth, sourceHeight, cropSelection.cropRatio);
+	const cropRatioConfig = cropRatioConfigByCropRatio[cropSelection.cropRatio];
 
 	cropCanvas.width = outputDimensions.width;
 	cropCanvas.height = outputDimensions.height;
@@ -253,8 +257,8 @@ async function getCroppedImageAsset(
 		return;
 	}
 
-	const thumbnailWidth = thumbnailWidthByCropRatio[cropSelection.cropRatio];
-	const ratioDimensions = ratioDimensionsByCropRatio[cropSelection.cropRatio];
+	const thumbnailWidth = cropRatioConfig.thumbnailWidth;
+	const ratioDimensions = cropRatioConfig.ratioDimensions;
 	const thumbnailHeight = (thumbnailWidth / ratioDimensions.width) * ratioDimensions.height;
 
 	thumbnailCanvas.width = thumbnailWidth;
@@ -263,20 +267,20 @@ async function getCroppedImageAsset(
 
 	const thumbnailBlobResult = await getCanvasBlob(thumbnailCanvas);
 	const baseImageName = stripExtension(imageName);
-	const fileNameSuffix = fileNameSuffixByCropRatio[cropSelection.cropRatio];
+	const fileNameSuffix = cropRatioConfig.fileNameSuffix;
 
 	return {
 		blob: cropBlobResult.blob,
 		imageName: `${baseImageName}-${fileNameSuffix}.${cropBlobResult.extension}`,
 		width: outputDimensions.width,
 		height: outputDimensions.height,
-		fileUploadTypeId: fileUploadTypeIdByCropRatio[cropSelection.cropRatio],
+		fileUploadTypeId: cropRatioConfig.fileUploadTypeId,
 		thumbnail: {
 			blob: thumbnailBlobResult.blob,
 			imageName: `${baseImageName}-${fileNameSuffix}-thumbnail.${thumbnailBlobResult.extension}`,
 			width: thumbnailCanvas.width,
 			height: thumbnailCanvas.height,
-			fileUploadTypeId: thumbnailFileUploadTypeIdByCropRatio[cropSelection.cropRatio],
+			fileUploadTypeId: cropRatioConfig.thumbnailFileUploadTypeId,
 		},
 	};
 }
