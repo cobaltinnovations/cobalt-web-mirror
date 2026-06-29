@@ -31,23 +31,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		marginBottom: 28,
 		color: theme.colors.n500,
 	},
-	uploadInstruction: {
-		margin: 0,
-		fontSize: 16,
-		lineHeight: 1.4,
-	},
-	uploadButton: {
-		padding: 0,
-		border: 0,
-		color: theme.colors.p500,
-		backgroundColor: 'transparent',
-	},
-	uploadRequirement: {
-		margin: '8px 0 0',
-		fontSize: 16,
-		lineHeight: 1.4,
-		color: theme.colors.n700,
-	},
 }));
 
 interface ImageRepositoryFileInputProps {
@@ -125,14 +108,6 @@ const ImageRepositoryFileInput: FC<ImageRepositoryFileInputProps> = ({
 		inputRef.current.click();
 	}, [disabled]);
 
-	const handleUploadTextClick = useCallback(
-		(event: React.MouseEvent<HTMLButtonElement>) => {
-			event.stopPropagation();
-			handleUploadButtonClick();
-		},
-		[handleUploadButtonClick]
-	);
-
 	return (
 		<div
 			className={classNames(classes.fileInputSurface, className, {
@@ -155,13 +130,10 @@ const ImageRepositoryFileInput: FC<ImageRepositoryFileInputProps> = ({
 			<input ref={inputRef} className="d-none" type="file" accept="image/*" onChange={handleInputChange} />
 			<div>
 				<SvgIcon className={classes.uploadIcon} kit="far" icon="cloud-arrow-up" size={36} />
-				<p className={classes.uploadInstruction}>
-					Drop a file here or{' '}
-					<button className={classes.uploadButton} type="button" onClick={handleUploadTextClick}>
-						click to upload
-					</button>
+				<p className="mb-0">
+					Drop a file here or <span className="text-primary">click to upload</span>
 				</p>
-				<p className={classes.uploadRequirement}>
+				<p className="mt-2 mb-0 text-muted">
 					File must be a SVG, PNG, JPG or GIF, no larger than {maxFileSizeDescription}
 				</p>
 			</div>
