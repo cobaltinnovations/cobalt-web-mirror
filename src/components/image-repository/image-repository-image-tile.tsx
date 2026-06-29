@@ -12,6 +12,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.border}`,
 		borderRadius: 8,
+		cursor: 'pointer',
 	},
 	imageTilePreview: {
 		display: 'flex',
@@ -38,20 +39,21 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface ImageRepositoryImageTileProps {
 	imageName: string;
 	imageUrl?: string;
+	onClick?(): void;
 }
 
-const ImageRepositoryImageTile: FC<ImageRepositoryImageTileProps> = ({ imageName, imageUrl }) => {
+const ImageRepositoryImageTile: FC<ImageRepositoryImageTileProps> = ({ imageName, imageUrl, onClick }) => {
 	const classes = useStyles();
 
 	return (
-		<div className={classes.imageTile}>
+		<button className={classes.imageTile} type="button" onClick={onClick}>
 			<div className={classes.imageTilePreview}>
 				{imageUrl && <img className={classes.imageTilePreviewImage} src={imageUrl} alt={imageName} />}
 			</div>
 			<div className={classes.imageTileNameOuter}>
 				<p className={`${classes.imageTileName} m-0`}>{imageName}</p>
 			</div>
-		</div>
+		</button>
 	);
 };
 

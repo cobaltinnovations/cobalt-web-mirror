@@ -59,9 +59,31 @@ export interface MediaImageUploadResult {
 	};
 }
 
+export enum IMAGE_TYPE {
+	RAW = 'RAW',
+	CROP = 'CROP',
+	THUMBNAIL = 'THUMBNAIL',
+}
+
+export interface ImageVariantModel {
+	imageId: string;
+	sourceImageId: string | null;
+	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
+	imageType: IMAGE_TYPE;
+	aspectRatio: string | null;
+	thumbnail: boolean;
+}
+
 export interface ImageListModel {
 	thumbnail: ImageModel;
 	sourceImageId: string;
+	variants: ImageVariantModel[];
+}
+
+export interface ImageDetailModel {
+	image: ImageModel & {
+		imageAltText?: string;
+	};
 	variants: ImageModel[];
 }
 
@@ -86,7 +108,7 @@ export const mediaService = {
 		});
 	},
 	getImage(imageId: string) {
-		return httpSingleton.orchestrateRequest<{ image: ImageModel; variants: ImageModel[] }>({
+		return httpSingleton.orchestrateRequest<ImageDetailModel>({
 			method: 'GET',
 			url: `/media/images/${imageId}`,
 		});

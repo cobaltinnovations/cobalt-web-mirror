@@ -48,17 +48,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 		lineHeight: 1.4,
 		color: theme.colors.n700,
 	},
-	cancelButton: {
-		marginTop: 24,
-		borderColor: theme.colors.d500,
-		color: theme.colors.d500,
-		fontWeight: 700,
-		'&:hover, &:focus': {
-			borderColor: theme.colors.d500,
-			backgroundColor: theme.colors.d500,
-			color: theme.colors.n0,
-		},
-	},
 }));
 
 interface ImageRepositoryUploaderProps {
@@ -122,7 +111,7 @@ const ImageRepositoryUploader: FC<ImageRepositoryUploaderProps> = ({
 				{!isComplete && !hasError && 'This may take a couple minutes'}
 			</p>
 			{onCancelUpload && !isComplete && !hasError && (
-				<Button className={classes.cancelButton} variant="outline-danger" onClick={onCancelUpload}>
+				<Button variant="outline-danger" onClick={onCancelUpload}>
 					Cancel Upload
 				</Button>
 			)}

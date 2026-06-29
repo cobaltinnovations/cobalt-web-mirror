@@ -3,6 +3,7 @@ import { FILE_UPLOAD_TYPE_ID } from '@/lib/services/media-service';
 export enum IMAGE_REPOSITORY_SCREEN_ID {
 	BROWSE_IMAGES = 'BROWSE_IMAGES',
 	ADD_IMAGE = 'ADD_IMAGE',
+	CROP_IMAGE = 'CROP_IMAGE',
 	SELECTED_IMAGE = 'SELECTED_IMAGE',
 }
 
@@ -31,10 +32,11 @@ export interface ImageRepositoryCropSelection {
 }
 
 export interface ImageRepositorySelectedImage {
-	file: File;
+	file?: File;
 	imageName: string;
 	imageUrl: string;
 	imageAltText: string;
+	sourceImageId?: string;
 }
 
 export interface ImageRepositoryUploadAsset {
@@ -52,7 +54,8 @@ export interface ImageRepositoryCroppedImage extends ImageRepositoryUploadAsset 
 }
 
 export interface ImageRepositoryUploadPayload {
-	rawImage: ImageRepositoryUploadAsset;
+	rawImage?: ImageRepositoryUploadAsset;
+	sourceImageId?: string;
 	croppedImage: ImageRepositoryCroppedImage;
 	imageAltText: string;
 }
@@ -61,7 +64,12 @@ export interface ImageRepositoryScreenProps {
 	onNavigate(nextScreenId: IMAGE_REPOSITORY_SCREEN_ID): void;
 	onFileSelected?(file: File): void;
 	onImageUploaded?(): void;
+	onRepositoryImageSelected?(imageId: string): void;
+	onRepositoryImageRecrop?(image: ImageRepositorySelectedImage, cropRatio: IMAGE_REPOSITORY_CROP_RATIO): void;
+	onRepositoryImageVariantAvailabilityChange?(isAvailable: boolean): void;
 	onSelectedImageChange?(image: ImageRepositorySelectedImage): void;
 	onUploadStatusChange?(isUploading: boolean): void;
+	initialCropRatio?: IMAGE_REPOSITORY_CROP_RATIO;
+	repositoryImageId?: string;
 	selectedImage?: ImageRepositorySelectedImage;
 }

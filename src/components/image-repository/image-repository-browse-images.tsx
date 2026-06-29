@@ -33,7 +33,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
-const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigate }) => {
+const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigate, onRepositoryImageSelected }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const [images, setImages] = useState<ImageListModel[]>([]);
@@ -98,6 +98,9 @@ const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigat
 						key={image.sourceImageId}
 						imageName={image.thumbnail.filename}
 						imageUrl={image.thumbnail.url}
+						onClick={() => {
+							onRepositoryImageSelected?.(image.sourceImageId);
+						}}
 					/>
 				))}
 		</div>
