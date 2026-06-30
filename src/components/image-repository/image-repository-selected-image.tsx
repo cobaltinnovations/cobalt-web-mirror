@@ -1,11 +1,11 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import AsyncWrapper from '@/components/async-page';
 import InputHelper from '@/components/input-helper';
-import InlineAlert from '@/components/inline-alert';
 import Loader from '@/components/loader';
 import NoData from '@/components/no-data';
+import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import {
 	FILE_UPLOAD_TYPE_ID,
@@ -17,21 +17,17 @@ import {
 import { IMAGE_REPOSITORY_CROP_RATIO, ImageRepositoryScreenProps } from './image-repository.types';
 
 interface CropRatioConfig {
-	aspectRatio: string;
 	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
 }
 
 const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
 	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: {
-		aspectRatio: '16 / 9',
 		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
 	},
 	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: {
-		aspectRatio: '4 / 3',
 		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
 	},
 	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: {
-		aspectRatio: '1 / 1',
 		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
 	},
 };
@@ -39,56 +35,35 @@ const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioC
 const useStyles = createUseThemedStyles((theme) => ({
 	selectedImageScreen: {
 		display: 'grid',
-		gridTemplateColumns: 'minmax(0, 1fr) 296px',
-		minHeight: 575,
+		gridTemplateColumns: 'minmax(0, 1fr) 320px',
+		height: 575,
 	},
 	imagePanel: {
 		minWidth: 0,
 		display: 'flex',
-		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
 		padding: '32px',
 		borderRight: `1px solid ${theme.colors.border}`,
-		backgroundColor: theme.colors.n0,
-	},
-	imagePanelHeader: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		gap: 24,
-		marginBottom: 24,
-	},
-	ratioControls: {
-		display: 'flex',
-		alignItems: 'center',
-		gap: 18,
-	},
-	imagePreviewOuter: {
-		flex: 1,
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		minHeight: 0,
-	},
-	imagePreview: {
-		width: '100%',
-		maxHeight: '100%',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		overflow: 'hidden',
-		aspectRatio: ({ cropRatio }: { cropRatio: IMAGE_REPOSITORY_CROP_RATIO }) =>
-			cropRatioConfigByCropRatio[cropRatio].aspectRatio,
-		backgroundColor: theme.colors.n500,
+		backgroundColor: theme.colors.background,
 	},
 	imagePreviewImage: {
-		width: '100%',
-		height: '100%',
 		display: 'block',
+		maxWidth: '100%',
+		maxHeight: '100%',
 		objectFit: 'contain',
 	},
 	metadataPanel: {
+		display: 'flex',
+		flexDirection: 'column',
 		padding: 24,
 		backgroundColor: theme.colors.n0,
+		overflowY: 'auto',
+	},
+	metadataActions: {
+		display: 'flex',
+		justifyContent: 'flex-end',
+		marginTop: 'auto',
 	},
 	loadingState: {
 		gridColumn: '1 / -1',
@@ -148,6 +123,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 
 		return getImageVariantForRatio(imageDetails.variants, cropRatio);
 	}, [cropRatio, imageDetails, repositoryImageId]);
+	const selectedImageMetadata = displayImage ?? imageDetails?.image;
 
 	useEffect(() => {
 		onRepositoryImageVariantAvailabilityChange?.(!!displayImage);
@@ -186,69 +162,63 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 			{imageDetails && (
 				<div className={classes.selectedImageScreen}>
 					<div className={classes.imagePanel}>
-						<div className={classes.imagePanelHeader}>
-							<div className={classes.ratioControls}>
-								<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
-								{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
-									<Form.Check
-										key={ratio}
-										inline
-										type="radio"
-										name="image-repository-selected-image-ratio"
-										id={`image-repository-selected-image-ratio-${ratio}`}
-										label={<span className="fs-large fw-semibold">{ratio}</span>}
-										checked={cropRatio === ratio}
-										onChange={() => {
-											setCropRatio(ratio);
-										}}
-									/>
-								))}
-							</div>
-							<Button variant="outline-primary" type="button" onClick={handleRecrop}>
-								Re-crop {cropRatio}
-							</Button>
-						</div>
-						<div className={classes.imagePreviewOuter}>
-							{displayImage?.url ? (
-								<div className={classes.imagePreview}>
-									<img
-										className={classes.imagePreviewImage}
-										src={displayImage.url}
-										alt={imageDetails.image.imageAltText ?? imageDetails.image.filename}
-									/>
-								</div>
-							) : (
-								<NoData
-									title={`No ${cropRatio} image available`}
-									description="This image has not been cropped to the selected ratio yet."
-									actions={[]}
-								/>
-							)}
-						</div>
+						{displayImage?.url ? (
+							<img
+								className={classes.imagePreviewImage}
+								src={displayImage.url}
+								alt={imageDetails.image.imageAltText ?? imageDetails.image.filename}
+							/>
+						) : (
+							<NoData
+								title={`No ${cropRatio} image available`}
+								description="This image has not been cropped to the selected ratio yet."
+								actions={[]}
+							/>
+						)}
 					</div>
 					<div className={classes.metadataPanel}>
-						<h3 className="mb-4 fs-default fw-semibold">Image Metadata</h3>
-						<InlineAlert
+						<InputHelper
 							className="mb-4"
-							variant="warning"
-							title="Updating this information will update it everywhere the image is used on Cobalt"
-						/>
+							label="Image Ratio:"
+							as="select"
+							value={cropRatio}
+							onChange={({ currentTarget }) => {
+								setCropRatio(currentTarget.value as IMAGE_REPOSITORY_CROP_RATIO);
+							}}
+						>
+							{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
+								<option key={ratio} value={ratio}>
+									{ratio}
+								</option>
+							))}
+						</InputHelper>
+						<p className="mb-4 fs-large fw-semibold">{cropRatio} Image Metadata</p>
+						{selectedImageMetadata?.createdDescription && (
+							<p className="mb-4 text-muted">Created {selectedImageMetadata.createdDescription}</p>
+						)}
 						<InputHelper
 							className="mb-4"
 							required
-							label="Image Name"
-							value={imageDetails.image.filename}
+							label="Name"
+							value={selectedImageMetadata?.filename ?? ''}
 							readOnly
 						/>
 						<InputHelper
+							className="mb-4"
 							as="textarea"
 							label="Image alt text"
 							placeholder="Describe the image for screen readers"
 							value={imageDetails.image.imageAltText ?? ''}
 							readOnly
 						/>
-						<h3 className="mt-7 mb-4 fs-default fw-semibold">Where is this image used?</h3>
+						<h3 className="mb-4 fs-default fw-semibold">Where is this image used?</h3>
 						<p className="mb-0 text-muted">Usage data is not available yet.</p>
+						<div className={classes.metadataActions}>
+							<Button variant="outline-primary" type="button" onClick={handleRecrop}>
+								<SvgIcon kit="far" icon="pen" size={16} className="me-2" />
+								Edit {cropRatio} Image
+							</Button>
+						</div>
 					</div>
 				</div>
 			)}
