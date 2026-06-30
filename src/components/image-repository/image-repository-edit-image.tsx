@@ -178,7 +178,12 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 				return;
 			}
 
+			console.log('startUpload 1isUploading', isUploading);
+			console.log('startUpload selectedImage', selectedImage);
+
 			const cropSelection = getCropSelection();
+
+			console.log('startUpload cropSelection', cropSelection);
 
 			if (!cropSelection) {
 				return;
@@ -188,12 +193,16 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 			uploadRunIdRef.current = uploadRunId;
 			activeUploadXhrRef.current = undefined;
 
+			console.log('startUpload 444444');
+
 			const isCurrentUpload = () => uploadRunIdRef.current === uploadRunId;
 			const handleXhrCreated = (xhr: XMLHttpRequest) => {
 				if (isCurrentUpload()) {
 					activeUploadXhrRef.current = xhr;
 				}
 			};
+
+			console.log('startUpload 33333');
 
 			try {
 				setProgress(0);
@@ -206,7 +215,11 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 					});
 				});
 
-				const imageUploadPayload = await getImageUploadPayload(selectedImage, cropSelection);
+				console.log('startUpload 22222');
+
+				const imageUploadPayload = await getImageUploadPayload(selectedImage, cropSelection, imageRef.current);
+
+				console.log('startUpload imageUploadPayload', imageUploadPayload);
 
 				if (!isCurrentUpload()) {
 					return;
@@ -233,6 +246,8 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 					onImageUploaded?.();
 				}
 			} catch (error) {
+				console.log('error', error);
+
 				if (!isCurrentUpload()) {
 					return;
 				}
@@ -265,6 +280,7 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 						<ReactCrop
 							key={selectedImage.imageUrl}
 							src={selectedImage.imageUrl}
+							crossorigin="anonymous"
 							imageAlt={selectedImage.imageAltText}
 							crop={crop}
 							disabled={isUploading}

@@ -83,6 +83,17 @@ function getImageVariantForRatio(
 	);
 }
 
+function getSourceImageFromDetails(imageDetails: ImageDetailModel): ImageModel {
+	if (imageDetails.image.fileUploadTypeId === FILE_UPLOAD_TYPE_ID.IMAGE_RAW) {
+		return imageDetails.image;
+	}
+
+	return (
+		imageDetails.variants.find((variant) => variant.fileUploadTypeId === FILE_UPLOAD_TYPE_ID.IMAGE_RAW) ??
+		imageDetails.image
+	);
+}
+
 type ImageRepositorySelectedImageProps = Pick<
 	ImageRepositoryScreenProps,
 	'onRepositoryImageEdit' | 'onRepositoryImageVariantAvailabilityChange' | 'repositoryImageId'
@@ -136,12 +147,13 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 			}
 
 			const nextImageVariant = getImageVariantForRatio(imageDetails.variants, nextCropRatio);
+			const sourceImage = getSourceImageFromDetails(imageDetails);
 
 			return {
-				imageName: nextImageVariant?.filename ?? imageDetails.image.filename,
-				imageUrl: imageDetails.image.url,
+				imageName: nextImageVariant?.filename ?? sourceImage.filename,
+				imageUrl: sourceImage.url,
 				imageAltText: imageDetails.image.imageAltText ?? '',
-				sourceImageId: imageDetails.image.imageId,
+				sourceImageId: sourceImage.imageId,
 				createdDescription: nextImageVariant?.createdDescription,
 				isCreatingMissingVariant: !nextImageVariant,
 			};

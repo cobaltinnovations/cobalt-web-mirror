@@ -318,10 +318,16 @@ async function getCroppedImageAsset(
 
 export async function getImageUploadPayload(
 	selectedImage: ImageRepositorySelectedImageModel,
-	cropSelection: ImageRepositoryCropSelection
+	cropSelection: ImageRepositoryCropSelection,
+	loadedImage?: HTMLImageElement
 ): Promise<ImageRepositoryUploadPayload | undefined> {
-	const image = await loadImage(selectedImage.imageUrl);
+	const image = loadedImage ?? (await loadImage(selectedImage.imageUrl));
+
+	console.log('tainted', image);
+
 	const croppedImage = await getCroppedImageAsset(image, selectedImage.imageName, cropSelection);
+
+	console.log('tainted', croppedImage);
 
 	if (!croppedImage) {
 		return;
@@ -683,7 +689,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 				await waitForNextFrame();
 				await waitForNextFrame();
 
-				const imageUploadPayload = await getImageUploadPayload(selectedImage, cropSelection);
+				const imageUploadPayload = await getImageUploadPayload(selectedImage, cropSelection, imageRef.current);
 
 				if (!isCurrentUpload()) {
 					return;
@@ -742,6 +748,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 						<ReactCrop
 							key={selectedImage.imageUrl}
 							src={selectedImage.imageUrl}
+							crossorigin="anonymous"
 							imageAlt={selectedImage.imageAltText}
 							crop={crop}
 							disabled={isUploading}
