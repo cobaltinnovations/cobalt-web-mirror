@@ -1,5 +1,6 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { PresignedUploadModel } from '@/lib/models';
+import { buildQueryParamUrl } from '@/lib/utils/url-utils';
 
 export enum FILE_UPLOAD_TYPE_ID {
 	IMAGE_RAW = 'IMAGE_RAW',
@@ -102,10 +103,10 @@ export const mediaService = {
 			url: `/media/images/${imageId}/uploaded`,
 		});
 	},
-	getImages() {
+	getImages(queryParameters?: { searchQuery?: string }) {
 		return httpSingleton.orchestrateRequest<{ images: ImageListModel[] }>({
 			method: 'GET',
-			url: '/media/images/',
+			url: buildQueryParamUrl('/media/images', queryParameters),
 		});
 	},
 	getImage(imageId: string) {
