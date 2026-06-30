@@ -8,6 +8,7 @@ import SvgIcon from '@/components/svg-icon';
 import ImageRepositoryAddImage from './image-repository-add-image';
 import ImageRepositoryBrowseImages from './image-repository-browse-images';
 import ImageRepositoryCropImage, { ImageRepositoryCropImageRef } from './image-repository-crop-image';
+import ImageRepositoryEditImage, { ImageRepositoryEditImageRef } from './image-repository-edit-image';
 import ImageRepositorySelectedImage from './image-repository-selected-image';
 import {
 	IMAGE_REPOSITORY_CROP_RATIO,
@@ -26,6 +27,7 @@ const modalTitleByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string> = {
 	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: 'Image Repository',
 	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: 'Add Image',
 	[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: 'Add Image',
+	[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: 'Add Image',
 	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'Add Image',
 };
 
@@ -33,6 +35,7 @@ const modalBodyClassNameByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string | 
 	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: 'p-0',
+	[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: 'p-0',
 	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'p-0',
 };
 
@@ -43,6 +46,7 @@ interface ImageRepositoryProps extends ModalProps {
 const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, onHide, show, ...modalProps }) => {
 	const classes = useStyles();
 	const cropImageRef = useRef<ImageRepositoryCropImageRef>(null);
+	const editImageRef = useRef<ImageRepositoryEditImageRef>(null);
 	const selectedImageUrlRef = useRef<string>();
 	const [activeScreenId, setActiveScreenId] = useState<IMAGE_REPOSITORY_SCREEN_ID>(
 		IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES
@@ -80,6 +84,10 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
 	}, [resetFlow]);
 
+	const handleReturnToSelectedImage = useCallback(() => {
+		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
+	}, []);
+
 	const handleHide = useCallback(() => {
 		resetFlow();
 		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES);
@@ -110,12 +118,12 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
 	}, []);
 
-	const handleRepositoryImageRecrop = useCallback(
+	const handleRepositoryImageEdit = useCallback(
 		(image: ImageRepositorySelectedImageModel, cropRatio: IMAGE_REPOSITORY_CROP_RATIO) => {
 			revokeSelectedImageUrl();
 			setSelectedImage(image);
 			setInitialCropRatio(cropRatio);
-			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE);
+			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE);
 		},
 		[revokeSelectedImageUrl]
 	);
@@ -130,6 +138,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		}
 
 		cropImageRef.current.startUpload();
+	}, []);
+
+	const handleEditComplete = useCallback(() => {
+		if (!editImageRef.current) {
+			return;
+		}
+
+		editImageRef.current.startUpload();
 	}, []);
 
 	useEffect(() => {
@@ -148,6 +164,12 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	useEffect(() => {
 		if (activeScreenId === IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE && !selectedImage) {
 			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE);
+		}
+	}, [activeScreenId, selectedImage]);
+
+	useEffect(() => {
+		if (activeScreenId === IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE && !selectedImage) {
+			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
 		}
 	}, [activeScreenId, selectedImage]);
 
@@ -176,9 +198,19 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 					selectedImage={selectedImage}
 				/>
 			),
+			[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: (
+				<ImageRepositoryEditImage
+					ref={editImageRef}
+					onImageUploaded={handleHide}
+					onSelectedImageChange={handleSelectedImageChange}
+					onUploadStatusChange={setIsUploadingImage}
+					initialCropRatio={initialCropRatio}
+					selectedImage={selectedImage}
+				/>
+			),
 			[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: (
 				<ImageRepositorySelectedImage
-					onRepositoryImageRecrop={handleRepositoryImageRecrop}
+					onRepositoryImageEdit={handleRepositoryImageEdit}
 					onRepositoryImageVariantAvailabilityChange={setIsSelectedRepositoryImageVariantAvailable}
 					repositoryImageId={repositoryImageId}
 				/>
@@ -188,7 +220,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 			handleFileSelected,
 			handleHide,
 			handleNavigate,
-			handleRepositoryImageRecrop,
+			handleRepositoryImageEdit,
 			handleRepositoryImageSelected,
 			handleSelectedImageChange,
 			initialCropRatio,
@@ -225,6 +257,21 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 					</Button>
 				</div>
 			),
+			[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: (
+				<div className="d-flex justify-content-between w-100">
+					<Button variant="outline-primary" onClick={handleReturnToSelectedImage} disabled={isUploadingImage}>
+						<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
+						Back
+					</Button>
+					<Button
+						variant="primary"
+						onClick={handleEditComplete}
+						disabled={!selectedImage || isUploadingImage}
+					>
+						Save Image
+					</Button>
+				</div>
+			),
 			[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: (
 				<div className="d-flex justify-content-between w-100">
 					<Button variant="outline-primary" onClick={handleReturnToLibrary}>
@@ -243,8 +290,10 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		}),
 		[
 			handleCropComplete,
+			handleEditComplete,
 			handleHide,
 			handleReturnToLibrary,
+			handleReturnToSelectedImage,
 			isSelectedRepositoryImageVariantAvailable,
 			isUploadingImage,
 			selectedImage,

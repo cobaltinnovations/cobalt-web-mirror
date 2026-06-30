@@ -85,17 +85,17 @@ function getImageVariantForRatio(
 
 type ImageRepositorySelectedImageProps = Pick<
 	ImageRepositoryScreenProps,
-	'onRepositoryImageRecrop' | 'onRepositoryImageVariantAvailabilityChange' | 'repositoryImageId'
+	'onRepositoryImageEdit' | 'onRepositoryImageVariantAvailabilityChange' | 'repositoryImageId'
 >;
 
 const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
-	onRepositoryImageRecrop,
+	onRepositoryImageEdit,
 	onRepositoryImageVariantAvailabilityChange,
 	repositoryImageId,
 }) => {
 	const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
 	const [imageDetails, setImageDetails] = useState<ImageDetailModel>();
-	const classes = useStyles({ cropRatio });
+	const classes = useStyles();
 
 	const request = useMemo(() => {
 		if (!repositoryImageId) {
@@ -129,21 +129,58 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 		onRepositoryImageVariantAvailabilityChange?.(!!displayImage);
 	}, [displayImage, onRepositoryImageVariantAvailabilityChange]);
 
-	const handleRecrop = useCallback(() => {
-		if (!imageDetails) {
-			return;
-		}
+	const getSelectedImageForEdit = useCallback(
+		(nextCropRatio: IMAGE_REPOSITORY_CROP_RATIO) => {
+			if (!imageDetails) {
+				return;
+			}
 
-		onRepositoryImageRecrop?.(
-			{
-				imageName: imageDetails.image.filename,
+			const nextImageVariant = getImageVariantForRatio(imageDetails.variants, nextCropRatio);
+
+			return {
+				imageName: nextImageVariant?.filename ?? imageDetails.image.filename,
 				imageUrl: imageDetails.image.url,
 				imageAltText: imageDetails.image.imageAltText ?? '',
 				sourceImageId: imageDetails.image.imageId,
-			},
-			cropRatio
-		);
-	}, [cropRatio, imageDetails, onRepositoryImageRecrop]);
+				createdDescription: nextImageVariant?.createdDescription,
+				isCreatingMissingVariant: !nextImageVariant,
+			};
+		},
+		[imageDetails]
+	);
+
+	const handleCropRatioChange = useCallback(
+		(nextCropRatio: IMAGE_REPOSITORY_CROP_RATIO) => {
+			if (!imageDetails) {
+				return;
+			}
+
+			const nextImageVariant = getImageVariantForRatio(imageDetails.variants, nextCropRatio);
+
+			if (!nextImageVariant) {
+				const selectedImageForEdit = getSelectedImageForEdit(nextCropRatio);
+
+				if (selectedImageForEdit) {
+					onRepositoryImageEdit?.(selectedImageForEdit, nextCropRatio);
+				}
+
+				return;
+			}
+
+			setCropRatio(nextCropRatio);
+		},
+		[getSelectedImageForEdit, imageDetails, onRepositoryImageEdit]
+	);
+
+	const handleEdit = useCallback(() => {
+		const selectedImageForEdit = getSelectedImageForEdit(cropRatio);
+
+		if (!selectedImageForEdit) {
+			return;
+		}
+
+		onRepositoryImageEdit?.(selectedImageForEdit, cropRatio);
+	}, [cropRatio, getSelectedImageForEdit, onRepositoryImageEdit]);
 
 	if (!repositoryImageId) {
 		return null;
@@ -183,7 +220,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 							as="select"
 							value={cropRatio}
 							onChange={({ currentTarget }) => {
-								setCropRatio(currentTarget.value as IMAGE_REPOSITORY_CROP_RATIO);
+								handleCropRatioChange(currentTarget.value as IMAGE_REPOSITORY_CROP_RATIO);
 							}}
 						>
 							{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
@@ -202,6 +239,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 							label="Name"
 							value={selectedImageMetadata?.filename ?? ''}
 							readOnly
+							disabled
 						/>
 						<InputHelper
 							className="mb-4"
@@ -210,11 +248,12 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 							placeholder="Describe the image for screen readers"
 							value={imageDetails.image.imageAltText ?? ''}
 							readOnly
+							disabled
 						/>
 						<h3 className="mb-4 fs-default fw-semibold">Where is this image used?</h3>
 						<p className="mb-0 text-muted">Usage data is not available yet.</p>
 						<div className={classes.metadataActions}>
-							<Button variant="outline-primary" type="button" onClick={handleRecrop}>
+							<Button variant="outline-primary" type="button" onClick={handleEdit}>
 								<SvgIcon kit="far" icon="pen" size={16} className="me-2" />
 								Edit {cropRatio} Image
 							</Button>

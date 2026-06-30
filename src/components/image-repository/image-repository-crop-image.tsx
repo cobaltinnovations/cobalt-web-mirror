@@ -34,7 +34,7 @@ interface CropRatioConfig {
 	fileNameSuffix: string;
 }
 
-const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
+export const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
 	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: {
 		aspect: 16 / 9,
 		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
@@ -61,13 +61,41 @@ const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioC
 	},
 };
 
-const getInitialCrop = (cropRatio: IMAGE_REPOSITORY_CROP_RATIO): ReactCrop.Crop => {
+const INITIAL_CROP_MAX_SIZE_PERCENT = 70;
+
+export const getInitialCrop = (
+	cropRatio: IMAGE_REPOSITORY_CROP_RATIO,
+	imageWidth?: number,
+	imageHeight?: number
+): ReactCrop.Crop => {
+	const aspect = cropRatioConfigByCropRatio[cropRatio].aspect;
+
+	if (!imageWidth || !imageHeight) {
+		return {
+			unit: '%' as '%',
+			x: 15,
+			y: 15,
+			width: INITIAL_CROP_MAX_SIZE_PERCENT,
+			aspect,
+		};
+	}
+
+	const renderedAspect = imageWidth / imageHeight;
+	let width = INITIAL_CROP_MAX_SIZE_PERCENT;
+	let height = (width * renderedAspect) / aspect;
+
+	if (height > INITIAL_CROP_MAX_SIZE_PERCENT) {
+		height = INITIAL_CROP_MAX_SIZE_PERCENT;
+		width = (height * aspect) / renderedAspect;
+	}
+
 	return {
 		unit: '%' as '%',
-		x: 15,
-		y: 15,
-		width: 70,
-		aspect: cropRatioConfigByCropRatio[cropRatio].aspect,
+		x: (100 - width) / 2,
+		y: (100 - height) / 2,
+		width,
+		height,
+		aspect,
 	};
 };
 
@@ -268,16 +296,19 @@ async function getCroppedImageAsset(
 	const thumbnailBlobResult = await getCanvasBlob(thumbnailCanvas);
 	const baseImageName = stripExtension(imageName);
 	const fileNameSuffix = cropRatioConfig.fileNameSuffix;
+	const outputBaseImageName = baseImageName.endsWith(`-${fileNameSuffix}`)
+		? baseImageName
+		: `${baseImageName}-${fileNameSuffix}`;
 
 	return {
 		blob: cropBlobResult.blob,
-		imageName: `${baseImageName}-${fileNameSuffix}.${cropBlobResult.extension}`,
+		imageName: `${outputBaseImageName}.${cropBlobResult.extension}`,
 		width: outputDimensions.width,
 		height: outputDimensions.height,
 		fileUploadTypeId: cropRatioConfig.fileUploadTypeId,
 		thumbnail: {
 			blob: thumbnailBlobResult.blob,
-			imageName: `${baseImageName}-${fileNameSuffix}-thumbnail.${thumbnailBlobResult.extension}`,
+			imageName: `${outputBaseImageName}-thumbnail.${thumbnailBlobResult.extension}`,
 			width: thumbnailCanvas.width,
 			height: thumbnailCanvas.height,
 			fileUploadTypeId: cropRatioConfig.thumbnailFileUploadTypeId,
@@ -285,7 +316,7 @@ async function getCroppedImageAsset(
 	};
 }
 
-async function getImageUploadPayload(
+export async function getImageUploadPayload(
 	selectedImage: ImageRepositorySelectedImageModel,
 	cropSelection: ImageRepositoryCropSelection
 ): Promise<ImageRepositoryUploadPayload | undefined> {
@@ -353,14 +384,16 @@ interface UploadMediaImageAssetOptions {
 	asset: ImageRepositoryUploadAsset;
 	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
 	sourceImageId?: string;
+	imageAltText?: string;
 	onProgress(percentage: number): void;
 	onXhrCreated(xhr: XMLHttpRequest): void;
 }
 
-async function uploadMediaImageAsset({
+export async function uploadMediaImageAsset({
 	asset,
 	fileUploadTypeId,
 	sourceImageId,
+	imageAltText,
 	onProgress,
 	onXhrCreated,
 }: UploadMediaImageAssetOptions): Promise<ImageModel> {
@@ -373,6 +406,7 @@ async function uploadMediaImageAsset({
 			width: asset.width,
 			height: asset.height,
 			sourceImageId,
+			imageAltText,
 		})
 		.fetch();
 
@@ -386,6 +420,82 @@ async function uploadMediaImageAsset({
 	const { image } = await mediaService.setImageAsUploaded(mediaImageUploadResult.imageId).fetch();
 
 	return image;
+}
+
+interface UploadImageRepositoryPayloadOptions {
+	imageUploadPayload: ImageRepositoryUploadPayload;
+	isCurrentUpload(): boolean;
+	onProgress(percentage: number): void;
+	onXhrCreated(xhr: XMLHttpRequest): void;
+}
+
+export async function uploadImageRepositoryPayload({
+	imageUploadPayload,
+	isCurrentUpload,
+	onProgress,
+	onXhrCreated,
+}: UploadImageRepositoryPayloadOptions): Promise<void> {
+	const uploadStepsCount = imageUploadPayload.rawImage ? 3 : 2;
+	let uploadStepIndex = 0;
+	let sourceImageId = imageUploadPayload.sourceImageId;
+
+	const setStepProgress = (stepIndex: number, stepProgress: number) => {
+		if (!isCurrentUpload()) {
+			return;
+		}
+
+		onProgress(Math.round(((stepIndex + stepProgress / 100) / uploadStepsCount) * 100));
+	};
+
+	if (imageUploadPayload.rawImage) {
+		const rawImage = await uploadMediaImageAsset({
+			asset: imageUploadPayload.rawImage,
+			fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_RAW,
+			imageAltText: imageUploadPayload.imageAltText,
+			onProgress: (percentage) => {
+				setStepProgress(uploadStepIndex, percentage);
+			},
+			onXhrCreated,
+		});
+
+		if (!isCurrentUpload()) {
+			return;
+		}
+
+		sourceImageId = rawImage.imageId;
+		uploadStepIndex += 1;
+	}
+
+	if (!sourceImageId) {
+		throw CobaltError.fromValidationFailed('There was an error preparing your image.');
+	}
+
+	const croppedImage = await uploadMediaImageAsset({
+		asset: imageUploadPayload.croppedImage,
+		fileUploadTypeId: imageUploadPayload.croppedImage.fileUploadTypeId,
+		sourceImageId,
+		imageAltText: imageUploadPayload.imageAltText,
+		onProgress: (percentage) => {
+			setStepProgress(uploadStepIndex, percentage);
+		},
+		onXhrCreated,
+	});
+
+	if (!isCurrentUpload()) {
+		return;
+	}
+
+	uploadStepIndex += 1;
+
+	await uploadMediaImageAsset({
+		asset: imageUploadPayload.croppedImage.thumbnail,
+		fileUploadTypeId: imageUploadPayload.croppedImage.thumbnail.fileUploadTypeId,
+		sourceImageId: croppedImage.imageId,
+		onProgress: (percentage) => {
+			setStepProgress(uploadStepIndex, percentage);
+		},
+		onXhrCreated,
+	});
 }
 
 export interface ImageRepositoryCropImageRef {
@@ -509,10 +619,14 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 			};
 		}, [onUploadStatusChange]);
 
-		const handleImageLoaded = useCallback((image: HTMLImageElement) => {
-			imageRef.current = image;
-			return true;
-		}, []);
+		const handleImageLoaded = useCallback(
+			(image: HTMLImageElement) => {
+				imageRef.current = image;
+				setCrop(getInitialCrop(cropRatio, image.width, image.height));
+				return false;
+			},
+			[cropRatio]
+		);
 
 		const getCropSelection = useCallback((): ImageRepositoryCropSelection | undefined => {
 			if (!selectedImage || !imageRef.current) {
@@ -580,62 +694,10 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 				}
 
 				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING);
-				const uploadStepsCount = imageUploadPayload.rawImage ? 3 : 2;
-				let uploadStepIndex = 0;
-				let sourceImageId = imageUploadPayload.sourceImageId;
-				const setStepProgress = (stepIndex: number, stepProgress: number) => {
-					if (!isCurrentUpload()) {
-						return;
-					}
-
-					setProgress(Math.round(((stepIndex + stepProgress / 100) / uploadStepsCount) * 100));
-				};
-
-				if (imageUploadPayload.rawImage) {
-					const rawImage = await uploadMediaImageAsset({
-						asset: imageUploadPayload.rawImage,
-						fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_RAW,
-						onProgress: (percentage) => {
-							setStepProgress(uploadStepIndex, percentage);
-						},
-						onXhrCreated: handleXhrCreated,
-					});
-
-					if (!isCurrentUpload()) {
-						return;
-					}
-
-					sourceImageId = rawImage.imageId;
-					uploadStepIndex += 1;
-				}
-
-				if (!sourceImageId) {
-					throw CobaltError.fromValidationFailed('There was an error preparing your image.');
-				}
-
-				const croppedImage = await uploadMediaImageAsset({
-					asset: imageUploadPayload.croppedImage,
-					fileUploadTypeId: imageUploadPayload.croppedImage.fileUploadTypeId,
-					sourceImageId,
-					onProgress: (percentage) => {
-						setStepProgress(uploadStepIndex, percentage);
-					},
-					onXhrCreated: handleXhrCreated,
-				});
-
-				if (!isCurrentUpload()) {
-					return;
-				}
-
-				uploadStepIndex += 1;
-
-				await uploadMediaImageAsset({
-					asset: imageUploadPayload.croppedImage.thumbnail,
-					fileUploadTypeId: imageUploadPayload.croppedImage.thumbnail.fileUploadTypeId,
-					sourceImageId: croppedImage.imageId,
-					onProgress: (percentage) => {
-						setStepProgress(uploadStepIndex, percentage);
-					},
+				await uploadImageRepositoryPayload({
+					imageUploadPayload,
+					isCurrentUpload,
+					onProgress: setProgress,
 					onXhrCreated: handleXhrCreated,
 				});
 
@@ -684,8 +746,8 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 							crop={crop}
 							disabled={isUploading}
 							onImageLoaded={handleImageLoaded}
-							onChange={(nextCrop) => {
-								setCrop(nextCrop);
+							onChange={(_, percentCrop) => {
+								setCrop(percentCrop);
 							}}
 						/>
 					</div>
@@ -704,7 +766,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 								disabled={isUploading}
 								onChange={() => {
 									setCropRatio(ratio);
-									setCrop(getInitialCrop(ratio));
+									setCrop(getInitialCrop(ratio, imageRef.current?.width, imageRef.current?.height));
 								}}
 							/>
 						))}

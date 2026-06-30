@@ -25,6 +25,7 @@ export interface GetPresignedUploadRequestBody {
 	width: number;
 	height: number;
 	sourceImageId?: string;
+	imageAltText?: string;
 }
 
 export interface ImageModel {

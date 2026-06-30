@@ -4,6 +4,7 @@ export enum IMAGE_REPOSITORY_SCREEN_ID {
 	BROWSE_IMAGES = 'BROWSE_IMAGES',
 	ADD_IMAGE = 'ADD_IMAGE',
 	CROP_IMAGE = 'CROP_IMAGE',
+	EDIT_IMAGE = 'EDIT_IMAGE',
 	SELECTED_IMAGE = 'SELECTED_IMAGE',
 }
 
@@ -37,6 +38,8 @@ export interface ImageRepositorySelectedImage {
 	imageUrl: string;
 	imageAltText: string;
 	sourceImageId?: string;
+	createdDescription?: string;
+	isCreatingMissingVariant?: boolean;
 }
 
 export interface ImageRepositoryUploadAsset {
@@ -64,8 +67,8 @@ export interface ImageRepositoryScreenProps {
 	onNavigate(nextScreenId: IMAGE_REPOSITORY_SCREEN_ID): void;
 	onFileSelected?(file: File): void;
 	onImageUploaded?(): void;
+	onRepositoryImageEdit?(image: ImageRepositorySelectedImage, cropRatio: IMAGE_REPOSITORY_CROP_RATIO): void;
 	onRepositoryImageSelected?(imageId: string): void;
-	onRepositoryImageRecrop?(image: ImageRepositorySelectedImage, cropRatio: IMAGE_REPOSITORY_CROP_RATIO): void;
 	onRepositoryImageVariantAvailabilityChange?(isAvailable: boolean): void;
 	onSelectedImageChange?(image: ImageRepositorySelectedImage): void;
 	onUploadStatusChange?(isUploading: boolean): void;
