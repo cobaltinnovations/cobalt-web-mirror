@@ -152,7 +152,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 			return {
 				imageName: nextImageVariant?.filename ?? sourceImage.filename,
 				imageUrl: sourceImage.url,
-				imageAltText: imageDetails.image.imageAltText ?? '',
+				imageAltText: nextImageVariant?.imageAltText ?? sourceImage.imageAltText ?? '',
 				sourceImageId: sourceImage.imageId,
 				createdDescription: nextImageVariant?.createdDescription,
 				isCreatingMissingVariant: !nextImageVariant,
@@ -215,7 +215,11 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 							<img
 								className={classes.imagePreviewImage}
 								src={displayImage.url}
-								alt={imageDetails.image.imageAltText ?? imageDetails.image.filename}
+								alt={
+									displayImage.imageAltText ??
+									imageDetails.image.imageAltText ??
+									imageDetails.image.filename
+								}
 							/>
 						) : (
 							<NoData
@@ -258,7 +262,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 							as="textarea"
 							label="Image alt text"
 							placeholder="Describe the image for screen readers"
-							value={imageDetails.image.imageAltText ?? ''}
+							value={selectedImageMetadata?.imageAltText ?? ''}
 							readOnly
 							disabled
 						/>

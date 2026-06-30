@@ -31,7 +31,6 @@ interface CropRatioConfig {
 		height: number;
 	};
 	thumbnailWidth: number;
-	fileNameSuffix: string;
 }
 
 export const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
@@ -41,7 +40,6 @@ export const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, Cro
 		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_16X9,
 		ratioDimensions: { width: 16, height: 9 },
 		thumbnailWidth: 320,
-		fileNameSuffix: '16x9',
 	},
 	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: {
 		aspect: 4 / 3,
@@ -49,7 +47,6 @@ export const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, Cro
 		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_4X3,
 		ratioDimensions: { width: 4, height: 3 },
 		thumbnailWidth: 320,
-		fileNameSuffix: '4x3',
 	},
 	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: {
 		aspect: 1,
@@ -57,7 +54,6 @@ export const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, Cro
 		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_1X1,
 		ratioDimensions: { width: 1, height: 1 },
 		thumbnailWidth: 320,
-		fileNameSuffix: '1x1',
 	},
 };
 
@@ -295,20 +291,16 @@ async function getCroppedImageAsset(
 
 	const thumbnailBlobResult = await getCanvasBlob(thumbnailCanvas);
 	const baseImageName = stripExtension(imageName);
-	const fileNameSuffix = cropRatioConfig.fileNameSuffix;
-	const outputBaseImageName = baseImageName.endsWith(`-${fileNameSuffix}`)
-		? baseImageName
-		: `${baseImageName}-${fileNameSuffix}`;
 
 	return {
 		blob: cropBlobResult.blob,
-		imageName: `${outputBaseImageName}.${cropBlobResult.extension}`,
+		imageName: `${baseImageName}.${cropBlobResult.extension}`,
 		width: outputDimensions.width,
 		height: outputDimensions.height,
 		fileUploadTypeId: cropRatioConfig.fileUploadTypeId,
 		thumbnail: {
 			blob: thumbnailBlobResult.blob,
-			imageName: `${outputBaseImageName}-thumbnail.${thumbnailBlobResult.extension}`,
+			imageName: `${baseImageName}.${thumbnailBlobResult.extension}`,
 			width: thumbnailCanvas.width,
 			height: thumbnailCanvas.height,
 			fileUploadTypeId: cropRatioConfig.thumbnailFileUploadTypeId,
@@ -322,12 +314,7 @@ export async function getImageUploadPayload(
 	loadedImage?: HTMLImageElement
 ): Promise<ImageRepositoryUploadPayload | undefined> {
 	const image = loadedImage ?? (await loadImage(selectedImage.imageUrl));
-
-	console.log('tainted', image);
-
 	const croppedImage = await getCroppedImageAsset(image, selectedImage.imageName, cropSelection);
-
-	console.log('tainted', croppedImage);
 
 	if (!croppedImage) {
 		return;
@@ -497,6 +484,7 @@ export async function uploadImageRepositoryPayload({
 		asset: imageUploadPayload.croppedImage.thumbnail,
 		fileUploadTypeId: imageUploadPayload.croppedImage.thumbnail.fileUploadTypeId,
 		sourceImageId: croppedImage.imageId,
+		imageAltText: imageUploadPayload.imageAltText,
 		onProgress: (percentage) => {
 			setStepProgress(uploadStepIndex, percentage);
 		},

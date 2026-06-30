@@ -38,6 +38,7 @@ export interface ImageModel {
 	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
 	width: number;
 	height: number;
+	imageAltText?: string;
 	filename: string;
 	filesizeInBytes: string;
 	contentType: string;
@@ -82,9 +83,7 @@ export interface ImageListModel {
 }
 
 export interface ImageDetailModel {
-	image: ImageModel & {
-		imageAltText?: string;
-	};
+	image: ImageModel;
 	variants: ImageModel[];
 }
 
