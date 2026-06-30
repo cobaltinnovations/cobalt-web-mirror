@@ -4,10 +4,13 @@ import { Button, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import SvgIcon from '@/components/svg-icon';
+import useHandleError from '@/hooks/use-handle-error';
+import { mediaService } from '@/lib/services/media-service';
 
 import ImageRepositoryAddImage from './image-repository-add-image';
 import ImageRepositoryBrowseImages from './image-repository-browse-images';
 import ImageRepositoryCropImage, { ImageRepositoryCropImageRef } from './image-repository-crop-image';
+import ImageRepositoryDuplicateImage from './image-repository-duplicate-image';
 import ImageRepositoryEditImage, { ImageRepositoryEditImageRef } from './image-repository-edit-image';
 import ImageRepositorySelectedImage from './image-repository-selected-image';
 import {
@@ -15,6 +18,7 @@ import {
 	IMAGE_REPOSITORY_SCREEN_ID,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
 } from './image-repository.types';
+import { getSha256Hash } from './image-repository.utils';
 
 const useStyles = createUseStyles({
 	imageRepositoryModal: {
@@ -27,6 +31,7 @@ const modalTitleByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string> = {
 	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: 'Image Repository',
 	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: 'Add Image',
 	[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: 'Add Image',
+	[IMAGE_REPOSITORY_SCREEN_ID.DUPLICATE_IMAGE]: 'Add Image',
 	[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: 'Add Image',
 	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'Add Image',
 };
@@ -35,6 +40,7 @@ const modalBodyClassNameByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string | 
 	[IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: 'p-0',
+	[IMAGE_REPOSITORY_SCREEN_ID.DUPLICATE_IMAGE]: undefined,
 	[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: 'p-0',
 	[IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE]: 'p-0',
 };
@@ -45,15 +51,19 @@ interface ImageRepositoryProps extends ModalProps {
 
 const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, onHide, show, ...modalProps }) => {
 	const classes = useStyles();
+	const handleError = useHandleError();
 	const cropImageRef = useRef<ImageRepositoryCropImageRef>(null);
 	const editImageRef = useRef<ImageRepositoryEditImageRef>(null);
 	const selectedImageUrlRef = useRef<string>();
+	const duplicateDetectionRunIdRef = useRef(0);
 	const [activeScreenId, setActiveScreenId] = useState<IMAGE_REPOSITORY_SCREEN_ID>(
 		IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES
 	);
 	const [repositoryImageId, setRepositoryImageId] = useState<string>();
+	const [duplicateRepositoryImageId, setDuplicateRepositoryImageId] = useState<string>();
 	const [selectedImage, setSelectedImage] = useState<ImageRepositorySelectedImageModel>();
 	const [initialCropRatio, setInitialCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+	const [isDetectingDuplicateImage, setIsDetectingDuplicateImage] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 	const [isSelectedRepositoryImageVariantAvailable, setIsSelectedRepositoryImageVariantAvailable] = useState(false);
 
@@ -67,10 +77,13 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	}, []);
 
 	const resetFlow = useCallback(() => {
+		duplicateDetectionRunIdRef.current += 1;
 		revokeSelectedImageUrl();
+		setDuplicateRepositoryImageId(undefined);
 		setRepositoryImageId(undefined);
 		setSelectedImage(undefined);
 		setInitialCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+		setIsDetectingDuplicateImage(false);
 		setIsUploadingImage(false);
 		setIsSelectedRepositoryImageVariantAvailable(false);
 	}, [revokeSelectedImageUrl]);
@@ -95,22 +108,80 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	}, [onHide, resetFlow]);
 
 	const handleFileSelected = useCallback(
-		(file: File) => {
+		async (file: File) => {
 			const imageUrl = URL.createObjectURL(file);
+			const duplicateDetectionRunId = duplicateDetectionRunIdRef.current + 1;
+
+			duplicateDetectionRunIdRef.current = duplicateDetectionRunId;
 
 			revokeSelectedImageUrl();
 			selectedImageUrlRef.current = imageUrl;
-			setSelectedImage({
-				file,
-				imageName: file.name,
-				imageUrl,
-				imageAltText: '',
-			});
-			setInitialCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
-			setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE);
+			setDuplicateRepositoryImageId(undefined);
+			setIsDetectingDuplicateImage(true);
+
+			const isCurrentDuplicateDetection = () => duplicateDetectionRunIdRef.current === duplicateDetectionRunId;
+
+			try {
+				const imageHash = await getSha256Hash(file);
+
+				if (!isCurrentDuplicateDetection()) {
+					URL.revokeObjectURL(imageUrl);
+					return;
+				}
+
+				setSelectedImage({
+					file,
+					imageHash,
+					imageName: file.name,
+					imageUrl,
+					imageAltText: '',
+				});
+				setInitialCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+
+				const response = await mediaService.detectDuplicate({ imageHash }).fetch();
+
+				if (!isCurrentDuplicateDetection()) {
+					return;
+				}
+
+				setIsDetectingDuplicateImage(false);
+
+				if (response.duplicate && response.imageIds.length > 0) {
+					setDuplicateRepositoryImageId(response.imageIds[0]);
+					setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.DUPLICATE_IMAGE);
+					return;
+				}
+
+				setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE);
+			} catch (error) {
+				if (!isCurrentDuplicateDetection()) {
+					return;
+				}
+
+				setIsDetectingDuplicateImage(false);
+				handleError(error);
+			}
 		},
-		[revokeSelectedImageUrl]
+		[handleError, revokeSelectedImageUrl]
 	);
+
+	const handleContinueWithDuplicateUpload = useCallback(() => {
+		setDuplicateRepositoryImageId(undefined);
+		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE);
+	}, []);
+
+	const handleUseExistingDuplicateImage = useCallback(() => {
+		if (!duplicateRepositoryImageId) {
+			return;
+		}
+
+		revokeSelectedImageUrl();
+		setSelectedImage(undefined);
+		setRepositoryImageId(duplicateRepositoryImageId);
+		setDuplicateRepositoryImageId(undefined);
+		setIsSelectedRepositoryImageVariantAvailable(false);
+		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
+	}, [duplicateRepositoryImageId, revokeSelectedImageUrl]);
 
 	const handleRepositoryImageSelected = useCallback((nextRepositoryImageId: string) => {
 		setRepositoryImageId(nextRepositoryImageId);
@@ -187,7 +258,15 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 					onRepositoryImageSelected={handleRepositoryImageSelected}
 				/>
 			),
-			[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: <ImageRepositoryAddImage onFileSelected={handleFileSelected} />,
+			[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: (
+				<ImageRepositoryAddImage disabled={isDetectingDuplicateImage} onFileSelected={handleFileSelected} />
+			),
+			[IMAGE_REPOSITORY_SCREEN_ID.DUPLICATE_IMAGE]: (
+				<ImageRepositoryDuplicateImage
+					onContinueWithUpload={handleContinueWithDuplicateUpload}
+					onUseExistingImage={handleUseExistingDuplicateImage}
+				/>
+			),
 			[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: (
 				<ImageRepositoryCropImage
 					ref={cropImageRef}
@@ -219,11 +298,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		[
 			handleFileSelected,
 			handleHide,
+			handleContinueWithDuplicateUpload,
 			handleNavigate,
 			handleRepositoryImageEdit,
 			handleRepositoryImageSelected,
 			handleSelectedImageChange,
+			handleUseExistingDuplicateImage,
 			initialCropRatio,
+			isDetectingDuplicateImage,
 			repositoryImageId,
 			selectedImage,
 		]
@@ -237,6 +319,12 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				</Button>
 			),
 			[IMAGE_REPOSITORY_SCREEN_ID.ADD_IMAGE]: (
+				<Button variant="outline-primary" onClick={handleReturnToLibrary}>
+					<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
+					Library
+				</Button>
+			),
+			[IMAGE_REPOSITORY_SCREEN_ID.DUPLICATE_IMAGE]: (
 				<Button variant="outline-primary" onClick={handleReturnToLibrary}>
 					<SvgIcon kit="far" icon="arrow-left" size={16} className="me-2" />
 					Library

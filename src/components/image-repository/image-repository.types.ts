@@ -4,6 +4,7 @@ export enum IMAGE_REPOSITORY_SCREEN_ID {
 	BROWSE_IMAGES = 'BROWSE_IMAGES',
 	ADD_IMAGE = 'ADD_IMAGE',
 	CROP_IMAGE = 'CROP_IMAGE',
+	DUPLICATE_IMAGE = 'DUPLICATE_IMAGE',
 	EDIT_IMAGE = 'EDIT_IMAGE',
 	SELECTED_IMAGE = 'SELECTED_IMAGE',
 }
@@ -34,6 +35,7 @@ export interface ImageRepositoryCropSelection {
 
 export interface ImageRepositorySelectedImage {
 	file?: File;
+	imageHash?: string;
 	imageName: string;
 	imageUrl: string;
 	imageAltText: string;
@@ -49,6 +51,10 @@ export interface ImageRepositoryUploadAsset {
 	height: number;
 }
 
+export interface ImageRepositoryRawImage extends ImageRepositoryUploadAsset {
+	imageHash: string;
+}
+
 export interface ImageRepositoryCroppedImage extends ImageRepositoryUploadAsset {
 	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
 	thumbnail: ImageRepositoryUploadAsset & {
@@ -57,7 +63,7 @@ export interface ImageRepositoryCroppedImage extends ImageRepositoryUploadAsset 
 }
 
 export interface ImageRepositoryUploadPayload {
-	rawImage?: ImageRepositoryUploadAsset;
+	rawImage?: ImageRepositoryRawImage;
 	sourceImageId?: string;
 	croppedImage: ImageRepositoryCroppedImage;
 	imageAltText: string;

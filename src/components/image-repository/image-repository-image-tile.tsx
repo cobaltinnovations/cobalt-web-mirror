@@ -30,9 +30,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	imageTileNameOuter: {
 		padding: '14px 14px 16px',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+		whiteSpace: 'nowrap',
 	},
 	imageTileName: {
 		color: theme.colors.n700,
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+		whiteSpace: 'nowrap',
 	},
 }));
 

@@ -47,6 +47,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderRight: `1px solid ${theme.colors.border}`,
 		backgroundColor: theme.colors.background,
 	},
+	imagePreviewFrame: {
+		width: '100%',
+		maxHeight: '100%',
+		aspectRatio: '16 / 9',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
 	imagePreviewImage: {
 		display: 'block',
 		maxWidth: '100%',
@@ -212,15 +220,17 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 				<div className={classes.selectedImageScreen}>
 					<div className={classes.imagePanel}>
 						{displayImage?.url ? (
-							<img
-								className={classes.imagePreviewImage}
-								src={displayImage.url}
-								alt={
-									displayImage.imageAltText ??
-									imageDetails.image.imageAltText ??
-									imageDetails.image.filename
-								}
-							/>
+							<div className={classes.imagePreviewFrame}>
+								<img
+									className={classes.imagePreviewImage}
+									src={displayImage.url}
+									alt={
+										displayImage.imageAltText ??
+										imageDetails.image.imageAltText ??
+										imageDetails.image.filename
+									}
+								/>
+							</div>
 						) : (
 							<NoData
 								title={`No ${cropRatio} image available`}

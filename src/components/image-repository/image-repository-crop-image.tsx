@@ -20,6 +20,7 @@ import {
 	ImageRepositoryUploadAsset,
 	ImageRepositoryUploadPayload,
 } from './image-repository.types';
+import { getSha256Hash } from './image-repository.utils';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
 
 interface CropRatioConfig {
@@ -320,15 +321,18 @@ export async function getImageUploadPayload(
 		return;
 	}
 
+	const rawImage = selectedImage.file
+		? {
+				blob: selectedImage.file,
+				imageName: selectedImage.imageName,
+				width: cropSelection.imageNaturalWidth,
+				height: cropSelection.imageNaturalHeight,
+				imageHash: selectedImage.imageHash ?? (await getSha256Hash(selectedImage.file)),
+		  }
+		: undefined;
+
 	return {
-		rawImage: selectedImage.file
-			? {
-					blob: selectedImage.file,
-					imageName: selectedImage.imageName,
-					width: cropSelection.imageNaturalWidth,
-					height: cropSelection.imageNaturalHeight,
-			  }
-			: undefined,
+		rawImage,
 		sourceImageId: selectedImage.sourceImageId,
 		croppedImage,
 		imageAltText: selectedImage.imageAltText,
@@ -378,6 +382,7 @@ interface UploadMediaImageAssetOptions {
 	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
 	sourceImageId?: string;
 	imageAltText?: string;
+	imageHash?: string;
 	onProgress(percentage: number): void;
 	onXhrCreated(xhr: XMLHttpRequest): void;
 }
@@ -387,6 +392,7 @@ export async function uploadMediaImageAsset({
 	fileUploadTypeId,
 	sourceImageId,
 	imageAltText,
+	imageHash,
 	onProgress,
 	onXhrCreated,
 }: UploadMediaImageAssetOptions): Promise<ImageModel> {
@@ -400,6 +406,7 @@ export async function uploadMediaImageAsset({
 			height: asset.height,
 			sourceImageId,
 			imageAltText,
+			...(fileUploadTypeId === FILE_UPLOAD_TYPE_ID.IMAGE_RAW && imageHash ? { imageHash } : {}),
 		})
 		.fetch();
 
@@ -445,6 +452,7 @@ export async function uploadImageRepositoryPayload({
 			asset: imageUploadPayload.rawImage,
 			fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_RAW,
 			imageAltText: imageUploadPayload.imageAltText,
+			imageHash: imageUploadPayload.rawImage.imageHash,
 			onProgress: (percentage) => {
 				setStepProgress(uploadStepIndex, percentage);
 			},

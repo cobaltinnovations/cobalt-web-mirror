@@ -24,6 +24,7 @@ export interface GetPresignedUploadRequestBody {
 	filesize: number;
 	width: number;
 	height: number;
+	imageHash?: string;
 	sourceImageId?: string;
 	imageAltText?: string;
 }
@@ -111,6 +112,13 @@ export const mediaService = {
 		return httpSingleton.orchestrateRequest<ImageDetailModel>({
 			method: 'GET',
 			url: `/media/images/${imageId}`,
+		});
+	},
+	detectDuplicate(data: { imageHash: string }) {
+		return httpSingleton.orchestrateRequest<{ duplicate: boolean; imageIds: string[]; duplicateCount: number }>({
+			method: 'POST',
+			url: '/media/images/duplicate-detection',
+			data,
 		});
 	},
 };
