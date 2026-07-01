@@ -5,7 +5,7 @@ import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { createUseThemedStyles } from '@/jss/theme';
 import type { ImageListModel } from '@/lib/models';
-import { mediaService } from '@/lib/services/media-service';
+import { MEDIA_IMAGE_SCOPE_ID, mediaService } from '@/lib/services/media-service';
 
 import AsyncWrapper from '@/components/async-page';
 import {
@@ -14,12 +14,6 @@ import {
 } from '@/components/image-repository/image-repository.types';
 import ImageRepositoryImageTile from '@/components/image-repository/image-repository-image-tile';
 import ImageRepositoryUploadImageTile from '@/components/image-repository/image-repository-upload-image-tile';
-
-enum IMAGE_REPOSITORY_IMAGE_FILTER {
-	ALL = 'ALL',
-	RESOURCES = 'RESOURCES',
-	GROUP_SESSIONS = 'GROUP_SESSIONS',
-}
 
 const useStyles = createUseThemedStyles((theme) => ({
 	browseImagesScreen: {
@@ -76,13 +70,16 @@ const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigat
 	const [images, setImages] = useState<ImageListModel[]>([]);
 	const [searchInputValue, setSearchInputValue] = useState('');
 	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchInputValue);
-	const [activeImageFilter, setActiveImageFilter] = useState(IMAGE_REPOSITORY_IMAGE_FILTER.ALL);
+	const [activeMediaImageScopeId, setActiveMediaImageScopeId] = useState<MEDIA_IMAGE_SCOPE_ID>();
 
 	const request = useMemo(() => {
 		const searchQuery = debouncedSearchQuery.trim();
 
-		return mediaService.getImages(searchQuery ? { searchQuery } : undefined);
-	}, [debouncedSearchQuery]);
+		return mediaService.getImages({
+			searchQuery: searchQuery || undefined,
+			mediaImageScopeId: activeMediaImageScopeId,
+		});
+	}, [activeMediaImageScopeId, debouncedSearchQuery]);
 
 	const fetchData = useCallback(async () => {
 		const response = await request.fetch();
@@ -117,35 +114,31 @@ const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigat
 				</Form>
 				<div className={classes.filterActions}>
 					<Button
-						variant={
-							activeImageFilter === IMAGE_REPOSITORY_IMAGE_FILTER.ALL ? 'primary' : 'outline-primary'
-						}
+						variant={activeMediaImageScopeId === undefined ? 'primary' : 'outline-primary'}
 						onClick={() => {
-							setActiveImageFilter(IMAGE_REPOSITORY_IMAGE_FILTER.ALL);
+							setActiveMediaImageScopeId(undefined);
 						}}
 					>
 						All
 					</Button>
 					<Button
 						variant={
-							activeImageFilter === IMAGE_REPOSITORY_IMAGE_FILTER.RESOURCES
-								? 'primary'
-								: 'outline-primary'
+							activeMediaImageScopeId === MEDIA_IMAGE_SCOPE_ID.RESOURCE ? 'primary' : 'outline-primary'
 						}
 						onClick={() => {
-							setActiveImageFilter(IMAGE_REPOSITORY_IMAGE_FILTER.RESOURCES);
+							setActiveMediaImageScopeId(MEDIA_IMAGE_SCOPE_ID.RESOURCE);
 						}}
 					>
 						Resources
 					</Button>
 					<Button
 						variant={
-							activeImageFilter === IMAGE_REPOSITORY_IMAGE_FILTER.GROUP_SESSIONS
+							activeMediaImageScopeId === MEDIA_IMAGE_SCOPE_ID.GROUP_SESSION
 								? 'primary'
 								: 'outline-primary'
 						}
 						onClick={() => {
-							setActiveImageFilter(IMAGE_REPOSITORY_IMAGE_FILTER.GROUP_SESSIONS);
+							setActiveMediaImageScopeId(MEDIA_IMAGE_SCOPE_ID.GROUP_SESSION);
 						}}
 					>
 						Group Sessions

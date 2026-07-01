@@ -20,6 +20,11 @@ export interface GetPresignedUploadRequestBody {
 	imageAltText?: string;
 }
 
+export enum MEDIA_IMAGE_SCOPE_ID {
+	RESOURCE = 'RESOURCE',
+	GROUP_SESSION = 'GROUP_SESSION',
+}
+
 export const mediaService = {
 	getPresignedUpload(data: GetPresignedUploadRequestBody) {
 		return httpSingleton.orchestrateRequest<{ mediaImageUploadResult: MediaImageUploadResult }>({
@@ -34,7 +39,7 @@ export const mediaService = {
 			url: `/media/images/${imageId}/uploaded`,
 		});
 	},
-	getImages(queryParameters?: { searchQuery?: string }) {
+	getImages(queryParameters?: { searchQuery?: string; mediaImageScopeId?: MEDIA_IMAGE_SCOPE_ID }) {
 		return httpSingleton.orchestrateRequest<{ images: ImageListModel[] }>({
 			method: 'GET',
 			url: buildQueryParamUrl('/media/images', queryParameters),
