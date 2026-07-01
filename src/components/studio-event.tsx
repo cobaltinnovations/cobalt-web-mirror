@@ -95,7 +95,7 @@ const StudioEvent: FC<StudioEventProps> = ({ studioEvent, expired, className }) 
 				) : (
 					<BackgroundImageContainer
 						className={classes.imageContainer}
-						imageUrl={studioEvent.imageUrl ? studioEvent.imageUrl : placeholderImage}
+						imageUrl={studioEvent.image?.thumbnail?.url ?? studioEvent.imageUrl ?? placeholderImage}
 					>
 						{showSeatAlert && (
 							<div className={classes.imageContent}>

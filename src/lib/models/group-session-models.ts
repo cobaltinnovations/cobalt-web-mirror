@@ -153,12 +153,18 @@ export interface GroupSessionRequestModel {
 	urlName: string;
 	facilitatorName: string;
 	facilitatorEmailAddress: string;
-	imageUrl?: string;
 	customQuestion1?: string;
 	customQuestion2?: string;
 	created: string;
 	createdDescription: string;
 	createdDateDescription: string;
+
+	// @deprecate
+	imageUrl?: string;
+	// @deprecate
+	imageFileUploadId?: string;
+	// new stuff!
+	image: ImageModel;
 }
 
 export interface GroupSessionReservationModel {

@@ -35,6 +35,7 @@ export interface ImageModel {
 	createdDescription: string;
 	lastUpdated: string;
 	lastUpdatedDescription: string;
+	thumbnail?: ImageModel;
 }
 
 export interface MediaImageUploadResult {
