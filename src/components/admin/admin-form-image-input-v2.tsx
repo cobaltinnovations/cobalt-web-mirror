@@ -2,6 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
 import ImageRepository from '@/components/image-repository/image-repository';
+import type { ImageRepositorySelectableCropFileUploadTypeId } from '@/components/image-repository/image-repository.types';
 import type { ImageModel } from '@/lib/models';
 
 export interface AdminFormImageInputV2Props {
@@ -9,6 +10,7 @@ export interface AdminFormImageInputV2Props {
 	className?: string;
 	buttonClassName?: string;
 	disabled?: boolean;
+	acceptableCropSizes?: ImageRepositorySelectableCropFileUploadTypeId[];
 	onChange(image?: ImageModel): void;
 }
 
@@ -17,6 +19,7 @@ export const AdminFormImageInputV2: FC<AdminFormImageInputV2Props> = ({
 	className,
 	buttonClassName,
 	disabled = false,
+	acceptableCropSizes,
 	onChange,
 }) => {
 	const [showImageRepository, setShowImageRepository] = useState(false);
@@ -76,6 +79,7 @@ export const AdminFormImageInputV2: FC<AdminFormImageInputV2Props> = ({
 				onHide={() => {
 					setShowImageRepository(false);
 				}}
+				acceptableCropSizes={acceptableCropSizes}
 				onImageSelect={handleImageSelect}
 			/>
 		</>

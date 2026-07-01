@@ -10,7 +10,12 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { FILE_UPLOAD_TYPE_ID, type ImageDetailModel, type ImageModel } from '@/lib/models';
 import { mediaService } from '@/lib/services/media-service';
 
-import { IMAGE_REPOSITORY_CROP_RATIO, ImageRepositoryScreenProps } from './image-repository.types';
+import {
+	IMAGE_REPOSITORY_CROP_RATIO,
+	ImageRepositoryScreenProps,
+	getAcceptableImageRepositoryCropRatios,
+	getDefaultImageRepositoryCropRatio,
+} from './image-repository.types';
 
 interface CropRatioConfig {
 	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
@@ -103,6 +108,7 @@ type ImageRepositorySelectedImageProps = Pick<
 	| 'onRepositoryImageEdit'
 	| 'onRepositoryImageVariantAvailabilityChange'
 	| 'onRepositoryImageVariantChange'
+	| 'acceptableCropSizes'
 	| 'repositoryImageId'
 >;
 
@@ -110,9 +116,18 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 	onRepositoryImageEdit,
 	onRepositoryImageVariantAvailabilityChange,
 	onRepositoryImageVariantChange,
+	acceptableCropSizes,
 	repositoryImageId,
 }) => {
-	const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+	const acceptableCropRatios = useMemo(
+		() => getAcceptableImageRepositoryCropRatios(acceptableCropSizes),
+		[acceptableCropSizes]
+	);
+	const defaultCropRatio = useMemo(
+		() => getDefaultImageRepositoryCropRatio(acceptableCropSizes),
+		[acceptableCropSizes]
+	);
+	const [cropRatio, setCropRatio] = useState(defaultCropRatio);
 	const [imageDetails, setImageDetails] = useState<ImageDetailModel>();
 	const classes = useStyles();
 
@@ -143,6 +158,16 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 		return getImageVariantForRatio(imageDetails.variants, cropRatio);
 	}, [cropRatio, imageDetails, repositoryImageId]);
 	const selectedImageMetadata = displayImage ?? imageDetails?.image;
+
+	useEffect(() => {
+		setCropRatio(defaultCropRatio);
+	}, [defaultCropRatio, repositoryImageId]);
+
+	useEffect(() => {
+		setCropRatio((currentCropRatio) =>
+			acceptableCropRatios.includes(currentCropRatio) ? currentCropRatio : defaultCropRatio
+		);
+	}, [acceptableCropRatios, defaultCropRatio]);
 
 	useEffect(() => {
 		onRepositoryImageVariantAvailabilityChange?.(!!displayImage);
@@ -250,7 +275,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 								handleCropRatioChange(currentTarget.value as IMAGE_REPOSITORY_CROP_RATIO);
 							}}
 						>
-							{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
+							{acceptableCropRatios.map((ratio) => (
 								<option key={ratio} value={ratio}>
 									{ratio}
 								</option>

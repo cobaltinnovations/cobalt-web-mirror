@@ -9,10 +9,10 @@ import { CobaltError } from '@/lib/http-client';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import {
-	IMAGE_REPOSITORY_CROP_RATIO,
 	ImageRepositoryCropSelection,
 	ImageRepositoryScreenProps,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
+	getResolvedImageRepositoryCropRatio,
 } from './image-repository.types';
 import { getImageUploadPayload, getInitialCrop, uploadImageRepositoryPayload } from './image-repository-crop-image';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
@@ -23,7 +23,12 @@ export interface ImageRepositoryEditImageRef {
 
 type ImageRepositoryEditImageProps = Pick<
 	ImageRepositoryScreenProps,
-	'initialCropRatio' | 'selectedImage' | 'onImageUploaded' | 'onSelectedImageChange' | 'onUploadStatusChange'
+	| 'acceptableCropSizes'
+	| 'initialCropRatio'
+	| 'selectedImage'
+	| 'onImageUploaded'
+	| 'onSelectedImageChange'
+	| 'onUploadStatusChange'
 >;
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -100,15 +105,25 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRepositoryEditImageProps>(
-	({ initialCropRatio, selectedImage, onImageUploaded, onSelectedImageChange, onUploadStatusChange }, ref) => {
+	(
+		{
+			acceptableCropSizes,
+			initialCropRatio,
+			selectedImage,
+			onImageUploaded,
+			onSelectedImageChange,
+			onUploadStatusChange,
+		},
+		ref
+	) => {
 		const classes = useStyles();
 		const handleError = useHandleError();
 		const imageRef = useRef<HTMLImageElement>();
 		const uploadRunIdRef = useRef(0);
 		const activeUploadXhrRef = useRef<XMLHttpRequest>();
 		const resolvedInitialCropRatio = useMemo(
-			() => initialCropRatio ?? IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE,
-			[initialCropRatio]
+			() => getResolvedImageRepositoryCropRatio(initialCropRatio, acceptableCropSizes),
+			[acceptableCropSizes, initialCropRatio]
 		);
 		const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(resolvedInitialCropRatio));
 		const [progress, setProgress] = useState(0);

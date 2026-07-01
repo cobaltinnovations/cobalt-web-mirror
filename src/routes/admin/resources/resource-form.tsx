@@ -18,6 +18,7 @@ import {
 	ContentStatusId,
 	ContentType,
 	ContentTypeId,
+	FILE_UPLOAD_TYPE_ID,
 	ImageModel,
 	Tag,
 } from '@/lib/models';
@@ -840,6 +841,7 @@ export const Component = () => {
 								<AdminFormImageInputV2
 									className="mb-2"
 									buttonClassName="d-block w-100"
+									acceptableCropSizes={[FILE_UPLOAD_TYPE_ID.IMAGE_16X9]}
 									value={formValues.image}
 									onChange={(image?: ImageModel) => {
 										updateFormValue('image', image);

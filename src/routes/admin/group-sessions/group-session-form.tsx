@@ -29,6 +29,7 @@ import SvgIcon from '@/components/svg-icon';
 import GroupSession from '@/components/group-session';
 import {
 	CONTENT_VISIBILITY_TYPE_ID,
+	FILE_UPLOAD_TYPE_ID,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionLearnMoreMethodId,
 	GroupSessionLocationTypeId,
@@ -980,6 +981,7 @@ export const Component = () => {
 						<AdminFormImageInputV2
 							className="mb-2"
 							buttonClassName="d-block w-100"
+							acceptableCropSizes={[FILE_UPLOAD_TYPE_ID.IMAGE_16X9]}
 							value={formValues.image}
 							onChange={(image?: ImageModel) => {
 								updateFormValue('image', image);

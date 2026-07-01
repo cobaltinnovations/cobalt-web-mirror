@@ -19,6 +19,8 @@ import {
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
 	ImageRepositoryUploadAsset,
 	ImageRepositoryUploadPayload,
+	getAcceptableImageRepositoryCropRatios,
+	getResolvedImageRepositoryCropRatio,
 } from './image-repository.types';
 import { getSha256Hash } from './image-repository.utils';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
@@ -508,7 +510,12 @@ export interface ImageRepositoryCropImageRef {
 
 type ImageRepositoryCropImageProps = Pick<
 	ImageRepositoryScreenProps,
-	'initialCropRatio' | 'selectedImage' | 'onImageUploaded' | 'onSelectedImageChange' | 'onUploadStatusChange'
+	| 'acceptableCropSizes'
+	| 'initialCropRatio'
+	| 'selectedImage'
+	| 'onImageUploaded'
+	| 'onSelectedImageChange'
+	| 'onUploadStatusChange'
 >;
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -589,15 +596,29 @@ const useStyles = createUseThemedStyles((theme) => ({
 }));
 
 const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRepositoryCropImageProps>(
-	({ initialCropRatio, selectedImage, onImageUploaded, onSelectedImageChange, onUploadStatusChange }, ref) => {
+	(
+		{
+			acceptableCropSizes,
+			initialCropRatio,
+			selectedImage,
+			onImageUploaded,
+			onSelectedImageChange,
+			onUploadStatusChange,
+		},
+		ref
+	) => {
 		const classes = useStyles();
 		const handleError = useHandleError();
 		const imageRef = useRef<HTMLImageElement>();
 		const uploadRunIdRef = useRef(0);
 		const activeUploadXhrRef = useRef<XMLHttpRequest>();
+		const acceptableCropRatios = useMemo(
+			() => getAcceptableImageRepositoryCropRatios(acceptableCropSizes),
+			[acceptableCropSizes]
+		);
 		const resolvedInitialCropRatio = useMemo(
-			() => initialCropRatio ?? IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE,
-			[initialCropRatio]
+			() => getResolvedImageRepositoryCropRatio(initialCropRatio, acceptableCropSizes),
+			[acceptableCropSizes, initialCropRatio]
 		);
 		const [cropRatio, setCropRatio] = useState(resolvedInitialCropRatio);
 		const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(resolvedInitialCropRatio));
@@ -762,7 +783,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 					</div>
 					<div className={classes.ratioControls}>
 						<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
-						{Object.values(IMAGE_REPOSITORY_CROP_RATIO).map((ratio) => (
+						{acceptableCropRatios.map((ratio) => (
 							<Form.Check
 								key={ratio}
 								inline

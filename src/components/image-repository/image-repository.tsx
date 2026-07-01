@@ -17,7 +17,9 @@ import ImageRepositorySelectedImage from './image-repository-selected-image';
 import {
 	IMAGE_REPOSITORY_CROP_RATIO,
 	IMAGE_REPOSITORY_SCREEN_ID,
+	getDefaultImageRepositoryCropRatio,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
+	ImageRepositorySelectableCropFileUploadTypeId,
 } from './image-repository.types';
 import { getSha256Hash } from './image-repository.utils';
 
@@ -47,10 +49,12 @@ const modalBodyClassNameByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string | 
 };
 
 interface ImageRepositoryProps extends ModalProps {
+	acceptableCropSizes?: ImageRepositorySelectableCropFileUploadTypeId[];
 	onImageSelect?(image: ImageModel): void;
 }
 
 const ImageRepository: FC<ImageRepositoryProps> = ({
+	acceptableCropSizes,
 	children,
 	dialogClassName,
 	onHide,
@@ -67,10 +71,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 	const [activeScreenId, setActiveScreenId] = useState<IMAGE_REPOSITORY_SCREEN_ID>(
 		IMAGE_REPOSITORY_SCREEN_ID.BROWSE_IMAGES
 	);
+	const defaultCropRatio = useMemo(
+		() => getDefaultImageRepositoryCropRatio(acceptableCropSizes),
+		[acceptableCropSizes]
+	);
 	const [repositoryImageId, setRepositoryImageId] = useState<string>();
 	const [duplicateRepositoryImageId, setDuplicateRepositoryImageId] = useState<string>();
 	const [selectedImage, setSelectedImage] = useState<ImageRepositorySelectedImageModel>();
-	const [initialCropRatio, setInitialCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+	const [initialCropRatio, setInitialCropRatio] = useState(defaultCropRatio);
 	const [isDetectingDuplicateImage, setIsDetectingDuplicateImage] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 	const [isSelectedRepositoryImageVariantAvailable, setIsSelectedRepositoryImageVariantAvailable] = useState(false);
@@ -91,12 +99,12 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 		setDuplicateRepositoryImageId(undefined);
 		setRepositoryImageId(undefined);
 		setSelectedImage(undefined);
-		setInitialCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+		setInitialCropRatio(defaultCropRatio);
 		setIsDetectingDuplicateImage(false);
 		setIsUploadingImage(false);
 		setIsSelectedRepositoryImageVariantAvailable(false);
 		setSelectedRepositoryImageVariant(undefined);
-	}, [revokeSelectedImageUrl]);
+	}, [defaultCropRatio, revokeSelectedImageUrl]);
 
 	const handleNavigate = useCallback((nextScreenId: IMAGE_REPOSITORY_SCREEN_ID) => {
 		setActiveScreenId(nextScreenId);
@@ -146,7 +154,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 					imageUrl,
 					imageAltText: '',
 				});
-				setInitialCropRatio(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
+				setInitialCropRatio(defaultCropRatio);
 
 				const response = await mediaService.detectDuplicate({ imageHash }).fetch();
 
@@ -172,7 +180,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 				handleError(error);
 			}
 		},
-		[handleError, revokeSelectedImageUrl]
+		[defaultCropRatio, handleError, revokeSelectedImageUrl]
 	);
 
 	const handleContinueWithDuplicateUpload = useCallback(() => {
@@ -301,6 +309,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 					onImageUploaded={handleImageUploaded}
 					onSelectedImageChange={handleSelectedImageChange}
 					onUploadStatusChange={setIsUploadingImage}
+					acceptableCropSizes={acceptableCropSizes}
 					initialCropRatio={initialCropRatio}
 					selectedImage={selectedImage}
 				/>
@@ -311,6 +320,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 					onImageUploaded={handleImageUploaded}
 					onSelectedImageChange={handleSelectedImageChange}
 					onUploadStatusChange={setIsUploadingImage}
+					acceptableCropSizes={acceptableCropSizes}
 					initialCropRatio={initialCropRatio}
 					selectedImage={selectedImage}
 				/>
@@ -320,6 +330,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 					onRepositoryImageEdit={handleRepositoryImageEdit}
 					onRepositoryImageVariantAvailabilityChange={setIsSelectedRepositoryImageVariantAvailable}
 					onRepositoryImageVariantChange={setSelectedRepositoryImageVariant}
+					acceptableCropSizes={acceptableCropSizes}
 					repositoryImageId={repositoryImageId}
 				/>
 			),
@@ -333,6 +344,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({
 			handleRepositoryImageSelected,
 			handleSelectedImageChange,
 			handleUseExistingDuplicateImage,
+			acceptableCropSizes,
 			initialCropRatio,
 			isDetectingDuplicateImage,
 			repositoryImageId,
