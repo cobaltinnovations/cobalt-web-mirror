@@ -616,6 +616,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 			() => getAcceptableImageRepositoryCropRatios(acceptableCropSizes),
 			[acceptableCropSizes]
 		);
+		const hasMultipleSelectableCropRatios = acceptableCropRatios.length > 1;
 		const resolvedInitialCropRatio = useMemo(
 			() => getResolvedImageRepositoryCropRatio(initialCropRatio, acceptableCropSizes),
 			[acceptableCropSizes, initialCropRatio]
@@ -781,26 +782,30 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 							}}
 						/>
 					</div>
-					<div className={classes.ratioControls}>
-						<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
-						{acceptableCropRatios.map((ratio) => (
-							<Form.Check
-								key={ratio}
-								inline
-								className="mb-0"
-								type="radio"
-								name="image-repository-crop-ratio"
-								id={`image-repository-crop-ratio-${ratio}`}
-								label={<span className="fs-large fw-semibold">{ratio}</span>}
-								checked={cropRatio === ratio}
-								disabled={isUploading}
-								onChange={() => {
-									setCropRatio(ratio);
-									setCrop(getInitialCrop(ratio, imageRef.current?.width, imageRef.current?.height));
-								}}
-							/>
-						))}
-					</div>
+					{hasMultipleSelectableCropRatios && (
+						<div className={classes.ratioControls}>
+							<p className="mb-0 text-muted fw-bold text-uppercase">Ratio:</p>
+							{acceptableCropRatios.map((ratio) => (
+								<Form.Check
+									key={ratio}
+									inline
+									className="mb-0"
+									type="radio"
+									name="image-repository-crop-ratio"
+									id={`image-repository-crop-ratio-${ratio}`}
+									label={<span className="fs-large fw-semibold">{ratio}</span>}
+									checked={cropRatio === ratio}
+									disabled={isUploading}
+									onChange={() => {
+										setCropRatio(ratio);
+										setCrop(
+											getInitialCrop(ratio, imageRef.current?.width, imageRef.current?.height)
+										);
+									}}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 				<div className={classes.metadataPanel}>
 					<h3 className="mb-4 fs-default fw-semibold">Image Metadata</h3>

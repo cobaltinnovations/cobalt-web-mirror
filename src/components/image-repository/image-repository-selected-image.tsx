@@ -123,6 +123,7 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 		() => getAcceptableImageRepositoryCropRatios(acceptableCropSizes),
 		[acceptableCropSizes]
 	);
+	const hasMultipleSelectableCropRatios = acceptableCropRatios.length > 1;
 	const defaultCropRatio = useMemo(
 		() => getDefaultImageRepositoryCropRatio(acceptableCropSizes),
 		[acceptableCropSizes]
@@ -266,21 +267,23 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 						)}
 					</div>
 					<div className={classes.metadataPanel}>
-						<InputHelper
-							className="mb-4"
-							label="Image Ratio:"
-							as="select"
-							value={cropRatio}
-							onChange={({ currentTarget }) => {
-								handleCropRatioChange(currentTarget.value as IMAGE_REPOSITORY_CROP_RATIO);
-							}}
-						>
-							{acceptableCropRatios.map((ratio) => (
-								<option key={ratio} value={ratio}>
-									{ratio}
-								</option>
-							))}
-						</InputHelper>
+						{hasMultipleSelectableCropRatios && (
+							<InputHelper
+								className="mb-4"
+								label="Image Ratio:"
+								as="select"
+								value={cropRatio}
+								onChange={({ currentTarget }) => {
+									handleCropRatioChange(currentTarget.value as IMAGE_REPOSITORY_CROP_RATIO);
+								}}
+							>
+								{acceptableCropRatios.map((ratio) => (
+									<option key={ratio} value={ratio}>
+										{ratio}
+									</option>
+								))}
+							</InputHelper>
+						)}
 						<p className="mb-4 fs-large fw-semibold">{cropRatio} Image Metadata</p>
 						{selectedImageMetadata?.createdDescription && (
 							<p className="mb-4 text-muted">Created {selectedImageMetadata.createdDescription}</p>
