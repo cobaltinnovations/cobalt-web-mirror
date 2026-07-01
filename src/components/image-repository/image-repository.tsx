@@ -5,6 +5,7 @@ import { createUseStyles } from 'react-jss';
 
 import SvgIcon from '@/components/svg-icon';
 import useHandleError from '@/hooks/use-handle-error';
+import type { ImageModel } from '@/lib/models';
 import { mediaService } from '@/lib/services/media-service';
 
 import ImageRepositoryAddImage from './image-repository-add-image';
@@ -46,10 +47,17 @@ const modalBodyClassNameByScreenId: Record<IMAGE_REPOSITORY_SCREEN_ID, string | 
 };
 
 interface ImageRepositoryProps extends ModalProps {
-	//
+	onImageSelect?(image: ImageModel): void;
 }
 
-const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, onHide, show, ...modalProps }) => {
+const ImageRepository: FC<ImageRepositoryProps> = ({
+	children,
+	dialogClassName,
+	onHide,
+	onImageSelect,
+	show,
+	...modalProps
+}) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const cropImageRef = useRef<ImageRepositoryCropImageRef>(null);
@@ -66,6 +74,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 	const [isDetectingDuplicateImage, setIsDetectingDuplicateImage] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 	const [isSelectedRepositoryImageVariantAvailable, setIsSelectedRepositoryImageVariantAvailable] = useState(false);
+	const [selectedRepositoryImageVariant, setSelectedRepositoryImageVariant] = useState<ImageModel>();
 
 	const revokeSelectedImageUrl = useCallback(() => {
 		if (!selectedImageUrlRef.current) {
@@ -86,6 +95,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 		setIsDetectingDuplicateImage(false);
 		setIsUploadingImage(false);
 		setIsSelectedRepositoryImageVariantAvailable(false);
+		setSelectedRepositoryImageVariant(undefined);
 	}, [revokeSelectedImageUrl]);
 
 	const handleNavigate = useCallback((nextScreenId: IMAGE_REPOSITORY_SCREEN_ID) => {
@@ -185,6 +195,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 
 	const handleRepositoryImageSelected = useCallback((nextRepositoryImageId: string) => {
 		setRepositoryImageId(nextRepositoryImageId);
+		setSelectedRepositoryImageVariant(undefined);
 		setIsSelectedRepositoryImageVariantAvailable(false);
 		setActiveScreenId(IMAGE_REPOSITORY_SCREEN_ID.SELECTED_IMAGE);
 	}, []);
@@ -218,6 +229,23 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 
 		editImageRef.current.startUpload();
 	}, []);
+
+	const handleImageUploaded = useCallback(
+		(image: ImageModel) => {
+			onImageSelect?.(image);
+			handleHide();
+		},
+		[handleHide, onImageSelect]
+	);
+
+	const handleSelectedRepositoryImageAdd = useCallback(() => {
+		if (!selectedRepositoryImageVariant) {
+			return;
+		}
+
+		onImageSelect?.(selectedRepositoryImageVariant);
+		handleHide();
+	}, [handleHide, onImageSelect, selectedRepositoryImageVariant]);
 
 	useEffect(() => {
 		if (show) {
@@ -270,7 +298,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 			[IMAGE_REPOSITORY_SCREEN_ID.CROP_IMAGE]: (
 				<ImageRepositoryCropImage
 					ref={cropImageRef}
-					onImageUploaded={handleHide}
+					onImageUploaded={handleImageUploaded}
 					onSelectedImageChange={handleSelectedImageChange}
 					onUploadStatusChange={setIsUploadingImage}
 					initialCropRatio={initialCropRatio}
@@ -280,7 +308,7 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 			[IMAGE_REPOSITORY_SCREEN_ID.EDIT_IMAGE]: (
 				<ImageRepositoryEditImage
 					ref={editImageRef}
-					onImageUploaded={handleHide}
+					onImageUploaded={handleImageUploaded}
 					onSelectedImageChange={handleSelectedImageChange}
 					onUploadStatusChange={setIsUploadingImage}
 					initialCropRatio={initialCropRatio}
@@ -291,13 +319,14 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 				<ImageRepositorySelectedImage
 					onRepositoryImageEdit={handleRepositoryImageEdit}
 					onRepositoryImageVariantAvailabilityChange={setIsSelectedRepositoryImageVariantAvailable}
+					onRepositoryImageVariantChange={setSelectedRepositoryImageVariant}
 					repositoryImageId={repositoryImageId}
 				/>
 			),
 		}),
 		[
 			handleFileSelected,
-			handleHide,
+			handleImageUploaded,
 			handleContinueWithDuplicateUpload,
 			handleNavigate,
 			handleRepositoryImageEdit,
@@ -368,8 +397,8 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 					</Button>
 					<Button
 						variant="primary"
-						onClick={handleHide}
-						disabled={!isSelectedRepositoryImageVariantAvailable}
+						onClick={handleSelectedRepositoryImageAdd}
+						disabled={!isSelectedRepositoryImageVariantAvailable || !selectedRepositoryImageVariant}
 					>
 						Add Image
 					</Button>
@@ -382,9 +411,11 @@ const ImageRepository: FC<ImageRepositoryProps> = ({ children, dialogClassName, 
 			handleHide,
 			handleReturnToLibrary,
 			handleReturnToSelectedImage,
+			handleSelectedRepositoryImageAdd,
 			isSelectedRepositoryImageVariantAvailable,
 			isUploadingImage,
 			selectedImage,
+			selectedRepositoryImageVariant,
 		]
 	);
 

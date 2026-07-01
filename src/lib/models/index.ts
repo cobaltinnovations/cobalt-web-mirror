@@ -21,6 +21,7 @@ export * from './institution';
 export * from './integrated-care-models';
 export * from './interaction-models';
 export * from './mailing-lists-models';
+export * from './media-models';
 export * from './pages-models';
 export * from './presigned-upload-models';
 export * from './provider';

@@ -6,8 +6,8 @@ import InputHelper from '@/components/input-helper';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import { CobaltError } from '@/lib/http-client';
-import { PresignedUploadModel } from '@/lib/models';
-import { FILE_UPLOAD_TYPE_ID, ImageModel, mediaService } from '@/lib/services/media-service';
+import { FILE_UPLOAD_TYPE_ID, type ImageModel, type PresignedUploadModel } from '@/lib/models';
+import { mediaService } from '@/lib/services/media-service';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import {
@@ -434,7 +434,7 @@ export async function uploadImageRepositoryPayload({
 	isCurrentUpload,
 	onProgress,
 	onXhrCreated,
-}: UploadImageRepositoryPayloadOptions): Promise<void> {
+}: UploadImageRepositoryPayloadOptions): Promise<ImageModel | undefined> {
 	const uploadStepsCount = imageUploadPayload.rawImage ? 3 : 2;
 	let uploadStepIndex = 0;
 	let sourceImageId = imageUploadPayload.sourceImageId;
@@ -498,6 +498,8 @@ export async function uploadImageRepositoryPayload({
 		},
 		onXhrCreated,
 	});
+
+	return croppedImage;
 }
 
 export interface ImageRepositoryCropImageRef {
@@ -696,7 +698,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 				}
 
 				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING);
-				await uploadImageRepositoryPayload({
+				const uploadedImage = await uploadImageRepositoryPayload({
 					imageUploadPayload,
 					isCurrentUpload,
 					onProgress: setProgress,
@@ -704,12 +706,16 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 				});
 
 				if (isCurrentUpload()) {
+					if (!uploadedImage) {
+						return;
+					}
+
 					activeUploadXhrRef.current = undefined;
 					setProgress(100);
 					setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE);
 					setIsUploading(false);
 					onUploadStatusChange?.(false);
-					onImageUploaded?.();
+					onImageUploaded?.(uploadedImage);
 				}
 			} catch (error) {
 				if (!isCurrentUpload()) {

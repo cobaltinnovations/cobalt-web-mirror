@@ -1,4 +1,4 @@
-import { FILE_UPLOAD_TYPE_ID } from '@/lib/services/media-service';
+import { FILE_UPLOAD_TYPE_ID, type ImageModel } from '@/lib/models';
 
 export enum IMAGE_REPOSITORY_SCREEN_ID {
 	BROWSE_IMAGES = 'BROWSE_IMAGES',
@@ -72,10 +72,11 @@ export interface ImageRepositoryUploadPayload {
 export interface ImageRepositoryScreenProps {
 	onNavigate(nextScreenId: IMAGE_REPOSITORY_SCREEN_ID): void;
 	onFileSelected?(file: File): void;
-	onImageUploaded?(): void;
+	onImageUploaded?(image: ImageModel): void;
 	onRepositoryImageEdit?(image: ImageRepositorySelectedImage, cropRatio: IMAGE_REPOSITORY_CROP_RATIO): void;
 	onRepositoryImageSelected?(imageId: string): void;
 	onRepositoryImageVariantAvailabilityChange?(isAvailable: boolean): void;
+	onRepositoryImageVariantChange?(image?: ImageModel): void;
 	onSelectedImageChange?(image: ImageRepositorySelectedImage): void;
 	onUploadStatusChange?(isUploading: boolean): void;
 	initialCropRatio?: IMAGE_REPOSITORY_CROP_RATIO;

@@ -34,6 +34,7 @@ import {
 	GroupSessionLocationTypeId,
 	GroupSessionModel,
 	GroupSessionUrlNameValidationResult,
+	ImageModel,
 	ScreeningFlow,
 	ScreeningFlowTypeId,
 	Tag,
@@ -49,7 +50,7 @@ import { DateFormats, buildBackendDownloadUrl } from '@/lib/utils';
 import { GroupSessionDetailNavigationSource } from '@/routes/group-session-detail';
 import useAccount from '@/hooks/use-account';
 import { ButtonLink } from '@/components/button-link';
-import { AdminFormFooter, AdminFormImageInput, AdminFormSection } from '@/components/admin';
+import { AdminFormFooter, AdminFormImageInput, AdminFormImageInputV2, AdminFormSection } from '@/components/admin';
 import { getTagGroupErrorMessage } from '@/lib/utils/error-utils';
 import { CobaltError } from '@/lib/http-client';
 import WysiwygBasic, { wysiwygIsValid } from '@/components/wysiwyg-basic';
@@ -154,8 +155,14 @@ const initialGroupSessionFormValues = {
 	startTime: '',
 	endTime: '',
 	endDate: moment().add(2, 'd').toDate() as Date | null,
+
+	// old image stuff
 	imageUrl: '',
 	imageFileUploadId: '',
+
+	// new image stuff
+	image: undefined as ImageModel | undefined,
+
 	description: '',
 	groupSessionLearnMoreMethodId: GroupSessionLearnMoreMethodId.URL,
 	learnMoreDescription: '',
@@ -968,22 +975,31 @@ export const Component = () => {
 					</>
 				}
 			>
-				<AdminFormImageInput
-					imageSrc={formValues.imageUrl}
-					onSrcChange={(nextId, nextSrc) => {
-						updateFormValue('imageFileUploadId', nextId);
-						updateFormValue('imageUrl', nextSrc);
-					}}
-					presignedUploadGetter={(blob, name) => {
-						return groupSessionsService.getPresignedUploadUrl({
-							contentType: blob.type,
-							filename: name,
-						}).fetch;
-					}}
-				/>
-				<Button type="button" className="mb-4 d-block w-100">
-					Add Image
-				</Button>
+				{institution.imageRepositoryEnabled ? (
+					<AdminFormImageInputV2
+						className="mb-2"
+						buttonClassName="d-block w-100"
+						value={formValues.image}
+						onChange={(image?: ImageModel) => {
+							updateFormValue('image', image);
+						}}
+					/>
+				) : (
+					<AdminFormImageInput
+						imageSrc={formValues.imageUrl}
+						onSrcChange={(nextId, nextSrc) => {
+							updateFormValue('imageFileUploadId', nextId);
+							updateFormValue('imageUrl', nextSrc);
+						}}
+						presignedUploadGetter={(blob, name) => {
+							return groupSessionsService.getPresignedUploadUrl({
+								contentType: blob.type,
+								filename: name,
+							}).fetch;
+						}}
+					/>
+				)}
+
 				<div className="d-flex">
 					<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 					<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
@@ -1791,6 +1807,7 @@ function prepareGroupSessionSubmission(
 		registrationEndDate,
 		tagGroupIds,
 		tags,
+		image,
 		...groupSessionSubmission
 	} = formValues;
 
@@ -1891,5 +1908,8 @@ function prepareGroupSessionSubmission(
 		tagIds:
 			(tags ?? []).filter((tag) => (tagGroupIds ?? []).includes(tag.tagGroupId)).map((tag) => tag.tagId) ?? [],
 		...groupSessionSubmission,
+		...(image && {
+			imageId: image.imageId,
+		}),
 	};
 }

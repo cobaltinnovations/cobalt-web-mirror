@@ -217,7 +217,7 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 				}
 
 				setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.UPLOADING);
-				await uploadImageRepositoryPayload({
+				const uploadedImage = await uploadImageRepositoryPayload({
 					imageUploadPayload,
 					isCurrentUpload,
 					onProgress: setProgress,
@@ -225,12 +225,16 @@ const ImageRepositoryEditImage = forwardRef<ImageRepositoryEditImageRef, ImageRe
 				});
 
 				if (isCurrentUpload()) {
+					if (!uploadedImage) {
+						return;
+					}
+
 					activeUploadXhrRef.current = undefined;
 					setProgress(100);
 					setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.COMPLETE);
 					setIsUploading(false);
 					onUploadStatusChange?.(false);
-					onImageUploaded?.();
+					onImageUploaded?.(uploadedImage);
 				}
 			} catch (error) {
 				if (!isCurrentUpload()) {

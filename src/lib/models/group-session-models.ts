@@ -1,6 +1,7 @@
 import { GroupSessionSchedulingSystemId } from '../services';
 import { CONTENT_VISIBILITY_TYPE_ID } from './content-visibility-type-id-models';
-import { Tag } from './tag-groups';
+import { ImageModel } from '@/lib/models/media-models';
+import { Tag } from '@/lib/models/tag-groups';
 
 export enum GROUP_SESSION_STATUS_ID {
 	NEW = 'NEW',
@@ -109,8 +110,7 @@ export interface GroupSessionModel {
 	assessmentId?: string;
 	facilitatorAccountId?: string;
 	scheduleUrl?: string;
-	imageUrl?: string;
-	imageFileUploadId?: string;
+
 	groupSessionLocationTypeId: GroupSessionLocationTypeId;
 	videoconferenceUrl?: string;
 	inPersonLocation?: string;
@@ -128,6 +128,14 @@ export interface GroupSessionModel {
 	registrationEndDateTime?: string;
 	registrationEndDateTimeDescription?: string;
 	registrationEndDateTimeHasPassed?: boolean;
+
+	// @deprecate
+	imageUrl?: string;
+	// @deprecate
+	imageFileUploadId?: string;
+
+	// new stuff!
+	image: ImageModel;
 }
 
 export interface GroupSessionUrlNameValidationResult {

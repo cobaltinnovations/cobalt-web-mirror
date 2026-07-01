@@ -3,6 +3,7 @@ export * from './admin-analytics-widget-group';
 export * from './admin-badge-select-control';
 export * from './admin-form-footer';
 export * from './admin-form-image-input';
+export * from './admin-form-image-input-v2';
 export * from './admin-form-non-image-file-input';
 export * from './admin-form-section';
 export * from './admin-group-session-filter-scheduling';

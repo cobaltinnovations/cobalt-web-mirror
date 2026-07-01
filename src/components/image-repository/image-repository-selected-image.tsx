@@ -7,12 +7,8 @@ import Loader from '@/components/loader';
 import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
-import {
-	FILE_UPLOAD_TYPE_ID,
-	mediaService,
-	type ImageDetailModel,
-	type ImageModel,
-} from '@/lib/services/media-service';
+import { FILE_UPLOAD_TYPE_ID, type ImageDetailModel, type ImageModel } from '@/lib/models';
+import { mediaService } from '@/lib/services/media-service';
 
 import { IMAGE_REPOSITORY_CROP_RATIO, ImageRepositoryScreenProps } from './image-repository.types';
 
@@ -104,12 +100,16 @@ function getSourceImageFromDetails(imageDetails: ImageDetailModel): ImageModel {
 
 type ImageRepositorySelectedImageProps = Pick<
 	ImageRepositoryScreenProps,
-	'onRepositoryImageEdit' | 'onRepositoryImageVariantAvailabilityChange' | 'repositoryImageId'
+	| 'onRepositoryImageEdit'
+	| 'onRepositoryImageVariantAvailabilityChange'
+	| 'onRepositoryImageVariantChange'
+	| 'repositoryImageId'
 >;
 
 const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 	onRepositoryImageEdit,
 	onRepositoryImageVariantAvailabilityChange,
+	onRepositoryImageVariantChange,
 	repositoryImageId,
 }) => {
 	const [cropRatio, setCropRatio] = useState(IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE);
@@ -146,7 +146,8 @@ const ImageRepositorySelectedImage: FC<ImageRepositorySelectedImageProps> = ({
 
 	useEffect(() => {
 		onRepositoryImageVariantAvailabilityChange?.(!!displayImage);
-	}, [displayImage, onRepositoryImageVariantAvailabilityChange]);
+		onRepositoryImageVariantChange?.(displayImage);
+	}, [displayImage, onRepositoryImageVariantAvailabilityChange, onRepositoryImageVariantChange]);
 
 	const getSelectedImageForEdit = useCallback(
 		(nextCropRatio: IMAGE_REPOSITORY_CROP_RATIO) => {

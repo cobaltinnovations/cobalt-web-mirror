@@ -4,7 +4,8 @@ import { Button, Form } from 'react-bootstrap';
 import InputHelperSearch from '@/components/input-helper-search';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import { createUseThemedStyles } from '@/jss/theme';
-import { mediaService, type ImageListModel } from '@/lib/services/media-service';
+import type { ImageListModel } from '@/lib/models';
+import { mediaService } from '@/lib/services/media-service';
 
 import AsyncWrapper from '@/components/async-page';
 import {

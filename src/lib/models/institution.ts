@@ -68,6 +68,7 @@ export interface Institution {
 	userExperienceTypeId: UserExperienceTypeId;
 	patientUserExperienceBaseUrl: string;
 	staffUserExperienceBaseUrl: string;
+	imageRepositoryEnabled: boolean;
 	integratedCarePhoneNumber: string;
 	integratedCarePhoneNumberDescription: string;
 	integratedCareAvailabilityDescription: string;

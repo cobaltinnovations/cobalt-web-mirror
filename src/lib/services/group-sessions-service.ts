@@ -59,6 +59,7 @@ export interface CreateGroupSessionRequestBody {
 	learnMoreDescription?: string;
 	tagIds?: string[];
 	registrationEndDateTime?: string;
+	imageId?: string;
 }
 
 interface CreateGroupSessionResponseBody {
