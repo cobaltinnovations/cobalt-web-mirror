@@ -42,9 +42,19 @@ export const AdminFormImageInputV2: FC<AdminFormImageInputV2Props> = ({
 							className="mb-3 w-100 d-block"
 							alt={value.imageAltText ?? value.filename}
 						/>
-						<Button type="button" variant="outline-primary" onClick={handleClearImage} disabled={disabled}>
-							Clear Image
-						</Button>
+						<div className="d-flex align-items-center justify-content-between">
+							<p className="m-0 text-muted">{value.imageAltText ?? value.filename}</p>
+							<Button
+								size="sm"
+								type="button"
+								variant="light"
+								className="ms-2 flex-shrink-0"
+								onClick={handleClearImage}
+								disabled={disabled}
+							>
+								Clear Image
+							</Button>
+						</div>
 					</>
 				) : (
 					<Button

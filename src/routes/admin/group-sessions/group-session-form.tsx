@@ -976,34 +976,48 @@ export const Component = () => {
 				}
 			>
 				{institution.imageRepositoryEnabled ? (
-					<AdminFormImageInputV2
-						className="mb-2"
-						buttonClassName="d-block w-100"
-						value={formValues.image}
-						onChange={(image?: ImageModel) => {
-							updateFormValue('image', image);
-						}}
-					/>
+					<>
+						<AdminFormImageInputV2
+							className="mb-2"
+							buttonClassName="d-block w-100"
+							value={formValues.image}
+							onChange={(image?: ImageModel) => {
+								updateFormValue('image', image);
+							}}
+						/>
+						{!formValues.image && (
+							<div className="d-flex">
+								<SvgIcon
+									kit="fas"
+									icon="circle-info"
+									size={16}
+									className="me-2 text-n500 flex-shrink-0"
+								/>
+								<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
+							</div>
+						)}
+					</>
 				) : (
-					<AdminFormImageInput
-						imageSrc={formValues.imageUrl}
-						onSrcChange={(nextId, nextSrc) => {
-							updateFormValue('imageFileUploadId', nextId);
-							updateFormValue('imageUrl', nextSrc);
-						}}
-						presignedUploadGetter={(blob, name) => {
-							return groupSessionsService.getPresignedUploadUrl({
-								contentType: blob.type,
-								filename: name,
-							}).fetch;
-						}}
-					/>
+					<>
+						<AdminFormImageInput
+							imageSrc={formValues.imageUrl}
+							onSrcChange={(nextId, nextSrc) => {
+								updateFormValue('imageFileUploadId', nextId);
+								updateFormValue('imageUrl', nextSrc);
+							}}
+							presignedUploadGetter={(blob, name) => {
+								return groupSessionsService.getPresignedUploadUrl({
+									contentType: blob.type,
+									filename: name,
+								}).fetch;
+							}}
+						/>
+						<div className="d-flex">
+							<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
+							<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
+						</div>
+					</>
 				)}
-
-				<div className="d-flex">
-					<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
-					<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
-				</div>
 			</AdminFormSection>
 
 			<hr />
