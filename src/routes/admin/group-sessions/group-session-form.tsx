@@ -934,7 +934,8 @@ export const Component = () => {
 						<Button
 							type="button"
 							variant="link"
-							className="mb-2 p-0 d-flex text-decoration-none"
+							className="mb-2 p-0 d-flex text-decoration-none align-items-center"
+							style={{ minHeight: '0 !important' }}
 							onClick={() => {
 								setShowImageSitesModal(true);
 							}}
@@ -942,7 +943,7 @@ export const Component = () => {
 							<SvgIcon
 								kit="fas"
 								icon="circle-question"
-								size={20}
+								size={16}
 								className="me-2 text-p500 flex-shrink-0"
 							/>
 							<p className="mb-0 fw-semibold">Where can I find images?</p>
@@ -950,7 +951,8 @@ export const Component = () => {
 						<Button
 							type="button"
 							variant="link"
-							className="p-0 d-flex text-decoration-none"
+							className="p-0 d-flex text-decoration-none align-items-center"
+							style={{ minHeight: '0 !important' }}
 							onClick={() => {
 								setShowImageSelectionTipsModal(true);
 							}}
@@ -958,7 +960,7 @@ export const Component = () => {
 							<SvgIcon
 								kit="fas"
 								icon="circle-question"
-								size={20}
+								size={16}
 								className="me-2 text-p500 flex-shrink-0"
 							/>
 							<p className="mb-0 fw-semibold">How do I choose an appropriate image?</p>
@@ -979,7 +981,10 @@ export const Component = () => {
 						}).fetch;
 					}}
 				/>
-				<div className="d-flex mt-2">
+				<Button type="button" className="mb-4 d-block w-100">
+					Add Image
+				</Button>
+				<div className="d-flex">
 					<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
 					<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
 				</div>
