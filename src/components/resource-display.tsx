@@ -140,7 +140,7 @@ const ResourceDisplay = ({ trackView, content, className }: ResourceDisplayProps
 							) : (
 								<BackgroundImageContainer
 									className={classNames(classes.mediaContainer, 'mb-6')}
-									imageUrl={content?.imageUrl || placeholderImage}
+									imageUrl={content?.image?.url ?? content?.imageUrl ?? placeholderImage}
 								/>
 							)}
 						</>

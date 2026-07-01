@@ -179,7 +179,11 @@ export const SelectResourcesModal = ({ contentIds, onAdd, ...props }: SelectReso
 									/>
 									<div
 										className={classes.imagePreview}
-										style={{ backgroundImage: `url(${c.imageUrl})` }}
+										style={{
+											backgroundImage: `url(${
+												c.image?.thumbnail?.url ?? c.image?.url ?? c.imageUrl
+											})`,
+										}}
 									/>
 									<div className="overflow-hidden">
 										<span className="d-block text-truncate">{c.title}</span>

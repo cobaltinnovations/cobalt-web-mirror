@@ -529,7 +529,11 @@ const Index: FC = () => {
 												key={content.contentId}
 												linkTo={`/resource-library/${content.contentId}`}
 												className="h-100"
-												imageUrl={content.imageUrl}
+												imageUrl={
+													content.image?.thumbnail?.url ??
+													content.image?.url ??
+													content.imageUrl
+												}
 												badgeTitle={content.newFlag ? 'New' : ''}
 												title={content.title}
 												author={content.author}

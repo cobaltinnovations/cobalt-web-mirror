@@ -1,4 +1,5 @@
 import { CONTENT_VISIBILITY_TYPE_ID } from './content-visibility-type-id-models';
+import { ImageModel } from './media-models';
 import { Tag } from './tag-groups';
 
 export enum ContentTypeId {
@@ -54,6 +55,7 @@ export type Content = {
 	title: string;
 	url: string;
 	imageUrl: string;
+	image?: ImageModel;
 	description: string;
 	author: string;
 	created: string;
@@ -87,6 +89,7 @@ export type AdminContent = {
 	durationInMinutesDescription?: string;
 	imageUrl: string;
 	imageFileUploadId: string;
+	image?: ImageModel;
 	inUseCount: number;
 	inUseInstitutionDescription: string;
 	isEditable: boolean;

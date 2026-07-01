@@ -18,6 +18,7 @@ import {
 	ContentStatusId,
 	ContentType,
 	ContentTypeId,
+	ImageModel,
 	Tag,
 } from '@/lib/models';
 import {
@@ -31,12 +32,14 @@ import {
 import { DateFormats } from '@/lib/utils';
 
 import useFlags from '@/hooks/use-flags';
+import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 
 import {
 	ADMIN_HEADER_HEIGHT,
 	ADMIN_RESOURCE_FORM_FOOTER_SUBMIT_ACTION,
 	AdminFormImageInput,
+	AdminFormImageInputV2,
 	AdminFormNonImageFileInput,
 	AdminFormSection,
 	AdminResourceFormFooter,
@@ -142,8 +145,14 @@ const initialResourceFormValues = {
 	resourceFileUploadId: '',
 	resourceFileUrl: '',
 	isShared: true,
+
+	// old image stuff
 	imageFileId: '',
 	imageUrl: '',
+
+	// new image stuff
+	image: undefined as ImageModel | undefined,
+
 	description: '',
 	contentAudienceTypeGroupIds: [] as string[],
 	contentAudienceTypes: [] as ContentAudienceType[],
@@ -178,6 +187,7 @@ function getInitialResourceFormValues({
 		isShared: adminContent?.sharedFlag !== undefined ? adminContent?.sharedFlag : true,
 		imageFileId: adminContent?.imageFileUploadId ?? '',
 		imageUrl: adminContent?.imageUrl ?? '',
+		image: adminContent?.image,
 		description: adminContent?.description ?? '',
 		contentAudienceTypeGroupIds:
 			adminContent?.contentAudienceTypes
@@ -201,6 +211,7 @@ function getInitialResourceFormValues({
 
 export const Component = () => {
 	const classes = useStyles();
+	const { institution } = useAccount();
 	const loaderData = useAdminResourceFormLoaderData();
 	const navigate = useNavigate();
 	const params = useParams<{ action: string; contentId: string }>();
@@ -248,7 +259,7 @@ export const Component = () => {
 
 	const updateOrCreateContent = useCallback(
 		(showFlag?: boolean) => {
-			const submission = prepareResourceSubmission(formValues);
+			const submission = prepareResourceSubmission(formValues, institution.imageRepositoryEnabled);
 
 			const tagGroupErrorMessage = getTagGroupErrorMessage(
 				formValues.tagGroupIds,
@@ -308,7 +319,7 @@ export const Component = () => {
 				}
 			});
 		},
-		[addFlag, formValues, isEdit, loaderData?.tagGroups, params.contentId]
+		[addFlag, formValues, institution.imageRepositoryEnabled, isEdit, loaderData?.tagGroups, params.contentId]
 	);
 
 	const handleFormSubmit = useCallback(
@@ -474,7 +485,8 @@ export const Component = () => {
 					content={mutateFormValuesToContentPreview(
 						formValues,
 						loaderData.contentTypes,
-						loaderData.contentResponse
+						loaderData.contentResponse,
+						institution.imageRepositoryEnabled
 					)}
 					className="pb-40"
 				/>
@@ -538,7 +550,8 @@ export const Component = () => {
 						content={mutateFormValuesToContentPreview(
 							formValues,
 							loaderData.contentTypes,
-							loaderData.contentResponse
+							loaderData.contentResponse,
+							institution.imageRepositoryEnabled
 						)}
 						className="pb-40"
 					/>
@@ -822,24 +835,55 @@ export const Component = () => {
 							</>
 						}
 					>
-						<AdminFormImageInput
-							imageSrc={formValues.imageUrl}
-							onSrcChange={(nextId, nextSrc) => {
-								updateFormValue('imageFileId', nextId);
-								updateFormValue('imageUrl', nextSrc);
-							}}
-							presignedUploadGetter={(blob, name) => {
-								return adminService.getPresignedUploadUrl({
-									contentType: blob.type,
-									filename: name,
-									filesize: blob.size,
-								}).fetch;
-							}}
-						/>
-						<div className="d-flex mt-2">
-							<SvgIcon kit="fas" icon="circle-info" size={16} className="me-2 text-n500 flex-shrink-0" />
-							<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
-						</div>
+						{institution.imageRepositoryEnabled ? (
+							<>
+								<AdminFormImageInputV2
+									className="mb-2"
+									buttonClassName="d-block w-100"
+									value={formValues.image}
+									onChange={(image?: ImageModel) => {
+										updateFormValue('image', image);
+									}}
+								/>
+								{!formValues.image && (
+									<div className="d-flex">
+										<SvgIcon
+											kit="fas"
+											icon="circle-info"
+											size={16}
+											className="me-2 text-n500 flex-shrink-0"
+										/>
+										<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
+									</div>
+								)}
+							</>
+						) : (
+							<>
+								<AdminFormImageInput
+									imageSrc={formValues.imageUrl}
+									onSrcChange={(nextId, nextSrc) => {
+										updateFormValue('imageFileId', nextId);
+										updateFormValue('imageUrl', nextSrc);
+									}}
+									presignedUploadGetter={(blob, name) => {
+										return adminService.getPresignedUploadUrl({
+											contentType: blob.type,
+											filename: name,
+											filesize: blob.size,
+										}).fetch;
+									}}
+								/>
+								<div className="d-flex mt-2">
+									<SvgIcon
+										kit="fas"
+										icon="circle-info"
+										size={16}
+										className="me-2 text-n500 flex-shrink-0"
+									/>
+									<p className="mb-0">A placeholder will be assigned if no image is uploaded.</p>
+								</div>
+							</>
+						)}
 					</AdminFormSection>
 
 					<hr />
@@ -1123,7 +1167,10 @@ export const Component = () => {
 	);
 };
 
-function prepareResourceSubmission(formValues: Partial<typeof initialResourceFormValues>): CreateContentRequest {
+function prepareResourceSubmission(
+	formValues: Partial<typeof initialResourceFormValues>,
+	imageRepositoryEnabled: boolean
+): CreateContentRequest {
 	const publishStartDate = moment(formValues.publishDate).format(DateFormats.API.Date);
 
 	const publishEndDate =
@@ -1141,6 +1188,7 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 				fileUploadId: formValues.resourceFileUploadId,
 			}),
 		...(formValues.imageFileId && { imageFileUploadId: formValues.imageFileId }),
+		...(imageRepositoryEnabled && formValues.image && { imageId: formValues.image.imageId }),
 		...(formValues.durationInMinutes && { durationInMinutes: formValues.durationInMinutes }),
 		description: formValues.description,
 		publishStartDate,
@@ -1166,7 +1214,8 @@ function prepareResourceSubmission(formValues: Partial<typeof initialResourceFor
 function mutateFormValuesToContentPreview(
 	formValues: ReturnType<typeof getInitialResourceFormValues>,
 	contentTypes: ContentType[],
-	contentResponse?: AdminContentResponse
+	contentResponse?: AdminContentResponse,
+	imageRepositoryEnabled = false
 ): Content {
 	const contentType = contentTypes.find((ct) => ct.contentTypeId === formValues.contentTypeId);
 
@@ -1175,7 +1224,8 @@ function mutateFormValuesToContentPreview(
 		contentTypeId: formValues.contentTypeId as ContentTypeId,
 		title: formValues.title,
 		url: formValues.resourceType === RESOURCE_TYPE.URL ? formValues.resourceUrl : formValues.resourceFileUrl,
-		imageUrl: formValues.imageUrl,
+		imageUrl: imageRepositoryEnabled ? formValues.image?.url ?? formValues.imageUrl : formValues.imageUrl,
+		image: imageRepositoryEnabled ? formValues.image : undefined,
 		description: formValues.description,
 		author: formValues.author,
 		created: contentResponse?.adminContent?.dateCreated ?? moment(new Date()).format('YYYY-MM-DD'),

@@ -352,7 +352,9 @@ const ResourceLibraryTags = () => {
 									<ResourceLibraryCard
 										className="h-100"
 										linkTo={`/resource-library/${content.contentId}`}
-										imageUrl={content.imageUrl}
+										imageUrl={
+											content.image?.thumbnail?.url ?? content.image?.url ?? content.imageUrl
+										}
 										badgeTitle={content.newFlag ? 'New' : ''}
 										title={content.title}
 										author={content.author}
