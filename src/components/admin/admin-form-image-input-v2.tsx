@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
 import ImageRepository from '@/components/image-repository/image-repository';
-import type { ImageRepositorySelectableCropFileUploadTypeId } from '@/components/image-repository/image-repository.types';
+import type { ImageRepositorySelectableCropFileUploadTypeId } from '@/components/image-repository/image-repository-ratios';
 import type { ImageModel } from '@/lib/models';
 
 export interface AdminFormImageInputV2Props {

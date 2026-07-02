@@ -11,7 +11,6 @@ import { mediaService } from '@/lib/services/media-service';
 
 import 'react-image-crop/dist/ReactCrop.css';
 import {
-	IMAGE_REPOSITORY_CROP_RATIO,
 	ImageRepositoryCrop,
 	ImageRepositoryCropSelection,
 	ImageRepositoryCroppedImage,
@@ -19,46 +18,15 @@ import {
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
 	ImageRepositoryUploadAsset,
 	ImageRepositoryUploadPayload,
+} from './image-repository.types';
+import {
+	IMAGE_REPOSITORY_CROP_RATIO,
 	getAcceptableImageRepositoryCropRatios,
 	getResolvedImageRepositoryCropRatio,
-} from './image-repository.types';
+	imageRepositoryCropRatioConfigByCropRatio,
+} from './image-repository-ratios';
 import { getSha256Hash } from './image-repository.utils';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
-
-interface CropRatioConfig {
-	aspect: number;
-	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
-	thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID;
-	ratioDimensions: {
-		width: number;
-		height: number;
-	};
-	thumbnailWidth: number;
-}
-
-export const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: {
-		aspect: 16 / 9,
-		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
-		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_16X9,
-		ratioDimensions: { width: 16, height: 9 },
-		thumbnailWidth: 320,
-	},
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: {
-		aspect: 4 / 3,
-		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
-		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_4X3,
-		ratioDimensions: { width: 4, height: 3 },
-		thumbnailWidth: 320,
-	},
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: {
-		aspect: 1,
-		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
-		thumbnailFileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_THUMBNAIL_1X1,
-		ratioDimensions: { width: 1, height: 1 },
-		thumbnailWidth: 320,
-	},
-};
 
 const INITIAL_CROP_MAX_SIZE_PERCENT = 70;
 
@@ -67,7 +35,7 @@ export const getInitialCrop = (
 	imageWidth?: number,
 	imageHeight?: number
 ): ReactCrop.Crop => {
-	const aspect = cropRatioConfigByCropRatio[cropRatio].aspect;
+	const aspect = imageRepositoryCropRatioConfigByCropRatio[cropRatio].aspect;
 
 	if (!imageWidth || !imageHeight) {
 		return {
@@ -216,7 +184,7 @@ function getAspectOutputDimensions(
 	sourceHeight: number,
 	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
 ): { width: number; height: number } {
-	const ratioDimensions = cropRatioConfigByCropRatio[cropRatio].ratioDimensions;
+	const ratioDimensions = imageRepositoryCropRatioConfigByCropRatio[cropRatio].ratioDimensions;
 	let width = Math.max(
 		ratioDimensions.width,
 		Math.floor(sourceWidth / ratioDimensions.width) * ratioDimensions.width
@@ -259,7 +227,7 @@ async function getCroppedImageAsset(
 	const sourceWidth = cropWidth * scaleX;
 	const sourceHeight = cropHeight * scaleY;
 	const outputDimensions = getAspectOutputDimensions(sourceWidth, sourceHeight, cropSelection.cropRatio);
-	const cropRatioConfig = cropRatioConfigByCropRatio[cropSelection.cropRatio];
+	const cropRatioConfig = imageRepositoryCropRatioConfigByCropRatio[cropSelection.cropRatio];
 
 	cropCanvas.width = outputDimensions.width;
 	cropCanvas.height = outputDimensions.height;

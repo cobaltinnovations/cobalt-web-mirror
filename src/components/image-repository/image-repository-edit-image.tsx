@@ -12,8 +12,8 @@ import {
 	ImageRepositoryCropSelection,
 	ImageRepositoryScreenProps,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
-	getResolvedImageRepositoryCropRatio,
 } from './image-repository.types';
+import { getResolvedImageRepositoryCropRatio } from './image-repository-ratios';
 import { getImageUploadPayload, getInitialCrop, uploadImageRepositoryPayload } from './image-repository-crop-image';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
 

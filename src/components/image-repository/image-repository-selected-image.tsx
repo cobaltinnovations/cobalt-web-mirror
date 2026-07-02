@@ -10,28 +10,13 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { FILE_UPLOAD_TYPE_ID, type ImageDetailModel, type ImageModel } from '@/lib/models';
 import { mediaService } from '@/lib/services/media-service';
 
+import { ImageRepositoryScreenProps } from './image-repository.types';
 import {
 	IMAGE_REPOSITORY_CROP_RATIO,
-	ImageRepositoryScreenProps,
 	getAcceptableImageRepositoryCropRatios,
 	getDefaultImageRepositoryCropRatio,
-} from './image-repository.types';
-
-interface CropRatioConfig {
-	fileUploadTypeId: FILE_UPLOAD_TYPE_ID;
-}
-
-const cropRatioConfigByCropRatio: Record<IMAGE_REPOSITORY_CROP_RATIO, CropRatioConfig> = {
-	[IMAGE_REPOSITORY_CROP_RATIO.SIXTEEN_NINE]: {
-		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_16X9,
-	},
-	[IMAGE_REPOSITORY_CROP_RATIO.FOUR_THREE]: {
-		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_4X3,
-	},
-	[IMAGE_REPOSITORY_CROP_RATIO.ONE_ONE]: {
-		fileUploadTypeId: FILE_UPLOAD_TYPE_ID.IMAGE_1X1,
-	},
-};
+	getImageRepositoryFileUploadTypeForCropRatio,
+} from './image-repository-ratios';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	selectedImageScreen: {
@@ -88,7 +73,7 @@ function getImageVariantForRatio(
 	cropRatio: IMAGE_REPOSITORY_CROP_RATIO
 ): ImageModel | undefined {
 	return variants.find(
-		(variant) => variant.fileUploadTypeId === cropRatioConfigByCropRatio[cropRatio].fileUploadTypeId
+		(variant) => variant.fileUploadTypeId === getImageRepositoryFileUploadTypeForCropRatio(cropRatio)
 	);
 }
 

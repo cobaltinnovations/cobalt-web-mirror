@@ -15,12 +15,14 @@ import ImageRepositoryDuplicateImage from './image-repository-duplicate-image';
 import ImageRepositoryEditImage, { ImageRepositoryEditImageRef } from './image-repository-edit-image';
 import ImageRepositorySelectedImage from './image-repository-selected-image';
 import {
-	IMAGE_REPOSITORY_CROP_RATIO,
 	IMAGE_REPOSITORY_SCREEN_ID,
-	getDefaultImageRepositoryCropRatio,
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
-	ImageRepositorySelectableCropFileUploadTypeId,
 } from './image-repository.types';
+import {
+	IMAGE_REPOSITORY_CROP_RATIO,
+	getDefaultImageRepositoryCropRatio,
+	ImageRepositorySelectableCropFileUploadTypeId,
+} from './image-repository-ratios';
 import { getSha256Hash } from './image-repository.utils';
 
 const useStyles = createUseStyles({
