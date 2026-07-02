@@ -14,7 +14,8 @@ import {
 	ImageRepositorySelectedImage as ImageRepositorySelectedImageModel,
 } from './image-repository.types';
 import { getResolvedImageRepositoryCropRatio } from './image-repository-ratios';
-import { getImageUploadPayload, getInitialCrop, uploadImageRepositoryPayload } from './image-repository-crop-image';
+import { uploadImageRepositoryPayload } from './image-repository-crop-image';
+import { getImageUploadPayload, getInitialCrop } from './image-repository.utils';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
 
 export interface ImageRepositoryEditImageRef {
