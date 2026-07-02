@@ -114,6 +114,7 @@ const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigat
 				</Form>
 				<div className={classes.filterActions}>
 					<Button
+						size="sm"
 						variant={activeMediaImageScopeId === undefined ? 'primary' : 'outline-primary'}
 						onClick={() => {
 							setActiveMediaImageScopeId(undefined);
@@ -122,6 +123,7 @@ const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigat
 						All
 					</Button>
 					<Button
+						size="sm"
 						variant={
 							activeMediaImageScopeId === MEDIA_IMAGE_SCOPE_ID.RESOURCE ? 'primary' : 'outline-primary'
 						}
@@ -132,6 +134,7 @@ const ImageRepositoryBrowseImages: FC<ImageRepositoryScreenProps> = ({ onNavigat
 						Resources
 					</Button>
 					<Button
+						size="sm"
 						variant={
 							activeMediaImageScopeId === MEDIA_IMAGE_SCOPE_ID.GROUP_SESSION
 								? 'primary'
