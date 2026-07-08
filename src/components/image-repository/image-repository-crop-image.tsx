@@ -17,7 +17,7 @@ import {
 	ImageRepositoryUploadPayload,
 } from './image-repository.types';
 import { getAcceptableImageRepositoryCropRatios, getResolvedImageRepositoryCropRatio } from './image-repository-ratios';
-import { getImageUploadPayload, getInitialCrop } from './image-repository.utils';
+import { getContainedImageSize, getImageUploadPayload, getInitialCrop } from './image-repository.utils';
 import ImageRepositoryUploader, { IMAGE_REPOSITORY_UPLOAD_STATUS } from './image-repository-uploader';
 
 function waitForNextFrame(): Promise<void> {
@@ -222,14 +222,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 		flex: 1,
 		minHeight: 520,
 		display: 'flex',
-		alignItems: 'stretch',
+		alignItems: 'center',
 		justifyContent: 'center',
 		overflow: 'hidden',
 		backgroundColor: theme.colors.n900,
 		'& .ReactCrop': {
-			width: '100%',
-			height: '100%',
-			display: 'block',
+			maxWidth: '100%',
+			maxHeight: '100%',
+			flex: '0 1 auto',
 			backgroundColor: theme.colors.n900,
 		},
 		'& .ReactCrop > div': {
@@ -239,9 +239,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'& .ReactCrop__image': {
 			width: '100%',
 			height: '100%',
-			maxWidth: 'none',
-			maxHeight: 'none',
-			objectFit: 'cover',
+			maxWidth: '100%',
+			maxHeight: '100%',
+			objectFit: 'contain',
 		},
 		'& .ReactCrop__crop-selection': {
 			border: `1px dashed ${theme.colors.n0}`,
@@ -297,6 +297,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 		const classes = useStyles();
 		const handleError = useHandleError();
 		const imageRef = useRef<HTMLImageElement>();
+		const cropperStageRef = useRef<HTMLDivElement>(null);
 		const uploadRunIdRef = useRef(0);
 		const activeUploadXhrRef = useRef<XMLHttpRequest>();
 		const acceptableCropRatios = useMemo(
@@ -310,6 +311,7 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 		);
 		const [cropRatio, setCropRatio] = useState(resolvedInitialCropRatio);
 		const [crop, setCrop] = useState<ReactCrop.Crop>(getInitialCrop(resolvedInitialCropRatio));
+		const [cropperImageSize, setCropperImageSize] = useState<React.CSSProperties>();
 		const [progress, setProgress] = useState(0);
 		const [uploadStatus, setUploadStatus] = useState<IMAGE_REPOSITORY_UPLOAD_STATUS>(
 			IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING
@@ -319,10 +321,58 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 		useEffect(() => {
 			setCropRatio(resolvedInitialCropRatio);
 			setCrop(getInitialCrop(resolvedInitialCropRatio));
+			setCropperImageSize(undefined);
 			setProgress(0);
 			setUploadStatus(IMAGE_REPOSITORY_UPLOAD_STATUS.PREPARING);
 			setIsUploading(false);
 		}, [resolvedInitialCropRatio, selectedImage?.imageUrl]);
+
+		const updateCropperImageSize = useCallback((image?: HTMLImageElement) => {
+			const currentImage = image ?? imageRef.current;
+			const cropperStage = cropperStageRef.current;
+
+			if (!currentImage || !cropperStage) {
+				return;
+			}
+
+			const nextCropperImageSize = getContainedImageSize({
+				imageWidth: currentImage.naturalWidth,
+				imageHeight: currentImage.naturalHeight,
+				containerWidth: cropperStage.clientWidth,
+				containerHeight: cropperStage.clientHeight,
+			});
+
+			setCropperImageSize(nextCropperImageSize);
+
+			return nextCropperImageSize;
+		}, []);
+
+		useEffect(() => {
+			const cropperStage = cropperStageRef.current;
+
+			if (!cropperStage) {
+				return;
+			}
+
+			const handleResize = () => {
+				updateCropperImageSize();
+			};
+
+			if (typeof ResizeObserver === 'undefined') {
+				window.addEventListener('resize', handleResize);
+
+				return () => {
+					window.removeEventListener('resize', handleResize);
+				};
+			}
+
+			const resizeObserver = new ResizeObserver(handleResize);
+			resizeObserver.observe(cropperStage);
+
+			return () => {
+				resizeObserver.disconnect();
+			};
+		}, [updateCropperImageSize]);
 
 		useEffect(() => {
 			return () => {
@@ -335,10 +385,17 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 		const handleImageLoaded = useCallback(
 			(image: HTMLImageElement) => {
 				imageRef.current = image;
-				setCrop(getInitialCrop(cropRatio, image.width, image.height));
+				const nextCropperImageSize = updateCropperImageSize(image);
+				setCrop(
+					getInitialCrop(
+						cropRatio,
+						nextCropperImageSize?.width ?? image.width,
+						nextCropperImageSize?.height ?? image.height
+					)
+				);
 				return false;
 			},
-			[cropRatio]
+			[cropRatio, updateCropperImageSize]
 		);
 
 		const getCropSelection = useCallback((): ImageRepositoryCropSelection | undefined => {
@@ -455,12 +512,14 @@ const ImageRepositoryCropImage = forwardRef<ImageRepositoryCropImageRef, ImageRe
 		return (
 			<div className={classes.selectedImageScreen}>
 				<div className={classes.cropperColumn}>
-					<div className={classes.cropperStage}>
+					<div ref={cropperStageRef} className={classes.cropperStage}>
 						<ReactCrop
 							key={selectedImage.imageUrl}
 							src={selectedImage.imageUrl}
 							crossorigin="anonymous"
 							imageAlt={selectedImage.imageAltText}
+							style={cropperImageSize}
+							imageStyle={cropperImageSize}
 							crop={crop}
 							disabled={isUploading}
 							onImageLoaded={handleImageLoaded}

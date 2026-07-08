@@ -11,6 +11,18 @@ import { IMAGE_REPOSITORY_CROP_RATIO, imageRepositoryCropRatioConfigByCropRatio 
 
 const INITIAL_CROP_MAX_SIZE_PERCENT = 70;
 
+interface GetContainedImageSizeOptions {
+	imageWidth: number;
+	imageHeight: number;
+	containerWidth: number;
+	containerHeight: number;
+}
+
+export interface ImageRepositoryContainedImageSize {
+	width: number;
+	height: number;
+}
+
 export const getInitialCrop = (
 	cropRatio: IMAGE_REPOSITORY_CROP_RATIO,
 	imageWidth?: number,
@@ -46,6 +58,28 @@ export const getInitialCrop = (
 		aspect,
 	};
 };
+
+export function getContainedImageSize({
+	imageWidth,
+	imageHeight,
+	containerWidth,
+	containerHeight,
+}: GetContainedImageSizeOptions): ImageRepositoryContainedImageSize | undefined {
+	if (
+		[imageWidth, imageHeight, containerWidth, containerHeight].some(
+			(value) => value <= 0 || !Number.isFinite(value)
+		)
+	) {
+		return;
+	}
+
+	const scale = Math.min(containerWidth / imageWidth, containerHeight / imageHeight);
+
+	return {
+		width: Math.round(imageWidth * scale),
+		height: Math.round(imageHeight * scale),
+	};
+}
 
 function loadImage(imageUrl: string): Promise<HTMLImageElement> {
 	return new Promise((resolve, reject) => {
