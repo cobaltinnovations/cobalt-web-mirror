@@ -60,7 +60,7 @@ const Index: FC = () => {
 		useAppRootLoaderData();
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
-	const revalidator = useRevalidator();
+	const { revalidate } = useRevalidator();
 	const { trackEvent } = useAnalytics();
 	const handleError = useHandleError();
 
@@ -184,8 +184,8 @@ const Index: FC = () => {
 	);
 	const handleOnboardingScreeningFlowComplete = useCallback(() => {
 		setShowOnboardingModal(false);
-		revalidator.revalidate();
-	}, [revalidator]);
+		revalidate();
+	}, [revalidate]);
 
 	if (institution?.integratedCareEnabled) {
 		return <Navigate to="/ic" />;
@@ -206,7 +206,7 @@ const Index: FC = () => {
 			</Helmet>
 
 			<PreviewCanvas title={institution.name} show={showOnboardingModal}>
-				{institution.onboardingScreeningFlowId && (
+				{showOnboardingModal && institution.onboardingScreeningFlowId && (
 					<Container className="pb-8">
 						<Row>
 							<Col md={12} lg={{ span: 6, offset: 3 }}>

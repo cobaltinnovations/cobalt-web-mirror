@@ -103,6 +103,7 @@ export function isMultiChartWidget(widget: AdminAnalyticsWidget): widget is Admi
 export interface AdminAnalyticsWidgetsRequestParams {
 	startDate: string;
 	endDate: string;
+	behaviorBridgeProvider?: 'true' | 'false';
 }
 
 export interface AdminAnalyticsWidgetGroup {
