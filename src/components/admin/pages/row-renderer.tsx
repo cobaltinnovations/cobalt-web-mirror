@@ -16,16 +16,13 @@ import {
 	isCallToActionFullWidthRow,
 	isGroupSessionsRow,
 	isCustomRow,
-	isOneColumnImageRightRow,
 	isMailingListRow,
 	isOneColumnImageRow,
-	isOneColumnTextRow,
 	isResourcesRow,
 	isTagGroupRow,
 	isTagRow,
 	isThreeColumnImageRow,
 	isTwoColumnImageRow,
-	isTwoColumnTextRow,
 	MailingListEntryTypeId,
 	MailingListRowModel,
 	OneColumnImageRowModel,
@@ -33,6 +30,7 @@ import {
 	PageRowUnionModel,
 	PageSiteLocationModel,
 	ResourcesRowModel,
+	ROW_TYPE_ID,
 	Tag,
 	TagGroupRowModel,
 	TagRowModel,
@@ -94,6 +92,14 @@ const mobileCarouselResponsive = {
 		items: 1,
 		partialVisibilityGutter: 0,
 	},
+};
+
+const normalizeAnalyticsLinkUrl = (linkUrl: string) => {
+	try {
+		return new URL(linkUrl, window.location.href).href;
+	} catch {
+		return linkUrl;
+	}
 };
 
 const ResourcesRowRenderer = ({
@@ -293,7 +299,7 @@ const TagGroupRowRenderer = ({
 
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG_GROUP, {
 							pageId,
-							tagId: pageRow.tagGroup.tagGroupId,
+							tagGroupId: pageRow.tagGroup.tagGroupId,
 							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
@@ -565,7 +571,7 @@ const OneColRowRenderer = ({
 }: RowRendererProps<OneColumnImageRowModel>) => {
 	const forceMobileLayout = previewViewport === 'mobile';
 
-	if (isOneColumnTextRow(pageRow)) {
+	if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT) {
 		return (
 			<Row className={className}>
 				<Col
@@ -599,7 +605,7 @@ const OneColRowRenderer = ({
 		);
 	}
 
-	const imageFirst = !isOneColumnImageRightRow(pageRow);
+	const imageFirst = pageRow.rowTypeId !== ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT;
 
 	return (
 		<Row className={classNames('align-items-center', className)}>
@@ -663,7 +669,7 @@ const TwoColRowRenderer = ({
 }: RowRendererProps<TwoColumnImageRowModel>) => {
 	const forceMobileLayout = previewViewport === 'mobile';
 
-	if (isTwoColumnTextRow(pageRow)) {
+	if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT) {
 		return (
 			<Row className={className}>
 				<Col
@@ -876,9 +882,11 @@ const FullWidthCallToActionRowRenderer = ({
 }: RowRendererProps<CallToActionFullWidthRowModel>) => {
 	const handleButtonClick = () => {
 		if (enableAnalytics && pageRow.buttonUrl) {
-			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CALL_TO_ACTION, {
 				pageId,
-				linkUrl: pageRow.buttonUrl,
+				pageRowId: pageRow.pageRowId,
+				rowTypeId: pageRow.rowTypeId,
+				linkUrl: normalizeAnalyticsLinkUrl(pageRow.buttonUrl),
 				linkText: pageRow.buttonText ?? '',
 				siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 			});
@@ -891,7 +899,7 @@ const FullWidthCallToActionRowRenderer = ({
 
 	return (
 		<CallToActionFullWidth
-			className={className}
+			contentClassName={className}
 			title={pageRow.headline ?? ''}
 			description={
 				pageRow.description ? (
@@ -931,9 +939,11 @@ const BlockCallToActionRowRenderer = ({
 
 	const handleButtonClick = () => {
 		if (enableAnalytics && pageRow.buttonUrl) {
-			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CALL_TO_ACTION, {
 				pageId,
-				linkUrl: pageRow.buttonUrl,
+				pageRowId: pageRow.pageRowId,
+				rowTypeId: pageRow.rowTypeId,
+				linkUrl: normalizeAnalyticsLinkUrl(pageRow.buttonUrl),
 				linkText: pageRow.buttonText ?? '',
 				siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 			});
@@ -953,6 +963,18 @@ const BlockCallToActionRowRenderer = ({
 			forceMobileLayout={forceMobileLayout}
 			primaryActionText={pageRow.buttonText}
 			onPrimaryActionClick={handleButtonClick}
+			onDescriptionLinkClick={({ linkUrl, linkText }) => {
+				if (!enableAnalytics) {
+					return;
+				}
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+					pageId,
+					linkUrl,
+					linkText,
+					siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+				});
+			}}
 		/>
 	);
 };
@@ -1049,6 +1071,7 @@ export const getRendererForPageRow = ({
 	enableAnalytics,
 	livePageSiteLocations,
 	previewViewport = 'desktop',
+	className,
 }: {
 	pageId: string;
 	pageRow: PageRowUnionModel;
@@ -1057,6 +1080,7 @@ export const getRendererForPageRow = ({
 	enableAnalytics: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
 	previewViewport?: PagePreviewViewport;
+	className?: string;
 }) => {
 	const rowTypeMap = [
 		{
@@ -1196,6 +1220,7 @@ export const getRendererForPageRow = ({
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
 					previewViewport={previewViewport}
+					className={className}
 				/>
 			),
 		},

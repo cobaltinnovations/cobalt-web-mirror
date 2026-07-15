@@ -140,7 +140,8 @@ const SIZE_SELECTION_OPTIONS: Array<{
 	},
 ];
 
-const getDefaultSizeSelection = () => SIZE_SELECTIONS.RECTANGLE;
+const getDefaultSizeSelection = (cropImage: boolean) =>
+	cropImage ? SIZE_SELECTIONS.RECTANGLE : SIZE_SELECTIONS.FREEFORM;
 
 const getInitialCrop = (sizeSelection: SIZE_SELECTIONS, imageWidth?: number, imageHeight?: number): ReactCrop.Crop => {
 	const sizeSelectionOption = SIZE_SELECTION_OPTIONS.find((option) => option.value === sizeSelection);
@@ -211,7 +212,7 @@ const SessionCropModal: FC<SessionCropModalProps> = ({
 	const { addFlag } = useFlags();
 	const imageRef = useRef<HTMLImageElement>();
 	const classes = useSessionCropModalStyles();
-	const defaultSizeSelection = getDefaultSizeSelection();
+	const defaultSizeSelection = getDefaultSizeSelection(cropImage);
 	const [sizeSelection, setSizeSelection] = useState<SIZE_SELECTIONS>(lockSizeSelection ?? defaultSizeSelection);
 	const effectiveSizeSelection = lockSizeSelection ?? sizeSelection;
 	const [crop, setCrop] = useState<ReactCrop.Crop>(() => getInitialCrop(lockSizeSelection ?? defaultSizeSelection));

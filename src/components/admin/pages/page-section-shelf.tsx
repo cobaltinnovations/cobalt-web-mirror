@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { ROW_TYPE_ID } from '@/lib/models';
+import { isCustomRow, ROW_TYPE_ID } from '@/lib/models';
 import {
 	HERO_SECTION_ID,
 	PageSectionShelfPage,
@@ -115,7 +115,7 @@ export const PageSectionShelf = () => {
 	}, [currentPageRow?.pageRowId]);
 
 	useEffect(() => {
-		if (currentPageRow?.rowTypeId !== ROW_TYPE_ID.CUSTOM_ROW) {
+		if (!currentPageRow || !isCustomRow(currentPageRow)) {
 			setSelectedCustomRowColumn(undefined);
 			return;
 		}

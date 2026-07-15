@@ -1,4 +1,5 @@
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import type { FormControlProps } from 'react-bootstrap';
 import { BACKGROUND_COLOR_ID, PageRowBaseModel, ROW_PADDING_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -9,6 +10,8 @@ import InputHelper from '@/components/input-helper';
 interface RowSettingsMetaFormProps {
 	nameInputRef?: RefObject<HTMLInputElement>;
 }
+
+type FormControlChangeEvent = Parameters<NonNullable<FormControlProps['onChange']>>[0];
 
 export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) => {
 	const handleError = useHandleError();
@@ -56,7 +59,7 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 	});
 
 	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		({ currentTarget }: FormControlChangeEvent) => {
 			setFormValues((previousValue) => {
 				const newValue = {
 					...previousValue,

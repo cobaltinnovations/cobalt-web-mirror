@@ -65,7 +65,6 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageNumber = useMemo(() => searchParams.get('pageNumber') ?? '', [searchParams]);
 	const pageSize = useMemo(() => searchParams.get('pageSize') ?? '', [searchParams]);
-	const searchQuery = useMemo(() => searchParams.get('searchQuery') ?? '', [searchParams]);
 	const orderBy = useMemo(() => searchParams.get('orderBy') ?? '', [searchParams]);
 	const { addFlag } = useFlags();
 
@@ -79,8 +78,11 @@ export const Component = () => {
 	const [showPageSettingsModal, setShowPageSettingsModal] = useState(false);
 	const [showDeletePageModal, setShowDeletePageModal] = useState(false);
 	const [showUnpublishPageModal, setShowUnpublishPageModal] = useState(false);
-	const [searchInputValue, setSearchInputValue] = useState(searchQuery);
+	const [searchInputValue, setSearchInputValue] = useState('');
 	const [debouncedSearchQuery] = useDebouncedState(searchInputValue);
+	const [searchPageNumber, setSearchPageNumber] = useState('0');
+	const normalizedSearchQuery = debouncedSearchQuery.trim();
+	const activePageNumber = normalizedSearchQuery ? searchPageNumber : pageNumber;
 
 	const copyTextToClipboard = useCopyTextToClipboard();
 
@@ -90,9 +92,9 @@ export const Component = () => {
 		try {
 			const { pages, totalCount, totalCountDescription } = await pagesService
 				.getPages({
-					...(pageNumber && { pageNumber }),
+					...(activePageNumber && { pageNumber: activePageNumber }),
 					...(pageSize && { pageSize }),
-					...(searchQuery && { searchQuery }),
+					...(normalizedSearchQuery && { searchQuery: normalizedSearchQuery }),
 					...(orderBy && { orderBy }),
 				})
 				.fetch();
@@ -105,32 +107,11 @@ export const Component = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, orderBy, pageNumber, pageSize, searchQuery]);
+	}, [activePageNumber, handleError, normalizedSearchQuery, orderBy, pageSize]);
 
 	useEffect(() => {
 		fetchPages();
 	}, [fetchPages]);
-
-	useEffect(() => {
-		setSearchInputValue(searchQuery);
-	}, [searchQuery]);
-
-	useEffect(() => {
-		if (debouncedSearchQuery === searchQuery) {
-			return;
-		}
-
-		const nextSearchParams = new URLSearchParams(searchParams);
-
-		if (debouncedSearchQuery) {
-			nextSearchParams.set('searchQuery', debouncedSearchQuery);
-		} else {
-			nextSearchParams.delete('searchQuery');
-		}
-
-		nextSearchParams.set('pageNumber', '0');
-		setSearchParams(nextSearchParams, { replace: true });
-	}, [debouncedSearchQuery, searchParams, searchQuery, setSearchParams]);
 
 	const handlePageButtonClick = useCallback(
 		async (pageId: string) => {
@@ -192,6 +173,11 @@ export const Component = () => {
 	}, [addFlag, fetchPages, handleError, selectedPage]);
 
 	const handlePaginationClick = (pageIndex: number) => {
+		if (normalizedSearchQuery) {
+			setSearchPageNumber(String(pageIndex));
+			return;
+		}
+
 		searchParams.set('pageNumber', String(pageIndex));
 		setSearchParams(searchParams);
 	};
@@ -313,9 +299,11 @@ export const Component = () => {
 									value={searchInputValue}
 									onChange={({ currentTarget }) => {
 										setSearchInputValue(currentTarget.value);
+										setSearchPageNumber('0');
 									}}
 									onClear={() => {
 										setSearchInputValue('');
+										setSearchPageNumber('0');
 									}}
 								/>
 							</div>
@@ -440,7 +428,7 @@ export const Component = () => {
 						<div className="d-flex justify-content-center align-items-center">
 							<TablePagination
 								total={pagesTotalCount}
-								page={parseInt(pageNumber, 10)}
+								page={parseInt(activePageNumber || '0', 10)}
 								size={15}
 								onClick={handlePaginationClick}
 								disabled={isLoading}

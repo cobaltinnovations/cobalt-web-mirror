@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, type FormControlProps } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import { BACKGROUND_COLOR_ID, CustomRowModel, isCustomRow, ROW_PADDING_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
@@ -12,6 +12,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const MAX_COLUMNS = 4;
 const COLUMN_LABELS = ['A', 'B', 'C', 'D'];
+type FormControlChangeEvent = Parameters<NonNullable<FormControlProps['onChange']>>[0];
 
 interface RowSettingsCustomRowProps {
 	onColumnClick?(pageRowColumnId: string, columnLabel: string): void;
@@ -234,7 +235,7 @@ export const RowSettingsCustomRow = ({ onColumnClick }: RowSettingsCustomRowProp
 	});
 
 	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		({ currentTarget }: FormControlChangeEvent) => {
 			setFormValues((previousValue) => {
 				const nextValue = {
 					...previousValue,

@@ -8,6 +8,7 @@ interface CallToActionFullWidthProps {
 	onButtonClick?: () => void;
 	buttonDisabled?: boolean;
 	className?: string;
+	contentClassName?: string;
 }
 
 const CallToActionFullWidth = ({
@@ -17,10 +18,11 @@ const CallToActionFullWidth = ({
 	onButtonClick,
 	buttonDisabled,
 	className,
+	contentClassName,
 }: CallToActionFullWidthProps) => {
 	return (
 		<Container fluid className={['bg-n75', className].filter(Boolean).join(' ')}>
-			<Container className="py-16 py-lg-24">
+			<Container className={contentClassName ?? 'py-16 py-lg-24'}>
 				<Row>
 					<Col md={{ span: 8, offset: 2 }} lg={{ span: 6, offset: 3 }}>
 						<h2 className="mb-6 text-center">{title}</h2>

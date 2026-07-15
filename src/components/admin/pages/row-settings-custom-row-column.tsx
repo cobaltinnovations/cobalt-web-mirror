@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import classNames from 'classnames';
@@ -20,6 +20,15 @@ interface RowSettingsCustomRowColumnProps {
 }
 
 type CustomRowColumnSectionId = 'IMAGE' | 'TEXT';
+
+interface CustomRowColumnFormValues {
+	description: string;
+	imageFileUploadId: string;
+	imageUrl: string;
+	imageAltText: string;
+	usePlaceholderImage: boolean;
+	contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
+}
 
 const SECTION_TITLE_BY_ID: Record<CustomRowColumnSectionId, string> = {
 	IMAGE: 'Image',
@@ -69,7 +78,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 		() => pageRow?.columns.find((column) => column.pageRowColumnId === pageRowColumnId),
 		[pageRow, pageRowColumnId]
 	);
-	const [formValues, setFormValues] = useState({
+	const [formValues, setFormValues] = useState<CustomRowColumnFormValues>({
 		description: '',
 		imageFileUploadId: '',
 		imageUrl: '',
@@ -77,24 +86,14 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 		usePlaceholderImage: false,
 		contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
 	});
-
-	useEffect(() => {
-		if (!pageRowColumn) {
-			return;
-		}
-
-		setFormValues({
-			description: pageRowColumn.description ?? '',
-			imageFileUploadId: pageRowColumn.imageFileUploadId ?? '',
-			imageUrl: pageRowColumn.imageUrl ?? '',
-			imageAltText: pageRowColumn.imageAltText ?? '',
-			usePlaceholderImage: pageRowColumn.usePlaceholderImage ?? false,
-			contentOrderId: pageRowColumn.contentOrderId ?? CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
-		});
-	}, [pageRowColumn]);
+	const formValuesRef = useRef(formValues);
+	const formColumnIdRef = useRef<string>();
+	const hasUnsavedChangesRef = useRef(false);
+	const persistenceQueueRef = useRef<Promise<void>>(Promise.resolve());
+	const pendingPersistenceCountRef = useRef(0);
 
 	const persistColumnValues = useCallback(
-		async (pr: CustomRowModel, prcId: string, fv: typeof formValues) => {
+		async (pr: CustomRowModel, prcId: string, fv: CustomRowColumnFormValues) => {
 			const { pageRow: updatedPageRow } = await pagesService
 				.updateCustomRowColumn(pr.pageRowId, prcId, {
 					description: fv.description,
@@ -110,7 +109,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 	);
 
 	const persistColumnContentOrder = useCallback(
-		async (pr: CustomRowModel, prcId: string, fv: typeof formValues) => {
+		async (pr: CustomRowModel, prcId: string, fv: CustomRowColumnFormValues) => {
 			const { pageRow: updatedPageRow } = await pagesService
 				.updateCustomRowColumn(pr.pageRowId, prcId, {
 					description: fv.description,
@@ -126,101 +125,161 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 		[updatePageRow]
 	);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(
-		async (pr: CustomRowModel, prcId: string, fv: typeof formValues) => {
+	const runPersistence = useCallback(
+		async (persistence: () => Promise<void>) => {
+			pendingPersistenceCountRef.current += 1;
 			setIsSaving(true);
 
+			const queuedPersistence = persistenceQueueRef.current.then(persistence);
+			persistenceQueueRef.current = queuedPersistence.catch(() => undefined);
+
 			try {
-				await persistColumnValues(pr, prcId, fv);
+				await queuedPersistence;
+			} finally {
+				pendingPersistenceCountRef.current -= 1;
+
+				if (pendingPersistenceCountRef.current === 0) {
+					setIsSaving(false);
+				}
+			}
+		},
+		[setIsSaving]
+	);
+
+	const persistFormValues = useCallback(
+		async (pr: CustomRowModel, prcId: string, fv: CustomRowColumnFormValues) => {
+			try {
+				await runPersistence(() => persistColumnValues(pr, prcId, fv));
+
+				if (formValuesRef.current === fv) {
+					hasUnsavedChangesRef.current = false;
+				}
 			} catch (error) {
 				handleError(error);
-			} finally {
-				setIsSaving(false);
 			}
+		},
+		[handleError, persistColumnValues, runPersistence]
+	);
+
+	const debouncedSubmission = useDebouncedAsyncFunction(
+		async (pr: CustomRowModel, prcId: string, fv: CustomRowColumnFormValues) => {
+			await persistFormValues(pr, prcId, fv);
 		}
 	);
 
 	useEffect(() => {
+		const previousColumnId = formColumnIdRef.current;
+		const nextColumnId = pageRowColumn?.pageRowColumnId;
+
+		if (previousColumnId && previousColumnId !== nextColumnId) {
+			void debouncedSubmission.flush();
+		}
+
+		if (!pageRowColumn) {
+			formColumnIdRef.current = undefined;
+			hasUnsavedChangesRef.current = false;
+			return;
+		}
+
+		if (previousColumnId === nextColumnId && hasUnsavedChangesRef.current) {
+			return;
+		}
+
+		const nextValues: CustomRowColumnFormValues = {
+			description: pageRowColumn.description ?? '',
+			imageFileUploadId: pageRowColumn.imageFileUploadId ?? '',
+			imageUrl: pageRowColumn.imageUrl ?? '',
+			imageAltText: pageRowColumn.imageAltText ?? '',
+			usePlaceholderImage: pageRowColumn.usePlaceholderImage ?? false,
+			contentOrderId: pageRowColumn.contentOrderId ?? CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+		};
+
+		formColumnIdRef.current = nextColumnId;
+		formValuesRef.current = nextValues;
+		hasUnsavedChangesRef.current = false;
+		setFormValues(nextValues);
+	}, [debouncedSubmission, pageRowColumn]);
+
+	useEffect(() => {
 		return () => {
-			debouncedSubmission.cancel();
+			void debouncedSubmission.flush();
 		};
 	}, [debouncedSubmission]);
 
+	const setLocalFormValues = useCallback((nextValues: CustomRowColumnFormValues) => {
+		formValuesRef.current = nextValues;
+		hasUnsavedChangesRef.current = true;
+		setFormValues(nextValues);
+	}, []);
+
 	const handleInputChange = useCallback(
 		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
-			setFormValues((previousValue) => {
-				const nextValue = {
-					...previousValue,
-					[currentTarget.name]: currentTarget.value,
-				};
+			const nextValue = {
+				...formValuesRef.current,
+				[currentTarget.name]: currentTarget.value,
+			} as CustomRowColumnFormValues;
 
-				if (pageRow && pageRowColumn) {
-					debouncedSubmission(pageRow, pageRowColumn.pageRowColumnId, nextValue);
-				}
+			setLocalFormValues(nextValue);
 
-				return nextValue;
-			});
+			if (pageRow && pageRowColumn) {
+				debouncedSubmission(pageRow, pageRowColumn.pageRowColumnId, nextValue);
+			}
 		},
-		[debouncedSubmission, pageRow, pageRowColumn]
+		[debouncedSubmission, pageRow, pageRowColumn, setLocalFormValues]
 	);
 
 	const handleQuillChange = useCallback(
 		(description: string) => {
-			setFormValues((previousValue) => {
-				const nextValue = {
-					...previousValue,
-					description,
-				};
+			const nextValue = {
+				...formValuesRef.current,
+				description,
+			};
 
-				if (pageRow && pageRowColumn) {
-					debouncedSubmission(pageRow, pageRowColumn.pageRowColumnId, nextValue);
-				}
+			setLocalFormValues(nextValue);
 
-				return nextValue;
-			});
+			if (pageRow && pageRowColumn) {
+				debouncedSubmission(pageRow, pageRowColumn.pageRowColumnId, nextValue);
+			}
 		},
-		[debouncedSubmission, pageRow, pageRowColumn]
+		[debouncedSubmission, pageRow, pageRowColumn, setLocalFormValues]
 	);
 
 	const handleUploadComplete = useCallback(
 		async (imageFileUploadId: string) => {
-			setIsSaving(true);
-
-			try {
-				if (!pageRow || !pageRowColumn) {
-					throw new Error('pageRow or pageRowColumn is undefined.');
-				}
-
-				const nextValue = {
-					...formValues,
-					imageFileUploadId,
-					usePlaceholderImage: false,
-				};
-
-				await persistColumnValues(pageRow, pageRowColumn.pageRowColumnId, nextValue);
-			} catch (error) {
-				handleError(error);
-			} finally {
-				setIsSaving(false);
+			if (!pageRow || !pageRowColumn || formColumnIdRef.current !== pageRowColumn.pageRowColumnId) {
+				handleError(new Error('pageRow or pageRowColumn is undefined or no longer active.'));
+				return;
 			}
+
+			const nextValue = {
+				...formValuesRef.current,
+				imageFileUploadId,
+				usePlaceholderImage: false,
+			};
+
+			setLocalFormValues(nextValue);
+			debouncedSubmission.cancel();
+			await persistFormValues(pageRow, pageRowColumn.pageRowColumnId, nextValue);
 		},
-		[formValues, handleError, pageRow, pageRowColumn, persistColumnValues, setIsSaving]
+		[debouncedSubmission, handleError, pageRow, pageRowColumn, persistFormValues, setLocalFormValues]
 	);
 
 	const handleImageChange = useCallback(
 		({ nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
+			const nextValue = {
+				...formValuesRef.current,
 				imageFileUploadId: nextId,
 				imageUrl: nextSrc,
 				usePlaceholderImage: false,
-			}));
+			};
+
+			setLocalFormValues(nextValue);
 
 			if (!nextId && !nextSrc) {
-				handleUploadComplete('');
+				void handleUploadComplete('');
 			}
 		},
-		[handleUploadComplete]
+		[handleUploadComplete, setLocalFormValues]
 	);
 
 	const handleDragEnd = useCallback(
@@ -229,16 +288,15 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 				return;
 			}
 
-			debouncedSubmission.cancel();
-
-			const previousContentOrderId = formValues.contentOrderId;
+			const hadUnsavedChanges = hasUnsavedChangesRef.current;
+			const previousContentOrderId = formValuesRef.current.contentOrderId;
 			const reorderedSectionIds = getSectionIdsForContentOrder(previousContentOrderId);
 			const [removedSectionId] = reorderedSectionIds.splice(source.index, 1);
 			reorderedSectionIds.splice(destination.index, 0, removedSectionId);
 
 			const nextContentOrderId = getContentOrderForSectionIds(reorderedSectionIds);
 			const nextValue = {
-				...formValues,
+				...formValuesRef.current,
 				contentOrderId: nextContentOrderId,
 			};
 			const optimisticPageRow = {
@@ -250,31 +308,40 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 				),
 			};
 
-			setFormValues(nextValue);
+			setLocalFormValues(nextValue);
 			updatePageRow(optimisticPageRow);
-			setIsSaving(true);
+			debouncedSubmission.cancel();
 
 			try {
-				await persistColumnContentOrder(pageRow, pageRowColumn.pageRowColumnId, nextValue);
+				await runPersistence(() =>
+					persistColumnContentOrder(pageRow, pageRowColumn.pageRowColumnId, nextValue)
+				);
+
+				if (formValuesRef.current === nextValue) {
+					hasUnsavedChangesRef.current = false;
+				}
 			} catch (error) {
-				setFormValues((previousValue) => ({
-					...previousValue,
+				const hasNewerChanges = formValuesRef.current !== nextValue;
+				const rolledBackValue = {
+					...formValuesRef.current,
 					contentOrderId: previousContentOrderId,
-				}));
+				};
+
+				formValuesRef.current = rolledBackValue;
+				hasUnsavedChangesRef.current = hadUnsavedChanges || hasNewerChanges;
+				setFormValues(rolledBackValue);
 				updatePageRow(pageRow);
 				handleError(error);
-			} finally {
-				setIsSaving(false);
 			}
 		},
 		[
 			debouncedSubmission,
-			formValues,
 			handleError,
 			pageRow,
 			pageRowColumn,
 			persistColumnContentOrder,
-			setIsSaving,
+			runPersistence,
+			setLocalFormValues,
 			updatePageRow,
 		]
 	);

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -280,11 +280,8 @@ const getPageBuilderTextStyleIdForFormats = (formats: Record<string, unknown>): 
 	return 'BODY_NORMAL';
 };
 
-const WysiwygBasic = React.forwardRef(
-	(
-		{ value, onChange, disabled, className, height, toolbarPreset = 'default' }: WysiwygProps,
-		forwardedRef: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
-	) => {
+const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
+	({ value, onChange, disabled, className, height, toolbarPreset = 'default' }: WysiwygProps, forwardedRef) => {
 		const classes = useWysiwygStyles({ height });
 		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
 		const pageBuilderToolbarId = `${reactQuillId}-toolbar`;

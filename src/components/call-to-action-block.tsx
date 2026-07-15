@@ -2,6 +2,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 type variant = 'primary' | 'light';
 
@@ -63,6 +64,7 @@ interface CallToActionBlockProps {
 	imageUrl: string;
 	primaryActionText?: string;
 	onPrimaryActionClick?: () => void;
+	onDescriptionLinkClick?: ({ linkUrl, linkText }: { linkUrl: string; linkText: string }) => void;
 	subheading?: string;
 	secondaryActionText?: string;
 	onSecondaryActionClick?: () => void;
@@ -79,6 +81,7 @@ const CallToActionBlock = ({
 	primaryActionText,
 	secondaryActionText,
 	onPrimaryActionClick,
+	onDescriptionLinkClick,
 	onSecondaryActionClick,
 	className,
 	variant,
@@ -107,13 +110,12 @@ const CallToActionBlock = ({
 
 					<h2 className="my-4">{heading}</h2>
 
-					<div
+					<WysiwygDisplay
 						className={classNames(classes.htmlContent, {
 							'mb-10': primaryActionText || secondaryActionText,
 						})}
-						dangerouslySetInnerHTML={{
-							__html: descriptionHtml,
-						}}
+						html={descriptionHtml}
+						onClick={onDescriptionLinkClick}
 					/>
 
 					{(primaryActionText || secondaryActionText) && (

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Form, type FormControlProps } from 'react-bootstrap';
 import {
 	CallToActionBlockRowModel,
 	CallToActionFullWidthRowModel,
@@ -21,6 +21,18 @@ interface RowSettingsCallToActionProps {
 }
 
 type CallToActionRowModel = CallToActionBlockRowModel | CallToActionFullWidthRowModel;
+type FormControlChangeEvent = Parameters<NonNullable<FormControlProps['onChange']>>[0];
+
+interface CallToActionFormValues {
+	headline: string;
+	description: string;
+	buttonText: string;
+	buttonUrl: string;
+	imageFileUploadId: string;
+	imageUrl: string;
+	paddingTopId: ROW_PADDING_ID;
+	paddingBottomId: ROW_PADDING_ID;
+}
 
 export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProps) => {
 	const handleError = useHandleError();
@@ -36,7 +48,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 
 		return undefined;
 	}, [currentPageRow, variant]);
-	const [formValues, setFormValues] = useState({
+	const [formValues, setFormValues] = useState<CallToActionFormValues>({
 		headline: '',
 		description: '',
 		buttonText: '',
@@ -46,26 +58,14 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 		paddingTopId: ROW_PADDING_ID.MEDIUM,
 		paddingBottomId: ROW_PADDING_ID.MEDIUM,
 	});
-
-	useEffect(() => {
-		if (!callToActionRow) {
-			return;
-		}
-
-		setFormValues({
-			headline: callToActionRow.headline ?? '',
-			description: callToActionRow.description ?? '',
-			buttonText: callToActionRow.buttonText ?? '',
-			buttonUrl: callToActionRow.buttonUrl ?? '',
-			imageFileUploadId: callToActionRow.imageFileUploadId ?? '',
-			imageUrl: callToActionRow.imageUrl ?? '',
-			paddingTopId: callToActionRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM,
-			paddingBottomId: callToActionRow.paddingBottomId ?? ROW_PADDING_ID.MEDIUM,
-		});
-	}, [callToActionRow]);
+	const formValuesRef = useRef(formValues);
+	const formRowIdRef = useRef<string>();
+	const hasUnsavedChangesRef = useRef(false);
+	const persistenceQueueRef = useRef<Promise<void>>(Promise.resolve());
+	const pendingPersistenceCountRef = useRef(0);
 
 	const persistValues = useCallback(
-		async (row: CallToActionRowModel, values: typeof formValues) => {
+		async (row: CallToActionRowModel, values: CallToActionFormValues) => {
 			if (row.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK) {
 				await pagesService
 					.updateCallToActionBlockRow(row.pageRowId, {
@@ -101,99 +101,161 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 		[updatePageRow]
 	);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(
-		async (row: CallToActionRowModel, values: typeof formValues) => {
+	const runPersistence = useCallback(
+		async (persistence: () => Promise<void>) => {
+			pendingPersistenceCountRef.current += 1;
 			setIsSaving(true);
 
+			const queuedPersistence = persistenceQueueRef.current.then(persistence);
+			persistenceQueueRef.current = queuedPersistence.catch(() => undefined);
+
 			try {
-				await persistValues(row, values);
+				await queuedPersistence;
+			} finally {
+				pendingPersistenceCountRef.current -= 1;
+
+				if (pendingPersistenceCountRef.current === 0) {
+					setIsSaving(false);
+				}
+			}
+		},
+		[setIsSaving]
+	);
+
+	const persistFormValues = useCallback(
+		async (row: CallToActionRowModel, values: CallToActionFormValues) => {
+			try {
+				await runPersistence(() => persistValues(row, values));
+
+				if (formValuesRef.current === values) {
+					hasUnsavedChangesRef.current = false;
+				}
 			} catch (error) {
 				handleError(error);
-			} finally {
-				setIsSaving(false);
 			}
+		},
+		[handleError, persistValues, runPersistence]
+	);
+
+	const debouncedSubmission = useDebouncedAsyncFunction(
+		async (row: CallToActionRowModel, values: CallToActionFormValues) => {
+			await persistFormValues(row, values);
 		}
 	);
 
 	useEffect(() => {
+		const previousRowId = formRowIdRef.current;
+		const nextRowId = callToActionRow?.pageRowId;
+
+		if (previousRowId && previousRowId !== nextRowId) {
+			void debouncedSubmission.flush();
+		}
+
+		if (!callToActionRow) {
+			formRowIdRef.current = undefined;
+			hasUnsavedChangesRef.current = false;
+			return;
+		}
+
+		if (previousRowId === nextRowId && hasUnsavedChangesRef.current) {
+			return;
+		}
+
+		const nextValues: CallToActionFormValues = {
+			headline: callToActionRow.headline ?? '',
+			description: callToActionRow.description ?? '',
+			buttonText: callToActionRow.buttonText ?? '',
+			buttonUrl: callToActionRow.buttonUrl ?? '',
+			imageFileUploadId: callToActionRow.imageFileUploadId ?? '',
+			imageUrl: callToActionRow.imageUrl ?? '',
+			paddingTopId: callToActionRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM,
+			paddingBottomId: callToActionRow.paddingBottomId ?? ROW_PADDING_ID.MEDIUM,
+		};
+
+		formRowIdRef.current = nextRowId;
+		formValuesRef.current = nextValues;
+		hasUnsavedChangesRef.current = false;
+		setFormValues(nextValues);
+	}, [callToActionRow, debouncedSubmission]);
+
+	useEffect(() => {
 		return () => {
-			debouncedSubmission.cancel();
+			void debouncedSubmission.flush();
 		};
 	}, [debouncedSubmission]);
 
+	const setLocalFormValues = useCallback((nextValues: CallToActionFormValues) => {
+		formValuesRef.current = nextValues;
+		hasUnsavedChangesRef.current = true;
+		setFormValues(nextValues);
+	}, []);
+
 	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-			setFormValues((previousValue) => {
-				const nextValue = {
-					...previousValue,
-					[currentTarget.name]: currentTarget.value,
-				};
+		({ currentTarget }: FormControlChangeEvent) => {
+			const nextValue = {
+				...formValuesRef.current,
+				[currentTarget.name]: currentTarget.value,
+			} as CallToActionFormValues;
 
-				if (callToActionRow) {
-					debouncedSubmission(callToActionRow, nextValue);
-				}
+			setLocalFormValues(nextValue);
 
-				return nextValue;
-			});
+			if (callToActionRow) {
+				debouncedSubmission(callToActionRow, nextValue);
+			}
 		},
-		[callToActionRow, debouncedSubmission]
+		[callToActionRow, debouncedSubmission, setLocalFormValues]
 	);
 
 	const handleDescriptionChange = useCallback(
 		(description: string) => {
-			setFormValues((previousValue) => {
-				const nextValue = {
-					...previousValue,
-					description,
-				};
+			const nextValue = {
+				...formValuesRef.current,
+				description,
+			};
 
-				if (callToActionRow) {
-					debouncedSubmission(callToActionRow, nextValue);
-				}
+			setLocalFormValues(nextValue);
 
-				return nextValue;
-			});
+			if (callToActionRow) {
+				debouncedSubmission(callToActionRow, nextValue);
+			}
 		},
-		[callToActionRow, debouncedSubmission]
+		[callToActionRow, debouncedSubmission, setLocalFormValues]
 	);
 
 	const handleUploadComplete = useCallback(
 		async (imageFileUploadId: string) => {
-			setIsSaving(true);
-
-			try {
-				if (!callToActionRow) {
-					throw new Error('callToActionRow is undefined.');
-				}
-
-				const nextValue = {
-					...formValues,
-					imageFileUploadId,
-				};
-
-				await persistValues(callToActionRow, nextValue);
-			} catch (error) {
-				handleError(error);
-			} finally {
-				setIsSaving(false);
+			if (!callToActionRow || formRowIdRef.current !== callToActionRow.pageRowId) {
+				handleError(new Error('callToActionRow is undefined or no longer active.'));
+				return;
 			}
+
+			const nextValue = {
+				...formValuesRef.current,
+				imageFileUploadId,
+			};
+
+			setLocalFormValues(nextValue);
+			debouncedSubmission.cancel();
+			await persistFormValues(callToActionRow, nextValue);
 		},
-		[callToActionRow, formValues, handleError, persistValues, setIsSaving]
+		[callToActionRow, debouncedSubmission, handleError, persistFormValues, setLocalFormValues]
 	);
 
 	const handleImageChange = useCallback(
 		({ nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
+			const nextValue = {
+				...formValuesRef.current,
 				imageFileUploadId: nextId,
 				imageUrl: nextSrc,
-			}));
+			};
+
+			setLocalFormValues(nextValue);
 
 			if (!nextId && !nextSrc) {
-				handleUploadComplete('');
+				void handleUploadComplete('');
 			}
 		},
-		[handleUploadComplete]
+		[handleUploadComplete, setLocalFormValues]
 	);
 
 	if (!callToActionRow) {
@@ -268,6 +330,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 					label="Button URL"
 					name="buttonUrl"
 					required
+					helperText="Use an HTTP(S) URL or a site-relative path beginning with /."
 					value={formValues.buttonUrl}
 					onChange={handleInputChange}
 				/>
