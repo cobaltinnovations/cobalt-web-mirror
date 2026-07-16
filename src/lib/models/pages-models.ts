@@ -121,6 +121,7 @@ export type PageRowUnionModel =
 
 export interface PageRowBaseModel {
 	pageRowId: string;
+	pageRowAnchorId: string;
 	pageSectionId: string;
 	rowTypeId: ROW_TYPE_ID;
 	name: string;

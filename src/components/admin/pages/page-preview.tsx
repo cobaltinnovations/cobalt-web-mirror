@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import {
 	AnalyticsNativeEventTypeId,
@@ -12,10 +12,12 @@ import {
 	Tag,
 } from '@/lib/models';
 import PageHeader from '@/components/page-header';
+import { HEADER_HEIGHT } from '@/components/header-v2';
 import { getRendererForPageRow, MailingListModal } from '@/components/admin/pages';
 import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { getPageRowAnchorDomId, getPageRowAnchorDomIdFromHash } from '@/lib/utils';
 
 const cookieNameForPage = (pageId: string) => `ALREADY_SHOWED_SUB_MODAL_${pageId}`;
 
@@ -47,6 +49,34 @@ const getRowPaddingClassName = (paddingTopId?: ROW_PADDING_ID, paddingBottomId?:
 		.filter(Boolean)
 		.join(' ');
 
+const PAGE_ROW_ANCHOR_STYLE: React.CSSProperties = {
+	scrollMarginTop: HEADER_HEIGHT + 16,
+};
+
+const getPageRowAnchorProps = (pageRowAnchorId?: string) =>
+	pageRowAnchorId
+		? {
+				id: getPageRowAnchorDomId(pageRowAnchorId),
+				style: PAGE_ROW_ANCHOR_STYLE,
+		  }
+		: {};
+
+const PageRowAnchorScroller = ({ pageRowAnchorIds }: { pageRowAnchorIds: string[] }) => {
+	const { hash } = useLocation();
+
+	useLayoutEffect(() => {
+		const pageRowAnchorDomId = getPageRowAnchorDomIdFromHash(hash, pageRowAnchorIds);
+
+		if (!pageRowAnchorDomId) {
+			return;
+		}
+
+		document.getElementById(pageRowAnchorDomId)?.scrollIntoView({ block: 'start' });
+	}, [hash, pageRowAnchorIds]);
+
+	return null;
+};
+
 export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop' }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
 	const livePageSiteLocationIdsRef = useRef(page.livePageSiteLocations.map((i) => i.siteLocationId));
@@ -69,6 +99,13 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 	const pageRows = useMemo(
 		() => page.pageSections.flatMap((pageSection) => pageSection.pageRows),
 		[page.pageSections]
+	);
+	const pageRowAnchorIds = useMemo(
+		() =>
+			pageRows
+				.map((pageRow) => pageRow.pageRowAnchorId)
+				.filter((pageRowAnchorId): pageRowAnchorId is string => Boolean(pageRowAnchorId)),
+		[pageRows]
 	);
 
 	useEffect(() => {
@@ -144,7 +181,7 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 			/>
 			{pageRows.map((pageRow) =>
 				pageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH ? (
-					<div key={pageRow.pageRowId}>
+					<div key={pageRow.pageRowId} {...getPageRowAnchorProps(pageRow.pageRowAnchorId)}>
 						{getRendererForPageRow({
 							pageId: page.pageId,
 							pageRow,
@@ -160,6 +197,7 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 					<Container
 						key={pageRow.pageRowId}
 						fluid
+						{...getPageRowAnchorProps(pageRow.pageRowAnchorId)}
 						className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
 					>
 						<Container className={getRowPaddingClassName(pageRow.paddingTopId, pageRow.paddingBottomId)}>
@@ -176,6 +214,7 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 					</Container>
 				)
 			)}
+			<PageRowAnchorScroller pageRowAnchorIds={pageRowAnchorIds} />
 		</AsyncWrapper>
 	);
 };
