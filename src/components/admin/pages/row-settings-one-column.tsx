@@ -1,6 +1,6 @@
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { OneColumnImageRowModel, ROW_TYPE_ID } from '@/lib/models';
+import { OneColumnRowModel, ROW_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -13,56 +13,62 @@ import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 
 interface RowSettingsOneColumnProps {
 	nameInputRef?: RefObject<HTMLInputElement>;
+	pageRow: OneColumnRowModel;
 }
 
-export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps) => {
+type OneColumnFormValues = {
+	columnOne: {
+		headline: string;
+		description: string;
+		imageFileUploadId: string;
+		imageUrl: string;
+		imageAltText: string;
+	};
+};
+
+const persistOneColumnRow = (pageRow: OneColumnRowModel, formValues: OneColumnFormValues) => {
+	const data = { columnOne: formValues.columnOne };
+
+	switch (pageRow.rowTypeId) {
+		case ROW_TYPE_ID.ONE_COLUMN_IMAGE:
+			return pagesService.updateOneColumnRow(pageRow.pageRowId, data).fetch();
+		case ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT:
+			return pagesService.updateOneColumnImageRightRow(pageRow.pageRowId, data).fetch();
+		case ROW_TYPE_ID.ONE_COLUMN_TEXT:
+			return pagesService.updateOneColumnTextRow(pageRow.pageRowId, data).fetch();
+		default: {
+			const unsupportedRowType: never = pageRow.rowTypeId;
+			throw new Error(`Unsupported one-column row type: ${unsupportedRowType}`);
+		}
+	}
+};
+
+export const RowSettingsOneColumn = ({ nameInputRef, pageRow }: RowSettingsOneColumnProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
-	const oneColumnImageRow = useMemo(() => currentPageRow as OneColumnImageRowModel | undefined, [currentPageRow]);
-	const isTextRow = oneColumnImageRow?.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT;
-	const [formValues, setFormValues] = useState({
+	const { updatePageRow, setIsSaving } = usePageBuilderContext();
+	const isTextRow = pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT;
+	const [formValues, setFormValues] = useState<OneColumnFormValues>({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 	});
 
 	useEffect(() => {
-		if (!oneColumnImageRow) {
-			return;
-		}
-
 		setFormValues({
 			columnOne: {
-				headline: oneColumnImageRow.columnOne.headline ?? '',
-				description: oneColumnImageRow.columnOne.description ?? '',
-				imageFileUploadId: oneColumnImageRow.columnOne.imageFileUploadId ?? '',
-				imageUrl: oneColumnImageRow.columnOne.imageUrl ?? '',
-				imageAltText: oneColumnImageRow.columnOne.imageAltText ?? '',
+				headline: pageRow.columnOne.headline ?? '',
+				description: pageRow.columnOne.description ?? '',
+				imageFileUploadId: pageRow.columnOne.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnOne.imageUrl ?? '',
+				imageAltText: pageRow.columnOne.imageAltText ?? '',
 			},
 		});
-	}, [oneColumnImageRow]);
+	}, [pageRow]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(
-		async (ocir: OneColumnImageRowModel, fv: typeof formValues) => {
+		async (oneColumnRow: OneColumnRowModel, fv: OneColumnFormValues) => {
 			setIsSaving(true);
 
 			try {
-				const response =
-					ocir.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT
-						? await pagesService
-								.updateOneColumnTextRow(ocir.pageRowId, {
-									columnOne: fv.columnOne,
-								})
-								.fetch()
-						: ocir.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT
-						? await pagesService
-								.updateOneColumnImageRightRow(ocir.pageRowId, {
-									columnOne: fv.columnOne,
-								})
-								.fetch()
-						: await pagesService
-								.updateOneColumnRow(ocir.pageRowId, {
-									columnOne: fv.columnOne,
-								})
-								.fetch();
+				const response = await persistOneColumnRow(oneColumnRow, fv);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -72,6 +78,12 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 			}
 		}
 	);
+
+	useEffect(() => {
+		return () => {
+			void debouncedSubmission.flush();
+		};
+	}, [debouncedSubmission]);
 
 	const handleInputChange = useCallback(
 		(
@@ -87,14 +99,12 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 					},
 				};
 
-				if (oneColumnImageRow) {
-					debouncedSubmission(oneColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 
 				return newValue;
 			});
 		},
-		[debouncedSubmission, oneColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleQuillChange = useCallback(
@@ -108,14 +118,12 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 					},
 				};
 
-				if (oneColumnImageRow) {
-					debouncedSubmission(oneColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 
 				return newValue;
 			});
 		},
-		[debouncedSubmission, oneColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleUploadComplete = useCallback(
@@ -123,10 +131,6 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 			setIsSaving(true);
 
 			try {
-				if (!oneColumnImageRow) {
-					throw new Error('oneColumnImageRow is undefined.');
-				}
-
 				const nextValue = {
 					...formValues,
 					[column]: {
@@ -134,12 +138,8 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 						imageFileUploadId,
 					},
 				};
-				const response =
-					oneColumnImageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT
-						? await pagesService
-								.updateOneColumnImageRightRow(oneColumnImageRow.pageRowId, nextValue)
-								.fetch()
-						: await pagesService.updateOneColumnRow(oneColumnImageRow.pageRowId, nextValue).fetch();
+				debouncedSubmission.cancel();
+				const response = await persistOneColumnRow(pageRow, nextValue);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -148,7 +148,7 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 				setIsSaving(false);
 			}
 		},
-		[formValues, handleError, oneColumnImageRow, setIsSaving, updatePageRow]
+		[debouncedSubmission, formValues, handleError, pageRow, setIsSaving, updatePageRow]
 	);
 
 	const handleImageChange = useCallback(
@@ -171,7 +171,7 @@ export const RowSettingsOneColumn = ({ nameInputRef }: RowSettingsOneColumnProps
 
 	return (
 		<>
-			<RowSettingsMetaForm nameInputRef={nameInputRef} />
+			<RowSettingsMetaForm nameInputRef={nameInputRef} pageRow={pageRow} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"

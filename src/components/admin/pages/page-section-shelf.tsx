@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { isCustomRow, ROW_TYPE_ID } from '@/lib/models';
+import { isCustomRow, isOneColumnRow, isThreeColumnImageRow, isTwoColumnRow, ROW_TYPE_ID } from '@/lib/models';
 import {
 	HERO_SECTION_ID,
 	PageSectionShelfPage,
@@ -19,6 +19,7 @@ import {
 	SectionHeroSettingsForm,
 } from '@/components/admin/pages';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import { PageBuilderContext } from '@/contexts/page-builder-context';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import ConfirmDialog from '@/components/confirm-dialog';
@@ -82,6 +83,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 export const PageSectionShelf = () => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const pageBuilderContext = usePageBuilderContext();
 	const {
 		setCurrentPageSectionId,
 		currentPageSection,
@@ -90,7 +92,7 @@ export const PageSectionShelf = () => {
 		updatePageRow,
 		deletePageRow,
 		setIsSaving,
-	} = usePageBuilderContext();
+	} = pageBuilderContext;
 	const [showRowDeleteModal, setShowRowDeleteModal] = useState(false);
 	const [showCustomRowColumnDeleteModal, setShowCustomRowColumnDeleteModal] = useState(false);
 	const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
@@ -273,9 +275,7 @@ export const PageSectionShelf = () => {
 					</PageSectionShelfPage>
 				)}
 
-				{(currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE ||
-					currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT ||
-					currentPageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT) && (
+				{isOneColumnRow(currentPageRow) && (
 					<PageSectionShelfPage
 						showDeleteButton
 						onDeleteButtonClick={() => {
@@ -285,12 +285,11 @@ export const PageSectionShelf = () => {
 						onCloseButtonButtonClick={handleClose}
 						title={currentPageRow.name}
 					>
-						<RowSettingsOneColumn />
+						<RowSettingsOneColumn pageRow={currentPageRow} />
 					</PageSectionShelfPage>
 				)}
 
-				{(currentPageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_IMAGE ||
-					currentPageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT) && (
+				{isTwoColumnRow(currentPageRow) && (
 					<PageSectionShelfPage
 						showDeleteButton
 						onDeleteButtonClick={() => {
@@ -300,11 +299,11 @@ export const PageSectionShelf = () => {
 						onCloseButtonButtonClick={handleClose}
 						title={currentPageRow.name}
 					>
-						<RowSettingsTwoColumns />
+						<RowSettingsTwoColumns pageRow={currentPageRow} />
 					</PageSectionShelfPage>
 				)}
 
-				{currentPageRow.rowTypeId === ROW_TYPE_ID.THREE_COLUMN_IMAGE && (
+				{isThreeColumnImageRow(currentPageRow) && (
 					<PageSectionShelfPage
 						showDeleteButton
 						onDeleteButtonClick={() => {
@@ -314,7 +313,7 @@ export const PageSectionShelf = () => {
 						onCloseButtonButtonClick={handleClose}
 						title={currentPageRow.name}
 					>
-						<RowSettingsThreeColumns />
+						<RowSettingsThreeColumns pageRow={currentPageRow} />
 					</PageSectionShelfPage>
 				)}
 
@@ -387,7 +386,11 @@ export const PageSectionShelf = () => {
 						classNames={transitionClassNames}
 						unmountOnExit
 					>
-						<div className={classes.transitionPage}>{currentPage}</div>
+						<div className={classes.transitionPage}>
+							<PageBuilderContext.Provider value={pageBuilderContext}>
+								{currentPage}
+							</PageBuilderContext.Provider>
+						</div>
 					</CSSTransition>
 				</TransitionGroup>
 			</div>

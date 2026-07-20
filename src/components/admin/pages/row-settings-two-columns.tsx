@@ -1,6 +1,6 @@
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { ROW_TYPE_ID, TwoColumnImageRowModel } from '@/lib/models';
+import { ROW_TYPE_ID, TwoColumnRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -13,60 +13,75 @@ import WysiwygBasic from '@/components/wysiwyg-basic';
 
 interface RowSettingsTwoColumnsProps {
 	nameInputRef?: RefObject<HTMLInputElement>;
+	pageRow: TwoColumnRowModel;
 }
 
-export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsProps) => {
+type TwoColumnFormValues = {
+	columnOne: {
+		headline: string;
+		description: string;
+		imageFileUploadId: string;
+		imageUrl: string;
+		imageAltText: string;
+	};
+	columnTwo: {
+		headline: string;
+		description: string;
+		imageFileUploadId: string;
+		imageUrl: string;
+		imageAltText: string;
+	};
+};
+
+const persistTwoColumnRow = (pageRow: TwoColumnRowModel, formValues: TwoColumnFormValues) => {
+	const data = { columnOne: formValues.columnOne, columnTwo: formValues.columnTwo };
+
+	switch (pageRow.rowTypeId) {
+		case ROW_TYPE_ID.TWO_COLUMN_IMAGE:
+			return pagesService.updateTwoColumnRow(pageRow.pageRowId, data).fetch();
+		case ROW_TYPE_ID.TWO_COLUMN_TEXT:
+			return pagesService.updateTwoColumnTextRow(pageRow.pageRowId, data).fetch();
+		default: {
+			const unsupportedRowType: never = pageRow.rowTypeId;
+			throw new Error(`Unsupported two-column row type: ${unsupportedRowType}`);
+		}
+	}
+};
+
+export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoColumnsProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
-	const twoColumnImageRow = useMemo(() => currentPageRow as TwoColumnImageRowModel | undefined, [currentPageRow]);
-	const isTextRow = twoColumnImageRow?.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT;
-	const [formValues, setFormValues] = useState({
+	const { updatePageRow, setIsSaving } = usePageBuilderContext();
+	const isTextRow = pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT;
+	const [formValues, setFormValues] = useState<TwoColumnFormValues>({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 		columnTwo: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 	});
 
 	useEffect(() => {
-		if (!twoColumnImageRow) {
-			return;
-		}
-
 		setFormValues({
 			columnOne: {
-				headline: twoColumnImageRow.columnOne.headline ?? '',
-				description: twoColumnImageRow.columnOne.description ?? '',
-				imageFileUploadId: twoColumnImageRow.columnOne.imageFileUploadId ?? '',
-				imageUrl: twoColumnImageRow.columnOne.imageUrl ?? '',
-				imageAltText: twoColumnImageRow.columnOne.imageAltText ?? '',
+				headline: pageRow.columnOne.headline ?? '',
+				description: pageRow.columnOne.description ?? '',
+				imageFileUploadId: pageRow.columnOne.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnOne.imageUrl ?? '',
+				imageAltText: pageRow.columnOne.imageAltText ?? '',
 			},
 			columnTwo: {
-				headline: twoColumnImageRow.columnTwo.headline ?? '',
-				description: twoColumnImageRow.columnTwo.description ?? '',
-				imageFileUploadId: twoColumnImageRow.columnTwo.imageFileUploadId ?? '',
-				imageUrl: twoColumnImageRow.columnTwo.imageUrl ?? '',
-				imageAltText: twoColumnImageRow.columnTwo.imageAltText ?? '',
+				headline: pageRow.columnTwo.headline ?? '',
+				description: pageRow.columnTwo.description ?? '',
+				imageFileUploadId: pageRow.columnTwo.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnTwo.imageUrl ?? '',
+				imageAltText: pageRow.columnTwo.imageAltText ?? '',
 			},
 		});
-	}, [twoColumnImageRow]);
+	}, [pageRow]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(
-		async (tcir: TwoColumnImageRowModel, fv: typeof formValues) => {
+		async (twoColumnRow: TwoColumnRowModel, fv: TwoColumnFormValues) => {
 			setIsSaving(true);
 
 			try {
-				const response =
-					tcir.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT
-						? await pagesService
-								.updateTwoColumnTextRow(tcir.pageRowId, {
-									columnOne: fv.columnOne,
-									columnTwo: fv.columnTwo,
-								})
-								.fetch()
-						: await pagesService
-								.updateTwoColumnRow(tcir.pageRowId, {
-									columnOne: fv.columnOne,
-									columnTwo: fv.columnTwo,
-								})
-								.fetch();
+				const response = await persistTwoColumnRow(twoColumnRow, fv);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -76,6 +91,12 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 			}
 		}
 	);
+
+	useEffect(() => {
+		return () => {
+			void debouncedSubmission.flush();
+		};
+	}, [debouncedSubmission]);
 
 	const handleInputChange = useCallback(
 		(
@@ -91,14 +112,12 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 					},
 				};
 
-				if (twoColumnImageRow) {
-					debouncedSubmission(twoColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 
 				return newValue;
 			});
 		},
-		[debouncedSubmission, twoColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleQuillChange = useCallback(
@@ -112,13 +131,11 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 					},
 				};
 
-				if (twoColumnImageRow) {
-					debouncedSubmission(twoColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 				return newValue;
 			});
 		},
-		[debouncedSubmission, twoColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleUploadComplete = useCallback(
@@ -126,10 +143,6 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 			setIsSaving(true);
 
 			try {
-				if (!twoColumnImageRow) {
-					throw new Error('twoColumnImageRow is undefined.');
-				}
-
 				const nextValue = {
 					...formValues,
 					[column]: {
@@ -137,7 +150,8 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 						imageFileUploadId,
 					},
 				};
-				const response = await pagesService.updateTwoColumnRow(twoColumnImageRow.pageRowId, nextValue).fetch();
+				debouncedSubmission.cancel();
+				const response = await persistTwoColumnRow(pageRow, nextValue);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -146,7 +160,7 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 				setIsSaving(false);
 			}
 		},
-		[formValues, handleError, setIsSaving, twoColumnImageRow, updatePageRow]
+		[debouncedSubmission, formValues, handleError, pageRow, setIsSaving, updatePageRow]
 	);
 
 	const handleImageChange = useCallback(
@@ -169,7 +183,7 @@ export const RowSettingsTwoColumns = ({ nameInputRef }: RowSettingsTwoColumnsPro
 
 	return (
 		<>
-			<RowSettingsMetaForm nameInputRef={nameInputRef} />
+			<RowSettingsMetaForm nameInputRef={nameInputRef} pageRow={pageRow} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"

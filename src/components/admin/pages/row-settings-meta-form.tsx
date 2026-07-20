@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useState } from 'react';
 import type { FormControlProps } from 'react-bootstrap';
 import { BACKGROUND_COLOR_ID, PageRowBaseModel, ROW_PADDING_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
@@ -9,14 +9,15 @@ import InputHelper from '@/components/input-helper';
 
 interface RowSettingsMetaFormProps {
 	nameInputRef?: RefObject<HTMLInputElement>;
+	pageRow?: PageRowBaseModel;
 }
 
 type FormControlChangeEvent = Parameters<NonNullable<FormControlProps['onChange']>>[0];
 
-export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) => {
+export const RowSettingsMetaForm = ({ nameInputRef, pageRow: pageRowSnapshot }: RowSettingsMetaFormProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
-	const pageRow = useMemo(() => currentPageRow as PageRowBaseModel | undefined, [currentPageRow]);
+	const pageRow = pageRowSnapshot ?? currentPageRow;
 	const [formValues, setFormValues] = useState({
 		name: '',
 		backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
@@ -57,6 +58,12 @@ export const RowSettingsMetaForm = ({ nameInputRef }: RowSettingsMetaFormProps) 
 			setIsSaving(false);
 		}
 	});
+
+	useEffect(() => {
+		return () => {
+			void debouncedSubmission.flush();
+		};
+	}, [debouncedSubmission]);
 
 	const handleInputChange = useCallback(
 		({ currentTarget }: FormControlChangeEvent) => {
