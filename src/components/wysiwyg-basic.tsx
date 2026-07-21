@@ -334,7 +334,12 @@ const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
 
 			const editor = quillRef.current.getEditor();
 			const selection = editor.getSelection();
-			const selectionFormats = selection ? editor.getFormat(selection) : editor.getFormat();
+
+			if (!selection) {
+				return;
+			}
+
+			const selectionFormats = editor.getFormat(selection);
 
 			setActivePageBuilderTextStyleId(getPageBuilderTextStyleIdForFormats(selectionFormats));
 		}, [toolbarPreset]);

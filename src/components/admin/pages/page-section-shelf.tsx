@@ -26,6 +26,7 @@ import ConfirmDialog from '@/components/confirm-dialog';
 import { createUseThemedStyles } from '@/jss/theme';
 
 const shelfPageTransitionDurationMs = 300;
+const shelfPageTransition = `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	transitionContainer: {
@@ -36,46 +37,66 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	transitionPage: {
 		inset: 0,
+		zIndex: 0,
 		height: '100%',
 		position: 'absolute',
 		backgroundColor: theme.colors.n0,
 	},
 	'@global': {
+		// Forward navigation slides the incoming page over the stationary outgoing page.
 		'.shelf-page-animation-enter': {
-			opacity: 0,
+			zIndex: 1,
+			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(100%)',
 		},
 		'.shelf-page-animation-enter-active': {
+			zIndex: 1,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
-			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
+			transition: shelfPageTransition,
 		},
 		'.shelf-page-animation-exit': {
+			zIndex: 0,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
+			transition: shelfPageTransition,
 		},
 		'.shelf-page-animation-exit-active': {
+			zIndex: 0,
 			opacity: 1,
-			transform: 'translateX(-100%)',
-			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
+			pointerEvents: 'none',
+			transform: 'translateX(0)',
+			transition: shelfPageTransition,
 		},
+		// Back navigation slides the outgoing page away to reveal the stationary incoming page.
 		'.shelf-page-animation-backward-enter': {
-			opacity: 0,
-			transform: 'translateX(-100%)',
+			zIndex: 0,
+			opacity: 1,
+			pointerEvents: 'none',
+			transform: 'translateX(0)',
 		},
 		'.shelf-page-animation-backward-enter-active': {
+			zIndex: 0,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
-			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
+			transition: 'none',
 		},
 		'.shelf-page-animation-backward-exit': {
+			zIndex: 1,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
 		},
 		'.shelf-page-animation-backward-exit-active': {
+			zIndex: 1,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(100%)',
-			transition: `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1), opacity ${shelfPageTransitionDurationMs}ms ease`,
+			transition: shelfPageTransition,
 		},
 	},
 }));
@@ -97,8 +118,15 @@ export const PageSectionShelf = () => {
 	const [showCustomRowColumnDeleteModal, setShowCustomRowColumnDeleteModal] = useState(false);
 	const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
 	const [selectedCustomRowColumn, setSelectedCustomRowColumn] = useState<
-		{ pageRowColumnId: string; label: string } | undefined
+		{ pageRowId: string; pageRowColumnId: string; label: string } | undefined
 	>();
+	const activeSelectedCustomRowColumn =
+		currentPageRow &&
+		isCustomRow(currentPageRow) &&
+		selectedCustomRowColumn?.pageRowId === currentPageRow.pageRowId &&
+		currentPageRow.columns.some((column) => column.pageRowColumnId === selectedCustomRowColumn.pageRowColumnId)
+			? selectedCustomRowColumn
+			: undefined;
 
 	const handleClose = useCallback(() => {
 		setSelectedCustomRowColumn(undefined);
@@ -117,18 +145,10 @@ export const PageSectionShelf = () => {
 	}, [currentPageRow?.pageRowId]);
 
 	useEffect(() => {
-		if (!currentPageRow || !isCustomRow(currentPageRow)) {
-			setSelectedCustomRowColumn(undefined);
-			return;
-		}
-
-		if (
-			selectedCustomRowColumn &&
-			!currentPageRow.columns.some((column) => column.pageRowColumnId === selectedCustomRowColumn.pageRowColumnId)
-		) {
+		if (selectedCustomRowColumn && !activeSelectedCustomRowColumn) {
 			setSelectedCustomRowColumn(undefined);
 		}
-	}, [currentPageRow, selectedCustomRowColumn]);
+	}, [activeSelectedCustomRowColumn, selectedCustomRowColumn]);
 
 	const handleRowDelete = useCallback(async () => {
 		setIsSaving(true);
@@ -154,12 +174,12 @@ export const PageSectionShelf = () => {
 		setIsSaving(true);
 
 		try {
-			if (!currentPageRow || !selectedCustomRowColumn) {
-				throw new Error('currentPageRow or selectedCustomRowColumn is undefined.');
+			if (!currentPageRow || !activeSelectedCustomRowColumn) {
+				throw new Error('currentPageRow or activeSelectedCustomRowColumn is undefined.');
 			}
 
 			const { pageRow: updatedPageRow } = await pagesService
-				.deleteCustomRowColumn(currentPageRow.pageRowId, selectedCustomRowColumn.pageRowColumnId)
+				.deleteCustomRowColumn(currentPageRow.pageRowId, activeSelectedCustomRowColumn.pageRowColumnId)
 				.fetch();
 
 			updatePageRow(updatedPageRow);
@@ -171,7 +191,7 @@ export const PageSectionShelf = () => {
 		} finally {
 			setIsSaving(false);
 		}
-	}, [currentPageRow, handleError, selectedCustomRowColumn, setIsSaving, updatePageRow]);
+	}, [activeSelectedCustomRowColumn, currentPageRow, handleError, setIsSaving, updatePageRow]);
 
 	if (!currentPageSection) {
 		return null;
@@ -180,14 +200,15 @@ export const PageSectionShelf = () => {
 	const transitionClassNames =
 		transitionDirection === 'backward' ? 'shelf-page-animation-backward' : 'shelf-page-animation';
 
-	const currentPageKey =
+	const currentTopLevelPageKey =
 		currentPageSection.pageSectionId === HERO_SECTION_ID
 			? 'hero'
 			: currentPageRow
-			? currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW && selectedCustomRowColumn
-				? `row-${currentPageRow.pageRowId}-column-${selectedCustomRowColumn.pageRowColumnId}`
-				: `row-${currentPageRow.pageRowId}`
-			: 'row-selection';
+			? `row-${currentPageRow.pageRowId}`
+			: `section-${currentPageSection.pageSectionId}-row-selection`;
+	const currentCustomRowPageKey = activeSelectedCustomRowColumn
+		? `column-${activeSelectedCustomRowColumn.pageRowColumnId}`
+		: 'overview';
 
 	const currentPage =
 		currentPageSection.pageSectionId === HERO_SECTION_ID ? (
@@ -213,7 +234,7 @@ export const PageSectionShelf = () => {
 				)}
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW &&
-					(selectedCustomRowColumn ? (
+					(activeSelectedCustomRowColumn ? (
 						<PageSectionShelfPage
 							showBackButton
 							onBackButtonClick={handleCustomRowColumnBack}
@@ -224,9 +245,11 @@ export const PageSectionShelf = () => {
 							showCloseButton
 							onCloseButtonButtonClick={handleClose}
 							bodyClassName="pt-0"
-							title={`Column ${selectedCustomRowColumn.label}`}
+							title={`Column ${activeSelectedCustomRowColumn.label}`}
 						>
-							<RowSettingsCustomRowColumn pageRowColumnId={selectedCustomRowColumn.pageRowColumnId} />
+							<RowSettingsCustomRowColumn
+								pageRowColumnId={activeSelectedCustomRowColumn.pageRowColumnId}
+							/>
 						</PageSectionShelfPage>
 					) : (
 						<PageSectionShelfPage
@@ -241,7 +264,11 @@ export const PageSectionShelf = () => {
 							<RowSettingsCustomRow
 								onColumnClick={(pageRowColumnId, label) => {
 									setTransitionDirection('forward');
-									setSelectedCustomRowColumn({ pageRowColumnId, label });
+									setSelectedCustomRowColumn({
+										pageRowId: currentPageRow.pageRowId,
+										pageRowColumnId,
+										label,
+									});
 								}}
 							/>
 						</PageSectionShelfPage>
@@ -371,28 +398,39 @@ export const PageSectionShelf = () => {
 				onConfirm={handleCustomRowColumnDelete}
 			/>
 
-			<div className={classes.transitionContainer}>
-				<TransitionGroup
-					component={null}
-					childFactory={(child) =>
-						React.cloneElement(child, {
-							classNames: transitionClassNames,
-						})
-					}
-				>
-					<CSSTransition
-						key={currentPageKey}
-						timeout={shelfPageTransitionDurationMs}
-						classNames={transitionClassNames}
-						unmountOnExit
+			<div key={currentTopLevelPageKey} className={classes.transitionContainer}>
+				{currentPageRow && isCustomRow(currentPageRow) ? (
+					<TransitionGroup
+						component={null}
+						childFactory={(child) =>
+							React.cloneElement(child, {
+								classNames: transitionClassNames,
+							})
+						}
 					>
-						<div className={classes.transitionPage}>
-							<PageBuilderContext.Provider value={pageBuilderContext}>
-								{currentPage}
-							</PageBuilderContext.Provider>
-						</div>
-					</CSSTransition>
-				</TransitionGroup>
+						<CSSTransition
+							key={currentCustomRowPageKey}
+							timeout={shelfPageTransitionDurationMs}
+							classNames={transitionClassNames}
+							onEntered={() => {
+								setTransitionDirection('forward');
+							}}
+							unmountOnExit
+						>
+							<div className={classes.transitionPage}>
+								<PageBuilderContext.Provider value={pageBuilderContext}>
+									{currentPage}
+								</PageBuilderContext.Provider>
+							</div>
+						</CSSTransition>
+					</TransitionGroup>
+				) : (
+					<div className={classes.transitionPage}>
+						<PageBuilderContext.Provider value={pageBuilderContext}>
+							{currentPage}
+						</PageBuilderContext.Provider>
+					</div>
+				)}
 			</div>
 		</>
 	);
