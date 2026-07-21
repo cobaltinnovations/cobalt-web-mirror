@@ -224,10 +224,16 @@ const renderShelf = () =>
 		</PageBuilderContext.Provider>
 	);
 
-const getTransitionPage = (settingsTestId: string) => {
+const getTransitionPage = (settings: HTMLElement) => {
 	// Transition classes belong to the keyed wrapper around each settings component.
 	// eslint-disable-next-line testing-library/no-node-access
-	return screen.getByTestId(settingsTestId).closest('.transition-page');
+	return settings.closest('.transition-page');
+};
+
+const getPeerTransitionPage = (settings: HTMLElement) => {
+	// Peer transition classes belong to the outer keyed page, outside any custom-row drilldown page.
+	// eslint-disable-next-line testing-library/no-node-access
+	return settings.closest('[data-peer-transition-page]');
 };
 
 beforeEach(() => {
@@ -240,10 +246,13 @@ afterEach(() => {
 	jest.useRealTimers();
 });
 
-it('immediately replaces same-type peer editors at a keyed identity boundary', () => {
+it('quickly animates the incoming peer after unmounting the previous editor', () => {
 	const { rerender } = renderShelf();
 
 	expect(screen.getByTestId('one-column-settings')).toHaveAttribute('data-page-row-id', oneColumnRow.pageRowId);
+	expect(getPeerTransitionPage(screen.getByTestId('one-column-settings'))).not.toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
 
 	mockPageBuilderContext = createContext(secondOneColumnRow);
 	rerender(
@@ -254,11 +263,71 @@ it('immediately replaces same-type peer editors at a keyed identity boundary', (
 
 	expect(screen.getAllByTestId('one-column-settings')).toHaveLength(1);
 	expect(screen.getByTestId('one-column-settings')).toHaveAttribute('data-page-row-id', secondOneColumnRow.pageRowId);
+	expect(getPeerTransitionPage(screen.getByTestId('one-column-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
 	expect(mockOneColumnUnmounts).toEqual([oneColumnRow.pageRowId]);
-	expect(getTransitionPage('one-column-settings')).not.toHaveClass('shelf-page-animation-enter-active');
+
+	act(() => {
+		jest.advanceTimersByTime(179);
+	});
+
+	expect(getPeerTransitionPage(screen.getByTestId('one-column-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
+
+	act(() => {
+		jest.advanceTimersByTime(1);
+	});
+
+	expect(getPeerTransitionPage(screen.getByTestId('one-column-settings'))).not.toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
 });
 
-it('unmounts a context-consuming peer editor before rendering the next row', () => {
+it('keeps only the latest editor mounted during rapid peer navigation', () => {
+	const { rerender } = renderShelf();
+
+	mockPageBuilderContext = createContext(secondOneColumnRow);
+	rerender(
+		<PageBuilderContext.Provider value={mockPageBuilderContext}>
+			<PageSectionShelf />
+		</PageBuilderContext.Provider>
+	);
+
+	mockPageBuilderContext = createContext(threeColumnRow);
+	rerender(
+		<PageBuilderContext.Provider value={mockPageBuilderContext}>
+			<PageSectionShelf />
+		</PageBuilderContext.Provider>
+	);
+
+	expect(screen.queryByTestId('one-column-settings')).not.toBeInTheDocument();
+	expect(screen.getAllByTestId('three-column-settings')).toHaveLength(1);
+	expect(screen.getByTestId('three-column-settings')).toHaveAttribute('data-page-row-id', threeColumnRow.pageRowId);
+	expect(mockOneColumnUnmounts).toEqual([oneColumnRow.pageRowId, secondOneColumnRow.pageRowId]);
+	expect(getPeerTransitionPage(screen.getByTestId('three-column-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
+});
+
+it('does not restart the peer animation when the selected row updates in place', () => {
+	const { rerender } = renderShelf();
+	const peerTransitionPage = getPeerTransitionPage(screen.getByTestId('one-column-settings'));
+
+	mockPageBuilderContext = createContext({ ...oneColumnRow, name: 'Updated one column' });
+	rerender(
+		<PageBuilderContext.Provider value={mockPageBuilderContext}>
+			<PageSectionShelf />
+		</PageBuilderContext.Provider>
+	);
+
+	expect(getPeerTransitionPage(screen.getByTestId('one-column-settings'))).toBe(peerTransitionPage);
+	expect(peerTransitionPage).not.toHaveClass('shelf-peer-page-animation-enter-active');
+	expect(mockOneColumnUnmounts).toEqual([]);
+});
+
+it('unmounts a context-consuming peer before animating the next row', () => {
 	mockPageBuilderContext = createContext(mailingListRow);
 	const { rerender } = renderShelf();
 
@@ -273,9 +342,12 @@ it('unmounts a context-consuming peer editor before rendering the next row', () 
 
 	expect(screen.queryByTestId('mailing-list-settings')).not.toBeInTheDocument();
 	expect(screen.getByTestId('three-column-settings')).toHaveAttribute('data-page-row-id', threeColumnRow.pageRowId);
+	expect(getPeerTransitionPage(screen.getByTestId('three-column-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
 });
 
-it('animates forward and backward only within a custom-row drilldown', () => {
+it('animates forward and backward within a custom-row drilldown and forward to a peer row', () => {
 	mockPageBuilderContext = createContext(customRow);
 	const { rerender } = renderShelf();
 
@@ -285,8 +357,12 @@ it('animates forward and backward only within a custom-row drilldown', () => {
 		jest.advanceTimersByTime(299);
 	});
 
-	expect(getTransitionPage('custom-row-settings')).toHaveClass('shelf-page-animation-exit-active');
-	expect(getTransitionPage('custom-column-settings')).toHaveClass('shelf-page-animation-enter-active');
+	expect(getTransitionPage(screen.getByTestId('custom-row-settings'))).toHaveClass(
+		'shelf-page-animation-exit-active'
+	);
+	expect(getTransitionPage(screen.getByTestId('custom-column-settings'))).toHaveClass(
+		'shelf-page-animation-enter-active'
+	);
 	expect(screen.getByTestId('custom-row-settings')).toBeInTheDocument();
 	expect(screen.getByTestId('custom-column-settings')).toHaveAttribute(
 		'data-page-row-column-id',
@@ -301,8 +377,12 @@ it('animates forward and backward only within a custom-row drilldown', () => {
 
 	fireEvent.click(screen.getByRole('button', { name: 'Back' }));
 
-	expect(getTransitionPage('custom-column-settings')).toHaveClass('shelf-page-animation-backward-exit-active');
-	expect(getTransitionPage('custom-row-settings')).toHaveClass('shelf-page-animation-backward-enter-active');
+	expect(getTransitionPage(screen.getByTestId('custom-column-settings'))).toHaveClass(
+		'shelf-page-animation-backward-exit-active'
+	);
+	expect(getTransitionPage(screen.getByTestId('custom-row-settings'))).toHaveClass(
+		'shelf-page-animation-backward-enter-active'
+	);
 
 	act(() => {
 		jest.advanceTimersByTime(299);
@@ -327,10 +407,19 @@ it('animates forward and backward only within a custom-row drilldown', () => {
 
 	expect(screen.queryByTestId('custom-row-settings')).not.toBeInTheDocument();
 	expect(screen.getByTestId('one-column-settings')).toHaveAttribute('data-page-row-id', oneColumnRow.pageRowId);
-	expect(getTransitionPage('one-column-settings')).not.toHaveClass('shelf-page-animation-enter-active');
+	expect(getPeerTransitionPage(screen.getByTestId('one-column-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
+
+	act(() => {
+		jest.advanceTimersByTime(180);
+	});
+
+	expect(screen.queryByTestId('custom-row-settings')).not.toBeInTheDocument();
+	expect(screen.getByTestId('one-column-settings')).toHaveAttribute('data-page-row-id', oneColumnRow.pageRowId);
 });
 
-it('immediately replaces an interrupted custom-row transition with a peer row', () => {
+it('safely completes an interrupted custom-row transition when selecting a peer row', () => {
 	mockPageBuilderContext = createContext(customRow);
 	const { rerender } = renderShelf();
 
@@ -349,6 +438,9 @@ it('immediately replaces an interrupted custom-row transition with a peer row', 
 	expect(screen.queryByTestId('custom-row-settings')).not.toBeInTheDocument();
 	expect(screen.queryByTestId('custom-column-settings')).not.toBeInTheDocument();
 	expect(screen.getByTestId('three-column-settings')).toHaveAttribute('data-page-row-id', threeColumnRow.pageRowId);
+	expect(getPeerTransitionPage(screen.getByTestId('three-column-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
 });
 
 it('does not carry a selected column into another custom row', () => {
@@ -375,4 +467,7 @@ it('does not carry a selected column into another custom row', () => {
 
 	expect(screen.queryByTestId('custom-column-settings')).not.toBeInTheDocument();
 	expect(screen.getByTestId('custom-row-settings')).toBeInTheDocument();
+	expect(getPeerTransitionPage(screen.getByTestId('custom-row-settings'))).toHaveClass(
+		'shelf-peer-page-animation-enter-active'
+	);
 });

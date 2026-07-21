@@ -27,6 +27,8 @@ import { createUseThemedStyles } from '@/jss/theme';
 
 const shelfPageTransitionDurationMs = 300;
 const shelfPageTransition = `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`;
+const shelfPeerPageTransitionDurationMs = 180;
+const shelfPeerPageTransition = `transform ${shelfPeerPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`;
 
 const useStyles = createUseThemedStyles((theme) => ({
 	transitionContainer: {
@@ -43,6 +45,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundColor: theme.colors.n0,
 	},
 	'@global': {
+		// Peer navigation immediately replaces the old editor, then quickly slides in the new one.
+		'.shelf-peer-page-animation-enter': {
+			pointerEvents: 'none',
+			transform: 'translateX(48px)',
+		},
+		'.shelf-peer-page-animation-enter-active': {
+			pointerEvents: 'none',
+			transform: 'translateX(0)',
+			transition: shelfPeerPageTransition,
+		},
 		// Forward navigation slides the incoming page over the stationary outgoing page.
 		'.shelf-page-animation-enter': {
 			zIndex: 1,
@@ -398,39 +410,49 @@ export const PageSectionShelf = () => {
 				onConfirm={handleCustomRowColumnDelete}
 			/>
 
-			<div key={currentTopLevelPageKey} className={classes.transitionContainer}>
-				{currentPageRow && isCustomRow(currentPageRow) ? (
-					<TransitionGroup
-						component={null}
-						childFactory={(child) =>
-							React.cloneElement(child, {
-								classNames: transitionClassNames,
-							})
-						}
+			<div className={classes.transitionContainer}>
+				<TransitionGroup component={null}>
+					<CSSTransition
+						key={currentTopLevelPageKey}
+						timeout={shelfPeerPageTransitionDurationMs}
+						classNames="shelf-peer-page-animation"
+						exit={false}
+						unmountOnExit
 					>
-						<CSSTransition
-							key={currentCustomRowPageKey}
-							timeout={shelfPageTransitionDurationMs}
-							classNames={transitionClassNames}
-							onEntered={() => {
-								setTransitionDirection('forward');
-							}}
-							unmountOnExit
-						>
-							<div className={classes.transitionPage}>
-								<PageBuilderContext.Provider value={pageBuilderContext}>
-									{currentPage}
-								</PageBuilderContext.Provider>
-							</div>
-						</CSSTransition>
-					</TransitionGroup>
-				) : (
-					<div className={classes.transitionPage}>
-						<PageBuilderContext.Provider value={pageBuilderContext}>
-							{currentPage}
-						</PageBuilderContext.Provider>
-					</div>
-				)}
+						<div className={classes.transitionPage} data-peer-transition-page>
+							<PageBuilderContext.Provider value={pageBuilderContext}>
+								{currentPageRow && isCustomRow(currentPageRow) ? (
+									<TransitionGroup
+										component={null}
+										childFactory={(child) =>
+											React.cloneElement(child, {
+												classNames: transitionClassNames,
+											})
+										}
+									>
+										<CSSTransition
+											key={currentCustomRowPageKey}
+											timeout={shelfPageTransitionDurationMs}
+											classNames={transitionClassNames}
+											onEntered={() => {
+												setTransitionDirection('forward');
+											}}
+											unmountOnExit
+										>
+											<div className={classes.transitionPage}>
+												<PageBuilderContext.Provider value={pageBuilderContext}>
+													{currentPage}
+												</PageBuilderContext.Provider>
+											</div>
+										</CSSTransition>
+									</TransitionGroup>
+								) : (
+									currentPage
+								)}
+							</PageBuilderContext.Provider>
+						</div>
+					</CSSTransition>
+				</TransitionGroup>
 			</div>
 		</>
 	);
