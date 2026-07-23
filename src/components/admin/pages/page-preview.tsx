@@ -1,31 +1,85 @@
 import Cookies from 'js-cookie';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
-import classNames from 'classnames';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Container } from 'react-bootstrap';
 import {
 	AnalyticsNativeEventTypeId,
 	BACKGROUND_COLOR_ID,
 	Content,
 	PageDetailModel,
 	PageRowMailingListModel,
+	ROW_PADDING_ID,
 	ROW_TYPE_ID,
 	Tag,
 } from '@/lib/models';
 import PageHeader from '@/components/page-header';
+import { HEADER_HEIGHT } from '@/components/header-v2';
 import { getRendererForPageRow, MailingListModal } from '@/components/admin/pages';
 import { analyticsService, resourceLibraryService } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { getPageRowAnchorDomId, getPageRowAnchorDomIdFromHash } from '@/lib/utils';
 
 const cookieNameForPage = (pageId: string) => `ALREADY_SHOWED_SUB_MODAL_${pageId}`;
 
 interface PagePreviewProps {
 	page: PageDetailModel;
 	enableAnalytics: boolean;
+	previewViewport?: 'desktop' | 'mobile';
 }
 
-export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
+const ROW_PADDING_TOP_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
+	[ROW_PADDING_ID.NONE]: '',
+	[ROW_PADDING_ID.SMALL]: 'pt-12',
+	[ROW_PADDING_ID.MEDIUM]: 'pt-16',
+	[ROW_PADDING_ID.LARGE]: 'pt-20',
+};
+
+const ROW_PADDING_BOTTOM_CLASS_BY_ID: Record<ROW_PADDING_ID, string> = {
+	[ROW_PADDING_ID.NONE]: '',
+	[ROW_PADDING_ID.SMALL]: 'pb-12',
+	[ROW_PADDING_ID.MEDIUM]: 'pb-16',
+	[ROW_PADDING_ID.LARGE]: 'pb-20',
+};
+
+const getRowPaddingClassName = (paddingTopId?: ROW_PADDING_ID, paddingBottomId?: ROW_PADDING_ID) =>
+	[
+		ROW_PADDING_TOP_CLASS_BY_ID[paddingTopId ?? ROW_PADDING_ID.MEDIUM],
+		ROW_PADDING_BOTTOM_CLASS_BY_ID[paddingBottomId ?? ROW_PADDING_ID.MEDIUM],
+	]
+		.filter(Boolean)
+		.join(' ');
+
+const PAGE_ROW_ANCHOR_STYLE: React.CSSProperties = {
+	scrollMarginTop: HEADER_HEIGHT + 16,
+};
+
+const getPageRowAnchorProps = (pageRowAnchorId?: string) =>
+	pageRowAnchorId
+		? {
+				id: getPageRowAnchorDomId(pageRowAnchorId),
+				style: PAGE_ROW_ANCHOR_STYLE,
+		  }
+		: {};
+
+const PageRowAnchorScroller = ({ pageRowAnchorIds }: { pageRowAnchorIds: string[] }) => {
+	const { hash } = useLocation();
+
+	useLayoutEffect(() => {
+		const pageRowAnchorDomId = getPageRowAnchorDomIdFromHash(hash, pageRowAnchorIds);
+
+		if (!pageRowAnchorDomId) {
+			return;
+		}
+
+		document.getElementById(pageRowAnchorDomId)?.scrollIntoView({ block: 'start' });
+	}, [hash, pageRowAnchorIds]);
+
+	return null;
+};
+
+export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop' }: PagePreviewProps) => {
 	const [searchParams] = useSearchParams();
+	const livePageSiteLocationIdsRef = useRef(page.livePageSiteLocations.map((i) => i.siteLocationId));
 
 	// Use cookieName that includes the page ID
 	const cookieName = useMemo(() => cookieNameForPage(page.pageId), [page.pageId]);
@@ -42,6 +96,21 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 
 	const [contentsByTagGroupId, setContentsByTagGroupId] = useState<Record<string, Content[]>>();
 	const [tagsByTagId, setTagsByTagId] = useState<Record<string, Tag>>();
+	const pageRows = useMemo(
+		() => page.pageSections.flatMap((pageSection) => pageSection.pageRows),
+		[page.pageSections]
+	);
+	const pageRowAnchorIds = useMemo(
+		() =>
+			pageRows
+				.map((pageRow) => pageRow.pageRowAnchorId)
+				.filter((pageRowAnchorId): pageRowAnchorId is string => Boolean(pageRowAnchorId)),
+		[pageRows]
+	);
+
+	useEffect(() => {
+		livePageSiteLocationIdsRef.current = page.livePageSiteLocations.map((i) => i.siteLocationId);
+	}, [page.livePageSiteLocations]);
 
 	const fetchData = useCallback(async () => {
 		const [libraryResponse, filtersResponse] = await Promise.all([
@@ -66,14 +135,14 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 		if (enableAnalytics) {
 			analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PAGE, {
 				pageId: page.pageId,
-				siteLocationIds: page.livePageSiteLocations.map((i) => i.siteLocationId),
+				siteLocationIds: livePageSiteLocationIdsRef.current,
 			});
 		}
-	}, [enableAnalytics, page.livePageSiteLocations, page.pageId]);
+	}, [enableAnalytics, page.pageId]);
 
-	const mailingListRowData = page.pageSections
-		.flatMap((ps) => ps.pageRows.find((pr) => pr.rowTypeId === ROW_TYPE_ID.MAILING_LIST))
-		.filter(Boolean)[0] as PageRowMailingListModel | undefined;
+	const mailingListRowData = pageRows.find((pageRow) => pageRow.rowTypeId === ROW_TYPE_ID.MAILING_LIST) as
+		| PageRowMailingListModel
+		| undefined;
 
 	return (
 		<AsyncWrapper fetchData={fetchData}>
@@ -94,6 +163,7 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 
 			<PageHeader
 				className="bg-p700 text-white"
+				forceMobileLayout={previewViewport === 'mobile'}
 				title={<h1>{page.headline ?? 'No hero headline'}</h1>}
 				descriptionHtml={page.description ?? 'No hero description'}
 				imageAlt={page.imageAltText ?? ''}
@@ -109,53 +179,42 @@ export const PagePreview = ({ page, enableAnalytics }: PagePreviewProps) => {
 						: undefined
 				}
 			/>
-			{(page.pageSections ?? []).map((ps) => (
-				<Container
-					key={ps.pageSectionId}
-					fluid
-					className={ps.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
-				>
-					<Container className="py-16">
-						{(ps.headline || ps.description) && (
-							<Row className="mb-16">
-								<Col
-									md={{ span: 10, offset: 1 }}
-									lg={{ span: 8, offset: 2 }}
-									xl={{ span: 6, offset: 3 }}
-								>
-									{ps.headline && (
-										<h2
-											className={classNames('text-center', {
-												'mb-6': ps.description,
-											})}
-										>
-											{ps.headline}
-										</h2>
-									)}
-									{ps.description && <p className="mb-0 fs-large text-center">{ps.description}</p>}
-								</Col>
-							</Row>
-						)}
-						{ps.pageRows.map((r, rowIndex) => {
-							const isLast = ps.pageRows.length - 1 === rowIndex;
-
-							return (
-								<React.Fragment key={r.pageRowId}>
-									{getRendererForPageRow({
-										pageId: page.pageId,
-										pageRow: r,
-										contentsByTagGroupId: contentsByTagGroupId ?? {},
-										tagsByTagId: tagsByTagId ?? {},
-										isLast,
-										enableAnalytics,
-										livePageSiteLocations: page.livePageSiteLocations,
-									})}
-								</React.Fragment>
-							);
+			{pageRows.map((pageRow) =>
+				pageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH ? (
+					<div key={pageRow.pageRowId} {...getPageRowAnchorProps(pageRow.pageRowAnchorId)}>
+						{getRendererForPageRow({
+							pageId: page.pageId,
+							pageRow,
+							contentsByTagGroupId: contentsByTagGroupId ?? {},
+							tagsByTagId: tagsByTagId ?? {},
+							enableAnalytics,
+							livePageSiteLocations: page.livePageSiteLocations,
+							previewViewport,
+							className: getRowPaddingClassName(pageRow.paddingTopId, pageRow.paddingBottomId),
 						})}
+					</div>
+				) : (
+					<Container
+						key={pageRow.pageRowId}
+						fluid
+						{...getPageRowAnchorProps(pageRow.pageRowAnchorId)}
+						className={pageRow.backgroundColorId === BACKGROUND_COLOR_ID.WHITE ? 'bg-white' : 'bg-n50'}
+					>
+						<Container className={getRowPaddingClassName(pageRow.paddingTopId, pageRow.paddingBottomId)}>
+							{getRendererForPageRow({
+								pageId: page.pageId,
+								pageRow,
+								contentsByTagGroupId: contentsByTagGroupId ?? {},
+								tagsByTagId: tagsByTagId ?? {},
+								enableAnalytics,
+								livePageSiteLocations: page.livePageSiteLocations,
+								previewViewport,
+							})}
+						</Container>
 					</Container>
-				</Container>
-			))}
+				)
+			)}
+			<PageRowAnchorScroller pageRowAnchorIds={pageRowAnchorIds} />
 		</AsyncWrapper>
 	);
 };

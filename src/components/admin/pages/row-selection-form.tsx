@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import {
+	CallToActionRowButton,
 	CollapseButton,
 	CustomRowButton,
 	PremadeComponentRowButton,
@@ -13,14 +14,47 @@ import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 import subscribeImg from '@/assets/images/subscribe.png';
-import { ROW_TYPE_ID } from '@/lib/models';
+import { BACKGROUND_COLOR_ID, CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
 import InlineAlert from '@/components/inline-alert';
+
+const CUSTOM_ROW_NAME_PREFIX = 'Custom Row';
+const DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION =
+	'<h2>Title</h2><p><br></p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>';
+
+const getNextCustomRowName = (page?: PageDetailModel) => {
+	const maxCustomRowNumber =
+		page?.pageSections
+			.flatMap((pageSection) => pageSection.pageRows)
+			.reduce((max, pageRow) => {
+				const match = pageRow.name.match(/^Custom Row(?: (\d+))?$/i);
+
+				if (!match) {
+					return max;
+				}
+
+				const customRowNumber = match[1] ? Number(match[1]) : 1;
+
+				if (!Number.isFinite(customRowNumber)) {
+					return max;
+				}
+
+				return Math.max(max, customRowNumber);
+			}, 0) ?? 0;
+
+	return `${CUSTOM_ROW_NAME_PREFIX} ${maxCustomRowNumber + 1}`;
+};
 
 export const RowSelectionForm = () => {
 	const handleError = useHandleError();
 
-	const { page, currentPageSection, addPageRowToCurrentPageSection, setCurrentPageRowId, setIsSaving } =
-		usePageBuilderContext();
+	const {
+		page,
+		currentPageSection,
+		addPageRowToCurrentPageSection,
+		updatePageRow,
+		setCurrentPageRowId,
+		setIsSaving,
+	} = usePageBuilderContext();
 	const [showSelectResourcesModal, setShowSelectResourcesModal] = useState(false);
 	const [showSelectGroupSessionsModal, setShowSelectGroupSessionsModal] = useState(false);
 	const [showSelectTagModal, setShowSelectTagModal] = useState(false);
@@ -83,7 +117,13 @@ export const RowSelectionForm = () => {
 		}
 	};
 
-	const handleOneColumnButtonClick = async () => {
+	const handleCustomRowPresetButtonClick = async (
+		columnConfigs: Array<{
+			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
+			usePlaceholderImage?: boolean;
+			description?: string;
+		}>
+	) => {
 		setIsSaving(true);
 
 		try {
@@ -91,45 +131,58 @@ export const RowSelectionForm = () => {
 				throw new Error('currentPageSection is undefined.');
 			}
 
-			const { pageRow } = await pagesService.createOneColumnRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
+			const customRowName = getNextCustomRowName(page);
+			const { pageRow: createdPageRow } = await pagesService
+				.createCustomRow(currentPageSection.pageSectionId, {
+					name: customRowName,
+					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+				})
+				.fetch();
 
-	const handleTwoColumnButtonClick = async () => {
-		setIsSaving(true);
+			addPageRowToCurrentPageSection(createdPageRow);
+			setCurrentPageRowId(createdPageRow.pageRowId);
 
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
+			let latestPageRow = createdPageRow;
+
+			for (const columnConfig of columnConfigs) {
+				const previousPageRow = latestPageRow;
+				const { pageRow } = await pagesService
+					.createCustomRowColumn(createdPageRow.pageRowId, {
+						contentOrderId: columnConfig.contentOrderId,
+						usePlaceholderImage: columnConfig.usePlaceholderImage,
+						description: columnConfig.description,
+					})
+					.fetch();
+
+				const createdColumn = pageRow.columns.find(
+					(column) =>
+						!previousPageRow.columns.some(
+							(previousColumn) => previousColumn.pageRowColumnId === column.pageRowColumnId
+						)
+				);
+
+				if (!createdColumn) {
+					throw new Error('Unable to determine created custom row column.');
+				}
+
+				const { pageRow: normalizedPageRow } = await pagesService
+					.updateCustomRowColumn(createdPageRow.pageRowId, createdColumn.pageRowColumnId, {
+						headline: '',
+						description: columnConfig.description ?? '',
+						imageFileUploadId: '',
+						imageAltText: '',
+						usePlaceholderImage: columnConfig.usePlaceholderImage ?? false,
+						contentOrderId: columnConfig.contentOrderId,
+					})
+					.fetch();
+
+				latestPageRow = normalizedPageRow;
+				updatePageRow(normalizedPageRow);
 			}
 
-			const { pageRow } = await pagesService.createTwoColumnRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
-
-	const handleThreeColumnButtonClick = async () => {
-		setIsSaving(true);
-
-		try {
-			if (!currentPageSection) {
-				throw new Error('currentPageSection is undefined.');
+			if (columnConfigs.length === 0) {
+				updatePageRow(latestPageRow);
 			}
-
-			const { pageRow } = await pagesService.createThreeColumnRow(currentPageSection.pageSectionId).fetch();
-			addPageRowToCurrentPageSection(pageRow);
-			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -151,6 +204,44 @@ export const RowSelectionForm = () => {
 				})
 				.fetch();
 
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleCallToActionBlockButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService.createCallToActionBlockRow(currentPageSection.pageSectionId).fetch();
+			addPageRowToCurrentPageSection(pageRow);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleCallToActionFullWidthButtonClick = async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageSection) {
+				throw new Error('currentPageSection is undefined.');
+			}
+
+			const { pageRow } = await pagesService
+				.createCallToActionFullWidthRow(currentPageSection.pageSectionId)
+				.fetch();
 			addPageRowToCurrentPageSection(pageRow);
 			setCurrentPageRowId(pageRow.pageRowId);
 		} catch (error) {
@@ -184,7 +275,6 @@ export const RowSelectionForm = () => {
 			/>
 
 			<SelectTagModal
-				tagId=""
 				show={showSelectTagModal}
 				onAdd={handleTagAdd}
 				onHide={() => {
@@ -225,16 +315,94 @@ export const RowSelectionForm = () => {
 			</CollapseButton>
 			<hr />
 			<CollapseButton title="Custom Row" initialShow>
-				<p className="mb-4">Custom rows are blank layouts. You will need to add your own images and text.</p>
+				<p className="mb-4">
+					Select from the recommended layouts or start completely from scratch. You will need to add your own
+					images and text to custom rows.
+				</p>
 				<div className="pb-6">
-					<CustomRowButton className="mb-4" title="Select Layout" onClick={handleOneColumnButtonClick} />
 					<CustomRowButton
 						className="mb-4"
-						cols={2}
 						title="Select Layout"
-						onClick={handleTwoColumnButtonClick}
+						preview="split-two"
+						onClick={() =>
+							handleCustomRowPresetButtonClick([
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: '',
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE,
+									usePlaceholderImage: false,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+							])
+						}
 					/>
-					<CustomRowButton cols={3} title="Select Layout" onClick={handleThreeColumnButtonClick} />
+					<CustomRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="two-columns"
+						onClick={() =>
+							handleCustomRowPresetButtonClick([
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+							])
+						}
+					/>
+					<CustomRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="three-columns"
+						onClick={() =>
+							handleCustomRowPresetButtonClick([
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+								{
+									contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.IMAGE_THEN_TEXT,
+									usePlaceholderImage: true,
+									description: DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION,
+								},
+							])
+						}
+					/>
+					<CustomRowButton
+						title="Select Layout"
+						preview="empty"
+						onClick={() => handleCustomRowPresetButtonClick([])}
+					/>
+				</div>
+			</CollapseButton>
+			<hr />
+			<CollapseButton title="Call-to-Action" initialShow>
+				<div className="pb-6">
+					<CallToActionRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="full-width"
+						onClick={handleCallToActionFullWidthButtonClick}
+					/>
+					<CallToActionRowButton
+						title="Select Layout"
+						preview="block"
+						onClick={handleCallToActionBlockButtonClick}
+					/>
 				</div>
 			</CollapseButton>
 			<hr />

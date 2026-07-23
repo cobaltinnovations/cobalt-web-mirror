@@ -2,9 +2,14 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
+	CallToActionBlockRowModel,
+	CallToActionFullWidthRowModel,
+	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
+	CustomRowModel,
 	GroupSessionsRowModel,
 	MailingListRowModel,
 	OneColumnImageRowModel,
+	OneColumnTextRowModel,
 	PAGE_STATUS_ID,
 	PageDetailModel,
 	PageFriendlyUrlValidationResult,
@@ -15,11 +20,13 @@ import {
 	PageSiteLocationModel,
 	PresignedUploadResponse,
 	ResourcesRowModel,
+	ROW_PADDING_ID,
 	SITE_LOCATION_ID,
 	TagGroupRowModel,
 	TagRowModel,
 	ThreeColumnImageRowModel,
 	TwoColumnImageRowModel,
+	TwoColumnTextRowModel,
 } from '@/lib/models';
 
 export interface GetPagesResponse {
@@ -54,7 +61,7 @@ export const pagesService = {
 			data,
 		});
 	},
-	getPages(searchParameters?: { pageNumber?: string; pageSize?: string; orderBy?: string }) {
+	getPages(searchParameters?: { pageNumber?: string; pageSize?: string; searchQuery?: string; orderBy?: string }) {
 		return httpSingleton.orchestrateRequest<GetPagesResponse>({
 			method: 'GET',
 			url: buildQueryParamUrl('/pages', searchParameters),
@@ -250,6 +257,77 @@ export const pagesService = {
 			data,
 		});
 	},
+	createCustomRow(
+		pageSectionId: string,
+		data: {
+			name?: string;
+			backgroundColorId?: BACKGROUND_COLOR_ID;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-row`,
+			data,
+		});
+	},
+	createCustomRowColumn(
+		pageRowId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			imageFileUploadId?: string;
+			imageAltText?: string;
+			usePlaceholderImage?: boolean;
+			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
+		} = {}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageRowId}/custom-row/column`,
+			data,
+		});
+	},
+	reorderCustomRowColumns(pageRowId: string, data: { pageRowColumnIds: string[] }) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-row/column`,
+			data,
+		});
+	},
+	updateCustomRowColumn(
+		pageRowId: string,
+		pageRowColumnId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			imageFileUploadId?: string;
+			imageAltText?: string;
+			usePlaceholderImage?: boolean;
+			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-row/column/${pageRowColumnId}`,
+			data,
+		});
+	},
+	deleteCustomRowColumn(pageRowId: string, pageRowColumnId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CustomRowModel;
+		}>({
+			method: 'DELETE',
+			url: `/pages/row/${pageRowId}/custom-row/column/${pageRowColumnId}`,
+		});
+	},
 	createOneColumnRow(pageSectionId: string) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: OneColumnImageRowModel;
@@ -373,10 +451,97 @@ export const pagesService = {
 			data,
 		});
 	},
+	createCallToActionBlockRow(
+		pageSectionId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			buttonText?: string;
+			buttonUrl?: string;
+			imageFileUploadId?: string;
+		} = {}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionBlockRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/call-to-action-block`,
+			data,
+		});
+	},
+	updateCallToActionBlockRow(
+		pageRowId: string,
+		data: {
+			headline: string;
+			description: string;
+			buttonText: string;
+			buttonUrl: string;
+			imageFileUploadId?: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionBlockRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/call-to-action-block`,
+			data,
+		});
+	},
+	createCallToActionFullWidthRow(
+		pageSectionId: string,
+		data: {
+			headline?: string;
+			description?: string;
+			buttonText?: string;
+			buttonUrl?: string;
+		} = {}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionFullWidthRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/call-to-action-full-width`,
+			data,
+		});
+	},
+	updateCallToActionFullWidthRow(
+		pageRowId: string,
+		data: {
+			headline: string;
+			description: string;
+			buttonText: string;
+			buttonUrl: string;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: CallToActionFullWidthRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/call-to-action-full-width`,
+			data,
+		});
+	},
 	deletePageRow(pageRowId: string) {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'DELETE',
 			url: `/pages/row/${pageRowId}`,
+		});
+	},
+	updatePageRow(
+		pageRowId: string,
+		data: {
+			name: string;
+			backgroundColorId: BACKGROUND_COLOR_ID;
+			paddingTopId: ROW_PADDING_ID;
+			paddingBottomId: ROW_PADDING_ID;
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: PageRowUnionModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/settings`,
+			data,
 		});
 	},
 	reorderPageSectionRows(pageSectionId: string, data: { pageRowIds: string[] }) {
@@ -449,6 +614,96 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<{ pageRowMailingLists: PageRowMailingListModel[] }>({
 			method: 'GET',
 			url: `/pages/${pageId}/page-row-mailing-lists`,
+		});
+	},
+	createOneColumnTextRow(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnTextRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-one-column-text`,
+			data: { columnOne: {} },
+		});
+	},
+	updateOneColumnTextRow(
+		pageRowId: string,
+		data: {
+			columnOne: {
+				headline: string;
+				description: string;
+				imageFileUploadId?: string;
+				imageAltText?: string;
+			};
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnTextRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-one-column-text`,
+			data,
+		});
+	},
+	createOneColumnImageRightRow(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnImageRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-one-column-right`,
+			data: { columnOne: {} },
+		});
+	},
+	updateOneColumnImageRightRow(
+		pageRowId: string,
+		data: {
+			columnOne: {
+				headline: string;
+				description: string;
+				imageFileUploadId: string;
+				imageAltText: string;
+			};
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: OneColumnImageRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-one-column-right`,
+			data,
+		});
+	},
+	createTwoColumnTextRow(pageSectionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: TwoColumnTextRowModel;
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageSectionId}/custom-two-column-text`,
+			data: { columnOne: {}, columnTwo: {} },
+		});
+	},
+	updateTwoColumnTextRow(
+		pageRowId: string,
+		data: {
+			columnOne: {
+				headline: string;
+				description: string;
+				imageFileUploadId?: string;
+				imageAltText?: string;
+			};
+			columnTwo: {
+				headline: string;
+				description: string;
+				imageFileUploadId?: string;
+				imageAltText?: string;
+			};
+		}
+	) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: TwoColumnTextRowModel;
+		}>({
+			method: 'PUT',
+			url: `/pages/row/${pageRowId}/custom-two-column-text`,
+			data,
 		});
 	},
 };

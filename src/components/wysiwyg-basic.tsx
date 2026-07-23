@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { RefObject, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
+import SvgIcon from '@/components/svg-icon';
 import 'react-quill/dist/quill.snow.css';
 
 interface UseWysiwygStylesProps {
@@ -26,6 +27,43 @@ const customFontSizes = [
 		lineHeight: 28,
 	},
 ];
+
+const customTitleStyles = [
+	{ title: 'Title 1', value: '1' },
+	{ title: 'Title 2', value: '2' },
+	{ title: 'Title 3', value: '3' },
+];
+
+type WysiwygToolbarPreset = 'default' | 'page-builder';
+type PageBuilderTextStyleId = 'TITLE_1' | 'TITLE_2' | 'TITLE_3' | 'BODY_SMALL' | 'BODY_NORMAL' | 'BODY_LARGE';
+
+const pageBuilderTextStyles: Array<
+	| {
+			type: 'option';
+			id: PageBuilderTextStyleId;
+			title: string;
+			header?: number;
+			size?: string;
+	  }
+	| {
+			type: 'divider';
+	  }
+> = [
+	{ type: 'option', id: 'TITLE_1', title: 'Title 1', header: 1 },
+	{ type: 'option', id: 'TITLE_2', title: 'Title 2', header: 2 },
+	{ type: 'option', id: 'TITLE_3', title: 'Title 3', header: 3 },
+	{ type: 'divider' },
+	{ type: 'option', id: 'BODY_SMALL', title: 'Small', size: '14px' },
+	{ type: 'option', id: 'BODY_NORMAL', title: 'Normal' },
+	{ type: 'option', id: 'BODY_LARGE', title: 'Large', size: '18px' },
+];
+
+const pageBuilderTextStyleOptions = pageBuilderTextStyles.filter(
+	(
+		pageBuilderTextStyle
+	): pageBuilderTextStyle is Extract<(typeof pageBuilderTextStyles)[number], { type: 'option' }> =>
+		pageBuilderTextStyle.type === 'option'
+);
 
 const useWysiwygStyles = createUseThemedStyles((theme) => ({
 	quill: {
@@ -54,6 +92,33 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 				}),
 				{} as Record<string, object>
 			),
+			'& .ql-picker.ql-header .ql-picker-label:not([data-value])::before': {
+				content: '"Body" !important',
+			},
+			'& .ql-picker.ql-header .ql-picker-item:not([data-value])::before': {
+				content: '"Body" !important',
+			},
+			...customTitleStyles.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[`& .ql-picker.ql-header .ql-picker-label[data-value="${currentValue.value}"]::before`]: {
+						content: `"${currentValue.title}" !important`,
+					},
+				}),
+				{} as Record<string, object>
+			),
+			...customTitleStyles.reduce(
+				(accumulator, currentValue) => ({
+					...accumulator,
+					[`& .ql-picker.ql-header .ql-picker-item[data-value="${currentValue.value}"]::before`]: {
+						content: `"${currentValue.title}" !important`,
+					},
+				}),
+				{} as Record<string, object>
+			),
+			'& .ql-snow .ql-color-picker .ql-picker-label svg, & .ql-snow .ql-icon-picker .ql-picker-label svg': {
+				display: 'flex',
+			},
 		},
 		'& .ql-container': {
 			borderBottomLeftRadius: 8,
@@ -65,6 +130,96 @@ const useWysiwygStyles = createUseThemedStyles((theme) => ({
 			},
 		},
 	},
+	pageBuilderToolbar: {
+		display: 'flex',
+		flexWrap: 'wrap',
+		alignItems: 'center',
+	},
+	pageBuilderStyleControl: {
+		position: 'relative',
+		display: 'inline-flex',
+	},
+	pageBuilderStyleButton: {
+		gap: 8,
+		border: 0,
+		height: 24,
+		display: 'inline-flex',
+		padding: '0 8px',
+		minWidth: 112,
+		cursor: 'pointer',
+		fontSize: 14,
+		alignItems: 'center',
+		borderRadius: 3,
+		justifyContent: 'space-between',
+		backgroundColor: 'transparent',
+		color: theme.colors.n700,
+		'&:hover': {
+			backgroundColor: theme.colors.n100,
+		},
+	},
+	pageBuilderStyleMenu: {
+		left: 0,
+		top: 'calc(100% + 6px)',
+		zIndex: 20,
+		width: 180,
+		padding: 6,
+		position: 'absolute',
+		borderRadius: 8,
+		backgroundColor: theme.colors.n0,
+		border: `1px solid ${theme.colors.n100}`,
+		boxShadow: theme.elevation.e200,
+	},
+	pageBuilderStyleMenuItem: {
+		height: 'auto !important',
+		width: '100% !important',
+		border: 0,
+		padding: '8px 10px',
+		fontSize: 14,
+		textAlign: 'left',
+		float: 'none !important',
+		display: 'block !important',
+		borderRadius: 6,
+		backgroundColor: 'transparent',
+		color: theme.colors.n700,
+		'&:hover': {
+			backgroundColor: theme.colors.n50,
+		},
+		'&.active': {
+			backgroundColor: theme.colors.n75,
+			fontWeight: 600,
+		},
+	},
+	pageBuilderStyleMenuItemTitle1: {
+		...theme.fonts.h1.default,
+		...theme.fonts.headingBold,
+	},
+	pageBuilderStyleMenuItemTitle2: {
+		...theme.fonts.h2.default,
+		...theme.fonts.headingBold,
+	},
+	pageBuilderStyleMenuItemTitle3: {
+		...theme.fonts.h3.default,
+		...theme.fonts.headingBold,
+	},
+	pageBuilderStyleMenuItemBodySmall: {
+		...theme.fonts.bodyNormal,
+		fontSize: customFontSizes[0].fontSize,
+		lineHeight: `${customFontSizes[0].lineHeight}px`,
+	},
+	pageBuilderStyleMenuItemBodyNormal: {
+		...theme.fonts.bodyNormal,
+		fontSize: customFontSizes[1].fontSize,
+		lineHeight: `${customFontSizes[1].lineHeight}px`,
+	},
+	pageBuilderStyleMenuItemBodyLarge: {
+		...theme.fonts.bodyNormal,
+		fontSize: customFontSizes[2].fontSize,
+		lineHeight: `${customFontSizes[2].lineHeight}px`,
+	},
+	pageBuilderStyleMenuDivider: {
+		margin: '6px 0',
+		borderTop: `1px solid ${theme.colors.n100}`,
+	},
 }));
 
 interface WysiwygProps {
@@ -73,12 +228,13 @@ interface WysiwygProps {
 	disabled?: boolean;
 	className?: string;
 	height?: number;
+	toolbarPreset?: WysiwygToolbarPreset;
 }
 
 const SizeStyle = Quill.import('attributors/style/size');
 SizeStyle.whitelist = customFontSizes.map((cfs) => `${cfs.fontSize}px`);
 Quill.register(SizeStyle, true);
-const quillModules = {
+const defaultQuillModules = {
 	toolbar: [
 		[{ size: customFontSizes.map((cfs) => `${cfs.fontSize}px`) }],
 		['bold', 'italic', 'underline', 'strike'],
@@ -86,27 +242,264 @@ const quillModules = {
 		['link', 'clean'],
 	],
 };
+const defaultQuillFormats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
+const pageBuilderQuillFormats = [
+	'header',
+	'size',
+	'align',
+	'bold',
+	'italic',
+	'underline',
+	'strike',
+	'list',
+	'bullet',
+	'link',
+];
 
-const WysiwygBasic = React.forwardRef(
-	(
-		{ value, onChange, disabled, className, height }: WysiwygProps,
-		ref: ((instance: ReactQuill | null) => void) | RefObject<ReactQuill> | null | undefined
-	) => {
+const getPageBuilderTextStyleIdForFormats = (formats: Record<string, unknown>): PageBuilderTextStyleId => {
+	if (formats.header === 1) {
+		return 'TITLE_1';
+	}
+
+	if (formats.header === 2) {
+		return 'TITLE_2';
+	}
+
+	if (formats.header === 3) {
+		return 'TITLE_3';
+	}
+
+	if (formats.size === '14px') {
+		return 'BODY_SMALL';
+	}
+
+	if (formats.size === '18px') {
+		return 'BODY_LARGE';
+	}
+
+	return 'BODY_NORMAL';
+};
+
+const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
+	({ value, onChange, disabled, className, height, toolbarPreset = 'default' }: WysiwygProps, forwardedRef) => {
 		const classes = useWysiwygStyles({ height });
 		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
+		const pageBuilderToolbarId = `${reactQuillId}-toolbar`;
+		const quillRef = useRef<ReactQuill | null>(null);
+		const pageBuilderStyleMenuRef = useRef<HTMLDivElement | null>(null);
+		const [isPageBuilderStyleMenuOpen, setIsPageBuilderStyleMenuOpen] = useState(false);
+		const [activePageBuilderTextStyleId, setActivePageBuilderTextStyleId] =
+			useState<PageBuilderTextStyleId>('BODY_NORMAL');
+		const modules = useMemo(
+			() =>
+				toolbarPreset === 'page-builder'
+					? {
+							toolbar: {
+								container: `#${pageBuilderToolbarId}`,
+							},
+					  }
+					: defaultQuillModules,
+			[pageBuilderToolbarId, toolbarPreset]
+		);
+		const formats = toolbarPreset === 'page-builder' ? pageBuilderQuillFormats : defaultQuillFormats;
+		const activePageBuilderTextStyle = pageBuilderTextStyleOptions.find(
+			(pageBuilderTextStyleOption) => pageBuilderTextStyleOption.id === activePageBuilderTextStyleId
+		);
+		const pageBuilderTextStyleClassNameById: Record<PageBuilderTextStyleId, string | undefined> = {
+			TITLE_1: classes.pageBuilderStyleMenuItemTitle1,
+			TITLE_2: classes.pageBuilderStyleMenuItemTitle2,
+			TITLE_3: classes.pageBuilderStyleMenuItemTitle3,
+			BODY_SMALL: classes.pageBuilderStyleMenuItemBodySmall,
+			BODY_NORMAL: classes.pageBuilderStyleMenuItemBodyNormal,
+			BODY_LARGE: classes.pageBuilderStyleMenuItemBodyLarge,
+		};
+
+		const setRefs = useCallback(
+			(instance: ReactQuill | null) => {
+				quillRef.current = instance;
+
+				if (typeof forwardedRef === 'function') {
+					forwardedRef(instance);
+				} else if (forwardedRef) {
+					forwardedRef.current = instance;
+				}
+			},
+			[forwardedRef]
+		);
+
+		const syncActivePageBuilderTextStyle = useCallback(() => {
+			if (toolbarPreset !== 'page-builder' || !quillRef.current) {
+				return;
+			}
+
+			const editor = quillRef.current.getEditor();
+			const selection = editor.getSelection();
+
+			if (!selection) {
+				return;
+			}
+
+			const selectionFormats = editor.getFormat(selection);
+
+			setActivePageBuilderTextStyleId(getPageBuilderTextStyleIdForFormats(selectionFormats));
+		}, [toolbarPreset]);
+
+		const applyPageBuilderTextStyle = useCallback((pageBuilderTextStyleId: PageBuilderTextStyleId) => {
+			if (!quillRef.current) {
+				return;
+			}
+
+			const selectedPageBuilderTextStyle = pageBuilderTextStyleOptions.find(
+				(pageBuilderTextStyleOption) => pageBuilderTextStyleOption.id === pageBuilderTextStyleId
+			);
+
+			if (!selectedPageBuilderTextStyle) {
+				return;
+			}
+
+			const editor = quillRef.current.getEditor();
+			const selection = editor.getSelection(true);
+
+			editor.focus();
+
+			if (selectedPageBuilderTextStyle.header) {
+				editor.formatLine(
+					selection.index,
+					selection.length,
+					'header',
+					selectedPageBuilderTextStyle.header,
+					'user'
+				);
+				editor.format('size', false, 'user');
+			} else {
+				editor.formatLine(selection.index, selection.length, 'header', false, 'user');
+				editor.format('size', selectedPageBuilderTextStyle.size ?? false, 'user');
+			}
+
+			setActivePageBuilderTextStyleId(pageBuilderTextStyleId);
+			setIsPageBuilderStyleMenuOpen(false);
+		}, []);
+
+		useEffect(() => {
+			if (toolbarPreset !== 'page-builder' || !isPageBuilderStyleMenuOpen) {
+				return undefined;
+			}
+
+			const handleDocumentMouseDown = (event: MouseEvent) => {
+				if (!pageBuilderStyleMenuRef.current?.contains(event.target as Node)) {
+					setIsPageBuilderStyleMenuOpen(false);
+				}
+			};
+
+			document.addEventListener('mousedown', handleDocumentMouseDown);
+
+			return () => {
+				document.removeEventListener('mousedown', handleDocumentMouseDown);
+			};
+		}, [isPageBuilderStyleMenuOpen, toolbarPreset]);
+
+		useEffect(() => {
+			syncActivePageBuilderTextStyle();
+		}, [syncActivePageBuilderTextStyle, value]);
 
 		return (
-			<ReactQuill
-				id={reactQuillId}
-				className={classNames(classes.quill, className)}
-				ref={ref}
-				theme="snow"
-				value={value}
-				onChange={onChange}
-				modules={quillModules}
-				readOnly={disabled}
-				bounds={`#${reactQuillId}`}
-			/>
+			<>
+				{toolbarPreset === 'page-builder' && (
+					<div
+						id={pageBuilderToolbarId}
+						className={classNames('ql-toolbar ql-snow', classes.pageBuilderToolbar)}
+					>
+						<span className="ql-formats">
+							<div ref={pageBuilderStyleMenuRef} className={classes.pageBuilderStyleControl}>
+								<button
+									type="button"
+									className={classes.pageBuilderStyleButton}
+									onClick={() => {
+										if (!disabled) {
+											setIsPageBuilderStyleMenuOpen((previousValue) => !previousValue);
+										}
+									}}
+									disabled={disabled}
+								>
+									<span>{activePageBuilderTextStyle?.title ?? 'Normal'}</span>
+									<SvgIcon kit="far" icon="chevron-down" size={12} />
+								</button>
+								{isPageBuilderStyleMenuOpen && (
+									<div className={classes.pageBuilderStyleMenu}>
+										{pageBuilderTextStyles.map((pageBuilderTextStyle, index) =>
+											pageBuilderTextStyle.type === 'divider' ? (
+												<div
+													key={`divider-${index}`}
+													className={classes.pageBuilderStyleMenuDivider}
+												/>
+											) : (
+												<button
+													key={pageBuilderTextStyle.id}
+													type="button"
+													className={classNames(
+														classes.pageBuilderStyleMenuItem,
+														pageBuilderTextStyleClassNameById[pageBuilderTextStyle.id],
+														{
+															active:
+																pageBuilderTextStyle.id ===
+																activePageBuilderTextStyleId,
+														}
+													)}
+													onClick={() => {
+														applyPageBuilderTextStyle(pageBuilderTextStyle.id);
+													}}
+												>
+													{pageBuilderTextStyle.title}
+												</button>
+											)
+										)}
+									</div>
+								)}
+							</div>
+						</span>
+						<span className="ql-formats">
+							<select className="ql-align" defaultValue="">
+								<option value="" />
+								<option value="center" />
+								<option value="right" />
+								<option value="justify" />
+							</select>
+						</span>
+						<span className="ql-formats">
+							<button type="button" className="ql-bold" />
+							<button type="button" className="ql-italic" />
+							<button type="button" className="ql-underline" />
+							<button type="button" className="ql-strike" />
+						</span>
+						<span className="ql-formats">
+							<button type="button" className="ql-list" value="ordered" />
+							<button type="button" className="ql-list" value="bullet" />
+						</span>
+						<span className="ql-formats">
+							<button type="button" className="ql-link" />
+							<button type="button" className="ql-clean" />
+						</span>
+					</div>
+				)}
+				<ReactQuill
+					id={reactQuillId}
+					className={classNames(classes.quill, className)}
+					ref={setRefs}
+					theme="snow"
+					value={value}
+					onChange={(nextValue, delta, source, editor) => {
+						onChange(nextValue, delta, source, editor);
+						syncActivePageBuilderTextStyle();
+					}}
+					onChangeSelection={() => {
+						syncActivePageBuilderTextStyle();
+					}}
+					modules={modules}
+					formats={formats}
+					readOnly={disabled}
+					bounds={`#${reactQuillId}`}
+				/>
+			</>
 		);
 	}
 );
@@ -183,6 +576,15 @@ const useWysiwygDisplayStyles = createUseThemedStyles((theme) => ({
 		},
 		'& a': {
 			...theme.fonts.bodyNormal,
+		},
+		'& .ql-align-center': {
+			textAlign: 'center',
+		},
+		'& .ql-align-right': {
+			textAlign: 'right',
+		},
+		'& .ql-align-justify': {
+			textAlign: 'justify',
 		},
 		'& .ql-size-small': {
 			fontSize: '0.9rem',

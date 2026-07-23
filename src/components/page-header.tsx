@@ -16,17 +16,26 @@ interface PageHeaderProps {
 	imageUrl?: string;
 	imageAlt?: string;
 	className?: string;
+	forceMobileLayout?: boolean;
 	ctaButton?: {
 		title: string;
 		onClick(): void;
 	};
 }
 
-const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className, ctaButton }: PageHeaderProps) => {
+const PageHeader = ({
+	title,
+	descriptionHtml,
+	imageUrl,
+	imageAlt,
+	className,
+	forceMobileLayout = false,
+	ctaButton,
+}: PageHeaderProps) => {
 	const classes = useStyles();
 
 	return (
-		<Container fluid className={classNames('p-5 p-lg-16', className)}>
+		<Container fluid className={classNames(forceMobileLayout ? 'p-5' : 'p-5 p-lg-16', className)}>
 			<Container>
 				<Row>
 					<Col>
@@ -50,7 +59,13 @@ const PageHeader = ({ title, descriptionHtml, imageUrl, imageAlt, className, cta
 					</Col>
 
 					{imageUrl && (
-						<Col xs={12} lg={{ offset: 1, span: 5 }} className="d-flex mt-12 mt-lg-0">
+						<Col
+							xs={12}
+							lg={forceMobileLayout ? undefined : { offset: 1, span: 5 }}
+							className={classNames('d-flex mt-12', {
+								'mt-lg-0': !forceMobileLayout,
+							})}
+						>
 							<img
 								className={classNames(classes.headerImg, 'w-100 align-self-center')}
 								src={imageUrl}

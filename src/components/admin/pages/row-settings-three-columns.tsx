@@ -1,19 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { ThreeColumnImageRowModel } from '@/lib/models';
+import { ThreeColumnRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
+import { RowSettingsMetaForm } from '@/components/admin/pages';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 
-export const RowSettingsThreeColumns = () => {
+interface RowSettingsThreeColumnsProps {
+	nameInputRef?: RefObject<HTMLInputElement>;
+	pageRow: ThreeColumnRowModel;
+}
+
+export const RowSettingsThreeColumns = ({ nameInputRef, pageRow }: RowSettingsThreeColumnsProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
-	const threeColumnImageRow = useMemo(() => currentPageRow as ThreeColumnImageRowModel | undefined, [currentPageRow]);
+	const { updatePageRow, setIsSaving } = usePageBuilderContext();
 	const [formValues, setFormValues] = useState({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 		columnTwo: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
@@ -21,46 +26,38 @@ export const RowSettingsThreeColumns = () => {
 	});
 
 	useEffect(() => {
-		if (!threeColumnImageRow) {
-			return;
-		}
-
 		setFormValues({
 			columnOne: {
-				headline: threeColumnImageRow.columnOne.headline ?? '',
-				description: threeColumnImageRow.columnOne.description ?? '',
-				imageFileUploadId: threeColumnImageRow.columnOne.imageFileUploadId ?? '',
-				imageUrl: threeColumnImageRow.columnOne.imageUrl ?? '',
-				imageAltText: threeColumnImageRow.columnOne.imageAltText ?? '',
+				headline: pageRow.columnOne.headline ?? '',
+				description: pageRow.columnOne.description ?? '',
+				imageFileUploadId: pageRow.columnOne.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnOne.imageUrl ?? '',
+				imageAltText: pageRow.columnOne.imageAltText ?? '',
 			},
 			columnTwo: {
-				headline: threeColumnImageRow.columnTwo.headline ?? '',
-				description: threeColumnImageRow.columnTwo.description ?? '',
-				imageFileUploadId: threeColumnImageRow.columnTwo.imageFileUploadId ?? '',
-				imageUrl: threeColumnImageRow.columnTwo.imageUrl ?? '',
-				imageAltText: threeColumnImageRow.columnTwo.imageAltText ?? '',
+				headline: pageRow.columnTwo.headline ?? '',
+				description: pageRow.columnTwo.description ?? '',
+				imageFileUploadId: pageRow.columnTwo.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnTwo.imageUrl ?? '',
+				imageAltText: pageRow.columnTwo.imageAltText ?? '',
 			},
 			columnThree: {
-				headline: threeColumnImageRow.columnThree.headline ?? '',
-				description: threeColumnImageRow.columnThree.description ?? '',
-				imageFileUploadId: threeColumnImageRow.columnThree.imageFileUploadId ?? '',
-				imageUrl: threeColumnImageRow.columnThree.imageUrl ?? '',
-				imageAltText: threeColumnImageRow.columnThree.imageAltText ?? '',
+				headline: pageRow.columnThree.headline ?? '',
+				description: pageRow.columnThree.description ?? '',
+				imageFileUploadId: pageRow.columnThree.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnThree.imageUrl ?? '',
+				imageAltText: pageRow.columnThree.imageAltText ?? '',
 			},
 		});
-	}, [threeColumnImageRow]);
+	}, [pageRow]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(
-		async (tcir: ThreeColumnImageRowModel, fv: typeof formValues) => {
+		async (threeColumnRow: ThreeColumnRowModel, fv: typeof formValues) => {
 			setIsSaving(true);
 
 			try {
-				if (!tcir) {
-					throw new Error('currentPageRow is undefined.');
-				}
-
 				const response = await pagesService
-					.updateThreeColumnRow(tcir.pageRowId, {
+					.updateThreeColumnRow(threeColumnRow.pageRowId, {
 						columnOne: fv.columnOne,
 						columnTwo: fv.columnTwo,
 						columnThree: fv.columnThree,
@@ -76,6 +73,12 @@ export const RowSettingsThreeColumns = () => {
 		}
 	);
 
+	useEffect(() => {
+		return () => {
+			void debouncedSubmission.flush();
+		};
+	}, [debouncedSubmission]);
+
 	const handleInputChange = useCallback(
 		(
 			column: keyof typeof formValues,
@@ -90,14 +93,12 @@ export const RowSettingsThreeColumns = () => {
 					},
 				};
 
-				if (threeColumnImageRow) {
-					debouncedSubmission(threeColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 
 				return newValue;
 			});
 		},
-		[debouncedSubmission, threeColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleQuillChange = useCallback(
@@ -111,13 +112,11 @@ export const RowSettingsThreeColumns = () => {
 					},
 				};
 
-				if (threeColumnImageRow) {
-					debouncedSubmission(threeColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 				return newValue;
 			});
 		},
-		[debouncedSubmission, threeColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleUploadComplete = useCallback(
@@ -125,12 +124,9 @@ export const RowSettingsThreeColumns = () => {
 			setIsSaving(true);
 
 			try {
-				if (!threeColumnImageRow) {
-					throw new Error('threeColumnImageRow is undefined.');
-				}
-
+				debouncedSubmission.cancel();
 				const response = await pagesService
-					.updateThreeColumnRow(threeColumnImageRow.pageRowId, {
+					.updateThreeColumnRow(pageRow.pageRowId, {
 						...formValues,
 						[column]: {
 							...formValues[column],
@@ -146,7 +142,7 @@ export const RowSettingsThreeColumns = () => {
 				setIsSaving(false);
 			}
 		},
-		[formValues, handleError, setIsSaving, threeColumnImageRow, updatePageRow]
+		[debouncedSubmission, formValues, handleError, pageRow, setIsSaving, updatePageRow]
 	);
 
 	const handleImageChange = useCallback(
@@ -169,6 +165,7 @@ export const RowSettingsThreeColumns = () => {
 
 	return (
 		<>
+			<RowSettingsMetaForm nameInputRef={nameInputRef} pageRow={pageRow} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"
@@ -183,6 +180,7 @@ export const RowSettingsThreeColumns = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnOne.description}
 						onChange={(value) => {
@@ -234,6 +232,7 @@ export const RowSettingsThreeColumns = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnTwo.description}
 						onChange={(value) => {
@@ -285,6 +284,7 @@ export const RowSettingsThreeColumns = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnThree.description}
 						onChange={(value) => {

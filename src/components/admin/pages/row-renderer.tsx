@@ -4,11 +4,18 @@ import { Button, Col, Form, Modal, ModalProps, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import {
 	AnalyticsNativeEventTypeId,
+	CallToActionBlockRowModel,
+	CallToActionFullWidthRowModel,
 	Content,
 	ContentStatusId,
+	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
+	CustomRowModel,
 	GROUP_SESSION_STATUS_ID,
 	GroupSessionsRowModel,
+	isCallToActionBlockRow,
+	isCallToActionFullWidthRow,
 	isGroupSessionsRow,
+	isCustomRow,
 	isMailingListRow,
 	isOneColumnImageRow,
 	isResourcesRow,
@@ -23,6 +30,7 @@ import {
 	PageRowUnionModel,
 	PageSiteLocationModel,
 	ResourcesRowModel,
+	ROW_TYPE_ID,
 	Tag,
 	TagGroupRowModel,
 	TagRowModel,
@@ -41,6 +49,11 @@ import AsyncWrapper from '@/components/async-page';
 import { TopicCenterGroupSession } from '@/components/topic-center-group-session';
 import InputHelper from '@/components/input-helper';
 import LoadingButton from '@/components/loading-button';
+import CallToActionBlock from '@/components/call-to-action-block';
+import CallToActionFullWidth from '@/components/call-to-action-full-width';
+import { PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC } from './page-builder-placeholder';
+
+export type PagePreviewViewport = 'desktop' | 'mobile';
 
 interface RowRendererProps<T = PageRowUnionModel> {
 	pageId: string;
@@ -49,8 +62,45 @@ interface RowRendererProps<T = PageRowUnionModel> {
 	tagsByTagId: Record<string, Tag>;
 	enableAnalytics: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
+	previewViewport?: PagePreviewViewport;
 	className?: string;
 }
+
+const mobileCarouselResponsive = {
+	externalMonitor: {
+		breakpoint: { max: 3000, min: 1201 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	desktopExtraLarge: {
+		breakpoint: { max: 1200, min: 993 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	desktop: {
+		breakpoint: { max: 992, min: 769 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	tablet: {
+		breakpoint: { max: 768, min: 575 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+	mobile: {
+		breakpoint: { max: 575, min: 0 },
+		items: 1,
+		partialVisibilityGutter: 0,
+	},
+};
+
+const normalizeAnalyticsLinkUrl = (linkUrl: string) => {
+	try {
+		return new URL(linkUrl, window.location.href).href;
+	} catch {
+		return linkUrl;
+	}
+};
 
 const ResourcesRowRenderer = ({
 	pageId,
@@ -59,14 +109,23 @@ const ResourcesRowRenderer = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<ResourcesRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	return (
 		<Row className={className}>
 			{pageRow.contents.map((content) => {
 				const expired = content.contentStatusId !== ContentStatusId.LIVE;
 
 				return (
-					<Col key={content.contentId} xs={12} md={6} lg={4} className="mb-8">
+					<Col
+						key={content.contentId}
+						xs={12}
+						md={forceMobileLayout ? undefined : 6}
+						lg={forceMobileLayout ? undefined : 4}
+						className="mb-8"
+					>
 						<ResourceLibraryCard
 							key={content.contentId}
 							expired={expired}
@@ -116,12 +175,14 @@ const GroupSessionsRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<GroupSessionsRowModel>) => {
 	const navigate = useNavigate();
+	const forceMobileLayout = previewViewport === 'mobile';
 
 	return (
 		<Row className={className}>
-			{pageRow.groupSessions.length < 3 ? (
+			{pageRow.groupSessions.length < 3 && !forceMobileLayout ? (
 				<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
 					{pageRow.groupSessions.map((groupSession, groupSessionIndex) => {
 						const isLast = pageRow.groupSessions.length - 1 === groupSessionIndex;
@@ -171,7 +232,13 @@ const GroupSessionsRowRenderer = ({
 						const expired = groupSession.groupSessionStatusId !== GROUP_SESSION_STATUS_ID.ADDED;
 
 						return (
-							<Col key={groupSession.groupSessionId} xs={12} md={6} lg={4} className="mb-8">
+							<Col
+								key={groupSession.groupSessionId}
+								xs={12}
+								md={forceMobileLayout ? undefined : 6}
+								lg={forceMobileLayout ? undefined : 4}
+								className="mb-8"
+							>
 								<Link
 									className="d-block text-decoration-none h-100"
 									to={`/group-sessions/${groupSession.urlName}`}
@@ -209,10 +276,16 @@ const TagGroupRowRenderer = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<TagGroupRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	return (
 		<Row className={className}>
-			<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+			<Col
+				lg={forceMobileLayout ? undefined : 3}
+				className={classNames('pt-4 pb-2', { 'mb-10': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<ResourceLibrarySubtopicCard
 					className="h-100"
 					colorId={pageRow.tagGroup.colorId}
@@ -226,14 +299,17 @@ const TagGroupRowRenderer = ({
 
 						analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG_GROUP, {
 							pageId,
-							tagId: pageRow.tagGroup.tagGroupId,
+							tagGroupId: pageRow.tagGroup.tagGroupId,
 							siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 						});
 					}}
 				/>
 			</Col>
-			<Col lg={9}>
-				<Carousel responsive={resourceLibraryCarouselConfig} trackStyles={{ paddingTop: 16, paddingBottom: 8 }}>
+			<Col lg={forceMobileLayout ? undefined : 9}>
+				<Carousel
+					responsive={forceMobileLayout ? mobileCarouselResponsive : resourceLibraryCarouselConfig}
+					trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
+				>
 					{(contentsByTagGroupId?.[pageRow.tagGroup.tagGroupId] ?? []).map((content) => {
 						return (
 							<ResourceLibraryCard
@@ -289,50 +365,57 @@ const TagRowRenderer = ({
 	tagsByTagId,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<TagRowModel>) => {
 	const [content, setContent] = useState<Content[]>([]);
+	const tag = pageRow.tag;
+	const forceMobileLayout = previewViewport === 'mobile';
 
 	const fetchContent = useCallback(async () => {
-		if (!pageRow.tag.urlName) {
-			throw new Error('pageRow.tag.urlName is undefined.');
+		if (!tag?.urlName) {
+			setContent([]);
+			return;
 		}
 
 		const { findResult } = await resourceLibraryService
-			.getResourceLibraryContentByUrlName(pageRow.tag.urlName, {
+			.getResourceLibraryContentByUrlName(tag.urlName, {
 				pageNumber: 0,
 				pageSize: 200,
 			})
 			.fetch();
 
 		setContent(findResult.contents);
-	}, [pageRow.tag.urlName]);
+	}, [tag?.urlName]);
 
 	return (
 		<AsyncWrapper fetchData={fetchContent}>
 			<Row className={className}>
-				<Col lg={3} className="mb-10 mb-lg-0 pt-4 pb-2">
+				<Col
+					lg={forceMobileLayout ? undefined : 3}
+					className={classNames('pt-4 pb-2', { 'mb-10': true, 'mb-lg-0': !forceMobileLayout })}
+				>
 					<ResourceLibrarySubtopicCard
 						className="h-100"
 						colorId={pageRow.tagGroupColorId}
-						title={pageRow.tag.name}
-						description={pageRow.tag.description}
-						to={`/resource-library/tags/${pageRow.tag.urlName}`}
+						title={tag?.name ?? 'Tag'}
+						description={tag?.description ?? ''}
+						to={tag?.urlName ? `/resource-library/tags/${tag.urlName}` : '#'}
 						onClick={() => {
-							if (!enableAnalytics) {
+							if (!enableAnalytics || !tag?.tagId) {
 								return;
 							}
 
 							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_TAG, {
 								pageId,
-								tagId: pageRow.tag.tagId,
+								tagId: tag.tagId,
 								siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
 							});
 						}}
 					/>
 				</Col>
-				<Col lg={9}>
+				<Col lg={forceMobileLayout ? undefined : 9}>
 					<Carousel
-						responsive={resourceLibraryCarouselConfig}
+						responsive={forceMobileLayout ? mobileCarouselResponsive : resourceLibraryCarouselConfig}
 						trackStyles={{ paddingTop: 16, paddingBottom: 8 }}
 					>
 						{content.map((content) => {
@@ -387,16 +470,153 @@ const TagRowRenderer = ({
 	);
 };
 
+const CustomRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+	previewViewport = 'desktop',
+}: RowRendererProps<CustomRowModel>) => {
+	const columns = [...pageRow.columns].sort(
+		(leftColumn, rightColumn) => leftColumn.columnDisplayOrder - rightColumn.columnDisplayOrder
+	);
+	const forceMobileLayout = previewViewport === 'mobile';
+	const lgColumnSpan = columns.length === 1 ? 12 : columns.length === 2 ? 6 : columns.length === 3 ? 4 : 3;
+
+	if (columns.length === 0) {
+		return null;
+	}
+
+	return (
+		<Row className={className}>
+			{columns.map((column, columnIndex) => (
+				<Col
+					key={column.pageRowColumnId}
+					xs={12}
+					lg={forceMobileLayout ? undefined : lgColumnSpan}
+					className={classNames({
+						'mb-16': columnIndex !== columns.length - 1,
+						'mb-lg-0': !forceMobileLayout && columnIndex !== columns.length - 1,
+					})}
+				>
+					{(column.contentOrderId === CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE
+						? ['text', 'image']
+						: ['image', 'text']
+					)
+						.filter((sectionId) => {
+							if (sectionId === 'image') {
+								return !!column.imageUrl || !!column.usePlaceholderImage;
+							}
+
+							return !!(column.headline || column.description);
+						})
+						.map((sectionId, sectionIndex, sectionIds) => (
+							<div
+								key={`${column.pageRowColumnId}-${sectionId}`}
+								className={classNames({ 'mb-6': sectionIndex !== sectionIds.length - 1 })}
+							>
+								{sectionId === 'image' ? (
+									<img
+										className="w-100"
+										src={column.imageUrl || PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC}
+										alt={column.imageAltText ?? ''}
+									/>
+								) : (
+									<>
+										{column.headline && (
+											<h3 className={classNames({ 'mb-6': column.description })}>
+												{column.headline}
+											</h3>
+										)}
+										{column.description && (
+											<WysiwygDisplay
+												html={column.description ?? ''}
+												onClick={({ linkUrl, linkText }) => {
+													if (!enableAnalytics) {
+														return;
+													}
+
+													analyticsService.persistEvent(
+														AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK,
+														{
+															pageId,
+															linkUrl,
+															linkText,
+															siteLocationIds: livePageSiteLocations.map(
+																(i) => i.siteLocationId
+															),
+														}
+													);
+												}}
+											/>
+										)}
+									</>
+								)}
+							</div>
+						))}
+				</Col>
+			))}
+		</Row>
+	);
+};
+
 const OneColRowRenderer = ({
 	pageId,
 	pageRow,
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<OneColumnImageRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
+	if (pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT) {
+		return (
+			<Row className={className}>
+				<Col
+					md={forceMobileLayout ? undefined : { span: 10, offset: 1 }}
+					lg={forceMobileLayout ? undefined : { span: 8, offset: 2 }}
+				>
+					{pageRow.columnOne.headline && (
+						<h2 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
+							{pageRow.columnOne.headline}
+						</h2>
+					)}
+					{pageRow.columnOne.description && (
+						<WysiwygDisplay
+							html={pageRow.columnOne.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+			</Row>
+		);
+	}
+
+	const imageFirst = pageRow.rowTypeId !== ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT;
+
 	return (
 		<Row className={classNames('align-items-center', className)}>
-			<Col xs={12} lg={6} className="mb-10 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 6}
+				className={classNames('mb-10', {
+					'mb-lg-0': !forceMobileLayout,
+					'order-lg-2': !forceMobileLayout && !imageFirst,
+				})}
+			>
 				{pageRow.columnOne.imageUrl && (
 					<img
 						className="w-100"
@@ -405,7 +625,13 @@ const OneColRowRenderer = ({
 					/>
 				)}
 			</Col>
-			<Col xs={12} lg={6}>
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 6}
+				className={classNames({
+					'order-lg-1': !forceMobileLayout && !imageFirst,
+				})}
+			>
 				{pageRow.columnOne.headline && (
 					<h3 className={classNames({ 'mb-6': pageRow.columnOne.description })}>
 						{pageRow.columnOne.headline}
@@ -439,10 +665,68 @@ const TwoColRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<TwoColumnImageRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
+	if (pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT) {
+		return (
+			<Row className={className}>
+				<Col
+					xs={12}
+					lg={forceMobileLayout ? undefined : 6}
+					className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+				>
+					{pageRow.columnOne.headline && <h3 className={classNames('mb-6')}>{pageRow.columnOne.headline}</h3>}
+					{pageRow.columnOne.description && (
+						<WysiwygDisplay
+							html={pageRow.columnOne.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+				<Col xs={12} lg={forceMobileLayout ? undefined : 6}>
+					{pageRow.columnTwo.headline && <h3 className={classNames('mb-6')}>{pageRow.columnTwo.headline}</h3>}
+					{pageRow.columnTwo.description && (
+						<WysiwygDisplay
+							html={pageRow.columnTwo.description ?? ''}
+							onClick={({ linkUrl, linkText }) => {
+								if (!enableAnalytics) {
+									return;
+								}
+
+								analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+									pageId,
+									linkUrl,
+									linkText,
+									siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+								});
+							}}
+						/>
+					)}
+				</Col>
+			</Row>
+		);
+	}
+
 	return (
 		<Row className={className}>
-			<Col xs={12} lg={6} className="mb-16 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 6}
+				className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnOne.imageUrl}
@@ -465,7 +749,7 @@ const TwoColRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col xs={12} lg={6}>
+			<Col xs={12} lg={forceMobileLayout ? undefined : 6}>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnTwo.imageUrl}
@@ -498,10 +782,17 @@ const ThreeColRowRenderer = ({
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<ThreeColumnImageRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
 	return (
 		<Row className={className}>
-			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 4}
+				className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnOne.imageUrl}
@@ -525,7 +816,11 @@ const ThreeColRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col xs={12} lg={4} className="mb-16 mb-lg-0">
+			<Col
+				xs={12}
+				lg={forceMobileLayout ? undefined : 4}
+				className={classNames({ 'mb-16': true, 'mb-lg-0': !forceMobileLayout })}
+			>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnTwo.imageUrl}
@@ -549,7 +844,7 @@ const ThreeColRowRenderer = ({
 					}}
 				/>
 			</Col>
-			<Col xs={12} lg={4}>
+			<Col xs={12} lg={forceMobileLayout ? undefined : 4}>
 				<img
 					className="mb-10 w-100"
 					src={pageRow.columnThree.imageUrl}
@@ -577,17 +872,126 @@ const ThreeColRowRenderer = ({
 	);
 };
 
+const FullWidthCallToActionRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+	previewViewport = 'desktop',
+}: RowRendererProps<CallToActionFullWidthRowModel>) => {
+	const handleButtonClick = () => {
+		if (enableAnalytics && pageRow.buttonUrl) {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CALL_TO_ACTION, {
+				pageId,
+				pageRowId: pageRow.pageRowId,
+				rowTypeId: pageRow.rowTypeId,
+				linkUrl: normalizeAnalyticsLinkUrl(pageRow.buttonUrl),
+				linkText: pageRow.buttonText ?? '',
+				siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+			});
+		}
+
+		if (pageRow.buttonUrl) {
+			window.location.assign(pageRow.buttonUrl);
+		}
+	};
+
+	return (
+		<CallToActionFullWidth
+			contentClassName={className}
+			title={pageRow.headline ?? ''}
+			description={
+				pageRow.description ? (
+					<WysiwygDisplay
+						html={pageRow.description}
+						onClick={({ linkUrl, linkText }) => {
+							if (!enableAnalytics) {
+								return;
+							}
+
+							analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+								pageId,
+								linkUrl,
+								linkText,
+								siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+							});
+						}}
+					/>
+				) : undefined
+			}
+			buttonText={pageRow.buttonText}
+			onButtonClick={handleButtonClick}
+			buttonDisabled={!pageRow.buttonUrl}
+		/>
+	);
+};
+
+const BlockCallToActionRowRenderer = ({
+	pageId,
+	pageRow,
+	className,
+	enableAnalytics,
+	livePageSiteLocations,
+	previewViewport = 'desktop',
+}: RowRendererProps<CallToActionBlockRowModel>) => {
+	const forceMobileLayout = previewViewport === 'mobile';
+
+	const handleButtonClick = () => {
+		if (enableAnalytics && pageRow.buttonUrl) {
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_CALL_TO_ACTION, {
+				pageId,
+				pageRowId: pageRow.pageRowId,
+				rowTypeId: pageRow.rowTypeId,
+				linkUrl: normalizeAnalyticsLinkUrl(pageRow.buttonUrl),
+				linkText: pageRow.buttonText ?? '',
+				siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+			});
+		}
+
+		if (pageRow.buttonUrl) {
+			window.location.assign(pageRow.buttonUrl);
+		}
+	};
+
+	return (
+		<CallToActionBlock
+			className={className}
+			heading={pageRow.headline}
+			descriptionHtml={pageRow.description ?? ''}
+			imageUrl={pageRow.imageUrl ?? ''}
+			forceMobileLayout={forceMobileLayout}
+			primaryActionText={pageRow.buttonText}
+			onPrimaryActionClick={handleButtonClick}
+			onDescriptionLinkClick={({ linkUrl, linkText }) => {
+				if (!enableAnalytics) {
+					return;
+				}
+
+				analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_LINK, {
+					pageId,
+					linkUrl,
+					linkText,
+					siteLocationIds: livePageSiteLocations.map((i) => i.siteLocationId),
+				});
+			}}
+		/>
+	);
+};
+
 const MailingListRowRenderer = ({
 	pageId,
 	pageRow,
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
 }: RowRendererProps<MailingListRowModel>) => {
 	const handleError = useHandleError();
 	const [isLoading, setIsLoading] = useState(false);
 	const [inputValue, setInputValue] = useState('');
 	const [hasSubmitted, setHasSubmitted] = useState(false);
+	const forceMobileLayout = previewViewport === 'mobile';
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -617,7 +1021,11 @@ const MailingListRowRenderer = ({
 
 	return (
 		<Row className={className}>
-			<Col md={{ span: 10, offset: 1 }} lg={{ span: 10, offset: 1 }} xl={{ span: 8, offset: 2 }}>
+			<Col
+				md={forceMobileLayout ? undefined : { span: 10, offset: 1 }}
+				lg={forceMobileLayout ? undefined : { span: 10, offset: 1 }}
+				xl={forceMobileLayout ? undefined : { span: 8, offset: 2 }}
+			>
 				{hasSubmitted ? (
 					<>
 						<h1 className="mb-6 text-center">You're subscribed!</h1>
@@ -660,17 +1068,19 @@ export const getRendererForPageRow = ({
 	pageRow,
 	contentsByTagGroupId,
 	tagsByTagId,
-	isLast,
 	enableAnalytics,
 	livePageSiteLocations,
+	previewViewport = 'desktop',
+	className,
 }: {
 	pageId: string;
 	pageRow: PageRowUnionModel;
 	contentsByTagGroupId: Record<string, Content[]>;
 	tagsByTagId: Record<string, Tag>;
-	isLast: boolean;
 	enableAnalytics: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
+	previewViewport?: PagePreviewViewport;
+	className?: string;
 }) => {
 	const rowTypeMap = [
 		{
@@ -683,7 +1093,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -697,7 +1107,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -711,7 +1121,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -725,7 +1135,21 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
+				/>
+			),
+		},
+		{
+			check: isCustomRow,
+			getRow: (row: any) => (
+				<CustomRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -739,7 +1163,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -753,7 +1177,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
@@ -767,7 +1191,36 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
+				/>
+			),
+		},
+		{
+			check: isCallToActionBlockRow,
+			getRow: (row: any) => (
+				<BlockCallToActionRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
+				/>
+			),
+		},
+		{
+			check: isCallToActionFullWidthRow,
+			getRow: (row: any) => (
+				<FullWidthCallToActionRowRenderer
+					pageId={pageId}
+					pageRow={row}
+					contentsByTagGroupId={contentsByTagGroupId}
+					tagsByTagId={tagsByTagId}
+					enableAnalytics={enableAnalytics}
+					livePageSiteLocations={livePageSiteLocations}
+					previewViewport={previewViewport}
+					className={className}
 				/>
 			),
 		},
@@ -781,7 +1234,7 @@ export const getRendererForPageRow = ({
 					tagsByTagId={tagsByTagId}
 					enableAnalytics={enableAnalytics}
 					livePageSiteLocations={livePageSiteLocations}
-					className={classNames({ 'mb-16': !isLast })}
+					previewViewport={previewViewport}
 				/>
 			),
 		},
