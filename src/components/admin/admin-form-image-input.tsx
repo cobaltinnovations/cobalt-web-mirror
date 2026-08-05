@@ -2,25 +2,33 @@ import useHandleError from '@/hooks/use-handle-error';
 import { imageUploader } from '@/lib/services';
 import React, { useEffect, useState } from 'react';
 import ImageUploadCard from '../image-upload-card';
-import SessionCropModal from '../session-crop-modal';
+import SessionCropModal, { SIZE_SELECTIONS } from '../session-crop-modal';
 import { PresignedUploadResponse } from '@/lib/models';
 
 export interface AdminFormImageInputProps {
 	imageSrc: string;
+	placeholderImageSrc?: string;
+	allowRemovePlaceholderImage?: boolean;
 	onSrcChange: (newId: string, newSrc: string) => void;
 	presignedUploadGetter: (blob: Blob, name: string) => () => Promise<PresignedUploadResponse>;
 	className?: string;
 	onUploadComplete?(fileUploadId: string): void;
 	cropImage?: boolean;
+	showSizeSelection?: boolean;
+	lockSizeSelection?: SIZE_SELECTIONS;
 }
 
 export const AdminFormImageInput = ({
 	imageSrc,
+	placeholderImageSrc,
+	allowRemovePlaceholderImage = false,
 	onSrcChange,
 	presignedUploadGetter,
 	className,
 	onUploadComplete,
 	cropImage = true,
+	showSizeSelection = true,
+	lockSizeSelection,
 }: AdminFormImageInputProps) => {
 	const handleError = useHandleError();
 	const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -30,19 +38,15 @@ export const AdminFormImageInput = ({
 	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
-		setImagePreviewSrc((previousValue) => {
-			if (!previousValue) {
-				return imageSrc;
-			}
-
-			return previousValue;
-		});
+		setImagePreviewSrc(imageSrc);
 	}, [imageSrc]);
 
 	return (
 		<>
 			<SessionCropModal
 				cropImage={cropImage}
+				showSizeSelection={showSizeSelection}
+				lockSizeSelection={lockSizeSelection}
 				imageName={sessionCropModalImageConfig.name}
 				imageSource={sessionCropModalImageConfig.source}
 				show={isCropModalOpen}
@@ -53,23 +57,27 @@ export const AdminFormImageInput = ({
 					setIsCropModalOpen(false);
 
 					let fileUploadId = '';
+					let previewImageUrl = '';
 
 					imageUploader(blob, presignedUploadGetter(blob, fileName))
-						.onBeforeUpload((previewImageUrl) => {
-							setImagePreviewSrc(previewImageUrl);
+						.onBeforeUpload((nextPreviewImageUrl) => {
+							previewImageUrl = nextPreviewImageUrl;
+							setImagePreviewSrc(nextPreviewImageUrl);
 						})
 						.onPresignedUploadObtained(({ fileUploadResult }) => {
 							fileUploadId = fileUploadResult.fileUploadId;
 
 							setIsUploading(true);
-							onSrcChange(fileUploadResult.fileUploadId, fileUploadResult.presignedUpload.accessUrl);
+							onSrcChange(
+								fileUploadResult.fileUploadId,
+								previewImageUrl || fileUploadResult.presignedUpload.accessUrl
+							);
 						})
 						.onProgress((percentage) => {
 							setProgress(percentage);
 						})
-						.onComplete((accessUrl) => {
+						.onComplete(() => {
 							setIsUploading(false);
-							setImagePreviewSrc(accessUrl);
 							onUploadComplete?.(fileUploadId);
 						})
 						.onError((error: any) => {
@@ -84,6 +92,8 @@ export const AdminFormImageInput = ({
 			<ImageUploadCard
 				className={className}
 				imagePreview={imagePreviewSrc}
+				placeholderImagePreview={placeholderImageSrc}
+				allowRemovePlaceholderImage={allowRemovePlaceholderImage}
 				isUploading={isUploading}
 				progress={progress}
 				onChange={(file) => {

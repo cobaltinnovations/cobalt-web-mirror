@@ -7,10 +7,17 @@ import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import { useCopyTextToClipboard } from '@/hooks/use-copy-text-to-clipboard';
 import useFlags from '@/hooks/use-flags';
+import useDebouncedState from '@/hooks/use-debounced-state';
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@/components/table';
-import { AddPageModal, MailingListActionsDropdown, PageActionsDropdown } from '@/components/admin/pages';
+import {
+	AddPageModal,
+	MailingListActionsDropdown,
+	PageActionsDropdown,
+	PageSettingsModal,
+} from '@/components/admin/pages';
 import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
+import InputHelperSearch from '@/components/input-helper-search';
 import SvgIcon from '@/components/svg-icon';
 import { buildBackendDownloadUrl } from '@/lib/utils';
 
@@ -68,8 +75,14 @@ export const Component = () => {
 
 	const [selectedPage, setSelectedPage] = useState<PageDetailModel>();
 	const [showAddPageModal, setShowAddPageModal] = useState(false);
+	const [showPageSettingsModal, setShowPageSettingsModal] = useState(false);
 	const [showDeletePageModal, setShowDeletePageModal] = useState(false);
 	const [showUnpublishPageModal, setShowUnpublishPageModal] = useState(false);
+	const [searchInputValue, setSearchInputValue] = useState('');
+	const [debouncedSearchQuery] = useDebouncedState(searchInputValue);
+	const [searchPageNumber, setSearchPageNumber] = useState('0');
+	const normalizedSearchQuery = debouncedSearchQuery.trim();
+	const activePageNumber = normalizedSearchQuery ? searchPageNumber : pageNumber;
 
 	const copyTextToClipboard = useCopyTextToClipboard();
 
@@ -79,8 +92,9 @@ export const Component = () => {
 		try {
 			const { pages, totalCount, totalCountDescription } = await pagesService
 				.getPages({
-					...(pageNumber && { pageNumber }),
+					...(activePageNumber && { pageNumber: activePageNumber }),
 					...(pageSize && { pageSize }),
+					...(normalizedSearchQuery && { searchQuery: normalizedSearchQuery }),
 					...(orderBy && { orderBy }),
 				})
 				.fetch();
@@ -93,7 +107,7 @@ export const Component = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, orderBy, pageNumber, pageSize]);
+	}, [activePageNumber, handleError, normalizedSearchQuery, orderBy, pageSize]);
 
 	useEffect(() => {
 		fetchPages();
@@ -159,6 +173,11 @@ export const Component = () => {
 	}, [addFlag, fetchPages, handleError, selectedPage]);
 
 	const handlePaginationClick = (pageIndex: number) => {
+		if (normalizedSearchQuery) {
+			setSearchPageNumber(String(pageIndex));
+			return;
+		}
+
 		searchParams.set('pageNumber', String(pageIndex));
 		setSearchParams(searchParams);
 	};
@@ -208,6 +227,20 @@ export const Component = () => {
 				}}
 			/>
 
+			<PageSettingsModal
+				page={selectedPage}
+				show={showPageSettingsModal}
+				onHide={() => {
+					setSelectedPage(undefined);
+					setShowPageSettingsModal(false);
+				}}
+				onSaved={() => {
+					setSelectedPage(undefined);
+					setShowPageSettingsModal(false);
+					fetchPages();
+				}}
+			/>
+
 			<ConfirmDialog
 				show={showDeletePageModal}
 				size="lg"
@@ -245,19 +278,35 @@ export const Component = () => {
 			<Container fluid className="px-8 py-8">
 				<Row className="mb-6">
 					<Col>
-						<div className="mb-6 d-flex align-items-center justify-content-between">
+						<div className="mb-6 d-flex align-items-center justify-content-between gap-4">
 							<h2 className="mb-0">Pages</h2>
-							<Button
-								variant="primary"
-								size="sm"
-								className="d-flex align-items-center"
-								onClick={() => {
-									setShowAddPageModal(true);
-								}}
-							>
-								<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
-								Add Page
-							</Button>
+							<div className="d-flex align-items-center">
+								<Button
+									variant="primary"
+									size="sm"
+									className="d-flex align-items-center"
+									onClick={() => {
+										setShowAddPageModal(true);
+									}}
+								>
+									<SvgIcon kit="fas" icon="plus" size={16} className="me-2" />
+									Add Page
+								</Button>
+								<InputHelperSearch
+									className="ms-2"
+									style={{ width: 335 }}
+									placeholder="Search pages"
+									value={searchInputValue}
+									onChange={({ currentTarget }) => {
+										setSearchInputValue(currentTarget.value);
+										setSearchPageNumber('0');
+									}}
+									onClear={() => {
+										setSearchInputValue('');
+										setSearchPageNumber('0');
+									}}
+								/>
+							</div>
 						</div>
 						<hr />
 					</Col>
@@ -349,6 +398,10 @@ export const Component = () => {
 													onEdit={({ pageId }) => {
 														handlePageButtonClick(pageId);
 													}}
+													onPageSettings={() => {
+														setSelectedPage(page);
+														setShowPageSettingsModal(true);
+													}}
 													onDuplicate={() => {
 														setSelectedPage(page);
 														setShowAddPageModal(true);
@@ -375,7 +428,7 @@ export const Component = () => {
 						<div className="d-flex justify-content-center align-items-center">
 							<TablePagination
 								total={pagesTotalCount}
-								page={parseInt(pageNumber, 10)}
+								page={parseInt(activePageNumber || '0', 10)}
 								size={15}
 								onClick={handlePaginationClick}
 								disabled={isLoading}

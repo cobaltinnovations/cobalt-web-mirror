@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { ROW_TYPE_ID } from '@/lib/models';
+import { isCustomRow, isOneColumnRow, isThreeColumnImageRow, isTwoColumnRow, ROW_TYPE_ID } from '@/lib/models';
 import {
 	HERO_SECTION_ID,
 	PageSectionShelfPage,
 	RowSelectionForm,
+	RowSettingsCallToAction,
+	RowSettingsCustomRow,
+	RowSettingsCustomRowColumn,
 	RowSettingsGroupSessions,
 	RowSettingsMailingList,
 	RowSettingsOneColumn,
@@ -14,110 +17,150 @@ import {
 	RowSettingsThreeColumns,
 	RowSettingsTwoColumns,
 	SectionHeroSettingsForm,
-	SectionSettingsForm,
 } from '@/components/admin/pages';
-import { createUseThemedStyles } from '@/jss/theme/create-use-themed-styles';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
+import { PageBuilderContext } from '@/contexts/page-builder-context';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import ConfirmDialog from '@/components/confirm-dialog';
+import { createUseThemedStyles } from '@/jss/theme';
 
-const PAGE_TRANSITION_DURATION_MS = 600;
+const shelfPageTransitionDurationMs = 300;
+const shelfPageTransition = `transform ${shelfPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`;
+const shelfPeerPageTransitionDurationMs = 180;
+const shelfPeerPageTransition = `transform ${shelfPeerPageTransitionDurationMs}ms cubic-bezier(.33,1,.33,1)`;
 
-const useStyles = createUseThemedStyles({
+const useStyles = createUseThemedStyles((theme) => ({
+	transitionContainer: {
+		height: '100%',
+		overflow: 'hidden',
+		position: 'relative',
+		backgroundColor: theme.colors.n0,
+	},
+	transitionPage: {
+		inset: 0,
+		zIndex: 0,
+		height: '100%',
+		position: 'absolute',
+		backgroundColor: theme.colors.n0,
+	},
 	'@global': {
-		'.right-to-left-enter, .right-to-left-enter-active, .right-to-left-exit, .right-to-left-exit-active, .left-to-right-enter, .left-to-right-enter-active, .left-to-right-exit, .left-to-right-exit-active':
-			{
-				top: 0,
-				left: 0,
-				right: 0,
-				position: 'absolute',
-			},
-		'.right-to-left-enter': {
-			opacity: 0,
+		// Peer navigation immediately replaces the old editor, then quickly slides in the new one.
+		'.shelf-peer-page-animation-enter': {
+			pointerEvents: 'none',
+			transform: 'translateX(48px)',
+		},
+		'.shelf-peer-page-animation-enter-active': {
+			pointerEvents: 'none',
+			transform: 'translateX(0)',
+			transition: shelfPeerPageTransition,
+		},
+		// Forward navigation slides the incoming page over the stationary outgoing page.
+		'.shelf-page-animation-enter': {
+			zIndex: 1,
+			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(100%)',
 		},
-		'.right-to-left-enter-active': {
+		'.shelf-page-animation-enter-active': {
+			zIndex: 1,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
+			transition: shelfPageTransition,
 		},
-		'.right-to-left-exit': {
+		'.shelf-page-animation-exit': {
+			zIndex: 0,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
+			transition: shelfPageTransition,
 		},
-		'.right-to-left-exit-active': {
-			opacity: 0,
-			transform: 'translateX(-100%)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
-		},
-		'.left-to-right-enter ': {
-			opacity: 0,
-			transform: 'translateX(-100%)',
-		},
-		'.left-to-right-enter-active': {
+		'.shelf-page-animation-exit-active': {
+			zIndex: 0,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
+			transition: shelfPageTransition,
 		},
-		'.left-to-right-exit': {
+		// Back navigation slides the outgoing page away to reveal the stationary incoming page.
+		'.shelf-page-animation-backward-enter': {
+			zIndex: 0,
 			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(0)',
 		},
-		'.left-to-right-exit-active': {
-			opacity: 0,
+		'.shelf-page-animation-backward-enter-active': {
+			zIndex: 0,
+			opacity: 1,
+			pointerEvents: 'none',
+			transform: 'translateX(0)',
+			transition: 'none',
+		},
+		'.shelf-page-animation-backward-exit': {
+			zIndex: 1,
+			opacity: 1,
+			pointerEvents: 'none',
+			transform: 'translateX(0)',
+		},
+		'.shelf-page-animation-backward-exit-active': {
+			zIndex: 1,
+			opacity: 1,
+			pointerEvents: 'none',
 			transform: 'translateX(100%)',
-			transition: `all ${PAGE_TRANSITION_DURATION_MS}ms cubic-bezier(.33,1,.33,1)`,
+			transition: shelfPageTransition,
 		},
 	},
-});
+}));
 
-interface SectionShelfProps {
-	onEditButtonClick(): void;
-	onDeleteButtonClick(): void;
-}
-
-enum PAGE_STATES {
-	SECTION_SETTINGS = 'SECTION_SETTINGS',
-	ADD_ROW = 'ADD_ROW',
-}
-
-export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: SectionShelfProps) => {
-	useStyles();
+export const PageSectionShelf = () => {
+	const classes = useStyles();
 	const handleError = useHandleError();
-
+	const pageBuilderContext = usePageBuilderContext();
 	const {
 		setCurrentPageSectionId,
 		currentPageSection,
 		setCurrentPageRowId,
 		currentPageRow,
+		updatePageRow,
 		deletePageRow,
 		setIsSaving,
-	} = usePageBuilderContext();
-	const [pageState, setPageState] = useState<PAGE_STATES | ROW_TYPE_ID>(PAGE_STATES.SECTION_SETTINGS);
-	const [isNext, setIsNext] = useState(true);
+	} = pageBuilderContext;
 	const [showRowDeleteModal, setShowRowDeleteModal] = useState(false);
+	const [showCustomRowColumnDeleteModal, setShowCustomRowColumnDeleteModal] = useState(false);
+	const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
+	const [selectedCustomRowColumn, setSelectedCustomRowColumn] = useState<
+		{ pageRowId: string; pageRowColumnId: string; label: string } | undefined
+	>();
+	const activeSelectedCustomRowColumn =
+		currentPageRow &&
+		isCustomRow(currentPageRow) &&
+		selectedCustomRowColumn?.pageRowId === currentPageRow.pageRowId &&
+		currentPageRow.columns.some((column) => column.pageRowColumnId === selectedCustomRowColumn.pageRowColumnId)
+			? selectedCustomRowColumn
+			: undefined;
 
-	useEffect(() => {
-		setIsNext(false);
-		setPageState(PAGE_STATES.SECTION_SETTINGS);
-	}, [currentPageSection?.pageSectionId]);
-
-	const handleRowBack = useCallback(() => {
+	const handleClose = useCallback(() => {
+		setSelectedCustomRowColumn(undefined);
+		setCurrentPageSectionId('');
 		setCurrentPageRowId('');
-		setIsNext(false);
-		setPageState(PAGE_STATES.SECTION_SETTINGS);
-	}, [setCurrentPageRowId]);
+	}, [setCurrentPageRowId, setCurrentPageSectionId]);
 
-	// Auto open row if one is set, typically from publish errors.
+	const handleCustomRowColumnBack = useCallback(() => {
+		setTransitionDirection('backward');
+		setSelectedCustomRowColumn(undefined);
+	}, []);
+
 	useEffect(() => {
-		if (!currentPageRow) {
-			return;
-		}
+		setSelectedCustomRowColumn(undefined);
+		setTransitionDirection('forward');
+	}, [currentPageRow?.pageRowId]);
 
-		setIsNext(true);
-		setPageState(currentPageRow.rowTypeId);
-	}, [currentPageRow]);
+	useEffect(() => {
+		if (selectedCustomRowColumn && !activeSelectedCustomRowColumn) {
+			setSelectedCustomRowColumn(undefined);
+		}
+	}, [activeSelectedCustomRowColumn, selectedCustomRowColumn]);
 
 	const handleRowDelete = useCallback(async () => {
 		setIsSaving(true);
@@ -131,13 +174,212 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 
 			deletePageRow(currentPageRow.pageRowId);
 			setShowRowDeleteModal(false);
-			handleRowBack();
+			handleClose();
 		} catch (error) {
 			handleError(error);
 		} finally {
 			setIsSaving(false);
 		}
-	}, [currentPageRow, deletePageRow, handleError, handleRowBack, setIsSaving]);
+	}, [currentPageRow, deletePageRow, handleClose, handleError, setIsSaving]);
+
+	const handleCustomRowColumnDelete = useCallback(async () => {
+		setIsSaving(true);
+
+		try {
+			if (!currentPageRow || !activeSelectedCustomRowColumn) {
+				throw new Error('currentPageRow or activeSelectedCustomRowColumn is undefined.');
+			}
+
+			const { pageRow: updatedPageRow } = await pagesService
+				.deleteCustomRowColumn(currentPageRow.pageRowId, activeSelectedCustomRowColumn.pageRowColumnId)
+				.fetch();
+
+			updatePageRow(updatedPageRow);
+			setTransitionDirection('backward');
+			setSelectedCustomRowColumn(undefined);
+			setShowCustomRowColumnDeleteModal(false);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsSaving(false);
+		}
+	}, [activeSelectedCustomRowColumn, currentPageRow, handleError, setIsSaving, updatePageRow]);
+
+	if (!currentPageSection) {
+		return null;
+	}
+
+	const transitionClassNames =
+		transitionDirection === 'backward' ? 'shelf-page-animation-backward' : 'shelf-page-animation';
+
+	const currentTopLevelPageKey =
+		currentPageSection.pageSectionId === HERO_SECTION_ID
+			? 'hero'
+			: currentPageRow
+			? `row-${currentPageRow.pageRowId}`
+			: `section-${currentPageSection.pageSectionId}-row-selection`;
+	const currentCustomRowPageKey = activeSelectedCustomRowColumn
+		? `column-${activeSelectedCustomRowColumn.pageRowColumnId}`
+		: 'overview';
+
+	const currentPage =
+		currentPageSection.pageSectionId === HERO_SECTION_ID ? (
+			<PageSectionShelfPage showCloseButton onCloseButtonButtonClick={handleClose} title="Hero">
+				<SectionHeroSettingsForm />
+			</PageSectionShelfPage>
+		) : currentPageRow ? (
+			<>
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.RESOURCES && (
+					<RowSettingsResources onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS && (
+					<RowSettingsGroupSessions onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP && (
+					<RowSettingsTagGroup onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.TAG && (
+					<RowSettingsTag onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW &&
+					(activeSelectedCustomRowColumn ? (
+						<PageSectionShelfPage
+							showBackButton
+							onBackButtonClick={handleCustomRowColumnBack}
+							showDeleteButton
+							onDeleteButtonClick={() => {
+								setShowCustomRowColumnDeleteModal(true);
+							}}
+							showCloseButton
+							onCloseButtonButtonClick={handleClose}
+							bodyClassName="pt-0"
+							title={`Column ${activeSelectedCustomRowColumn.label}`}
+						>
+							<RowSettingsCustomRowColumn
+								pageRowColumnId={activeSelectedCustomRowColumn.pageRowColumnId}
+							/>
+						</PageSectionShelfPage>
+					) : (
+						<PageSectionShelfPage
+							showDeleteButton
+							onDeleteButtonClick={() => {
+								setShowRowDeleteModal(true);
+							}}
+							showCloseButton
+							onCloseButtonButtonClick={handleClose}
+							title={currentPageRow.name}
+						>
+							<RowSettingsCustomRow
+								onColumnClick={(pageRowColumnId, label) => {
+									setTransitionDirection('forward');
+									setSelectedCustomRowColumn({
+										pageRowId: currentPageRow.pageRowId,
+										pageRowColumnId,
+										label,
+									});
+								}}
+							/>
+						</PageSectionShelfPage>
+					))}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsCallToAction variant="block" />
+					</PageSectionShelfPage>
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsCallToAction variant="full-width" />
+					</PageSectionShelfPage>
+				)}
+
+				{isOneColumnRow(currentPageRow) && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsOneColumn pageRow={currentPageRow} />
+					</PageSectionShelfPage>
+				)}
+
+				{isTwoColumnRow(currentPageRow) && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsTwoColumns pageRow={currentPageRow} />
+					</PageSectionShelfPage>
+				)}
+
+				{isThreeColumnImageRow(currentPageRow) && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsThreeColumns pageRow={currentPageRow} />
+					</PageSectionShelfPage>
+				)}
+
+				{currentPageRow.rowTypeId === ROW_TYPE_ID.MAILING_LIST && (
+					<PageSectionShelfPage
+						showDeleteButton
+						onDeleteButtonClick={() => {
+							setShowRowDeleteModal(true);
+						}}
+						showCloseButton
+						onCloseButtonButtonClick={handleClose}
+						title={currentPageRow.name}
+					>
+						<RowSettingsMailingList />
+					</PageSectionShelfPage>
+				)}
+			</>
+		) : (
+			<PageSectionShelfPage
+				showCloseButton
+				onCloseButtonButtonClick={handleClose}
+				title="Select row type to add"
+				bodyClassName="pt-0"
+			>
+				<RowSelectionForm />
+			</PageSectionShelfPage>
+		);
 
 	return (
 		<>
@@ -154,184 +396,64 @@ export const PageSectionShelf = ({ onEditButtonClick, onDeleteButtonClick }: Sec
 				}}
 				onConfirm={handleRowDelete}
 			/>
+			<ConfirmDialog
+				show={showCustomRowColumnDeleteModal}
+				size="lg"
+				titleText="Delete Column"
+				bodyText="Are you sure you want to delete this column?"
+				dismissText="Cancel"
+				confirmText="Delete"
+				destructive
+				onHide={() => {
+					setShowCustomRowColumnDeleteModal(false);
+				}}
+				onConfirm={handleCustomRowColumnDelete}
+			/>
 
-			<TransitionGroup
-				component={null}
-				childFactory={(child) =>
-					React.cloneElement(child, {
-						classNames: isNext ? 'right-to-left' : 'left-to-right',
-						timeout: PAGE_TRANSITION_DURATION_MS,
-					})
-				}
-			>
-				<CSSTransition key={pageState} timeout={PAGE_TRANSITION_DURATION_MS}>
-					<>
-						{pageState === PAGE_STATES.SECTION_SETTINGS && (
-							<PageSectionShelfPage
-								showEditButton={currentPageSection?.pageSectionId !== HERO_SECTION_ID}
-								onEditButtonClick={onEditButtonClick}
-								showDeleteButton={currentPageSection?.pageSectionId !== HERO_SECTION_ID}
-								onDeleteButtonClick={onDeleteButtonClick}
-								showCloseButton
-								onCloseButtonButtonClick={() => {
-									setCurrentPageSectionId('');
-								}}
-								title={currentPageSection?.name ?? ''}
-								bodyClassName={currentPageSection?.pageSectionId !== HERO_SECTION_ID ? 'pt-0' : ''}
-							>
-								{currentPageSection && (
-									<>
-										{currentPageSection.pageSectionId === HERO_SECTION_ID ? (
-											<SectionHeroSettingsForm />
-										) : (
-											<SectionSettingsForm
-												onAddRowButtonClick={() => {
-													setCurrentPageRowId('');
-													setIsNext(true);
-													setPageState(PAGE_STATES.ADD_ROW);
-												}}
-												onRowButtonClick={(pageRow) => {
-													setCurrentPageRowId(pageRow.pageRowId);
-												}}
-											/>
-										)}
-									</>
+			<div className={classes.transitionContainer}>
+				<TransitionGroup component={null}>
+					<CSSTransition
+						key={currentTopLevelPageKey}
+						timeout={shelfPeerPageTransitionDurationMs}
+						classNames="shelf-peer-page-animation"
+						exit={false}
+						unmountOnExit
+					>
+						<div className={classes.transitionPage} data-peer-transition-page>
+							<PageBuilderContext.Provider value={pageBuilderContext}>
+								{currentPageRow && isCustomRow(currentPageRow) ? (
+									<TransitionGroup
+										component={null}
+										childFactory={(child) =>
+											React.cloneElement(child, {
+												classNames: transitionClassNames,
+											})
+										}
+									>
+										<CSSTransition
+											key={currentCustomRowPageKey}
+											timeout={shelfPageTransitionDurationMs}
+											classNames={transitionClassNames}
+											onEntered={() => {
+												setTransitionDirection('forward');
+											}}
+											unmountOnExit
+										>
+											<div className={classes.transitionPage}>
+												<PageBuilderContext.Provider value={pageBuilderContext}>
+													{currentPage}
+												</PageBuilderContext.Provider>
+											</div>
+										</CSSTransition>
+									</TransitionGroup>
+								) : (
+									currentPage
 								)}
-							</PageSectionShelfPage>
-						)}
-
-						{pageState === PAGE_STATES.ADD_ROW && (
-							<PageSectionShelfPage
-								showBackButton
-								onBackButtonClick={handleRowBack}
-								showCloseButton
-								onCloseButtonButtonClick={() => {
-									setCurrentPageSectionId('');
-								}}
-								title="Select row type to add"
-								bodyClassName="pt-0"
-							>
-								<RowSelectionForm />
-							</PageSectionShelfPage>
-						)}
-
-						{pageState === ROW_TYPE_ID.RESOURCES && (
-							<RowSettingsResources
-								onBackButtonClick={handleRowBack}
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-							/>
-						)}
-
-						{pageState === ROW_TYPE_ID.GROUP_SESSIONS && (
-							<RowSettingsGroupSessions
-								onBackButtonClick={handleRowBack}
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-							/>
-						)}
-
-						{pageState === ROW_TYPE_ID.TAG_GROUP && (
-							<RowSettingsTagGroup
-								onBackButtonClick={handleRowBack}
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-							/>
-						)}
-
-						{pageState === ROW_TYPE_ID.TAG && (
-							<RowSettingsTag
-								onBackButtonClick={handleRowBack}
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-							/>
-						)}
-
-						{pageState === ROW_TYPE_ID.ONE_COLUMN_IMAGE && (
-							<PageSectionShelfPage
-								showBackButton
-								onBackButtonClick={handleRowBack}
-								showDeleteButton
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-								showCloseButton
-								onCloseButtonButtonClick={() => {
-									setCurrentPageSectionId('');
-									setCurrentPageRowId('');
-								}}
-								title="Custom Row (1 Item)"
-								bodyClassName="pt-0"
-							>
-								<RowSettingsOneColumn />
-							</PageSectionShelfPage>
-						)}
-
-						{pageState === ROW_TYPE_ID.TWO_COLUMN_IMAGE && (
-							<PageSectionShelfPage
-								showBackButton
-								onBackButtonClick={handleRowBack}
-								showDeleteButton
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-								showCloseButton
-								onCloseButtonButtonClick={() => {
-									setCurrentPageSectionId('');
-									setCurrentPageRowId('');
-								}}
-								title="Custom Row (2 Items)"
-								bodyClassName="pt-0"
-							>
-								<RowSettingsTwoColumns />
-							</PageSectionShelfPage>
-						)}
-
-						{pageState === ROW_TYPE_ID.THREE_COLUMN_IMAGE && (
-							<PageSectionShelfPage
-								showBackButton
-								onBackButtonClick={handleRowBack}
-								showDeleteButton
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-								showCloseButton
-								onCloseButtonButtonClick={() => {
-									setCurrentPageSectionId('');
-									setCurrentPageRowId('');
-								}}
-								title="Custom Row (3 Items)"
-								bodyClassName="pt-0"
-							>
-								<RowSettingsThreeColumns />
-							</PageSectionShelfPage>
-						)}
-
-						{pageState === ROW_TYPE_ID.MAILING_LIST && (
-							<PageSectionShelfPage
-								showBackButton
-								onBackButtonClick={handleRowBack}
-								showDeleteButton
-								onDeleteButtonClick={() => {
-									setShowRowDeleteModal(true);
-								}}
-								showCloseButton
-								onCloseButtonButtonClick={() => {
-									setCurrentPageSectionId('');
-									setCurrentPageRowId('');
-								}}
-								title="Subscribe"
-							>
-								<RowSettingsMailingList />
-							</PageSectionShelfPage>
-						)}
-					</>
-				</CSSTransition>
-			</TransitionGroup>
+							</PageBuilderContext.Provider>
+						</div>
+					</CSSTransition>
+				</TransitionGroup>
+			</div>
 		</>
 	);
 };
