@@ -21,6 +21,7 @@ import {
 	AppointmentModality,
 	FirstAvailableAppointmentModel,
 	ScreeningRequirement,
+	AppointmentTypeSummary,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -163,6 +164,7 @@ interface GetProviderByIdResponse {
 }
 
 export interface AvailabilityModel {
+	appointmentTypes: AppointmentTypeSummary[];
 	appointmentModalities: AppointmentModality[];
 	providerId?: string;
 	providerName?: string;
@@ -170,8 +172,8 @@ export interface AvailabilityModel {
 	clinicDescription?: string;
 	startDate: string;
 	endDate: string;
-	firstAvailableAppointment: FirstAvailableAppointmentModel;
-	screeningRequirement: ScreeningRequirement;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
+	screeningRequirement?: ScreeningRequirement;
 }
 
 export const providerService = {

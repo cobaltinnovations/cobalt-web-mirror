@@ -21,29 +21,30 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import NoData from '@/components/no-data';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import useHandleError from '@/hooks/use-handle-error';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import {
+	ALL_INSTITUTION_LOCATIONS_ID,
+	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
+	buildBookingV2UrlWithV1Fallback,
+	getBookingV1FallbackUrlFromSearchParams,
+	getPersistedInstitutionLocationId,
+	isAllInstitutionLocationsId,
+} from '@/lib/utils';
 
 export const loader = () => {
 	return null;
-};
-
-const ALL_INSTITUTION_LOCATIONS_ID = 'na';
-
-const isAllInstitutionLocationsId = (institutionLocationId: string) => {
-	return institutionLocationId.toLowerCase() === ALL_INSTITUTION_LOCATIONS_ID;
-};
-
-const getAccountInstitutionLocationId = (institutionLocationId: string) => {
-	return isAllInstitutionLocationsId(institutionLocationId) ? '' : institutionLocationId;
 };
 
 const buildProviderConfirmAppointmentTimeUrl = ({
 	featureId,
 	institutionLocationId,
 	provider,
+	bookingV1FallbackUrl,
 }: {
 	featureId: string;
 	institutionLocationId: string;
 	provider: ProviderSearchResultModel;
+	bookingV1FallbackUrl?: string;
 }) => {
 	const firstAvailableAppointment = provider.firstAvailableAppointment;
 
@@ -78,6 +79,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	}
 
 	params.set('providerSearchResultTypeId', provider.providerSearchResultTypeId);
+	params.set('appointmentSelectionTypeId', provider.appointmentSelectionTypeId);
 
 	const appointmentModalityId = provider.supportedAppointmentModalities[0]?.appointmentModalityId;
 
@@ -92,17 +94,30 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 		params.set('appointmentTypeId', firstAvailableAppointment.appointmentTypeId);
 	}
 
-	return `/provider-confirm-appointment-time?${params.toString()}`;
+	if (firstAvailableAppointment.epicDepartmentId) {
+		params.set('epicDepartmentId', firstAvailableAppointment.epicDepartmentId);
+	}
+
+	if (firstAvailableAppointment.epicAppointmentFhirId) {
+		params.set('epicAppointmentFhirId', firstAvailableAppointment.epicAppointmentFhirId);
+	}
+
+	return buildBookingV2UrlWithV1Fallback(
+		`/provider-confirm-appointment-time?${params.toString()}`,
+		bookingV1FallbackUrl
+	);
 };
 
 const appointmentBookingContextForProviderSearchResult = ({
 	featureId,
 	institutionLocationId,
 	provider,
+	bookingV1FallbackUrl,
 }: {
 	featureId: string;
 	institutionLocationId: string;
 	provider: ProviderSearchResultModel;
+	bookingV1FallbackUrl?: string;
 }) => {
 	const context: Record<string, string> = {};
 	const firstAvailableAppointment = provider.firstAvailableAppointment;
@@ -113,6 +128,10 @@ const appointmentBookingContextForProviderSearchResult = ({
 
 	if (institutionLocationId) {
 		context.institutionLocationId = institutionLocationId;
+	}
+
+	if (bookingV1FallbackUrl) {
+		context[BOOKING_V1_FALLBACK_URL_SEARCH_PARAM] = bookingV1FallbackUrl;
 	}
 
 	if (provider.providerSearchResultTypeId === ProviderSearchResultTypeId.CLINIC) {
@@ -132,6 +151,7 @@ const appointmentBookingContextForProviderSearchResult = ({
 	}
 
 	context.providerSearchResultTypeId = provider.providerSearchResultTypeId;
+	context.appointmentSelectionTypeId = provider.appointmentSelectionTypeId;
 
 	const appointmentModalityId = provider.supportedAppointmentModalities[0]?.appointmentModalityId;
 
@@ -145,6 +165,14 @@ const appointmentBookingContextForProviderSearchResult = ({
 
 		if (firstAvailableAppointment.appointmentTypeId) {
 			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
+		}
+
+		if (firstAvailableAppointment.epicDepartmentId) {
+			context.epicDepartmentId = firstAvailableAppointment.epicDepartmentId;
+		}
+
+		if (firstAvailableAppointment.epicAppointmentFhirId) {
+			context.epicAppointmentFhirId = firstAvailableAppointment.epicAppointmentFhirId;
 		}
 	}
 
@@ -168,6 +196,10 @@ const ProviderSearchResultWithScreening = ({
 }: ProviderSearchResultWithScreeningProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const bookingV1FallbackUrl = useMemo(
+		() => getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search)),
+		[location.search]
+	);
 	const screeningRequired =
 		provider.screeningRequirement?.screeningRequired &&
 		!provider.screeningRequirement?.screeningSatisfied &&
@@ -178,19 +210,30 @@ const ProviderSearchResultWithScreening = ({
 				featureId,
 				institutionLocationId,
 				provider,
+				bookingV1FallbackUrl,
 			}),
-		[featureId, institutionLocationId, provider]
+		[bookingV1FallbackUrl, featureId, institutionLocationId, provider]
 	);
-	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader } = useScreeningFlow({
-		screeningFlowId: provider.screeningRequirement?.screeningFlowId,
-		instantiateOnLoad: false,
-		disabled: !screeningRequired,
-		screeningQuestionPathPrefix: '/screening-questions-fullscreen',
-		screeningQuestionSearch: new URLSearchParams({
+	const screeningQuestionSearch = useMemo(() => {
+		const params = new URLSearchParams({
 			returnTo: location.pathname + location.search,
-		}).toString(),
-		...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
-	});
+		});
+
+		if (bookingV1FallbackUrl) {
+			params.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
+		}
+
+		return params.toString();
+	}, [bookingV1FallbackUrl, location.pathname, location.search]);
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
+		useScreeningFlow({
+			screeningFlowId: provider.screeningRequirement?.screeningFlowId,
+			instantiateOnLoad: false,
+			disabled: !screeningRequired,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch,
+			...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
+		});
 
 	if (renderedPreScreeningLoader) {
 		return renderedPreScreeningLoader;
@@ -199,6 +242,7 @@ const ProviderSearchResultWithScreening = ({
 	return (
 		<React.Fragment>
 			{renderedCollectPhoneModal}
+			{renderedAccountSourcesModal}
 			<ProviderSearchResult
 				className="mb-6"
 				provider={provider}
@@ -214,6 +258,7 @@ const ProviderSearchResultWithScreening = ({
 						featureId,
 						institutionLocationId,
 						provider,
+						bookingV1FallbackUrl,
 					});
 
 					if (providerConfirmAppointmentTimeUrl) {
@@ -233,6 +278,7 @@ export const Component = () => {
 	const { account, institution } = useAccount();
 	const careTypeRef = useRef<HTMLInputElement>(null);
 	const employerRef = useRef<HTMLInputElement>(null);
+	const forcedLocationPersistenceKeyRef = useRef<string | undefined>(undefined);
 
 	/* -------------------------------- */
 	/* Search Params */
@@ -240,6 +286,7 @@ export const Component = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
+	const bookingV1FallbackUrl = useMemo(() => getBookingV1FallbackUrlFromSearchParams(searchParams), [searchParams]);
 	const forceLocation = useMemo(() => {
 		const v = searchParams.get('forceLocation');
 		return v?.toLowerCase() === 'true';
@@ -271,14 +318,14 @@ export const Component = () => {
 	const selectedInstitutionFeatureName = selectedInstitutionFeature?.name.toLocaleLowerCase() ?? 'matching';
 	const selectedInstitutionLocationName = selectedInstitutionLocation?.name ?? 'the selected employer';
 
-	const shouldPersistForcedLocation = account && forceLocation && institutionLocationId;
+	const shouldPersistForcedLocation = Boolean(account && forceLocation && institutionLocationId);
 	const persistForcedLocation = useCallback(async () => {
 		if (!account || !institutionLocationId) {
 			return;
 		}
 
 		try {
-			const accountInstitutionLocationId = getAccountInstitutionLocationId(institutionLocationId);
+			const accountInstitutionLocationId = getPersistedInstitutionLocationId(institutionLocationId);
 			const response = await accountService
 				.setAccountLocation(account.accountId, {
 					accountId: account.accountId,
@@ -286,25 +333,36 @@ export const Component = () => {
 				})
 				.fetch();
 
-			if (response.account.institutionLocationId) {
-				searchParams.set('institutionLocationId', response.account.institutionLocationId);
-			} else if (isAllInstitutionLocationsId(institutionLocationId)) {
-				searchParams.set('institutionLocationId', ALL_INSTITUTION_LOCATIONS_ID);
-			} else {
-				searchParams.delete('institutionLocationId');
-			}
+			const nextSearchParams = new URLSearchParams(searchParams);
 
-			setSearchParams(searchParams);
+			if (response.account.institutionLocationId) {
+				nextSearchParams.set('institutionLocationId', response.account.institutionLocationId);
+			} else if (isAllInstitutionLocationsId(institutionLocationId)) {
+				nextSearchParams.set('institutionLocationId', ALL_INSTITUTION_LOCATIONS_ID);
+			} else {
+				nextSearchParams.delete('institutionLocationId');
+			}
+			nextSearchParams.delete('forceLocation');
+
+			setSearchParams(nextSearchParams, { replace: true });
 		} catch (error) {
 			handleError(error);
 		}
 	}, [account, handleError, institutionLocationId, searchParams, setSearchParams]);
 	useEffect(() => {
-		if (shouldPersistForcedLocation) {
-			persistForcedLocation();
+		if (!account || !shouldPersistForcedLocation) {
 			return;
 		}
-	}, [persistForcedLocation, shouldPersistForcedLocation]);
+
+		const persistenceKey = `${account.accountId}|${institutionLocationId}`;
+
+		if (forcedLocationPersistenceKeyRef.current === persistenceKey) {
+			return;
+		}
+
+		forcedLocationPersistenceKeyRef.current = persistenceKey;
+		persistForcedLocation();
+	}, [account, institutionLocationId, persistForcedLocation, shouldPersistForcedLocation]);
 
 	/* -------------------------------- */
 	/* List */
@@ -421,45 +479,49 @@ export const Component = () => {
 
 	const handleCareTypeSelectChange = useCallback(
 		async ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+			const nextSearchParams = new URLSearchParams(searchParams);
+
 			if (currentTarget.value) {
-				searchParams.set('featureId', currentTarget.value);
+				nextSearchParams.set('featureId', currentTarget.value);
 			} else {
-				searchParams.delete('featureId');
+				nextSearchParams.delete('featureId');
 			}
 
-			setSearchParams(searchParams, { replace: true });
+			setSearchParams(nextSearchParams, { replace: true });
 		},
 		[searchParams, setSearchParams]
 	);
 
 	const handleEmployerSelectChange = useCallback(
 		async ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+			const nextSearchParams = new URLSearchParams(searchParams);
+
 			if (currentTarget.value) {
 				try {
 					if (account) {
 						const response = await accountService
 							.setAccountLocation(account.accountId, {
 								accountId: account.accountId,
-								institutionLocationId: getAccountInstitutionLocationId(currentTarget.value),
+								institutionLocationId: getPersistedInstitutionLocationId(currentTarget.value),
 							})
 							.fetch();
 
 						if (response.account.institutionLocationId) {
-							searchParams.set('institutionLocationId', response.account.institutionLocationId);
+							nextSearchParams.set('institutionLocationId', response.account.institutionLocationId);
 						} else {
-							searchParams.set('institutionLocationId', currentTarget.value);
+							nextSearchParams.set('institutionLocationId', currentTarget.value);
 						}
 					} else {
-						searchParams.set('institutionLocationId', currentTarget.value);
+						nextSearchParams.set('institutionLocationId', currentTarget.value);
 					}
 				} catch (error) {
 					handleError(error);
 				} finally {
-					setSearchParams(searchParams, { replace: true });
+					setSearchParams(nextSearchParams, { replace: true });
 				}
 			} else {
-				searchParams.delete('institutionLocationId');
-				setSearchParams(searchParams, { replace: true });
+				nextSearchParams.delete('institutionLocationId');
+				setSearchParams(nextSearchParams, { replace: true });
 			}
 		},
 		[account, handleError, searchParams, setSearchParams]
@@ -467,6 +529,7 @@ export const Component = () => {
 
 	return (
 		<>
+			<IneligibleBookingModal />
 			<Helmet>
 				<title>{institution.platformName ?? 'Cobalt'} | Providers</title>
 			</Helmet>
@@ -573,9 +636,14 @@ export const Component = () => {
 							)}
 							{featureId &&
 								institutionLocationId &&
-								providers.map((provider) => (
+								providers.map((provider, providerIndex) => (
 									<ProviderSearchResultWithScreening
-										key={provider.providerId}
+										key={
+											provider.providerSearchResultId ??
+											provider.providerId ??
+											provider.clinicId ??
+											`${provider.providerSearchResultTypeId}-${providerIndex}`
+										}
 										featureId={featureId}
 										institutionLocationId={institutionLocationId}
 										provider={provider}
@@ -594,6 +662,8 @@ export const Component = () => {
 												clinicId: provider.clinicId ?? undefined,
 												providerId: provider.providerId ?? undefined,
 												providerSearchResultTypeId: provider.providerSearchResultTypeId,
+												appointmentSelectionTypeId: provider.appointmentSelectionTypeId,
+												bookingV1FallbackUrl,
 											});
 										}}
 									/>

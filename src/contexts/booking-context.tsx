@@ -127,7 +127,7 @@ interface BookingState {
 const BookingContext = createContext({} as BookingState);
 
 const BookingProvider: FC<PropsWithChildren> = (props) => {
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const [appointmentTypes, setAppointmentTypes] = useState<FindProvidersResponse['appointmentTypes']>([]);
 	const [specialties, setSpecialties] = useState<FindProvidersResponse['specialties']>([]);
 	const [epicDepartments, setEpicDepartments] = useState<FindProvidersResponse['epicDepartments']>([]);
@@ -210,8 +210,9 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		}
 	}, [selectedProvider?.providerId]);
 
-	// reset booking context when accountId changes
+	// Reset state that cannot safely cross accounts or booking experiences.
 	const accountId = account?.accountId;
+	const bookingV2Enabled = institution.bookingV2Enabled;
 	useEffect(() => {
 		setAppointmentTypes([]);
 		setSpecialties([]);
@@ -222,9 +223,10 @@ const BookingProvider: FC<PropsWithChildren> = (props) => {
 		setSelectedDate(undefined);
 		setSelectedProvider(undefined);
 		setSelectedTimeSlot(undefined);
+		setSelectedPatientOrderId(undefined);
 		setIsEligible(true);
 		setPreviousProviderId(undefined);
-	}, [accountId]);
+	}, [accountId, bookingV2Enabled]);
 
 	const redirectProviderId = selectedProvider?.providerId || previousProviderId;
 	const getExitBookingLocation = useCallback(

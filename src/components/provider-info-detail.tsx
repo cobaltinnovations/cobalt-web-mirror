@@ -19,6 +19,12 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import ProviderInfoDetailContact from './provider-info-detail-contact';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
+import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import {
+	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
+	buildBookingV2UrlWithV1Fallback,
+	getBookingV1FallbackUrlFromSearchParams,
+} from '@/lib/utils';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
@@ -45,6 +51,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 	const [searchParams] = useSearchParams();
 	const featureId = useMemo(() => searchParams.get('featureId') ?? undefined, [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? undefined, [searchParams]);
+	const bookingV1FallbackUrl = useMemo(() => getBookingV1FallbackUrlFromSearchParams(searchParams), [searchParams]);
 
 	const [showProviderScheduleModal, setShowProviderScheduleModal] = useState(false);
 	const [provider, setProvider] = useState<Provider>();
@@ -59,13 +66,27 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 		return {
 			featureId,
 			institutionLocationId,
+			bookingV1FallbackUrl,
 			clinicId,
 			providerId,
 			providerSearchResultTypeId: providerId
 				? ProviderSearchResultTypeId.PROVIDER
 				: ProviderSearchResultTypeId.CLINIC,
+			appointmentSelectionTypeId: getAppointmentSelectionTypeId({
+				availability,
+				phoneNumber: provider?.phoneNumber ?? clinic?.phoneNumber,
+			}),
 		};
-	}, [availability, clinicId, featureId, institutionLocationId, providerId]);
+	}, [
+		availability,
+		bookingV1FallbackUrl,
+		clinic?.phoneNumber,
+		clinicId,
+		featureId,
+		institutionLocationId,
+		provider?.phoneNumber,
+		providerId,
+	]);
 
 	const fetchData = useCallback(async () => {
 		if (!providerId && !clinicId) {
@@ -100,6 +121,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 
 	return (
 		<>
+			<IneligibleBookingModal />
 			<ProviderScheduleModal
 				config={providerScheduleModalConfig}
 				show={showProviderScheduleModal && !!providerScheduleModalConfig}
@@ -149,6 +171,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 								<ProviderInfoDetailSchedule
 									featureId={featureId}
 									institutionLocationId={institutionLocationId}
+									bookingV1FallbackUrl={bookingV1FallbackUrl}
 									provider={provider}
 									clinic={clinic}
 									availability={availability}
@@ -171,6 +194,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 interface ProviderInfoDetailScheduleProps {
 	featureId?: string;
 	institutionLocationId?: string;
+	bookingV1FallbackUrl?: string;
 	provider?: Provider;
 	clinic?: Clinic;
 	availability: AvailabilityModel;
@@ -185,12 +209,16 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	availability,
 	providerId,
 	clinicId,
+	appointmentSelectionTypeId,
+	bookingV1FallbackUrl,
 }: {
 	featureId?: string;
 	institutionLocationId?: string;
 	availability: AvailabilityModel;
 	providerId?: string;
 	clinicId?: string;
+	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
+	bookingV1FallbackUrl?: string;
 }) => {
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 
@@ -224,6 +252,8 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 		params.set('appointmentModalityId', appointmentModalityId);
 	}
 
+	params.set('appointmentSelectionTypeId', appointmentSelectionTypeId);
+
 	params.set('date', firstAvailableAppointment.date);
 	params.set('time', firstAvailableAppointment.time);
 
@@ -231,7 +261,18 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 		params.set('appointmentTypeId', firstAvailableAppointment.appointmentTypeId);
 	}
 
-	return `/provider-confirm-appointment-time?${params.toString()}`;
+	if (firstAvailableAppointment.epicDepartmentId) {
+		params.set('epicDepartmentId', firstAvailableAppointment.epicDepartmentId);
+	}
+
+	if (firstAvailableAppointment.epicAppointmentFhirId) {
+		params.set('epicAppointmentFhirId', firstAvailableAppointment.epicAppointmentFhirId);
+	}
+
+	return buildBookingV2UrlWithV1Fallback(
+		`/provider-confirm-appointment-time?${params.toString()}`,
+		bookingV1FallbackUrl
+	);
 };
 
 const appointmentBookingContextForProviderAvailability = ({
@@ -240,12 +281,16 @@ const appointmentBookingContextForProviderAvailability = ({
 	availability,
 	providerId,
 	clinicId,
+	appointmentSelectionTypeId,
+	bookingV1FallbackUrl,
 }: {
-	featureId: string;
-	institutionLocationId: string;
+	featureId?: string;
+	institutionLocationId?: string;
 	availability: AvailabilityModel;
 	providerId?: string;
 	clinicId?: string;
+	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
+	bookingV1FallbackUrl?: string;
 }) => {
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 
@@ -257,6 +302,10 @@ const appointmentBookingContextForProviderAvailability = ({
 
 	if (institutionLocationId) {
 		context.institutionLocationId = institutionLocationId;
+	}
+
+	if (bookingV1FallbackUrl) {
+		context[BOOKING_V1_FALLBACK_URL_SEARCH_PARAM] = bookingV1FallbackUrl;
 	}
 
 	if (clinicId) {
@@ -275,12 +324,22 @@ const appointmentBookingContextForProviderAvailability = ({
 		context.appointmentModalityId = appointmentModalityId;
 	}
 
+	context.appointmentSelectionTypeId = appointmentSelectionTypeId;
+
 	if (firstAvailableAppointment) {
 		context.date = firstAvailableAppointment.date;
 		context.time = firstAvailableAppointment.time;
 
 		if (firstAvailableAppointment.appointmentTypeId) {
 			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
+		}
+
+		if (firstAvailableAppointment.epicDepartmentId) {
+			context.epicDepartmentId = firstAvailableAppointment.epicDepartmentId;
+		}
+
+		if (firstAvailableAppointment.epicAppointmentFhirId) {
+			context.epicAppointmentFhirId = firstAvailableAppointment.epicAppointmentFhirId;
 		}
 	}
 
@@ -327,7 +386,7 @@ const getAppointmentSelectionTypeId = ({
 		firstAvailableAppointment.appointmentTypeIds ??
 		(firstAvailableAppointment.appointmentTypeId ? [firstAvailableAppointment.appointmentTypeId] : []);
 
-	return appointmentTypeIds.length <= 1
+	return appointmentTypeIds.length === 1
 		? ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED
 		: ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED;
 };
@@ -335,6 +394,7 @@ const getAppointmentSelectionTypeId = ({
 const ProviderInfoDetailSchedule = ({
 	featureId,
 	institutionLocationId,
+	bookingV1FallbackUrl,
 	provider,
 	clinic,
 	availability,
@@ -368,18 +428,29 @@ const ProviderInfoDetailSchedule = ({
 				availability,
 				providerId,
 				clinicId,
+				appointmentSelectionTypeId: scheduleTypeId,
+				bookingV1FallbackUrl,
 			}),
-		[availability, clinicId, featureId, institutionLocationId, providerId]
+		[availability, bookingV1FallbackUrl, clinicId, featureId, institutionLocationId, providerId, scheduleTypeId]
 	);
+	const screeningQuestionSearch = useMemo(() => {
+		const params = new URLSearchParams({
+			returnTo: location.pathname + location.search,
+		});
+
+		if (bookingV1FallbackUrl) {
+			params.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
+		}
+
+		return params.toString();
+	}, [bookingV1FallbackUrl, location.pathname, location.search]);
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
 		useScreeningFlow({
 			screeningFlowId: screeningRequirement?.screeningFlowId,
 			instantiateOnLoad: false,
 			disabled: !screeningRequired,
 			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
-			screeningQuestionSearch: new URLSearchParams({
-				returnTo: location.pathname + location.search,
-			}).toString(),
+			screeningQuestionSearch,
 			...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
 		});
 
@@ -407,6 +478,8 @@ const ProviderInfoDetailSchedule = ({
 						availability,
 						providerId,
 						clinicId,
+						appointmentSelectionTypeId: scheduleTypeId,
+						bookingV1FallbackUrl,
 					});
 
 					if (providerConfirmAppointmentTimeUrl) {

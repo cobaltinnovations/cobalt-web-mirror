@@ -1,6 +1,5 @@
 import { AppointmentType } from './appointments';
 import { ResourcePacketAddress } from './care-resource-models';
-import { ScreeningSessionDestinationId } from './screening-models';
 
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/SupportRole.java#L18
 export enum SupportRoleId {
@@ -54,7 +53,7 @@ export interface AvailabilityTimeSlot {
 	appointmentParticipantStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentTypeIds: string[];
-	appointmentTypeDescription: string;
+	appointmentTypeDescription?: string;
 	epicAppointmentFhirId?: string;
 	epicDepartmentId?: string;
 	providerId?: string;
@@ -184,22 +183,37 @@ export interface ProviderSearchResultModel {
 	imageUrl?: string;
 	institutionId?: string;
 	name?: string;
-	phoneNumber: string;
-	phoneNumberDescription: string;
+	phoneNumber?: string;
+	phoneNumberDescription?: string;
 	providerId?: string;
 	providerSearchResultId?: string;
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
-	screeningRequirement: ScreeningRequirement;
+	screeningRequirement?: ScreeningRequirement;
 	supportedAppointmentModalities: ProviderAppointmentModality[];
 	title?: string;
 	treatmentDescription?: string;
 }
 
 export interface ScreeningRequirement {
-	appointmentBookingRequirementsDestinationId: ScreeningSessionDestinationId;
-	screeningFlowId: string;
+	appointmentBookingRequirementsDestinationId: AppointmentBookingRequirementsDestinationId;
+	screeningFlowId?: string;
 	screeningRequired: boolean;
 	screeningSatisfied: boolean;
+}
+
+export enum AppointmentBookingRequirementsDestinationId {
+	APPOINTMENT_BOOKING = 'APPOINTMENT_BOOKING',
+	SCREENING_SESSION = 'SCREENING_SESSION',
+}
+
+export interface AppointmentTypeSummary {
+	appointmentTypeId: string;
+	name?: string;
+	description?: string;
+	durationInMinutes?: number;
+	durationInMinutesDescription?: string;
+	screeningFlowId?: string;
+	assessmentId?: string;
 }
 
 export interface ProviderAppointmentModality {

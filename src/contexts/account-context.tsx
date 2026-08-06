@@ -14,6 +14,7 @@ import { AccountSource, Institution, UserExperienceTypeId } from '@/lib/models/i
 import { useAppRootLoaderData } from '@/routes/root';
 
 import { config } from '@/config';
+import { getEffectiveBookingV2Enabled } from '@/lib/utils';
 
 type AccountContextConfig = {
 	account: AccountModel | undefined;
@@ -103,10 +104,19 @@ const AccountProvider: FC<PropsWithChildren> = (props) => {
 		[accountId]
 	);
 
-	const institution = useMemo(
-		() => accountResponse?.institution || institutionResponse.institution,
-		[accountResponse?.institution, institutionResponse.institution]
-	);
+	const institution = useMemo(() => {
+		const institutionFromResponse = accountResponse?.institution || institutionResponse.institution;
+		const bookingV2Enabled = getEffectiveBookingV2Enabled(institutionFromResponse);
+
+		if (bookingV2Enabled === institutionFromResponse.bookingV2Enabled) {
+			return institutionFromResponse;
+		}
+
+		return {
+			...institutionFromResponse,
+			bookingV2Enabled,
+		};
+	}, [accountResponse?.institution, institutionResponse.institution]);
 
 	const isIntegratedCarePatient = useMemo(
 		() => institution.integratedCareEnabled && institution.userExperienceTypeId === UserExperienceTypeId.PATIENT,

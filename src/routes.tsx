@@ -12,7 +12,15 @@ import {
 } from '@/pages/provider-management';
 import Cookies from 'js-cookie';
 import React, { useCallback, useMemo, useState } from 'react';
-import { LoaderFunctionArgs, Navigate, Outlet, RouteObject, redirect, useParams } from 'react-router-dom';
+import {
+	LoaderFunctionArgs,
+	Navigate,
+	Outlet,
+	RouteObject,
+	redirect,
+	useParams,
+	useSearchParams,
+} from 'react-router-dom';
 
 import { lazyLoadWithRefresh } from './lib/utils/error-utils';
 
@@ -39,6 +47,12 @@ import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
 
 import AsyncWrapper from './components/async-page';
+import {
+	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
+	buildQueryParamUrl,
+	getBookingV2DisabledFallbackUrl,
+	getFeatureIdForLegacyCareUrlName,
+} from './lib/utils';
 
 export interface RouteHandle {
 	hideHeader?: boolean;
@@ -302,6 +316,89 @@ const ToggledOutlet = ({ isEnabled }: { isEnabled: (accountContext: ReturnType<t
 	return canPassthrough ? <Outlet /> : <NoMatch />;
 };
 
+const ProviderBookingV2Outlet = () => {
+	const { account, institution } = useAccount();
+	const [searchParams] = useSearchParams();
+
+	if (institution.bookingV2Enabled) {
+		return <Outlet />;
+	}
+
+	return (
+		<Navigate
+			to={getBookingV2DisabledFallbackUrl({
+				features: institution.features,
+				featureId: searchParams.get('featureId') ?? undefined,
+				institutionLocationId:
+					searchParams.get('institutionLocationId') ?? account?.institutionLocationId ?? undefined,
+				bookingV1FallbackUrl: searchParams.get(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM) ?? undefined,
+			})}
+			replace
+		/>
+	);
+};
+
+const LegacyConfirmAppointmentRoute = () => {
+	const { account, institution } = useAccount();
+
+	if (institution.bookingV2Enabled) {
+		return (
+			<Navigate
+				to={buildQueryParamUrl('/providers', {
+					institutionLocationId: account?.institutionLocationId,
+				})}
+				replace
+			/>
+		);
+	}
+
+	return <ConfirmAppointment />;
+};
+
+interface LegacyCareExperienceRouteProps {
+	element: JSX.Element;
+	featureId?: FeatureId;
+	isLegacyEnabled?: (accountContext: ReturnType<typeof useAccount>) => boolean;
+}
+
+const LegacyCareExperienceRoute = ({ element, featureId, isLegacyEnabled }: LegacyCareExperienceRouteProps) => {
+	const accountContext = useAccount();
+	const { account, institution } = accountContext;
+	const { urlName } = useParams<{ urlName: string }>();
+	const [searchParams] = useSearchParams();
+
+	if (!institution.bookingV2Enabled) {
+		return !isLegacyEnabled || isLegacyEnabled(accountContext) ? element : <NoMatch />;
+	}
+
+	const effectiveFeatureId =
+		featureId ??
+		getFeatureIdForLegacyCareUrlName(searchParams.get('featureId') ?? undefined) ??
+		getFeatureIdForLegacyCareUrlName(urlName);
+	const feature = institution.features.find(
+		(institutionFeature) => institutionFeature.featureId === effectiveFeatureId
+	);
+
+	if (!feature) {
+		return <Navigate to="/" replace />;
+	}
+
+	if (feature.supportRoleIds.length === 0) {
+		return element;
+	}
+
+	return (
+		<Navigate
+			to={buildQueryParamUrl('/providers', {
+				featureId: feature.featureId,
+				institutionLocationId:
+					searchParams.get('institutionLocationId') ?? account?.institutionLocationId ?? undefined,
+			})}
+			replace
+		/>
+	);
+};
+
 export const routes: RouteObject[] = [
 	{
 		id: 'root',
@@ -528,7 +625,22 @@ export const routes: RouteObject[] = [
 							},
 							{
 								path: 'connect-with-support/medication-prescriber',
-								element: <ConnectWithSupportMedicationPrescriber />,
+								element: (
+									<LegacyCareExperienceRoute
+										featureId={FeatureId.MEDICATION_PRESCRIBER}
+										element={<ConnectWithSupportMedicationPrescriber />}
+									/>
+								),
+							},
+							{
+								path: 'connect-with-support/mental-health-providers',
+								element: (
+									<LegacyCareExperienceRoute
+										featureId={FeatureId.MENTAL_HEALTH_PROVIDERS}
+										element={<ConnectWithSupportMentalHealthProviders />}
+										isLegacyEnabled={({ institution }) => institution.epicFhirEnabled}
+									/>
+								),
 							},
 							{
 								element: (
@@ -540,10 +652,6 @@ export const routes: RouteObject[] = [
 								),
 								children: [
 									{
-										path: 'connect-with-support/mental-health-providers',
-										element: <ConnectWithSupportMentalHealthProviders />,
-									},
-									{
 										path: '/connect-with-support/recommendations',
 										element: <ConnectWithSupportMentalHealthRecommendations />,
 									},
@@ -551,7 +659,7 @@ export const routes: RouteObject[] = [
 							},
 							{
 								path: 'connect-with-support/:urlName',
-								element: <ConnectWithSupportV2 />,
+								element: <LegacyCareExperienceRoute element={<ConnectWithSupportV2 />} />,
 							},
 						],
 					},
@@ -570,7 +678,7 @@ export const routes: RouteObject[] = [
 					},
 					{
 						path: 'confirm-appointment',
-						element: <ConfirmAppointment />,
+						element: <LegacyConfirmAppointmentRoute />,
 					},
 					{
 						element: (
@@ -767,37 +875,42 @@ export const routes: RouteObject[] = [
 						element: <RedirectToAdminPathOrRender pathname="analytics" element={<NoMatch />} />,
 					},
 					{
-						id: 'providers',
-						path: 'providers',
-						lazy: () => import('@/routes/providers'),
-					},
-					{
-						id: 'provider-info',
-						path: 'provider-info/:providerId',
-						lazy: () => import('@/routes/provider-info'),
-					},
-					{
-						id: 'clinic-info',
-						path: 'clinic-info/:clincId',
-						lazy: () => import('@/routes/provider-info'),
-					},
-					{
-						id: 'provider-confirm-appointment-time',
-						path: 'provider-confirm-appointment-time',
-						lazy: () => import('@/routes/provider-confirm-appointment-time'),
-						handle: {
-							hideHeader: true,
-							hideFooter: true,
-						} as RouteHandle,
-					},
-					{
-						id: 'provider-book-appointment',
-						path: 'provider-book-appointment',
-						lazy: () => import('@/routes/provider-book-appointment'),
-						handle: {
-							hideHeader: true,
-							hideFooter: true,
-						} as RouteHandle,
+						element: <ProviderBookingV2Outlet />,
+						children: [
+							{
+								id: 'providers',
+								path: 'providers',
+								lazy: () => import('@/routes/providers'),
+							},
+							{
+								id: 'provider-info',
+								path: 'provider-info/:providerId',
+								lazy: () => import('@/routes/provider-info'),
+							},
+							{
+								id: 'clinic-info',
+								path: 'clinic-info/:clinicId',
+								lazy: () => import('@/routes/provider-info'),
+							},
+							{
+								id: 'provider-confirm-appointment-time',
+								path: 'provider-confirm-appointment-time',
+								lazy: () => import('@/routes/provider-confirm-appointment-time'),
+								handle: {
+									hideHeader: true,
+									hideFooter: true,
+								} as RouteHandle,
+							},
+							{
+								id: 'provider-book-appointment',
+								path: 'provider-book-appointment',
+								lazy: () => import('@/routes/provider-book-appointment'),
+								handle: {
+									hideHeader: true,
+									hideFooter: true,
+								} as RouteHandle,
+							},
+						],
 					},
 					{
 						id: 'provider-booking-complete',

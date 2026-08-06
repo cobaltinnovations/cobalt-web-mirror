@@ -3,7 +3,7 @@ import { ScreeningSessionDestinationResultId } from '@/lib/models';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const useIneligibleBookingModal = createUseStyles({
 	ineligibleBookingModal: {
@@ -27,13 +27,16 @@ const modalConfig = {
 };
 
 const IneligibleBookingModal = ({ uiType = 'provider', show, onHide, ...props }: IneligibleBookingModalProps) => {
-	useTrackModalView('IneligibleBookingModal', props.show);
 	const classes = useIneligibleBookingModal();
 	const location = useLocation();
+	const navigate = useNavigate();
 	const [isShown, setIsShown] = useState(false);
 
 	const didFailIntake =
 		location.state?.screeningSessionDestinationResultId === ScreeningSessionDestinationResultId.FAILURE;
+	const ineligibleMessage =
+		typeof location.state?.ineligibleMessage === 'string' ? location.state.ineligibleMessage : undefined;
+	useTrackModalView('IneligibleBookingModal', Boolean(show || didFailIntake));
 
 	// TODO: should be cleaned up after replacing provider `/intake-assessment` with a screeningFlow;
 	useEffect(() => {
@@ -42,12 +45,19 @@ const IneligibleBookingModal = ({ uiType = 'provider', show, onHide, ...props }:
 
 	const handleDismiss = useCallback(() => {
 		if (didFailIntake) {
-			window.history.replaceState({}, '', location.pathname);
+			navigate(
+				{
+					pathname: location.pathname,
+					search: location.search,
+					hash: location.hash,
+				},
+				{ replace: true, state: null }
+			);
 			setIsShown(false);
 		} else {
 			onHide?.();
 		}
-	}, [didFailIntake, location.pathname, onHide]);
+	}, [didFailIntake, location.hash, location.pathname, location.search, navigate, onHide]);
 
 	return (
 		<Modal
@@ -61,7 +71,7 @@ const IneligibleBookingModal = ({ uiType = 'provider', show, onHide, ...props }:
 				<Modal.Title>{modalConfig[uiType].title}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<p className="mb-0">{modalConfig[uiType].body}</p>
+				<p className="mb-0">{ineligibleMessage ?? modalConfig[uiType].body}</p>
 			</Modal.Body>
 			<Modal.Footer>
 				<div className="text-right">

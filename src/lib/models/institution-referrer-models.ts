@@ -1,5 +1,6 @@
 export interface InstitutionReferrerResultScreenBooking {
 	path?: string;
+	v2Path?: string;
 	featureId?: string;
 	pageTitle?: string;
 	pageDescription?: string;

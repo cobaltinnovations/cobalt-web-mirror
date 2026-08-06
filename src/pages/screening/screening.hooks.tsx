@@ -6,6 +6,7 @@ import {
 	ScreeningSession,
 	ScreeningSessionDestination,
 	ScreeningSessionDestinationId,
+	ScreeningSessionDestinationResultId,
 	ModifiedAssessmentTypeId,
 } from '@/lib/models';
 import { screeningService } from '@/lib/services';
@@ -18,6 +19,11 @@ import CollectPhoneModal from '@/components/collect-phone-modal';
 import AccountSourcesModal from '@/components/account-sources-modal';
 import useAccount from '@/hooks/use-account';
 import useAccountSourceClickHandler from '@/hooks/use-account-source-click-handler';
+import {
+	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
+	getBookingV1FallbackUrlFromSearchParams,
+	getSafeBookingV1FallbackUrl,
+} from '@/lib/utils';
 
 export function useScreeningNavigation() {
 	const navigate = useNavigate();
@@ -51,9 +57,16 @@ export function useScreeningNavigation() {
 				? `/screening-questions-fullscreen/${contextId}`
 				: `/screening-questions/${contextId}`;
 
+			const fallbackSearchParams = new URLSearchParams();
+			const bookingV1FallbackUrl = getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search));
+
+			if (bookingV1FallbackUrl) {
+				fallbackSearchParams.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
+			}
+
 			navigate({
 				pathname,
-				search: fullscreenScreening ? location.search : '',
+				search: fullscreenScreening ? location.search : fallbackSearchParams.toString(),
 			});
 		},
 		[fullscreenScreening, location.search, matches, navigate]
@@ -174,15 +187,47 @@ export function useScreeningNavigation() {
 					);
 					return;
 				case ScreeningSessionDestinationId.APPOINTMENT_BOOKING_CONFIRMATION:
-					navigate(
-						{
-							pathname: '/provider-confirm-appointment-time',
-							search: new URLSearchParams(destination.context as Record<string, string>).toString(),
-						},
-						{
-							replace,
+					if (
+						destination.screeningSessionDestinationResultId === ScreeningSessionDestinationResultId.SUCCESS
+					) {
+						const destinationSearchParams = new URLSearchParams(
+							destination.context as Record<string, string>
+						);
+						const destinationFallbackUrl = destination.context[BOOKING_V1_FALLBACK_URL_SEARCH_PARAM];
+						const bookingV1FallbackUrl =
+							(typeof destinationFallbackUrl === 'string'
+								? getSafeBookingV1FallbackUrl(destinationFallbackUrl)
+								: undefined) ??
+							getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search));
+
+						if (bookingV1FallbackUrl) {
+							destinationSearchParams.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
+						} else {
+							destinationSearchParams.delete(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM);
 						}
-					);
+
+						navigate(
+							{
+								pathname: '/provider-confirm-appointment-time',
+								search: destinationSearchParams.toString(),
+							},
+							{
+								replace,
+							}
+						);
+						return;
+					}
+
+					const returnTo = new URLSearchParams(location.search).get('returnTo') ?? '/providers';
+					const ineligibleMessage = destination.context.ineligibleMessage;
+
+					navigate(returnTo, {
+						replace,
+						state: {
+							screeningSessionDestinationResultId: ScreeningSessionDestinationResultId.FAILURE,
+							...(typeof ineligibleMessage === 'string' && { ineligibleMessage }),
+						},
+					});
 					return;
 				case ScreeningSessionDestinationId.ONE_ON_ONE_PROVIDER_LIST:
 				default: {
@@ -199,7 +244,7 @@ export function useScreeningNavigation() {
 				}
 			}
 		},
-		[navigate, navigateToQuestion, revalidator, trackEvent]
+		[location.search, navigate, navigateToQuestion, revalidator, trackEvent]
 	);
 
 	const navigateToNext = useCallback(
@@ -403,16 +448,14 @@ export function useScreeningFlow({
 				throw new Error('Unknown Active Flow Version');
 			}
 
-			if (
-				activeFlowVersion.requiredAccountSources &&
-				activeFlowVersion.requiredAccountSources.length > 0 &&
-				account?.accountSourceId
-			) {
-				const currentAccountSourceId = account.accountSourceId;
+			if (activeFlowVersion.requiredAccountSources && activeFlowVersion.requiredAccountSources.length > 0) {
+				const currentAccountSourceId = account?.accountSourceId;
 				const availableAccountSourceIds = activeFlowVersion.requiredAccountSources.map(
 					(as) => as.accountSourceId
 				);
-				const accountSourceIdIsValid = availableAccountSourceIds.includes(currentAccountSourceId);
+				const accountSourceIdIsValid = currentAccountSourceId
+					? availableAccountSourceIds.includes(currentAccountSourceId)
+					: false;
 
 				if (!accountSourceIdIsValid) {
 					setShowAccountSourcesModal(true);

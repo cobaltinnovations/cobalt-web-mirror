@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
@@ -21,11 +21,14 @@ import {
 import useAccount from '@/hooks/use-account';
 import AsyncWrapper from '@/components/async-page';
 import FullscreenBar from '@/components/fullscreen-bar';
-import InlineAlert from '@/components/inline-alert';
 import InputHelper from '@/components/input-helper';
-import { getAppointmentModalitySummaryById } from '@/components/provider-appointment-modality-summary';
+import {
+	getAppointmentModalitySummaryById,
+	isProviderAppointmentModalityId,
+} from '@/components/provider-appointment-modality-summary';
 import SvgIcon from '@/components/svg-icon';
 import useHandleError from '@/hooks/use-handle-error';
+import { PROVIDER_BOOKING_EXPERIENCE_ID, shouldFetchInstitutionLocation } from '@/lib/utils';
 
 const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) => {
 	const date = searchParams.get('date');
@@ -40,10 +43,12 @@ const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) =
 const getAppointmentTypeDescriptionFromAvailability = ({
 	appointmentDateTime,
 	appointmentModalityId,
+	appointmentTypeId,
 	availability,
 }: {
 	appointmentDateTime: ReturnType<typeof getAppointmentDateTimeFromSearchParams>;
 	appointmentModalityId?: ProviderAppointmentModalityId;
+	appointmentTypeId?: string;
 	availability: AvailabilityModel;
 }) => {
 	if (!appointmentDateTime || !appointmentModalityId) {
@@ -66,7 +71,15 @@ const getAppointmentTypeDescriptionFromAvailability = ({
 		return timeSlotDateTime.isSame(appointmentDateTime, 'minute');
 	});
 
-	return selectedTimeSlot?.appointmentTypeDescription;
+	if (selectedTimeSlot?.appointmentTypeDescription) {
+		return selectedTimeSlot.appointmentTypeDescription;
+	}
+
+	const selectedAppointmentType = availability.appointmentTypes.find(
+		(appointmentType) => appointmentType.appointmentTypeId === appointmentTypeId
+	);
+
+	return selectedAppointmentType?.description ?? selectedAppointmentType?.name;
 };
 
 export const loader = () => {
@@ -87,11 +100,12 @@ export const Component = () => {
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
+	const epicAppointmentFhirId = useMemo(() => searchParams.get('epicAppointmentFhirId') ?? undefined, [searchParams]);
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
-	const appointmentModalityId = useMemo(
-		() => (searchParams.get('appointmentModalityId') as ProviderAppointmentModalityId) ?? '',
-		[searchParams]
-	);
+	const appointmentModalityId = useMemo(() => {
+		const value = searchParams.get('appointmentModalityId');
+		return isProviderAppointmentModalityId(value) ? value : undefined;
+	}, [searchParams]);
 	const providerSearchResultTypeId = useMemo(
 		() => (searchParams.get('providerSearchResultTypeId') as ProviderSearchResultTypeId) ?? '',
 		[searchParams]
@@ -106,15 +120,17 @@ export const Component = () => {
 	const [clinic, setClinic] = useState<Clinic>();
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
 	const [selectedAppointmentTypeDescription, setSelectedAppointmentTypeDescription] = useState<string>();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const submissionInFlightRef = useRef(false);
 	const [formValues, setFormValues] = useState({
-		firstName: account?.firstName,
-		lastName: account?.lastName,
-		emailAddress: account?.emailAddress,
-		phoneNumber: account?.phoneNumber,
+		firstName: account?.firstName ?? '',
+		lastName: account?.lastName ?? '',
+		emailAddress: account?.emailAddress ?? '',
+		phoneNumber: account?.phoneNumber ?? '',
 	});
 
 	const fetchData = useCallback(async () => {
-		const institutionLocationRequest = institutionLocationId
+		const institutionLocationRequest = shouldFetchInstitutionLocation(institutionLocationId)
 			? institutionService.getInstitutionLocationByIinstitutionLocationId(institutionLocationId).fetch()
 			: Promise.resolve(undefined);
 		const availabilityQueryParams = {
@@ -136,6 +152,7 @@ export const Component = () => {
 				getAppointmentTypeDescriptionFromAvailability({
 					appointmentDateTime,
 					appointmentModalityId,
+					appointmentTypeId,
 					availability: availabilityResponse.providerAvailability,
 				})
 			);
@@ -156,6 +173,7 @@ export const Component = () => {
 				getAppointmentTypeDescriptionFromAvailability({
 					appointmentDateTime,
 					appointmentModalityId,
+					appointmentTypeId,
 					availability: availabilityResponse.clinicAvailability,
 				})
 			);
@@ -184,13 +202,33 @@ export const Component = () => {
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
+		if (submissionInFlightRef.current) {
+			return;
+		}
+
 		try {
 			if (!providerIdToSchedule) {
 				throw new Error('Provider ID to schedule is undefined.');
 			}
 
+			if (!appointmentTypeId) {
+				throw new Error('Appointment type ID is undefined.');
+			}
+
+			if (!appointmentDateTime) {
+				throw new Error('Appointment date and time are undefined.');
+			}
+
+			if (!appointmentModalityId) {
+				throw new Error('Appointment modality ID is undefined.');
+			}
+
+			submissionInFlightRef.current = true;
+			setIsSubmitting(true);
+
 			await appointmentService
 				.createAppointment({
+					bookingExperienceId: PROVIDER_BOOKING_EXPERIENCE_ID,
 					providerId: providerIdToSchedule,
 					accountId: account?.accountId,
 					firstName: formValues.firstName,
@@ -201,6 +239,7 @@ export const Component = () => {
 					phoneNumber: formValues.phoneNumber,
 					appointmentTypeId: appointmentTypeId,
 					appointmentModalityId,
+					epicAppointmentFhirId,
 				})
 				.fetch();
 
@@ -208,6 +247,9 @@ export const Component = () => {
 			navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
 		} catch (error) {
 			handleError(error);
+		} finally {
+			submissionInFlightRef.current = false;
+			setIsSubmitting(false);
 		}
 	};
 
@@ -219,7 +261,11 @@ export const Component = () => {
 
 			<AsyncWrapper fetchData={fetchData}>
 				<FullscreenBar
-					title={`Appointment Scheduling - ${institutionLocation?.name}`}
+					title={
+						institutionLocation?.name
+							? `Appointment Scheduling - ${institutionLocation.name}`
+							: 'Appointment Scheduling'
+					}
 					onExit={() => {
 						navigate('/providers');
 					}}
@@ -229,9 +275,7 @@ export const Component = () => {
 					<Row className="mb-10">
 						<Col>
 							<h2 className="mb-4">Book Appointment</h2>
-							<p className="mb-0 fs-large">
-								This provider requires more information before you can schedule.
-							</p>
+							<p className="mb-0 fs-large">Confirm your contact information before booking.</p>
 						</Col>
 					</Row>
 
@@ -240,8 +284,8 @@ export const Component = () => {
 							<div className="bg-white border rounded-4 py-8 px-6">
 								<h4 className="mb-4">Additional Info</h4>
 								<p className="mb-8 fs-large">
-									Message about why info is needed and who has access to it. Please make sure that
-									your information is entered correctly.
+									Your provider will receive this information and may use it to contact you about your
+									appointment. Please make sure it is entered correctly.
 								</p>
 
 								<Form id="provider-book-appointment-form" onSubmit={handleFormSubmit}>
@@ -279,13 +323,9 @@ export const Component = () => {
 										value={formValues.phoneNumber}
 										onChange={handleFormValueChange}
 									/>
-									<p className="mb-8 text-muted small">Required because...</p>
-
-									<InlineAlert
-										variant="info"
-										title="Message about information sharing"
-										description="TBD"
-									/>
+									<p className="mb-0 text-muted small">
+										Used for appointment updates and to help your provider reach you if needed.
+									</p>
 								</Form>
 							</div>
 						</Col>
@@ -342,7 +382,12 @@ export const Component = () => {
 									</p>
 								</div>
 
-								<Button type="submit" form="provider-book-appointment-form" className="w-100 mt-6">
+								<Button
+									type="submit"
+									form="provider-book-appointment-form"
+									className="w-100 mt-6"
+									disabled={isSubmitting}
+								>
 									Book Appointment
 								</Button>
 							</div>

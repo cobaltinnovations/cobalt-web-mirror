@@ -8,6 +8,11 @@ export enum ATTENDANCE_STATUS_ID {
 	ATTENDED = 'ATTENDED',
 }
 
+export enum BookingExperienceId {
+	V1 = 'V1',
+	V2 = 'V2',
+}
+
 export interface AppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;

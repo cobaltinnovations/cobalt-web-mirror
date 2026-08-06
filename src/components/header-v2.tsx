@@ -34,6 +34,7 @@ import { useAppRootLoaderData } from '@/routes/root';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
+import { buildQueryParamUrl } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 export const HEADER_HEIGHT = 60;
@@ -466,7 +467,9 @@ const HeaderV2 = () => {
 									to:
 										featureIdsWithLocationFilter.includes(featureId) &&
 										account?.institutionLocationId
-											? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+											? buildQueryParamUrl(urlName, {
+													institutionLocationId: account.institutionLocationId,
+											  })
 											: urlName,
 									onClick: () => {
 										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {

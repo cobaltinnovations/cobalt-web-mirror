@@ -12,6 +12,7 @@ import mediaQueries from '@/jss/media-queries';
 import useAnalytics from '@/hooks/use-analytics';
 import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId, FeatureId } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
+import { buildQueryParamUrl } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
@@ -191,7 +192,9 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 										<Link
 											to={
 												featureId === FeatureId.THERAPY && account?.institutionLocationId
-													? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+													? buildQueryParamUrl(urlName, {
+															institutionLocationId: account.institutionLocationId,
+													  })
 													: urlName
 											}
 											className={classNames(classes.pathway, {

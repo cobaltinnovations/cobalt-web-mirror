@@ -7,13 +7,16 @@ import DatePicker from '@/components/date-picker';
 import Loader from '@/components/loader';
 import SvgIcon from '@/components/svg-icon';
 import TabBar from '@/components/tab-bar';
+import InputHelper from '@/components/input-helper';
 import useHandleError from '@/hooks/use-handle-error';
 import mediaQueries from '@/jss/media-queries';
 import { createUseThemedStyles } from '@/jss/theme';
 import {
 	AppointmentModality,
+	AppointmentTypeSummary,
 	AvailabilityTimeSlot,
 	ProviderAppointmentModalityId,
+	ProviderAppointmentSelectionTypeId,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { AvailabilityModel, providerService } from '@/lib/services';
@@ -82,6 +85,42 @@ const getTimeSlotForDateTime = (dateTime: Moment, appointmentModality?: Appointm
 
 	return matchingTimeSlots?.find((timeSlot) => timeSlot.providerId === providerId) ?? matchingTimeSlots?.[0];
 };
+
+const getAppointmentTypeIdForTimeSlot = (timeSlot: AvailabilityTimeSlot, currentAppointmentTypeId?: string) => {
+	if (timeSlot.appointmentTypeIds.length === 1) {
+		return timeSlot.appointmentTypeIds[0];
+	}
+
+	return currentAppointmentTypeId && timeSlot.appointmentTypeIds.includes(currentAppointmentTypeId)
+		? currentAppointmentTypeId
+		: undefined;
+};
+
+const getValueForTimeSlot = (
+	value: AppointmentDateTimePickerValue,
+	date: string | Date,
+	timeSlot: AvailabilityTimeSlot
+): AppointmentDateTimePickerValue => {
+	const appointmentTypeId = getAppointmentTypeIdForTimeSlot(timeSlot, value.appointmentTypeId);
+	const preserveSelectedAppointmentTypeDescription =
+		timeSlot.appointmentTypeIds.length > 1 && appointmentTypeId === value.appointmentTypeId;
+
+	return {
+		...value,
+		dateTime: createAppointmentDateTime(date, timeSlot),
+		appointmentTypeIds: [...timeSlot.appointmentTypeIds],
+		appointmentTypeId,
+		appointmentTypeDescription: preserveSelectedAppointmentTypeDescription
+			? value.appointmentTypeDescription
+			: timeSlot.appointmentTypeDescription,
+		epicDepartmentId: timeSlot.epicDepartmentId,
+		epicAppointmentFhirId: timeSlot.epicAppointmentFhirId,
+		providerId: timeSlot.providerId,
+	};
+};
+
+const haveSameStringValues = (left?: string[], right?: string[]) =>
+	(left ?? []).length === (right ?? []).length && (left ?? []).every((value, index) => value === right?.[index]);
 
 const useStyles = createUseThemedStyles((theme) => ({
 	appointmentModalityTabs: {
@@ -174,7 +213,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 export interface AppointmentDateTimePickerValue {
 	dateTime: Moment;
 	appointmentModalityId?: ProviderAppointmentModalityId;
+	appointmentTypeIds?: string[];
+	appointmentTypeId?: string;
 	appointmentTypeDescription?: string;
+	epicDepartmentId?: string;
+	epicAppointmentFhirId?: string;
 	providerId?: string;
 }
 
@@ -184,6 +227,7 @@ export interface AppointmentDateTimePickerConfig {
 	clinicId?: string;
 	providerId?: string;
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
 }
 
 type AppointmentDateTimePickerFetchData = {
@@ -200,12 +244,23 @@ export interface AppointmentDateTimePickerProps {
 const getAppointmentModalitiesFromFetchData = (data: AppointmentDateTimePickerFetchData) =>
 	Object.values(data).flatMap((availability) => availability.appointmentModalities);
 
+const getAppointmentTypesFromFetchData = (data: AppointmentDateTimePickerFetchData) => {
+	const appointmentTypesById = new Map<string, AppointmentTypeSummary>();
+
+	for (const appointmentType of Object.values(data).flatMap((availability) => availability.appointmentTypes)) {
+		appointmentTypesById.set(appointmentType.appointmentTypeId, appointmentType);
+	}
+
+	return Array.from(appointmentTypesById.values());
+};
+
 const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: AppointmentDateTimePickerProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const minSelectableDate = moment().startOf('day').toDate();
 	const [isLoading, setIsLoading] = useState(false);
 	const [appointmentModalities, setAppointmentModalities] = useState<AppointmentModality[]>([]);
+	const [appointmentTypes, setAppointmentTypes] = useState<AppointmentTypeSummary[]>([]);
 	const selectedAppointmentDateTime = value.dateTime;
 	const selectedAppointmentModalityId = value.appointmentModalityId ?? '';
 
@@ -232,6 +287,18 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 	const selectedDateAvailability = selectedAppointmentModality?.availability.find(
 		(availability) => availability.date === selectedAppointmentDateTime.format('YYYY-MM-DD')
+	);
+	const selectedAppointmentTypes = useMemo(
+		() =>
+			(value.appointmentTypeIds ?? []).map(
+				(appointmentTypeId) =>
+					appointmentTypes.find(
+						(appointmentType) => appointmentType.appointmentTypeId === appointmentTypeId
+					) ?? {
+						appointmentTypeId,
+					}
+			),
+		[appointmentTypes, value.appointmentTypeIds]
 	);
 
 	const timeSlotGroups = useMemo(
@@ -264,41 +331,43 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 		const firstTimeSlot = selectedAvailability?.times[0];
 
 		if (firstTimeSlot) {
-			onChange({
-				...value,
-				dateTime: createAppointmentDateTime(date, firstTimeSlot),
-				appointmentTypeDescription: firstTimeSlot.appointmentTypeDescription,
-				providerId: firstTimeSlot.providerId,
-			});
+			onChange(getValueForTimeSlot(value, date, firstTimeSlot));
 		}
 	};
 
 	const handleTimeSelect = (timeSlot: AvailabilityTimeSlot) => {
-		onChange({
-			...value,
-			dateTime: createAppointmentDateTime(selectedAppointmentDateTime.toDate(), timeSlot),
-			appointmentTypeDescription: timeSlot.appointmentTypeDescription,
-			providerId: timeSlot.providerId,
-		});
+		onChange(getValueForTimeSlot(value, selectedAppointmentDateTime.toDate(), timeSlot));
 	};
 
 	const handleAppointmentModalitySelect = (appointmentModalityId: string) => {
 		onChange({
 			...value,
 			appointmentModalityId: appointmentModalityId as ProviderAppointmentModalityId,
+			appointmentTypeIds: undefined,
+			appointmentTypeId: undefined,
 			appointmentTypeDescription: undefined,
+			epicDepartmentId: undefined,
+			epicAppointmentFhirId: undefined,
 			providerId: undefined,
+		});
+	};
+
+	const handleAppointmentTypeSelect = ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+		const appointmentTypeId = currentTarget.value || undefined;
+		const appointmentType = appointmentTypes.find(
+			(candidateAppointmentType) => candidateAppointmentType.appointmentTypeId === appointmentTypeId
+		);
+
+		onChange({
+			...value,
+			appointmentTypeId,
+			appointmentTypeDescription: appointmentType?.description ?? appointmentType?.name,
 		});
 	};
 
 	const handleFirstAvailableSelect = () => {
 		if (firstAvailableAppointment) {
-			onChange({
-				...value,
-				dateTime: firstAvailableAppointment.dateTime.clone(),
-				appointmentTypeDescription: firstAvailableAppointment.timeSlot.appointmentTypeDescription,
-				providerId: firstAvailableAppointment.timeSlot.providerId,
-			});
+			onChange(getValueForTimeSlot(value, firstAvailableAppointment.date, firstAvailableAppointment.timeSlot));
 		}
 	};
 
@@ -308,6 +377,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 		const fetchAvailability = async () => {
 			if (!fetchData && !config) {
 				setAppointmentModalities([]);
+				setAppointmentTypes([]);
 				return;
 			}
 
@@ -319,6 +389,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 					if (!didCancel) {
 						setAppointmentModalities(getAppointmentModalitiesFromFetchData(response));
+						setAppointmentTypes(getAppointmentTypesFromFetchData(response));
 					}
 
 					return;
@@ -326,6 +397,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 				if (!config) {
 					setAppointmentModalities([]);
+					setAppointmentTypes([]);
 					return;
 				}
 
@@ -340,6 +412,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 					if (!didCancel) {
 						setAppointmentModalities(response.clinicAvailability.appointmentModalities);
+						setAppointmentTypes(response.clinicAvailability.appointmentTypes);
 					}
 
 					return;
@@ -356,6 +429,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 					if (!didCancel) {
 						setAppointmentModalities(response.providerAvailability.appointmentModalities);
+						setAppointmentTypes(response.providerAvailability.appointmentTypes);
 					}
 				}
 			} catch (error) {
@@ -404,15 +478,17 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 		);
 
 		if (selectedTimeSlot) {
+			const nextValue = getValueForTimeSlot(value, selectedAppointmentDateTime.toDate(), selectedTimeSlot);
+
 			if (
-				value.appointmentTypeDescription !== selectedTimeSlot.appointmentTypeDescription ||
-				value.providerId !== selectedTimeSlot.providerId
+				!haveSameStringValues(value.appointmentTypeIds, nextValue.appointmentTypeIds) ||
+				value.appointmentTypeId !== nextValue.appointmentTypeId ||
+				value.appointmentTypeDescription !== nextValue.appointmentTypeDescription ||
+				value.epicDepartmentId !== nextValue.epicDepartmentId ||
+				value.epicAppointmentFhirId !== nextValue.epicAppointmentFhirId ||
+				value.providerId !== nextValue.providerId
 			) {
-				onChange({
-					...value,
-					appointmentTypeDescription: selectedTimeSlot.appointmentTypeDescription,
-					providerId: selectedTimeSlot.providerId,
-				});
+				onChange(nextValue);
 			}
 
 			return;
@@ -421,12 +497,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 		const firstAvailableAppointment = getFirstAvailableAppointment(selectedAppointmentModality);
 
 		if (firstAvailableAppointment) {
-			onChange({
-				...value,
-				dateTime: firstAvailableAppointment.dateTime.clone(),
-				appointmentTypeDescription: firstAvailableAppointment.timeSlot.appointmentTypeDescription,
-				providerId: firstAvailableAppointment.timeSlot.providerId,
-			});
+			onChange(getValueForTimeSlot(value, firstAvailableAppointment.date, firstAvailableAppointment.timeSlot));
 		}
 	}, [onChange, selectedAppointmentDateTime, selectedAppointmentModality, value]);
 
@@ -448,6 +519,28 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 					className={classes.appointmentModalityTabs}
 					classNameInner={classes.appointmentModalityTabsInner}
 				/>
+			)}
+			{selectedAppointmentTypes.length > 1 && (
+				<div className="pt-6 px-6">
+					<InputHelper
+						required
+						as="select"
+						label="Appointment Type"
+						value={value.appointmentTypeId ?? ''}
+						onChange={handleAppointmentTypeSelect}
+					>
+						<option value="" disabled>
+							Select an appointment type...
+						</option>
+						{selectedAppointmentTypes.map((appointmentType) => (
+							<option key={appointmentType.appointmentTypeId} value={appointmentType.appointmentTypeId}>
+								{appointmentType.description ??
+									appointmentType.name ??
+									appointmentType.appointmentTypeId}
+							</option>
+						))}
+					</InputHelper>
+				</div>
 			)}
 			{firstAvailableAppointmentLabel && (
 				<div className={classes.firstAvailableCallout}>

@@ -14,6 +14,7 @@ import FooterNav from './footer-nav';
 
 import { FeatureId } from '@/lib/models';
 import { RouteHandle } from '@/routes';
+import { buildQueryParamUrl } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 const useFooterStyles = createUseThemedStyles((theme) => ({
@@ -151,7 +152,10 @@ const Footer: FC = () => {
 														to={
 															featureId === FeatureId.THERAPY &&
 															account?.institutionLocationId
-																? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+																? buildQueryParamUrl(urlName, {
+																		institutionLocationId:
+																			account.institutionLocationId,
+																  })
 																: urlName
 														}
 													>

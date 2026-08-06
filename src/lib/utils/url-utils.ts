@@ -3,29 +3,34 @@ import Cookies from 'js-cookie';
 import { config } from '@/config';
 
 export function buildQueryParamUrl(url: string, queryParams?: Record<string, any>): string {
-	let queryString;
+	if (!queryParams) {
+		return url;
+	}
 
-	if (queryParams) {
-		const urlSearchParams = new URLSearchParams();
+	const hashIndex = url.indexOf('#');
+	const hash = hashIndex >= 0 ? url.slice(hashIndex) : '';
+	const urlWithoutHash = hashIndex >= 0 ? url.slice(0, hashIndex) : url;
+	const queryIndex = urlWithoutHash.indexOf('?');
+	const pathname = queryIndex >= 0 ? urlWithoutHash.slice(0, queryIndex) : urlWithoutHash;
+	const existingQueryString = queryIndex >= 0 ? urlWithoutHash.slice(queryIndex + 1) : '';
+	const urlSearchParams = new URLSearchParams(existingQueryString);
 
-		Object.entries(queryParams).forEach(([key, value]) => {
-			if (Array.isArray(value)) {
-				value.forEach((innerValue) => {
+	Object.entries(queryParams).forEach(([key, value]) => {
+		if (Array.isArray(value)) {
+			urlSearchParams.delete(key);
+			value.forEach((innerValue) => {
+				if (innerValue !== undefined && innerValue !== null) {
 					urlSearchParams.append(key, innerValue);
-				});
-			} else if (value !== undefined && value !== null) {
-				urlSearchParams.append(key, value);
-			}
-		});
+				}
+			});
+		} else if (value !== undefined && value !== null) {
+			urlSearchParams.set(key, value);
+		}
+	});
 
-		queryString = urlSearchParams.toString();
-	}
+	const queryString = urlSearchParams.toString();
 
-	if (queryString) {
-		url = url.concat(`?${queryString.toString()}`);
-	}
-
-	return url;
+	return `${pathname}${queryString ? `?${queryString}` : ''}${hash}`;
 }
 
 export function buildBackendDownloadUrl(proxiedPath: string, queryParams: Record<string, any>) {

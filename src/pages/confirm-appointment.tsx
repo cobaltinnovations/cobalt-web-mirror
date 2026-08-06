@@ -13,7 +13,7 @@ import AppointmentUnavailableModal from '@/components/appointment-unavailable-mo
 import { CobaltError } from '@/lib/http-client';
 import Cookies from 'js-cookie';
 import moment from 'moment';
-import { DateFormats } from '@/lib/utils';
+import { DateFormats, LEGACY_BOOKING_EXPERIENCE_ID } from '@/lib/utils';
 import ConfirmAppointmentDisclaimer from '@/components/confirm-appointment-disclaimer';
 import { AnalyticsNativeEventTypeId } from '@/lib/models';
 
@@ -171,6 +171,7 @@ const ConfirmAppointment = () => {
 
 			const response = await appointmentService
 				.createAppointment({
+					bookingExperienceId: LEGACY_BOOKING_EXPERIENCE_ID,
 					providerId,
 					appointmentTypeId,
 					date,

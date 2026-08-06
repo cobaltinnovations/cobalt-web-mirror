@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,29 +7,21 @@ import AppointmentDateTimePicker, {
 	AppointmentDateTimePickerValue,
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
-import InlineAlert from '@/components/inline-alert';
 import { createUseThemedStyles } from '@/jss/theme';
+import { buildBookingV2UrlWithV1Fallback } from '@/lib/utils';
 
-const appointmentTitle = 'UPHS Employee Assistance Program';
-const appointmentSubtitle = '30 minute intake phone call';
-
-const useStyles = createUseThemedStyles((theme) => ({
+const useStyles = createUseThemedStyles(() => ({
 	providerScheduleModal: {
 		maxWidth: 760,
 		'& .cobalt-modal__body': {
 			padding: 0,
 		},
 	},
-	imagePlaceholder: {
-		width: 56,
-		height: 56,
-		flexShrink: 0,
-		marginRight: 16,
-		backgroundColor: theme.colors.n500,
-	},
 }));
 
-export type ProviderScheduleModalConfig = AppointmentDateTimePickerConfig;
+export type ProviderScheduleModalConfig = AppointmentDateTimePickerConfig & {
+	bookingV1FallbackUrl?: string;
+};
 
 interface ProviderScheduleModalContinueOptions {
 	config?: ProviderScheduleModalConfig;
@@ -65,8 +57,24 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 		params.set('providerSearchResultTypeId', config.providerSearchResultTypeId);
 	}
 
+	if (config?.appointmentSelectionTypeId) {
+		params.set('appointmentSelectionTypeId', config.appointmentSelectionTypeId);
+	}
+
 	if (value.appointmentModalityId) {
 		params.set('appointmentModalityId', value.appointmentModalityId);
+	}
+
+	if (value.appointmentTypeId) {
+		params.set('appointmentTypeId', value.appointmentTypeId);
+	}
+
+	if (value.epicDepartmentId) {
+		params.set('epicDepartmentId', value.epicDepartmentId);
+	}
+
+	if (value.epicAppointmentFhirId) {
+		params.set('epicAppointmentFhirId', value.epicAppointmentFhirId);
 	}
 
 	params.set('date', value.dateTime.format('YYYY-MM-DD'));
@@ -74,7 +82,11 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 
 	const queryString = params.toString();
 
-	return queryString ? `${providerConfirmAppointmentTimePath}?${queryString}` : providerConfirmAppointmentTimePath;
+	const providerConfirmAppointmentTimeUrl = queryString
+		? `${providerConfirmAppointmentTimePath}?${queryString}`
+		: providerConfirmAppointmentTimePath;
+
+	return buildBookingV2UrlWithV1Fallback(providerConfirmAppointmentTimeUrl, config?.bookingV1FallbackUrl);
 };
 
 const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps) => {
@@ -83,8 +95,17 @@ const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps)
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(
 		getDefaultAppointmentDateTimePickerValue
 	);
+
+	useEffect(() => {
+		setSelectedAppointmentDateTimePickerValue(getDefaultAppointmentDateTimePickerValue());
+	}, [config, props.show]);
 	const selectedDateLabel = selectedAppointmentDateTimePickerValue.dateTime.format('MMMM D, YYYY');
 	const selectedTimeLabel = selectedAppointmentDateTimePickerValue.dateTime.format('h:mmA');
+	const canContinue = Boolean(
+		selectedAppointmentDateTimePickerValue.appointmentModalityId &&
+			selectedAppointmentDateTimePickerValue.appointmentTypeId &&
+			selectedAppointmentDateTimePickerValue.providerId
+	);
 
 	return (
 		<Modal {...props} dialogClassName={classes.providerScheduleModal} centered>
@@ -92,25 +113,11 @@ const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps)
 				<Modal.Title>Schedule Appointment</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<div className="d-flex border-bottom py-8 px-6">
-					<div className={classes.imagePlaceholder} aria-hidden="true" />
-					<div>
-						<h4 className="mb-2">{appointmentTitle}</h4>
-						<h4 className="mb-0">{appointmentSubtitle}</h4>
-					</div>
-				</div>
 				<AppointmentDateTimePicker
 					config={config}
 					value={selectedAppointmentDateTimePickerValue}
 					onChange={setSelectedAppointmentDateTimePickerValue}
 				/>
-				<div className="pb-8 px-6">
-					<InlineAlert
-						variant="warning"
-						title="Insurance Warning"
-						description="Description would go here if needed"
-					/>
-				</div>
 			</Modal.Body>
 			<Modal.Footer className="d-flex align-items-center justify-content-between">
 				<p className="mb-0 fs-large">
@@ -121,6 +128,7 @@ const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps)
 				</p>
 				<Button
 					variant="primary"
+					disabled={!canContinue}
 					onClick={() => {
 						navigate(
 							buildProviderConfirmAppointmentTimeUrl({

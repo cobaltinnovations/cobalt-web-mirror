@@ -7,6 +7,7 @@ import FullscreenBar from '@/components/fullscreen-bar';
 import useAccount from '@/hooks/use-account';
 import { InstitutionReferrer, InstitutionReferrerResultScreen } from '@/lib/models';
 import { institutionReferrersService } from '@/lib/services';
+import { buildBookingV2UrlWithV1Fallback, buildQueryParamUrl, getSafeBookingV1FallbackUrl } from '@/lib/utils';
 
 enum SEARCH_PARAMS {
 	APPOINTMENT_TYPE_ID = 'appointmentTypeId',
@@ -29,24 +30,6 @@ function resultScreenForKey(
 	}
 
 	return resultScreen;
-}
-
-function appendSearchParams(path: string, params: URLSearchParams) {
-	if (path.includes('?')) {
-		return path;
-	}
-
-	const queryString = params.toString();
-
-	if (queryString.length === 0) {
-		return path;
-	}
-
-	const hashIndex = path.indexOf('#');
-	const pathWithoutHash = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
-	const hash = hashIndex >= 0 ? path.slice(hashIndex) : '';
-
-	return `${pathWithoutHash}?${queryString}${hash}`;
 }
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -78,36 +61,31 @@ export const Component = () => {
 	const { institutionReferrer, resultScreen } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const { institution } = useAccount();
+	const { account, institution } = useAccount();
 
 	const screeningTitle = institutionReferrer.metadata?.screening?.title ?? institutionReferrer.title;
 	const returnTo = searchParams.get(SEARCH_PARAMS.RETURN_TO) ?? `/referrals/${institutionReferrer.urlName}`;
-	const bookingPath = resultScreen.booking?.path ?? `/connect-with-support/${institutionReferrer.urlName}`;
-	const bookingParams = new URLSearchParams();
-
-	if (resultScreen.booking?.providerId) {
-		bookingParams.set(SEARCH_PARAMS.PROVIDER_ID, resultScreen.booking.providerId);
-	}
-
-	if (resultScreen.booking?.featureId) {
-		bookingParams.set(SEARCH_PARAMS.FEATURE_ID, resultScreen.booking.featureId);
-	}
-
-	if (resultScreen.booking?.pageTitle) {
-		bookingParams.set(SEARCH_PARAMS.PAGE_TITLE, resultScreen.booking.pageTitle);
-	}
-
-	if (resultScreen.booking?.pageDescription) {
-		bookingParams.set(SEARCH_PARAMS.PAGE_DESCRIPTION, resultScreen.booking.pageDescription);
-	}
-
-	resultScreen.booking?.clinicIds?.forEach((clinicId) => {
-		bookingParams.append(SEARCH_PARAMS.CLINIC_ID, clinicId);
+	const legacyBookingPath = resultScreen.booking?.path ?? `/connect-with-support/${institutionReferrer.urlName}`;
+	const configuredLegacyBookingUrl = buildQueryParamUrl(legacyBookingPath, {
+		providerId: resultScreen.booking?.providerId,
+		featureId: resultScreen.booking?.featureId,
+		pageTitle: resultScreen.booking?.pageTitle,
+		pageDescription: resultScreen.booking?.pageDescription,
+		clinicId: resultScreen.booking?.clinicIds,
+		appointmentTypeId: resultScreen.booking?.appointmentTypeIds,
 	});
-
-	resultScreen.booking?.appointmentTypeIds?.forEach((appointmentTypeId) => {
-		bookingParams.append(SEARCH_PARAMS.APPOINTMENT_TYPE_ID, appointmentTypeId);
-	});
+	const legacyBookingUrl =
+		getSafeBookingV1FallbackUrl(configuredLegacyBookingUrl) ??
+		`/connect-with-support/${institutionReferrer.urlName}`;
+	const bookingV2Url =
+		resultScreen.booking?.v2Path ??
+		buildQueryParamUrl('/providers', {
+			featureId: resultScreen.booking?.featureId,
+			institutionLocationId: account?.institutionLocationId,
+		});
+	const bookingPath = institution.bookingV2Enabled
+		? buildBookingV2UrlWithV1Fallback(bookingV2Url, legacyBookingUrl)
+		: legacyBookingUrl;
 
 	return (
 		<>
@@ -152,7 +130,7 @@ export const Component = () => {
 								<Button
 									type="button"
 									onClick={() => {
-										navigate(appendSearchParams(bookingPath, bookingParams));
+										navigate(bookingPath);
 									}}
 								>
 									{resultScreen.buttonText ?? 'Continue to Scheduling'}

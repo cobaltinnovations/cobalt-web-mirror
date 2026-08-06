@@ -7,6 +7,7 @@ import React from 'react';
 import { Button, Row, Col, Form } from 'react-bootstrap';
 import TimeInput from '@/components/time-input';
 import { appointmentService } from '@/lib/services';
+import { getBookingExperienceId } from '@/lib/utils';
 import { AppointmentTypeDropdown } from './appointment-type-dropdown';
 
 interface AppointmentFormSchema {
@@ -24,7 +25,7 @@ interface AppointmentFormProps {
 }
 
 export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSuccess }: AppointmentFormProps) => {
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const handleError = useHandleError();
 
 	return (
@@ -54,6 +55,7 @@ export const AppointmentForm = ({ appointmentId, initialValues, onBack, onSucces
 				});
 
 				const request = appointmentService.rescheduleAppointment(appointmentId, {
+					bookingExperienceId: getBookingExperienceId(institution.bookingV2Enabled),
 					providerId: account.providerId,
 					date: startDateTime.format('YYYY-MM-DD'),
 					time: startDateTime.format('HH:mm'),
