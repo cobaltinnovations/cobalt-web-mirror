@@ -12,7 +12,7 @@ import mediaQueries from '@/jss/media-queries';
 import useAnalytics from '@/hooks/use-analytics';
 import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId, FeatureId } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildQueryParamUrl, getGeneralNavigationFeatures } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
@@ -173,8 +173,9 @@ interface PathwaysSectionProps {
 const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionProps) => {
 	const { account, institution } = useAccount();
 	const { trackEvent } = useAnalytics();
+	const generalNavigationFeatures = getGeneralNavigationFeatures(institution);
 	const classes = useStyles({
-		featuresLength: (institution?.features ?? []).filter((feature) => feature.landingPageVisible).length,
+		featuresLength: generalNavigationFeatures.filter((feature) => feature.landingPageVisible).length,
 	});
 
 	const { startScreeningFlow } = featuresScreeningFlow;
@@ -185,7 +186,7 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 				<Row>
 					<Col>
 						<div className={classes.pathways}>
-							{(institution?.features ?? [])
+							{generalNavigationFeatures
 								.filter((feature) => feature.landingPageVisible)
 								.map(({ featureId, urlName, name, recommended, subtitle }) => (
 									<div key={featureId} className="pathway-outer">

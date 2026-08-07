@@ -34,7 +34,7 @@ import { useAppRootLoaderData } from '@/routes/root';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildQueryParamUrl, getGeneralNavigationFeatures } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 export const HEADER_HEIGHT = 60;
@@ -329,6 +329,7 @@ const HeaderV2 = () => {
 	const { trackEvent } = useAnalytics();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
+	const generalNavigationFeatures = useMemo(() => getGeneralNavigationFeatures(institution), [institution]);
 
 	/* ----------------------------------------------------------- */
 	/* Body padding for fixed header */
@@ -451,12 +452,12 @@ const HeaderV2 = () => {
 						{
 							navigationItemId: 'CONNECT_WITH_SUPPORT',
 							title: 'Connect with Support',
-							active: (institution?.features ?? [])
+							active: generalNavigationFeatures
 								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
 								.filter((feature) => feature.navVisible)
 								.map(({ urlName }) => urlName)
 								.some((urlName) => matchPath(urlName + '/*', pathname)),
-							items: (institution?.features ?? [])
+							items: generalNavigationFeatures
 								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
 								.filter((feature) => feature.navVisible)
 								.map(({ featureId, name, navDescription, urlName }) => ({
@@ -486,13 +487,13 @@ const HeaderV2 = () => {
 				title: 'Browse Resources',
 				subtitle: 'Resources',
 				active: [
-					...(institution?.features ?? [])
+					...generalNavigationFeatures
 						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
 						.map(({ urlName }) => urlName),
 					...exploreLinks.map(({ to }) => to()),
 				].some((to) => matchPath(to + '/*', pathname)),
 				items: [
-					...(institution?.features ?? [])
+					...generalNavigationFeatures
 						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
 						.map(({ featureId, name, navDescription, urlName }) => ({
 							navigationItemId: featureId,
@@ -560,8 +561,8 @@ const HeaderV2 = () => {
 	}, [
 		institution?.additionalNavigationItems,
 		institution?.featuresEnabled,
-		institution?.features,
 		institution.preferLegacyTopicCenters,
+		generalNavigationFeatures,
 		pathname,
 		account?.institutionLocationId,
 	]);

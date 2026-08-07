@@ -5,6 +5,8 @@ import {
 	shouldFetchInstitutionLocation,
 	getBookingExperienceId,
 	getEffectiveBookingV2Enabled,
+	getEffectiveProviderSearchFeatureId,
+	getGeneralNavigationFeatures,
 	getFeatureIdForLegacyCareUrlName,
 	getBookingV2DisabledFallbackUrl,
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
@@ -14,7 +16,7 @@ import {
 	didBookingExperienceChange,
 	getSafeBookingV1FallbackUrl,
 } from './provider-booking-utils';
-import { BookingExperienceId, FeatureId, InstitutionFeature } from '@/lib/models';
+import { BookingExperienceId, FeatureId, InstitutionFeature, SupportRoleId } from '@/lib/models';
 
 describe('provider booking institution locations', () => {
 	it('recognizes the synthetic all-locations option case-insensitively', () => {
@@ -33,6 +35,17 @@ describe('provider booking institution locations', () => {
 });
 
 describe('provider booking experience', () => {
+	const providerFeature = ({
+		featureId,
+		urlName,
+		supportRoleIds,
+	}: Pick<InstitutionFeature, 'featureId' | 'urlName' | 'supportRoleIds'>) =>
+		({
+			featureId,
+			urlName,
+			supportRoleIds,
+		}) as InstitutionFeature;
+
 	it.each([
 		{ bookingV2Enabled: false, integratedCareEnabled: false, expected: false },
 		{ bookingV2Enabled: true, integratedCareEnabled: false, expected: true },
@@ -48,6 +61,70 @@ describe('provider booking experience', () => {
 	it('maps the institution toggle to the API booking experience identifier', () => {
 		expect(getBookingExperienceId(false)).toBe(BookingExperienceId.V1);
 		expect(getBookingExperienceId(true)).toBe(BookingExperienceId.V2);
+	});
+
+	it('uses Mental Health Providers as the canonical V2 navigation feature', () => {
+		const therapy = providerFeature({
+			featureId: FeatureId.THERAPY,
+			urlName: '/providers?featureId=THERAPY',
+			supportRoleIds: [SupportRoleId.Clinician],
+		});
+		const medicationPrescriber = providerFeature({
+			featureId: FeatureId.MEDICATION_PRESCRIBER,
+			urlName: '/providers?featureId=MEDICATION_PRESCRIBER',
+			supportRoleIds: [SupportRoleId.Psychiatrist],
+		});
+		const psychiatrist = providerFeature({
+			featureId: FeatureId.PSYCHIATRIST,
+			urlName: '/providers?featureId=PSYCHIATRIST',
+			supportRoleIds: [SupportRoleId.Psychiatrist],
+		});
+		const mentalHealthProviders = providerFeature({
+			featureId: FeatureId.MENTAL_HEALTH_PROVIDERS,
+			urlName: '/providers?featureId=MENTAL_HEALTH_PROVIDERS',
+			supportRoleIds: [SupportRoleId.Clinician],
+		});
+		const coaching = providerFeature({
+			featureId: FeatureId.COACHING,
+			urlName: '/providers?featureId=COACHING',
+			supportRoleIds: [SupportRoleId.Coach],
+		});
+		const spiritualSupport = providerFeature({
+			featureId: FeatureId.SPIRITUAL_SUPPORT,
+			urlName: '/providers?featureId=SPIRITUAL_SUPPORT',
+			supportRoleIds: [SupportRoleId.Chaplain],
+		});
+		const groupSessions = providerFeature({
+			featureId: FeatureId.GROUP_SESSIONS,
+			urlName: '/group-sessions',
+			supportRoleIds: [],
+		});
+		const features = [
+			therapy,
+			medicationPrescriber,
+			groupSessions,
+			psychiatrist,
+			mentalHealthProviders,
+			coaching,
+			spiritualSupport,
+		];
+
+		expect(getGeneralNavigationFeatures({ features, bookingV2Enabled: false })).toBe(features);
+		expect(getGeneralNavigationFeatures({ features, bookingV2Enabled: true })).toEqual([
+			groupSessions,
+			{
+				...mentalHealthProviders,
+				urlName: '/providers',
+			},
+		]);
+		expect(mentalHealthProviders.urlName).toBe('/providers?featureId=MENTAL_HEALTH_PROVIDERS');
+	});
+
+	it('defaults the canonical provider route to Mental Health Providers without overriding explicit filters', () => {
+		expect(getEffectiveProviderSearchFeatureId()).toBe(FeatureId.MENTAL_HEALTH_PROVIDERS);
+		expect(getEffectiveProviderSearchFeatureId(null)).toBe(FeatureId.MENTAL_HEALTH_PROVIDERS);
+		expect(getEffectiveProviderSearchFeatureId('')).toBe(FeatureId.MENTAL_HEALTH_PROVIDERS);
+		expect(getEffectiveProviderSearchFeatureId(FeatureId.THERAPY)).toBe(FeatureId.THERAPY);
 	});
 
 	it('pins each version-specific booking flow to its own experience', () => {
@@ -81,6 +158,7 @@ describe('provider booking experience', () => {
 			})
 		).toBe('/connect-with-support/therapy?source=booking&institutionLocationId=location-id');
 		expect(getBookingV2DisabledFallbackUrl({ features, featureId: 'UNKNOWN' })).toBe('/');
+		expect(getBookingV2DisabledFallbackUrl({ features })).toBe('/');
 		expect(
 			getBookingV2DisabledFallbackUrl({
 				features,

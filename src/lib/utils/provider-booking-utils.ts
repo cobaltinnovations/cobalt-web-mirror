@@ -26,6 +26,35 @@ export const getEffectiveBookingV2Enabled = ({
 	integratedCareEnabled,
 }: Pick<Institution, 'bookingV2Enabled' | 'integratedCareEnabled'>) => bookingV2Enabled && !integratedCareEnabled;
 
+export const getGeneralNavigationFeatures = ({
+	features,
+	bookingV2Enabled,
+}: Pick<Institution, 'features' | 'bookingV2Enabled'>): InstitutionFeature[] => {
+	if (!bookingV2Enabled) {
+		return features;
+	}
+
+	return features.flatMap((feature) => {
+		if (feature.supportRoleIds.length === 0) {
+			return [feature];
+		}
+
+		if (feature.featureId !== FeatureId.MENTAL_HEALTH_PROVIDERS) {
+			return [];
+		}
+
+		return [
+			{
+				...feature,
+				urlName: '/providers',
+			},
+		];
+	});
+};
+
+export const getEffectiveProviderSearchFeatureId = (featureId?: string | null) =>
+	featureId || FeatureId.MENTAL_HEALTH_PROVIDERS;
+
 export const getSafeBookingV1FallbackUrl = (fallbackUrl?: string) => {
 	if (!fallbackUrl?.startsWith('/')) {
 		return undefined;

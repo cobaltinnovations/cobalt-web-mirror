@@ -27,6 +27,7 @@ import {
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
 	buildBookingV2UrlWithV1Fallback,
 	getBookingV1FallbackUrlFromSearchParams,
+	getEffectiveProviderSearchFeatureId,
 	getPersistedInstitutionLocationId,
 	isAllInstitutionLocationsId,
 } from '@/lib/utils';
@@ -284,7 +285,10 @@ export const Component = () => {
 	/* Search Params */
 	/* -------------------------------- */
 	const [searchParams, setSearchParams] = useSearchParams();
-	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
+	const featureId = useMemo(
+		() => getEffectiveProviderSearchFeatureId(searchParams.get('featureId')),
+		[searchParams]
+	);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const bookingV1FallbackUrl = useMemo(() => getBookingV1FallbackUrlFromSearchParams(searchParams), [searchParams]);
 	const forceLocation = useMemo(() => {
