@@ -6,7 +6,13 @@ import InputHelper from '@/components/input-helper';
 import NoData from '@/components/no-data';
 import {
 	BACKGROUND_COLOR_ID,
+	CallToActionBlockRowModel,
+	CallToActionFullWidthRowModel,
+	CustomRowModel,
 	GroupSessionsRowModel,
+	isCallToActionBlockRow,
+	isCallToActionFullWidthRow,
+	isCustomRow,
 	isGroupSessionsRow,
 	isMailingListRow,
 	isOneColumnImageRow,
@@ -63,6 +69,10 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 			{ check: isTagGroupRow, title: () => 'Tag Group' },
 			{ check: isTagRow, title: () => 'Tag' },
 			{
+				check: isCustomRow,
+				title: (row: CustomRowModel) => row.name,
+			},
+			{
 				check: (row: PageRowUnionModel) =>
 					isOneColumnImageRow(row) || isTwoColumnImageRow(row) || isThreeColumnImageRow(row),
 				title: (row: OneColumnImageRowModel) => row.columnOne.headline ?? 'Custom Row',
@@ -72,6 +82,14 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 				title: (row: MailingListRowModel) => {
 					return row.title ?? 'Subscribe';
 				},
+			},
+			{
+				check: isCallToActionBlockRow,
+				title: (row: CallToActionBlockRowModel) => row.headline || row.name,
+			},
+			{
+				check: isCallToActionFullWidthRow,
+				title: (row: CallToActionFullWidthRowModel) => row.headline || row.name,
 			},
 		];
 
@@ -96,12 +114,19 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 				getSubtitle: (row: GroupSessionsRowModel) =>
 					`${row.groupSessions.length} Session${row.groupSessions.length === 1 ? '' : 's'}`,
 			},
+			{
+				check: isCustomRow,
+				getSubtitle: (row: CustomRowModel) =>
+					`${row.columns.length} Column${row.columns.length === 1 ? '' : 's'}`,
+			},
 			{ check: isTagGroupRow, getSubtitle: (row: TagGroupRowModel) => row.tagGroup.name },
-			{ check: isTagRow, getSubtitle: (row: TagRowModel) => row.tag.name },
+			{ check: isTagRow, getSubtitle: (row: TagRowModel) => row.tag?.name ?? 'Tag' },
 			{ check: isOneColumnImageRow, getSubtitle: () => '1 Item' },
 			{ check: isTwoColumnImageRow, getSubtitle: () => '2 Items' },
 			{ check: isThreeColumnImageRow, getSubtitle: () => '3 Items' },
 			{ check: isMailingListRow, getSubtitle: () => 'Subscribe' },
+			{ check: isCallToActionBlockRow, getSubtitle: () => 'Block CTA' },
+			{ check: isCallToActionFullWidthRow, getSubtitle: () => 'Full-width CTA' },
 		];
 
 		for (const { check, getSubtitle } of rowTypeMap) {
@@ -204,27 +229,17 @@ export const SectionSettingsForm = ({ onAddRowButtonClick, onRowButtonClick }: S
 					value={formValues.description}
 					onChange={handleInputChange}
 				/>
-				<Form.Group className="mb-6">
-					<Form.Label className="mb-2">Background color</Form.Label>
-					<Form.Check
-						type="radio"
-						id="background-color--white"
-						label="White"
-						name="backgroundColor"
-						value={BACKGROUND_COLOR_ID.WHITE}
-						checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.WHITE}
-						onChange={handleInputChange}
-					/>
-					<Form.Check
-						type="radio"
-						id="background-color--neutral"
-						label="Neutral"
-						name="backgroundColor"
-						value={BACKGROUND_COLOR_ID.NEUTRAL}
-						checked={formValues.backgroundColor === BACKGROUND_COLOR_ID.NEUTRAL}
-						onChange={handleInputChange}
-					/>
-				</Form.Group>
+				<InputHelper
+					className="mb-6"
+					as="select"
+					label="Background color"
+					name="backgroundColor"
+					value={formValues.backgroundColor}
+					onChange={handleInputChange}
+				>
+					<option value={BACKGROUND_COLOR_ID.WHITE}>White</option>
+					<option value={BACKGROUND_COLOR_ID.NEUTRAL}>Neutral</option>
+				</InputHelper>
 			</CollapseButton>
 			<hr />
 			<Form.Group className="py-6 d-flex align-items-center justify-content-between">

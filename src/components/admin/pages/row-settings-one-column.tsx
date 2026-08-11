@@ -1,49 +1,74 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { OneColumnImageRowModel } from '@/lib/models';
+import { OneColumnRowModel, ROW_TYPE_ID } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
+import { RowSettingsMetaForm } from '@/components/admin/pages';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
 
-export const RowSettingsOneColumn = () => {
+interface RowSettingsOneColumnProps {
+	nameInputRef?: RefObject<HTMLInputElement>;
+	pageRow: OneColumnRowModel;
+}
+
+type OneColumnFormValues = {
+	columnOne: {
+		headline: string;
+		description: string;
+		imageFileUploadId: string;
+		imageUrl: string;
+		imageAltText: string;
+	};
+};
+
+const persistOneColumnRow = (pageRow: OneColumnRowModel, formValues: OneColumnFormValues) => {
+	const data = { columnOne: formValues.columnOne };
+
+	switch (pageRow.rowTypeId) {
+		case ROW_TYPE_ID.ONE_COLUMN_IMAGE:
+			return pagesService.updateOneColumnRow(pageRow.pageRowId, data).fetch();
+		case ROW_TYPE_ID.ONE_COLUMN_IMAGE_RIGHT:
+			return pagesService.updateOneColumnImageRightRow(pageRow.pageRowId, data).fetch();
+		case ROW_TYPE_ID.ONE_COLUMN_TEXT:
+			return pagesService.updateOneColumnTextRow(pageRow.pageRowId, data).fetch();
+		default: {
+			const unsupportedRowType: never = pageRow.rowTypeId;
+			throw new Error(`Unsupported one-column row type: ${unsupportedRowType}`);
+		}
+	}
+};
+
+export const RowSettingsOneColumn = ({ nameInputRef, pageRow }: RowSettingsOneColumnProps) => {
 	const handleError = useHandleError();
-	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
-	const oneColumnImageRow = useMemo(() => currentPageRow as OneColumnImageRowModel | undefined, [currentPageRow]);
-	const [formValues, setFormValues] = useState({
+	const { updatePageRow, setIsSaving } = usePageBuilderContext();
+	const isTextRow = pageRow.rowTypeId === ROW_TYPE_ID.ONE_COLUMN_TEXT;
+	const [formValues, setFormValues] = useState<OneColumnFormValues>({
 		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
 	});
 
 	useEffect(() => {
-		if (!oneColumnImageRow) {
-			return;
-		}
-
 		setFormValues({
 			columnOne: {
-				headline: oneColumnImageRow.columnOne.headline ?? '',
-				description: oneColumnImageRow.columnOne.description ?? '',
-				imageFileUploadId: oneColumnImageRow.columnOne.imageFileUploadId ?? '',
-				imageUrl: oneColumnImageRow.columnOne.imageUrl ?? '',
-				imageAltText: oneColumnImageRow.columnOne.imageAltText ?? '',
+				headline: pageRow.columnOne.headline ?? '',
+				description: pageRow.columnOne.description ?? '',
+				imageFileUploadId: pageRow.columnOne.imageFileUploadId ?? '',
+				imageUrl: pageRow.columnOne.imageUrl ?? '',
+				imageAltText: pageRow.columnOne.imageAltText ?? '',
 			},
 		});
-	}, [oneColumnImageRow]);
+	}, [pageRow]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(
-		async (ocir: OneColumnImageRowModel, fv: typeof formValues) => {
+		async (oneColumnRow: OneColumnRowModel, fv: OneColumnFormValues) => {
 			setIsSaving(true);
 
 			try {
-				const response = await pagesService
-					.updateOneColumnRow(ocir.pageRowId, {
-						columnOne: fv.columnOne,
-					})
-					.fetch();
+				const response = await persistOneColumnRow(oneColumnRow, fv);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -53,6 +78,12 @@ export const RowSettingsOneColumn = () => {
 			}
 		}
 	);
+
+	useEffect(() => {
+		return () => {
+			void debouncedSubmission.flush();
+		};
+	}, [debouncedSubmission]);
 
 	const handleInputChange = useCallback(
 		(
@@ -68,14 +99,12 @@ export const RowSettingsOneColumn = () => {
 					},
 				};
 
-				if (oneColumnImageRow) {
-					debouncedSubmission(oneColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 
 				return newValue;
 			});
 		},
-		[debouncedSubmission, oneColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleQuillChange = useCallback(
@@ -89,14 +118,12 @@ export const RowSettingsOneColumn = () => {
 					},
 				};
 
-				if (oneColumnImageRow) {
-					debouncedSubmission(oneColumnImageRow, newValue);
-				}
+				debouncedSubmission(pageRow, newValue);
 
 				return newValue;
 			});
 		},
-		[debouncedSubmission, oneColumnImageRow]
+		[debouncedSubmission, pageRow]
 	);
 
 	const handleUploadComplete = useCallback(
@@ -104,19 +131,15 @@ export const RowSettingsOneColumn = () => {
 			setIsSaving(true);
 
 			try {
-				if (!oneColumnImageRow) {
-					throw new Error('oneColumnImageRow is undefined.');
-				}
-
-				const response = await pagesService
-					.updateOneColumnRow(oneColumnImageRow.pageRowId, {
-						...formValues,
-						[column]: {
-							...formValues[column],
-							imageFileUploadId,
-						},
-					})
-					.fetch();
+				const nextValue = {
+					...formValues,
+					[column]: {
+						...formValues[column],
+						imageFileUploadId,
+					},
+				};
+				debouncedSubmission.cancel();
+				const response = await persistOneColumnRow(pageRow, nextValue);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -125,7 +148,7 @@ export const RowSettingsOneColumn = () => {
 				setIsSaving(false);
 			}
 		},
-		[formValues, handleError, oneColumnImageRow, setIsSaving, updatePageRow]
+		[debouncedSubmission, formValues, handleError, pageRow, setIsSaving, updatePageRow]
 	);
 
 	const handleImageChange = useCallback(
@@ -148,6 +171,7 @@ export const RowSettingsOneColumn = () => {
 
 	return (
 		<>
+			<RowSettingsMetaForm nameInputRef={nameInputRef} pageRow={pageRow} />
 			<CollapseButton title="Item 1" initialShow>
 				<InputHelper
 					className="mb-4"
@@ -162,6 +186,7 @@ export const RowSettingsOneColumn = () => {
 				<Form.Group className="mb-4">
 					<Form.Label className="mb-2">Description</Form.Label>
 					<WysiwygBasic
+						toolbarPreset="page-builder"
 						height={228}
 						value={formValues.columnOne.description}
 						onChange={(value) => {
@@ -169,35 +194,37 @@ export const RowSettingsOneColumn = () => {
 						}}
 					/>
 				</Form.Group>
-				<Form.Group className="mb-6">
-					<Form.Label className="mb-2">Image</Form.Label>
-					<AdminFormImageInput
-						className="mb-4"
-						imageSrc={formValues.columnOne.imageUrl}
-						onSrcChange={(nextId, nextSrc) => {
-							handleImageChange('columnOne', { nextId, nextSrc });
-						}}
-						onUploadComplete={(fileUploadId) => {
-							handleUploadComplete('columnOne', fileUploadId);
-						}}
-						presignedUploadGetter={(blob, name) => {
-							return pagesService.createPresignedFileUpload({
-								contentType: blob.type,
-								filename: name,
-							}).fetch;
-						}}
-						cropImage={false}
-					/>
-					<InputHelper
-						type="text"
-						label="Image alt text"
-						name="imageAltText"
-						value={formValues.columnOne.imageAltText}
-						onChange={(event) => {
-							handleInputChange('columnOne', event);
-						}}
-					/>
-				</Form.Group>
+				{!isTextRow && (
+					<Form.Group className="mb-6">
+						<Form.Label className="mb-2">Image</Form.Label>
+						<AdminFormImageInput
+							className="mb-4"
+							imageSrc={formValues.columnOne.imageUrl}
+							onSrcChange={(nextId, nextSrc) => {
+								handleImageChange('columnOne', { nextId, nextSrc });
+							}}
+							onUploadComplete={(fileUploadId) => {
+								handleUploadComplete('columnOne', fileUploadId);
+							}}
+							presignedUploadGetter={(blob, name) => {
+								return pagesService.createPresignedFileUpload({
+									contentType: blob.type,
+									filename: name,
+								}).fetch;
+							}}
+							cropImage={false}
+						/>
+						<InputHelper
+							type="text"
+							label="Image alt text"
+							name="imageAltText"
+							value={formValues.columnOne.imageAltText}
+							onChange={(event) => {
+								handleInputChange('columnOne', event);
+							}}
+						/>
+					</Form.Group>
+				)}
 			</CollapseButton>
 		</>
 	);

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { MailingListRowModel } from '@/lib/models';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -6,8 +6,13 @@ import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { pagesService } from '@/lib/services';
+import { RowSettingsMetaForm } from '@/components/admin/pages';
 
-export const RowSettingsMailingList = () => {
+interface RowSettingsMailingListProps {
+	nameInputRef?: RefObject<HTMLInputElement>;
+}
+
+export const RowSettingsMailingList = ({ nameInputRef }: RowSettingsMailingListProps) => {
 	const handleError = useHandleError();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const mailingListRow = useMemo(() => currentPageRow as MailingListRowModel | undefined, [currentPageRow]);
@@ -65,6 +70,7 @@ export const RowSettingsMailingList = () => {
 
 	return (
 		<>
+			<RowSettingsMetaForm nameInputRef={nameInputRef} />
 			<Form.Group className="mb-6">
 				<Form.Label className="mb-2">Title</Form.Label>
 				<InputHelper

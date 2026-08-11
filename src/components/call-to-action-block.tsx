@@ -2,6 +2,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import classNames from 'classnames';
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
+import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 
 type variant = 'primary' | 'light';
 
@@ -63,11 +64,13 @@ interface CallToActionBlockProps {
 	imageUrl: string;
 	primaryActionText?: string;
 	onPrimaryActionClick?: () => void;
+	onDescriptionLinkClick?: ({ linkUrl, linkText }: { linkUrl: string; linkText: string }) => void;
 	subheading?: string;
 	secondaryActionText?: string;
 	onSecondaryActionClick?: () => void;
 	className?: string;
 	variant?: variant;
+	forceMobileLayout?: boolean;
 }
 
 const CallToActionBlock = ({
@@ -78,36 +81,48 @@ const CallToActionBlock = ({
 	primaryActionText,
 	secondaryActionText,
 	onPrimaryActionClick,
+	onDescriptionLinkClick,
 	onSecondaryActionClick,
 	className,
 	variant,
+	forceMobileLayout = false,
 }: CallToActionBlockProps) => {
 	const classes = useStyles({
 		variant,
 	});
 
 	return (
-		<div className={classNames(className, classes.container, 'px-6 py-10 px-lg-16 py-lg-16')}>
+		<div
+			className={classNames(
+				className,
+				classes.container,
+				forceMobileLayout ? 'px-6 py-10' : 'px-6 py-10 px-lg-16 py-lg-16'
+			)}
+		>
 			<Row>
-				<Col xs={12} md={8} lg={7} className="d-flex flex-column">
+				<Col
+					xs={12}
+					md={forceMobileLayout ? undefined : 8}
+					lg={forceMobileLayout ? undefined : 7}
+					className="d-flex flex-column"
+				>
 					{subheading && <p className={classes.subheading}>{subheading}</p>}
 
 					<h2 className="my-4">{heading}</h2>
 
-					<div
+					<WysiwygDisplay
 						className={classNames(classes.htmlContent, {
 							'mb-10': primaryActionText || secondaryActionText,
 						})}
-						dangerouslySetInnerHTML={{
-							__html: descriptionHtml,
-						}}
+						html={descriptionHtml}
+						onClick={onDescriptionLinkClick}
 					/>
 
 					{(primaryActionText || secondaryActionText) && (
-						<div className="d-flex flex-column d-lg-block mt-auto">
+						<div className={classNames('d-flex flex-column mt-auto', { 'd-lg-block': !forceMobileLayout })}>
 							{primaryActionText && (
 								<Button
-									className="align-self-lg-start"
+									className={classNames({ 'align-self-lg-start': !forceMobileLayout })}
 									variant={variant === 'light' ? 'primary' : 'light'}
 									onClick={onPrimaryActionClick}
 								>
@@ -116,7 +131,9 @@ const CallToActionBlock = ({
 							)}
 							{secondaryActionText && (
 								<Button
-									className="mt-4 mt-lg-0 ms-lg-2 align-self-lg-start"
+									className={classNames('mt-4', {
+										'mt-lg-0 ms-lg-2 align-self-lg-start': !forceMobileLayout,
+									})}
 									variant={variant === 'light' ? 'outline-primary' : 'primary'}
 									onClick={onSecondaryActionClick}
 								>
@@ -128,7 +145,14 @@ const CallToActionBlock = ({
 				</Col>
 
 				{imageUrl && (
-					<Col xs={12} md={4} lg={{ span: 4, offset: 1 }} className="d-flex mt-12 mt-md-0">
+					<Col
+						xs={12}
+						md={forceMobileLayout ? undefined : 4}
+						lg={forceMobileLayout ? undefined : { span: 4, offset: 1 }}
+						className={classNames('d-flex mt-12', {
+							'mt-md-0': !forceMobileLayout,
+						})}
+					>
 						<img className="w-100 align-self-center" src={imageUrl} alt={heading} />
 					</Col>
 				)}
