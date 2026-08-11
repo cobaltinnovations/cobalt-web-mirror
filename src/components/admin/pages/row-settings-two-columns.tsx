@@ -1,6 +1,6 @@
-import React, { RefObject, useCallback, useEffect, useState } from 'react';
+import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { ROW_TYPE_ID, TwoColumnRowModel } from '@/lib/models';
+import { ImageModel, ROW_TYPE_ID, TwoColumnRowModel } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -8,8 +8,11 @@ import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import { RowSettingsMetaForm } from '@/components/admin/pages';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
+import { AdminFormImageInputV2 } from '@/components/admin/admin-form-image-input-v2';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
+import useAccount from '@/hooks/use-account';
+import { getPageBuilderImageAssociationRequest } from './page-builder-image';
 
 interface RowSettingsTwoColumnsProps {
 	nameInputRef?: RefObject<HTMLInputElement>;
@@ -20,6 +23,7 @@ type TwoColumnFormValues = {
 	columnOne: {
 		headline: string;
 		description: string;
+		image?: ImageModel;
 		imageFileUploadId: string;
 		imageUrl: string;
 		imageAltText: string;
@@ -27,14 +31,25 @@ type TwoColumnFormValues = {
 	columnTwo: {
 		headline: string;
 		description: string;
+		image?: ImageModel;
 		imageFileUploadId: string;
 		imageUrl: string;
 		imageAltText: string;
 	};
 };
 
-const persistTwoColumnRow = (pageRow: TwoColumnRowModel, formValues: TwoColumnFormValues) => {
-	const data = { columnOne: formValues.columnOne, columnTwo: formValues.columnTwo };
+const persistTwoColumnRow = (
+	pageRow: TwoColumnRowModel,
+	formValues: TwoColumnFormValues,
+	imageRepositoryEnabled: boolean
+) => {
+	const toRequest = (column: TwoColumnFormValues['columnOne']) => ({
+		headline: column.headline,
+		description: column.description,
+		imageAltText: column.imageAltText,
+		...getPageBuilderImageAssociationRequest(column, imageRepositoryEnabled),
+	});
+	const data = { columnOne: toRequest(formValues.columnOne), columnTwo: toRequest(formValues.columnTwo) };
 
 	switch (pageRow.rowTypeId) {
 		case ROW_TYPE_ID.TWO_COLUMN_IMAGE:
@@ -50,18 +65,35 @@ const persistTwoColumnRow = (pageRow: TwoColumnRowModel, formValues: TwoColumnFo
 
 export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoColumnsProps) => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const { updatePageRow, setIsSaving } = usePageBuilderContext();
 	const isTextRow = pageRow.rowTypeId === ROW_TYPE_ID.TWO_COLUMN_TEXT;
 	const [formValues, setFormValues] = useState<TwoColumnFormValues>({
-		columnOne: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
-		columnTwo: { headline: '', description: '', imageFileUploadId: '', imageUrl: '', imageAltText: '' },
+		columnOne: {
+			headline: '',
+			description: '',
+			image: undefined,
+			imageFileUploadId: '',
+			imageUrl: '',
+			imageAltText: '',
+		},
+		columnTwo: {
+			headline: '',
+			description: '',
+			image: undefined,
+			imageFileUploadId: '',
+			imageUrl: '',
+			imageAltText: '',
+		},
 	});
+	const formValuesRef = useRef(formValues);
 
 	useEffect(() => {
-		setFormValues({
+		const nextValues: TwoColumnFormValues = {
 			columnOne: {
 				headline: pageRow.columnOne.headline ?? '',
 				description: pageRow.columnOne.description ?? '',
+				image: pageRow.columnOne.image,
 				imageFileUploadId: pageRow.columnOne.imageFileUploadId ?? '',
 				imageUrl: pageRow.columnOne.imageUrl ?? '',
 				imageAltText: pageRow.columnOne.imageAltText ?? '',
@@ -69,11 +101,14 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 			columnTwo: {
 				headline: pageRow.columnTwo.headline ?? '',
 				description: pageRow.columnTwo.description ?? '',
+				image: pageRow.columnTwo.image,
 				imageFileUploadId: pageRow.columnTwo.imageFileUploadId ?? '',
 				imageUrl: pageRow.columnTwo.imageUrl ?? '',
 				imageAltText: pageRow.columnTwo.imageAltText ?? '',
 			},
-		});
+		};
+		formValuesRef.current = nextValues;
+		setFormValues(nextValues);
 	}, [pageRow]);
 
 	const debouncedSubmission = useDebouncedAsyncFunction(
@@ -81,7 +116,7 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 			setIsSaving(true);
 
 			try {
-				const response = await persistTwoColumnRow(twoColumnRow, fv);
+				const response = await persistTwoColumnRow(twoColumnRow, fv, institution.imageRepositoryEnabled);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -91,6 +126,11 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 			}
 		}
 	);
+
+	const setLocalFormValues = useCallback((nextValues: TwoColumnFormValues) => {
+		formValuesRef.current = nextValues;
+		setFormValues(nextValues);
+	}, []);
 
 	useEffect(() => {
 		return () => {
@@ -103,39 +143,29 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 			column: keyof typeof formValues,
 			{ currentTarget }: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 		) => {
-			setFormValues((previousValue) => {
-				const newValue = {
-					...previousValue,
-					[column]: {
-						...previousValue[column],
-						[currentTarget.name]: currentTarget.value,
-					},
-				};
-
-				debouncedSubmission(pageRow, newValue);
-
-				return newValue;
-			});
+			const nextValues = {
+				...formValuesRef.current,
+				[column]: {
+					...formValuesRef.current[column],
+					[currentTarget.name]: currentTarget.value,
+				},
+			};
+			setLocalFormValues(nextValues);
+			debouncedSubmission(pageRow, nextValues);
 		},
-		[debouncedSubmission, pageRow]
+		[debouncedSubmission, pageRow, setLocalFormValues]
 	);
 
 	const handleQuillChange = useCallback(
 		(column: keyof typeof formValues, description: string) => {
-			setFormValues((previousValue) => {
-				const newValue = {
-					...previousValue,
-					[column]: {
-						...previousValue[column],
-						description,
-					},
-				};
-
-				debouncedSubmission(pageRow, newValue);
-				return newValue;
-			});
+			const nextValues = {
+				...formValuesRef.current,
+				[column]: { ...formValuesRef.current[column], description },
+			};
+			setLocalFormValues(nextValues);
+			debouncedSubmission(pageRow, nextValues);
 		},
-		[debouncedSubmission, pageRow]
+		[debouncedSubmission, pageRow, setLocalFormValues]
 	);
 
 	const handleUploadComplete = useCallback(
@@ -144,14 +174,15 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 
 			try {
 				const nextValue = {
-					...formValues,
+					...formValuesRef.current,
 					[column]: {
-						...formValues[column],
+						...formValuesRef.current[column],
 						imageFileUploadId,
 					},
 				};
+				setLocalFormValues(nextValue);
 				debouncedSubmission.cancel();
-				const response = await persistTwoColumnRow(pageRow, nextValue);
+				const response = await persistTwoColumnRow(pageRow, nextValue, institution.imageRepositoryEnabled);
 
 				updatePageRow(response.pageRow);
 			} catch (error) {
@@ -160,25 +191,60 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 				setIsSaving(false);
 			}
 		},
-		[debouncedSubmission, formValues, handleError, pageRow, setIsSaving, updatePageRow]
+		[
+			debouncedSubmission,
+			handleError,
+			institution.imageRepositoryEnabled,
+			pageRow,
+			setIsSaving,
+			setLocalFormValues,
+			updatePageRow,
+		]
 	);
 
 	const handleImageChange = useCallback(
 		async (column: keyof typeof formValues, { nextId, nextSrc }: { nextId: string; nextSrc: string }) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
+			setLocalFormValues({
+				...formValuesRef.current,
 				[column]: {
-					...previousValue[column],
+					...formValuesRef.current[column],
 					imageFileUploadId: nextId,
 					imageUrl: nextSrc,
 				},
-			}));
+			});
 
 			if (!nextId && !nextSrc) {
 				handleUploadComplete(column, '');
 			}
 		},
-		[handleUploadComplete]
+		[handleUploadComplete, setLocalFormValues]
+	);
+
+	const handleRepositoryImageChange = useCallback(
+		async (column: keyof TwoColumnFormValues, image?: ImageModel) => {
+			const nextValues: TwoColumnFormValues = {
+				...formValuesRef.current,
+				[column]: {
+					...formValuesRef.current[column],
+					image,
+					imageFileUploadId: image?.fileUploadId ?? '',
+					imageUrl: image?.url ?? '',
+				},
+			};
+			setLocalFormValues(nextValues);
+			debouncedSubmission.cancel();
+			setIsSaving(true);
+
+			try {
+				const response = await persistTwoColumnRow(pageRow, nextValues, true);
+				updatePageRow(response.pageRow);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsSaving(false);
+			}
+		},
+		[debouncedSubmission, handleError, pageRow, setIsSaving, setLocalFormValues, updatePageRow]
 	);
 
 	return (
@@ -209,22 +275,33 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 				{!isTextRow && (
 					<Form.Group className="mb-6">
 						<Form.Label className="mb-2">Image</Form.Label>
-						<AdminFormImageInput
-							className="mb-4"
-							imageSrc={formValues.columnOne.imageUrl}
-							onSrcChange={(nextId, nextSrc) => {
-								handleImageChange('columnOne', { nextId, nextSrc });
-							}}
-							onUploadComplete={(fileUploadId) => {
-								handleUploadComplete('columnOne', fileUploadId);
-							}}
-							presignedUploadGetter={(blob, name) => {
-								return pagesService.createPresignedFileUpload({
-									contentType: blob.type,
-									filename: name,
-								}).fetch;
-							}}
-						/>
+						{institution.imageRepositoryEnabled ? (
+							<AdminFormImageInputV2
+								className="mb-4"
+								buttonClassName="d-block w-100"
+								value={formValues.columnOne.image}
+								onChange={(image) => {
+									void handleRepositoryImageChange('columnOne', image);
+								}}
+							/>
+						) : (
+							<AdminFormImageInput
+								className="mb-4"
+								imageSrc={formValues.columnOne.imageUrl}
+								onSrcChange={(nextId, nextSrc) => {
+									handleImageChange('columnOne', { nextId, nextSrc });
+								}}
+								onUploadComplete={(fileUploadId) => {
+									void handleUploadComplete('columnOne', fileUploadId);
+								}}
+								presignedUploadGetter={(blob, name) => {
+									return pagesService.createPresignedFileUpload({
+										contentType: blob.type,
+										filename: name,
+									}).fetch;
+								}}
+							/>
+						)}
 						<InputHelper
 							type="text"
 							label="Image alt text"
@@ -263,22 +340,33 @@ export const RowSettingsTwoColumns = ({ nameInputRef, pageRow }: RowSettingsTwoC
 				{!isTextRow && (
 					<Form.Group className="mb-6">
 						<Form.Label className="mb-2">Image</Form.Label>
-						<AdminFormImageInput
-							className="mb-4"
-							imageSrc={formValues.columnTwo.imageUrl}
-							onSrcChange={(nextId, nextSrc) => {
-								handleImageChange('columnTwo', { nextId, nextSrc });
-							}}
-							onUploadComplete={(fileUploadId) => {
-								handleUploadComplete('columnTwo', fileUploadId);
-							}}
-							presignedUploadGetter={(blob, name) => {
-								return pagesService.createPresignedFileUpload({
-									contentType: blob.type,
-									filename: name,
-								}).fetch;
-							}}
-						/>
+						{institution.imageRepositoryEnabled ? (
+							<AdminFormImageInputV2
+								className="mb-4"
+								buttonClassName="d-block w-100"
+								value={formValues.columnTwo.image}
+								onChange={(image) => {
+									void handleRepositoryImageChange('columnTwo', image);
+								}}
+							/>
+						) : (
+							<AdminFormImageInput
+								className="mb-4"
+								imageSrc={formValues.columnTwo.imageUrl}
+								onSrcChange={(nextId, nextSrc) => {
+									handleImageChange('columnTwo', { nextId, nextSrc });
+								}}
+								onUploadComplete={(fileUploadId) => {
+									void handleUploadComplete('columnTwo', fileUploadId);
+								}}
+								presignedUploadGetter={(blob, name) => {
+									return pagesService.createPresignedFileUpload({
+										contentType: blob.type,
+										filename: name,
+									}).fetch;
+								}}
+							/>
+						)}
 						<InputHelper
 							type="text"
 							label="Image alt text"

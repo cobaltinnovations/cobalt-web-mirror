@@ -35,6 +35,19 @@ export interface GetPagesResponse {
 	pages: PageDetailModel[];
 }
 
+export interface PageImageAssociationRequest {
+	imageId?: string;
+	imageFileUploadId?: string;
+}
+
+export interface PageRowColumnRequest extends PageImageAssociationRequest {
+	headline?: string;
+	description?: string;
+	imageAltText?: string;
+	usePlaceholderImage?: boolean;
+	contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
+}
+
 export const pagesService = {
 	validatePageUrl(searchParameters?: { searchQuery?: string; pageId?: string }) {
 		return httpSingleton.orchestrateRequest<{
@@ -50,6 +63,7 @@ export const pagesService = {
 		pageStatusId: PAGE_STATUS_ID;
 		headline?: string;
 		description?: string;
+		imageId?: string;
 		imageFileUploadId?: string;
 		imageAltText?: string;
 	}) {
@@ -105,7 +119,8 @@ export const pagesService = {
 		data: {
 			headline: string;
 			description: string;
-			imageFileUploadId: string;
+			imageId?: string;
+			imageFileUploadId?: string;
 			imageAltText: string;
 		}
 	) {
@@ -272,17 +287,7 @@ export const pagesService = {
 			data,
 		});
 	},
-	createCustomRowColumn(
-		pageRowId: string,
-		data: {
-			headline?: string;
-			description?: string;
-			imageFileUploadId?: string;
-			imageAltText?: string;
-			usePlaceholderImage?: boolean;
-			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
-		} = {}
-	) {
+	createCustomRowColumn(pageRowId: string, data: PageRowColumnRequest = {}) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: CustomRowModel;
 		}>({
@@ -300,18 +305,7 @@ export const pagesService = {
 			data,
 		});
 	},
-	updateCustomRowColumn(
-		pageRowId: string,
-		pageRowColumnId: string,
-		data: {
-			headline?: string;
-			description?: string;
-			imageFileUploadId?: string;
-			imageAltText?: string;
-			usePlaceholderImage?: boolean;
-			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
-		}
-	) {
+	updateCustomRowColumn(pageRowId: string, pageRowColumnId: string, data: PageRowColumnRequest) {
 		return httpSingleton.orchestrateRequest<{
 			pageRow: CustomRowModel;
 		}>({
@@ -340,12 +334,7 @@ export const pagesService = {
 	updateOneColumnRow(
 		pageRowId: string,
 		data: {
-			columnOne: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
+			columnOne: PageRowColumnRequest;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -368,18 +357,8 @@ export const pagesService = {
 	updateTwoColumnRow(
 		pageRowId: string,
 		data: {
-			columnOne: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
-			columnTwo: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
+			columnOne: PageRowColumnRequest;
+			columnTwo: PageRowColumnRequest;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -402,24 +381,9 @@ export const pagesService = {
 	updateThreeColumnRow(
 		pageRowId: string,
 		data: {
-			columnOne: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
-			columnTwo: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
-			columnThree: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
+			columnOne: PageRowColumnRequest;
+			columnTwo: PageRowColumnRequest;
+			columnThree: PageRowColumnRequest;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -458,6 +422,7 @@ export const pagesService = {
 			description?: string;
 			buttonText?: string;
 			buttonUrl?: string;
+			imageId?: string;
 			imageFileUploadId?: string;
 		} = {}
 	) {
@@ -476,6 +441,7 @@ export const pagesService = {
 			description: string;
 			buttonText: string;
 			buttonUrl: string;
+			imageId?: string;
 			imageFileUploadId?: string;
 		}
 	) {
@@ -628,12 +594,7 @@ export const pagesService = {
 	updateOneColumnTextRow(
 		pageRowId: string,
 		data: {
-			columnOne: {
-				headline: string;
-				description: string;
-				imageFileUploadId?: string;
-				imageAltText?: string;
-			};
+			columnOne: PageRowColumnRequest;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -656,12 +617,7 @@ export const pagesService = {
 	updateOneColumnImageRightRow(
 		pageRowId: string,
 		data: {
-			columnOne: {
-				headline: string;
-				description: string;
-				imageFileUploadId: string;
-				imageAltText: string;
-			};
+			columnOne: PageRowColumnRequest;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -684,18 +640,8 @@ export const pagesService = {
 	updateTwoColumnTextRow(
 		pageRowId: string,
 		data: {
-			columnOne: {
-				headline: string;
-				description: string;
-				imageFileUploadId?: string;
-				imageAltText?: string;
-			};
-			columnTwo: {
-				headline: string;
-				description: string;
-				imageFileUploadId?: string;
-				imageAltText?: string;
-			};
+			columnOne: PageRowColumnRequest;
+			columnTwo: PageRowColumnRequest;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{

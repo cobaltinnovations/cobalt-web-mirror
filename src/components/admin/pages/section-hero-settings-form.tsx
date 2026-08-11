@@ -1,94 +1,69 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
 import InputHelper from '@/components/input-helper';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
+import { AdminFormImageInputV2 } from '@/components/admin/admin-form-image-input-v2';
 import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
-import { PageDetailModel } from '@/lib/models';
+import { ImageModel, PageDetailModel } from '@/lib/models';
 import { SIZE_SELECTIONS } from '@/components/session-crop-modal';
+import useAccount from '@/hooks/use-account';
+import { getPageBuilderImageAssociationRequest } from './page-builder-image';
 
 export const HERO_SECTION_ID = 'HERO';
 
+interface HeroFormValues {
+	headline: string;
+	description: string;
+	image?: ImageModel;
+	imageFileUploadId: string;
+	imageUrl: string;
+	imageAltText: string;
+}
+
 export const SectionHeroSettingsForm = () => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const { page, setPage, setIsSaving } = usePageBuilderContext();
-	const [formValues, setFormValues] = useState({
+	const [formValues, setFormValues] = useState<HeroFormValues>({
 		headline: '',
 		description: '',
+		image: undefined,
 		imageFileUploadId: '',
 		imageUrl: '',
 		imageAltText: '',
 	});
+	const formValuesRef = useRef(formValues);
 
 	useEffect(() => {
 		if (!page) {
 			return;
 		}
 
-		setFormValues({
+		const nextValues: HeroFormValues = {
 			headline: page.headline ?? '',
 			description: page.description ?? '',
+			image: page.image,
 			imageFileUploadId: page.imageFileUploadId ?? '',
 			imageUrl: page.imageUrl ?? '',
 			imageAltText: page.imageAltText ?? '',
-		});
+		};
+		formValuesRef.current = nextValues;
+		setFormValues(nextValues);
 	}, [page]);
 
-	const debouncedSubmission = useDebouncedAsyncFunction(async (p: PageDetailModel, fv: typeof formValues) => {
-		setIsSaving(true);
-
-		try {
-			const response = await pagesService
-				.updatePageHero(p.pageId, {
-					headline: fv.headline,
-					description: fv.description,
-					imageFileUploadId: fv.imageFileUploadId,
-					imageAltText: fv.imageAltText,
-				})
-				.fetch();
-
-			setPage(response.page);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	});
-
-	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
-			setFormValues((previousValue) => {
-				const newValue = {
-					...previousValue,
-					[currentTarget.name]: currentTarget.value,
-				};
-
-				if (page) {
-					debouncedSubmission(page, newValue);
-				}
-
-				return newValue;
-			});
-		},
-		[debouncedSubmission, page]
-	);
-
-	const handleUploadComplete = useCallback(
-		async (fileUploadId?: string) => {
+	const persistHero = useCallback(
+		async (p: PageDetailModel, fv: HeroFormValues) => {
 			setIsSaving(true);
 
 			try {
-				if (!page) {
-					throw new Error('page is undefined');
-				}
-
 				const response = await pagesService
-					.updatePageHero(page.pageId, {
-						headline: page.headline,
-						description: page.description,
-						imageFileUploadId: fileUploadId ?? '',
-						imageAltText: page.imageAltText,
+					.updatePageHero(p.pageId, {
+						headline: fv.headline,
+						description: fv.description,
+						...getPageBuilderImageAssociationRequest(fv, institution.imageRepositoryEnabled),
+						imageAltText: fv.imageAltText,
 					})
 					.fetch();
 
@@ -99,22 +74,79 @@ export const SectionHeroSettingsForm = () => {
 				setIsSaving(false);
 			}
 		},
-		[handleError, page, setIsSaving, setPage]
+		[handleError, institution.imageRepositoryEnabled, setIsSaving, setPage]
+	);
+
+	const debouncedSubmission = useDebouncedAsyncFunction(persistHero);
+
+	const setLocalFormValues = useCallback((nextValues: HeroFormValues) => {
+		formValuesRef.current = nextValues;
+		setFormValues(nextValues);
+	}, []);
+
+	const handleInputChange = useCallback(
+		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
+			const nextValues = {
+				...formValuesRef.current,
+				[currentTarget.name]: currentTarget.value,
+			} as HeroFormValues;
+			setLocalFormValues(nextValues);
+
+			if (page) {
+				debouncedSubmission(page, nextValues);
+			}
+		},
+		[debouncedSubmission, page, setLocalFormValues]
+	);
+
+	const handleUploadComplete = useCallback(
+		async (fileUploadId?: string) => {
+			if (!page) {
+				handleError(new Error('page is undefined'));
+				return;
+			}
+
+			const nextValues = { ...formValuesRef.current, imageFileUploadId: fileUploadId ?? '' };
+			setLocalFormValues(nextValues);
+			debouncedSubmission.cancel();
+			await persistHero(page, nextValues);
+		},
+		[debouncedSubmission, handleError, page, persistHero, setLocalFormValues]
 	);
 
 	const handleImageChange = useCallback(
 		async (nextId: string, nextSrc: string) => {
-			setFormValues((previousValue) => ({
-				...previousValue,
+			setLocalFormValues({
+				...formValuesRef.current,
 				imageFileUploadId: nextId,
 				imageUrl: nextSrc,
-			}));
+			});
 
 			if (!nextId && !nextSrc) {
 				handleUploadComplete('');
 			}
 		},
-		[handleUploadComplete]
+		[handleUploadComplete, setLocalFormValues]
+	);
+
+	const handleRepositoryImageChange = useCallback(
+		async (image?: ImageModel) => {
+			if (!page) {
+				handleError(new Error('page is undefined'));
+				return;
+			}
+
+			const nextValues: HeroFormValues = {
+				...formValuesRef.current,
+				image,
+				imageFileUploadId: image?.fileUploadId ?? '',
+				imageUrl: image?.url ?? '',
+			};
+			setLocalFormValues(nextValues);
+			debouncedSubmission.cancel();
+			await persistHero(page, nextValues);
+		},
+		[debouncedSubmission, handleError, page, persistHero, setLocalFormValues]
 	);
 
 	return (
@@ -137,20 +169,29 @@ export const SectionHeroSettingsForm = () => {
 				value={formValues.description}
 				onChange={handleInputChange}
 			/>
-			<AdminFormImageInput
-				className="mb-4"
-				imageSrc={formValues.imageUrl}
-				showSizeSelection={false}
-				lockSizeSelection={SIZE_SELECTIONS.RECTANGLE}
-				onSrcChange={handleImageChange}
-				onUploadComplete={handleUploadComplete}
-				presignedUploadGetter={(blob, name) => {
-					return pagesService.createPresignedFileUpload({
-						contentType: blob.type,
-						filename: name,
-					}).fetch;
-				}}
-			/>
+			{institution.imageRepositoryEnabled ? (
+				<AdminFormImageInputV2
+					className="mb-4"
+					buttonClassName="d-block w-100"
+					value={formValues.image}
+					onChange={handleRepositoryImageChange}
+				/>
+			) : (
+				<AdminFormImageInput
+					className="mb-4"
+					imageSrc={formValues.imageUrl}
+					showSizeSelection={false}
+					lockSizeSelection={SIZE_SELECTIONS.RECTANGLE}
+					onSrcChange={handleImageChange}
+					onUploadComplete={handleUploadComplete}
+					presignedUploadGetter={(blob, name) => {
+						return pagesService.createPresignedFileUpload({
+							contentType: blob.type,
+							filename: name,
+						}).fetch;
+					}}
+				/>
+			)}
 			<InputHelper
 				type="text"
 				label="Image alt text"

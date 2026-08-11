@@ -1,4 +1,4 @@
-import { AdminContent, COLOR_IDS, GroupSessionModel, Tag, TagGroup } from '@/lib/models';
+import { AdminContent, COLOR_IDS, GroupSessionModel, ImageModel, Tag, TagGroup } from '@/lib/models';
 
 export enum SITE_LOCATION_ID {
 	COMMUNITY = 'COMMUNITY',
@@ -12,6 +12,8 @@ export interface PageSiteLocationModel {
 	headline: string;
 	description: string;
 	shortDescription?: string;
+	imageId?: string;
+	image?: ImageModel;
 	imageAltText?: string;
 	imageUrl: string;
 	callToAction: string;
@@ -78,6 +80,8 @@ export interface PageDetailModel {
 	pageStatusId: PAGE_STATUS_ID;
 	headline: string;
 	description: string;
+	imageId?: string;
+	image?: ImageModel;
 	imageFileUploadId: string;
 	imageAltText: string;
 	imageUrl: string;
@@ -182,6 +186,8 @@ export interface PageRowColumnModel {
 	pageRowId: string;
 	headline: string;
 	description: string;
+	imageId?: string;
+	image?: ImageModel;
 	imageFileUploadId: string;
 	imageAltText: string;
 	imageUrl: string;
@@ -201,6 +207,8 @@ export interface CallToActionRowBaseModel extends PageRowBaseModel {
 	description: string;
 	buttonText: string;
 	buttonUrl: string;
+	imageId?: string;
+	image?: ImageModel;
 	imageFileUploadId?: string;
 	imageUrl?: string;
 }

@@ -3,6 +3,7 @@ import { Form, type FormControlProps } from 'react-bootstrap';
 import {
 	CallToActionBlockRowModel,
 	CallToActionFullWidthRowModel,
+	ImageModel,
 	isCallToActionBlockRow,
 	isCallToActionFullWidthRow,
 	ROW_PADDING_ID,
@@ -15,6 +16,9 @@ import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
+import { AdminFormImageInputV2 } from '@/components/admin/admin-form-image-input-v2';
+import useAccount from '@/hooks/use-account';
+import { getPageBuilderImageAssociationRequest } from './page-builder-image';
 
 interface RowSettingsCallToActionProps {
 	variant: 'block' | 'full-width';
@@ -28,6 +32,7 @@ interface CallToActionFormValues {
 	description: string;
 	buttonText: string;
 	buttonUrl: string;
+	image?: ImageModel;
 	imageFileUploadId: string;
 	imageUrl: string;
 	paddingTopId: ROW_PADDING_ID;
@@ -36,6 +41,7 @@ interface CallToActionFormValues {
 
 export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProps) => {
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const callToActionRow = useMemo(() => {
 		if (variant === 'block' && currentPageRow && isCallToActionBlockRow(currentPageRow)) {
@@ -53,6 +59,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 		description: '',
 		buttonText: '',
 		buttonUrl: '',
+		image: undefined,
 		imageFileUploadId: '',
 		imageUrl: '',
 		paddingTopId: ROW_PADDING_ID.MEDIUM,
@@ -73,7 +80,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 						description: values.description,
 						buttonText: values.buttonText,
 						buttonUrl: values.buttonUrl,
-						imageFileUploadId: values.imageFileUploadId,
+						...getPageBuilderImageAssociationRequest(values, institution.imageRepositoryEnabled),
 					})
 					.fetch();
 			} else {
@@ -98,7 +105,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 
 			updatePageRow(updatedPageRow);
 		},
-		[updatePageRow]
+		[institution.imageRepositoryEnabled, updatePageRow]
 	);
 
 	const runPersistence = useCallback(
@@ -166,6 +173,7 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 			description: callToActionRow.description ?? '',
 			buttonText: callToActionRow.buttonText ?? '',
 			buttonUrl: callToActionRow.buttonUrl ?? '',
+			image: callToActionRow.image,
 			imageFileUploadId: callToActionRow.imageFileUploadId ?? '',
 			imageUrl: callToActionRow.imageUrl ?? '',
 			paddingTopId: callToActionRow.paddingTopId ?? ROW_PADDING_ID.MEDIUM,
@@ -258,6 +266,27 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 		[handleUploadComplete, setLocalFormValues]
 	);
 
+	const handleRepositoryImageChange = useCallback(
+		async (image?: ImageModel) => {
+			if (!callToActionRow || formRowIdRef.current !== callToActionRow.pageRowId) {
+				handleError(new Error('callToActionRow is undefined or no longer active.'));
+				return;
+			}
+
+			const nextValue: CallToActionFormValues = {
+				...formValuesRef.current,
+				image,
+				imageFileUploadId: image?.fileUploadId ?? '',
+				imageUrl: image?.url ?? '',
+			};
+
+			setLocalFormValues(nextValue);
+			debouncedSubmission.cancel();
+			await persistFormValues(callToActionRow, nextValue);
+		},
+		[callToActionRow, debouncedSubmission, handleError, persistFormValues, setLocalFormValues]
+	);
+
 	if (!callToActionRow) {
 		return null;
 	}
@@ -338,21 +367,32 @@ export const RowSettingsCallToAction = ({ variant }: RowSettingsCallToActionProp
 			{variant === 'block' && (
 				<Form.Group className="mb-6">
 					<Form.Label className="mb-2">Image (optional)</Form.Label>
-					<AdminFormImageInput
-						className="mb-4"
-						imageSrc={formValues.imageUrl}
-						onSrcChange={(nextId, nextSrc) => {
-							handleImageChange({ nextId, nextSrc });
-						}}
-						onUploadComplete={handleUploadComplete}
-						presignedUploadGetter={(blob, name) => {
-							return pagesService.createPresignedFileUpload({
-								contentType: blob.type,
-								filename: name,
-							}).fetch;
-						}}
-						cropImage={false}
-					/>
+					{institution.imageRepositoryEnabled ? (
+						<AdminFormImageInputV2
+							className="mb-4"
+							buttonClassName="d-block w-100"
+							value={formValues.image}
+							onChange={(image) => {
+								void handleRepositoryImageChange(image);
+							}}
+						/>
+					) : (
+						<AdminFormImageInput
+							className="mb-4"
+							imageSrc={formValues.imageUrl}
+							onSrcChange={(nextId, nextSrc) => {
+								handleImageChange({ nextId, nextSrc });
+							}}
+							onUploadComplete={handleUploadComplete}
+							presignedUploadGetter={(blob, name) => {
+								return pagesService.createPresignedFileUpload({
+									contentType: blob.type,
+									filename: name,
+								}).fetch;
+							}}
+							cropImage={false}
+						/>
+					)}
 				</Form.Group>
 			)}
 		</>

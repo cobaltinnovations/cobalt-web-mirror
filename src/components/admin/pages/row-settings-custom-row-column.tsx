@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Form } from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd';
 import classNames from 'classnames';
-import { CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID, CustomRowModel, isCustomRow } from '@/lib/models';
+import { CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID, CustomRowModel, ImageModel, isCustomRow } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
@@ -11,9 +11,12 @@ import { CollapseButton } from '@/components/admin/pages/collapse-button';
 import InputHelper from '@/components/input-helper';
 import WysiwygBasic from '@/components/wysiwyg-basic';
 import { AdminFormImageInput } from '@/components/admin/admin-form-image-input';
+import { AdminFormImageInputV2 } from '@/components/admin/admin-form-image-input-v2';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '@/components/svg-icon';
 import { PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC } from './page-builder-placeholder';
+import useAccount from '@/hooks/use-account';
+import { getPageBuilderImageAssociationRequest } from './page-builder-image';
 
 interface RowSettingsCustomRowColumnProps {
 	pageRowColumnId: string;
@@ -23,6 +26,7 @@ type CustomRowColumnSectionId = 'IMAGE' | 'TEXT';
 
 interface CustomRowColumnFormValues {
 	description: string;
+	image?: ImageModel;
 	imageFileUploadId: string;
 	imageUrl: string;
 	imageAltText: string;
@@ -69,6 +73,7 @@ const getContentOrderForSectionIds = (sectionIds: CustomRowColumnSectionId[]): C
 export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCustomRowColumnProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
+	const { institution } = useAccount();
 	const { currentPageRow, updatePageRow, setIsSaving } = usePageBuilderContext();
 	const pageRow = useMemo(
 		() => (currentPageRow && isCustomRow(currentPageRow) ? currentPageRow : undefined),
@@ -80,6 +85,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 	);
 	const [formValues, setFormValues] = useState<CustomRowColumnFormValues>({
 		description: '',
+		image: undefined,
 		imageFileUploadId: '',
 		imageUrl: '',
 		imageAltText: '',
@@ -97,7 +103,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 			const { pageRow: updatedPageRow } = await pagesService
 				.updateCustomRowColumn(pr.pageRowId, prcId, {
 					description: fv.description,
-					imageFileUploadId: fv.imageFileUploadId,
+					...getPageBuilderImageAssociationRequest(fv, institution.imageRepositoryEnabled),
 					imageAltText: fv.imageAltText,
 					usePlaceholderImage: fv.usePlaceholderImage,
 				})
@@ -105,7 +111,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 
 			updatePageRow(updatedPageRow);
 		},
-		[updatePageRow]
+		[institution.imageRepositoryEnabled, updatePageRow]
 	);
 
 	const persistColumnContentOrder = useCallback(
@@ -113,7 +119,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 			const { pageRow: updatedPageRow } = await pagesService
 				.updateCustomRowColumn(pr.pageRowId, prcId, {
 					description: fv.description,
-					imageFileUploadId: fv.imageFileUploadId,
+					...getPageBuilderImageAssociationRequest(fv, institution.imageRepositoryEnabled),
 					imageAltText: fv.imageAltText,
 					usePlaceholderImage: fv.usePlaceholderImage,
 					contentOrderId: fv.contentOrderId,
@@ -122,7 +128,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 
 			updatePageRow(updatedPageRow);
 		},
-		[updatePageRow]
+		[institution.imageRepositoryEnabled, updatePageRow]
 	);
 
 	const runPersistence = useCallback(
@@ -187,6 +193,7 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 
 		const nextValues: CustomRowColumnFormValues = {
 			description: pageRowColumn.description ?? '',
+			image: pageRowColumn.image,
 			imageFileUploadId: pageRowColumn.imageFileUploadId ?? '',
 			imageUrl: pageRowColumn.imageUrl ?? '',
 			imageAltText: pageRowColumn.imageAltText ?? '',
@@ -280,6 +287,28 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 			}
 		},
 		[handleUploadComplete, setLocalFormValues]
+	);
+
+	const handleRepositoryImageChange = useCallback(
+		async (image?: ImageModel) => {
+			if (!pageRow || !pageRowColumn || formColumnIdRef.current !== pageRowColumn.pageRowColumnId) {
+				handleError(new Error('pageRow or pageRowColumn is undefined or no longer active.'));
+				return;
+			}
+
+			const nextValue: CustomRowColumnFormValues = {
+				...formValuesRef.current,
+				image,
+				imageFileUploadId: image?.fileUploadId ?? '',
+				imageUrl: image?.url ?? '',
+				usePlaceholderImage: false,
+			};
+
+			setLocalFormValues(nextValue);
+			debouncedSubmission.cancel();
+			await persistFormValues(pageRow, pageRowColumn.pageRowColumnId, nextValue);
+		},
+		[debouncedSubmission, handleError, pageRow, pageRowColumn, persistFormValues, setLocalFormValues]
 	);
 
 	const handleDragEnd = useCallback(
@@ -388,27 +417,44 @@ export const RowSettingsCustomRowColumn = ({ pageRowColumnId }: RowSettingsCusto
 										>
 											{sectionId === 'IMAGE' ? (
 												<Form.Group className="mb-6">
-													<AdminFormImageInput
-														className="mb-4"
-														imageSrc={formValues.imageUrl}
-														placeholderImageSrc={
-															formValues.usePlaceholderImage
-																? PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC
-																: undefined
-														}
-														allowRemovePlaceholderImage
-														onSrcChange={(nextId, nextSrc) => {
-															handleImageChange({ nextId, nextSrc });
-														}}
-														onUploadComplete={handleUploadComplete}
-														presignedUploadGetter={(blob, name) => {
-															return pagesService.createPresignedFileUpload({
-																contentType: blob.type,
-																filename: name,
-															}).fetch;
-														}}
-														cropImage={false}
-													/>
+													{institution.imageRepositoryEnabled ? (
+														<AdminFormImageInputV2
+															className="mb-4"
+															buttonClassName="d-block w-100"
+															value={formValues.image}
+															placeholderImageSrc={
+																formValues.usePlaceholderImage
+																	? PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC
+																	: undefined
+															}
+															allowRemovePlaceholderImage
+															onChange={(image) => {
+																void handleRepositoryImageChange(image);
+															}}
+														/>
+													) : (
+														<AdminFormImageInput
+															className="mb-4"
+															imageSrc={formValues.imageUrl}
+															placeholderImageSrc={
+																formValues.usePlaceholderImage
+																	? PAGE_BUILDER_PLACEHOLDER_IMAGE_SRC
+																	: undefined
+															}
+															allowRemovePlaceholderImage
+															onSrcChange={(nextId, nextSrc) => {
+																handleImageChange({ nextId, nextSrc });
+															}}
+															onUploadComplete={handleUploadComplete}
+															presignedUploadGetter={(blob, name) => {
+																return pagesService.createPresignedFileUpload({
+																	contentType: blob.type,
+																	filename: name,
+																}).fetch;
+															}}
+															cropImage={false}
+														/>
+													)}
 													<InputHelper
 														type="text"
 														label="Image alt text"
