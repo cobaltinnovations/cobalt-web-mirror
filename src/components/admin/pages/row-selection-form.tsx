@@ -14,12 +14,20 @@ import useHandleError from '@/hooks/use-handle-error';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 
 import subscribeImg from '@/assets/images/subscribe.png';
-import { BACKGROUND_COLOR_ID, CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
+import {
+	BACKGROUND_COLOR_ID,
+	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
+	PageDetailModel,
+	ROW_PADDING_ID,
+	ROW_TYPE_ID,
+} from '@/lib/models';
 import InlineAlert from '@/components/inline-alert';
 
 const CUSTOM_ROW_NAME_PREFIX = 'Custom Row';
 const DEFAULT_CUSTOM_ROW_COLUMN_DESCRIPTION =
 	'<h2>Title</h2><p><br></p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>';
+const DEFAULT_HEADLINE_ROW_COLUMN_DESCRIPTION =
+	'<h2 class="ql-align-center">headline</h2><p class="ql-align-center"><br></p><p class="ql-align-center">description text.</p>';
 
 const getNextCustomRowName = (page?: PageDetailModel) => {
 	const maxCustomRowNumber =
@@ -122,7 +130,11 @@ export const RowSelectionForm = () => {
 			contentOrderId?: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID;
 			usePlaceholderImage?: boolean;
 			description?: string;
-		}>
+		}>,
+		rowDefaults: {
+			paddingTopId?: ROW_PADDING_ID;
+			paddingBottomId?: ROW_PADDING_ID;
+		} = {}
 	) => {
 		setIsSaving(true);
 
@@ -136,6 +148,7 @@ export const RowSelectionForm = () => {
 				.createCustomRow(currentPageSection.pageSectionId, {
 					name: customRowName,
 					backgroundColorId: BACKGROUND_COLOR_ID.WHITE,
+					...rowDefaults,
 				})
 				.fetch();
 
@@ -320,6 +333,23 @@ export const RowSelectionForm = () => {
 					images and text to custom rows.
 				</p>
 				<div className="pb-6">
+					<CustomRowButton
+						className="mb-4"
+						title="Select Layout"
+						preview="headline"
+						onClick={() =>
+							handleCustomRowPresetButtonClick(
+								[
+									{
+										contentOrderId: CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID.TEXT_THEN_IMAGE,
+										usePlaceholderImage: false,
+										description: DEFAULT_HEADLINE_ROW_COLUMN_DESCRIPTION,
+									},
+								],
+								{ paddingBottomId: ROW_PADDING_ID.NONE }
+							)
+						}
+					/>
 					<CustomRowButton
 						className="mb-4"
 						title="Select Layout"

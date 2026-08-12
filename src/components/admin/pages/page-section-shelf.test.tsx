@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import {
 	BACKGROUND_COLOR_ID,
 	CUSTOM_ROW_COLUMN_CONTENT_ORDER_ID,
@@ -16,13 +16,19 @@ import { PageSectionShelf } from './page-section-shelf';
 
 let mockPageBuilderContext: React.ContextType<typeof PageBuilderContext>;
 const mockOneColumnUnmounts: string[] = [];
+const mockDuplicatePageRow = jest.fn();
+const mockHandleError = jest.fn();
 
 jest.mock('@/hooks/use-handle-error', () => ({
 	__esModule: true,
-	default: () => jest.fn(),
+	default: () => mockHandleError,
 }));
 
-jest.mock('@/lib/services', () => ({ pagesService: {} }));
+jest.mock('@/lib/services', () => ({
+	pagesService: {
+		duplicatePageRow: (...args: unknown[]) => mockDuplicatePageRow(...args),
+	},
+}));
 
 jest.mock('@/jss/theme', () => ({
 	createUseThemedStyles: () => () => ({
@@ -45,9 +51,23 @@ jest.mock('@/components/admin/pages', () => {
 			children,
 			showBackButton,
 			onBackButtonClick,
-		}: React.PropsWithChildren<{ showBackButton?: boolean; onBackButtonClick?(): void }>) => (
+			showDuplicateButton,
+			duplicateButtonDisabled,
+			onDuplicateButtonClick,
+		}: React.PropsWithChildren<{
+			showBackButton?: boolean;
+			onBackButtonClick?(): void;
+			showDuplicateButton?: boolean;
+			duplicateButtonDisabled?: boolean;
+			onDuplicateButtonClick?(): void;
+		}>) => (
 			<>
 				{showBackButton && <button onClick={onBackButtonClick}>Back</button>}
+				{showDuplicateButton && (
+					<button onClick={onDuplicateButtonClick} disabled={duplicateButtonDisabled}>
+						Duplicate row
+					</button>
+				)}
 				{children}
 			</>
 		),
@@ -86,6 +106,8 @@ jest.mock('@/components/admin/pages', () => {
 
 			return <div data-testid="mailing-list-settings" data-page-row-id={context.currentPageRow?.pageRowId} />;
 		},
+		SectionHeroSettingsForm: () => <div data-testid="hero-settings" />,
+		RowSelectionForm: () => <div data-testid="row-selection" />,
 	};
 });
 
@@ -122,6 +144,15 @@ const secondOneColumnRow: OneColumnRowModel = {
 	name: 'Second one column',
 	displayOrder: 1,
 	columnOne: createColumn('second-one-column-row', 0),
+};
+
+const duplicatedOneColumnRow: OneColumnRowModel = {
+	...oneColumnRow,
+	pageRowId: 'duplicated-one-column-row',
+	pageRowAnchorId: 'duplicated-one-column-anchor',
+	name: 'One column Copy',
+	displayOrder: 1,
+	columnOne: createColumn('duplicated-one-column-row', 0),
 };
 
 const threeColumnRow: ThreeColumnRowModel = {
@@ -238,12 +269,102 @@ const getPeerTransitionPage = (settings: HTMLElement) => {
 
 beforeEach(() => {
 	jest.useFakeTimers();
+	jest.clearAllMocks();
 	mockOneColumnUnmounts.length = 0;
 	mockPageBuilderContext = createContext(oneColumnRow);
 });
 
 afterEach(() => {
 	jest.useRealTimers();
+});
+
+it('duplicates the selected row, applies server ordering, and selects the copy', async () => {
+	const pageRows = [oneColumnRow, duplicatedOneColumnRow, secondOneColumnRow];
+	let resolveFetch: (value: { pageRow: OneColumnRowModel; pageRows: OneColumnRowModel[] }) => void = () => undefined;
+	const fetchPromise = new Promise<{ pageRow: OneColumnRowModel; pageRows: OneColumnRowModel[] }>((resolve) => {
+		resolveFetch = resolve;
+	});
+	mockDuplicatePageRow.mockReturnValue({
+		fetch: jest.fn().mockReturnValue(fetchPromise),
+	});
+	renderShelf();
+
+	fireEvent.click(screen.getByRole('button', { name: 'Duplicate row' }));
+
+	expect(screen.getByRole('button', { name: 'Duplicate row' })).toBeDisabled();
+	fireEvent.click(screen.getByRole('button', { name: 'Duplicate row' }));
+
+	expect(mockDuplicatePageRow).toHaveBeenCalledTimes(1);
+
+	await act(async () => {
+		resolveFetch({ pageRow: duplicatedOneColumnRow, pageRows });
+		await fetchPromise;
+	});
+
+	expect(mockDuplicatePageRow).toHaveBeenCalledWith(oneColumnRow.pageRowId);
+	expect(mockPageBuilderContext.updatePageSection).toHaveBeenCalledWith({ ...pageSection, pageRows });
+	expect(mockPageBuilderContext.setCurrentPageRowId).toHaveBeenCalledWith(duplicatedOneColumnRow.pageRowId);
+	expect(mockPageBuilderContext.setIsSaving).toHaveBeenNthCalledWith(1, true);
+	expect(mockPageBuilderContext.setIsSaving).toHaveBeenLastCalledWith(false);
+	expect(mockHandleError).not.toHaveBeenCalled();
+});
+
+it('leaves the original selected and reports an error when duplication fails', async () => {
+	const error = new Error('Unable to duplicate row');
+	mockDuplicatePageRow.mockReturnValue({ fetch: jest.fn().mockRejectedValue(error) });
+	renderShelf();
+
+	fireEvent.click(screen.getByRole('button', { name: 'Duplicate row' }));
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(mockPageBuilderContext.updatePageSection).not.toHaveBeenCalled();
+	expect(mockPageBuilderContext.setCurrentPageRowId).not.toHaveBeenCalled();
+});
+
+it('does not offer duplication for Subscribe rows', () => {
+	mockPageBuilderContext = createContext(mailingListRow);
+	renderShelf();
+
+	expect(screen.queryByRole('button', { name: 'Duplicate row' })).not.toBeInTheDocument();
+});
+
+it('does not offer duplication for Hero, add-row selection, or custom-column headers', () => {
+	mockPageBuilderContext = {
+		...createContext(oneColumnRow),
+		currentPageSection: { ...pageSection, pageSectionId: 'hero' },
+		currentPageRow: undefined,
+	};
+	const { rerender } = renderShelf();
+
+	expect(screen.getByTestId('hero-settings')).toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Duplicate row' })).not.toBeInTheDocument();
+
+	mockPageBuilderContext = { ...createContext(oneColumnRow), currentPageRow: undefined };
+	rerender(
+		<PageBuilderContext.Provider value={mockPageBuilderContext}>
+			<PageSectionShelf />
+		</PageBuilderContext.Provider>
+	);
+
+	expect(screen.getByTestId('row-selection')).toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Duplicate row' })).not.toBeInTheDocument();
+
+	mockPageBuilderContext = createContext(customRow);
+	rerender(
+		<PageBuilderContext.Provider value={mockPageBuilderContext}>
+			<PageSectionShelf />
+		</PageBuilderContext.Provider>
+	);
+
+	expect(screen.getByRole('button', { name: 'Duplicate row' })).toBeInTheDocument();
+	fireEvent.click(screen.getByRole('button', { name: 'Edit column A' }));
+
+	act(() => {
+		jest.advanceTimersByTime(300);
+	});
+
+	expect(screen.getByTestId('custom-column-settings')).toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Duplicate row' })).not.toBeInTheDocument();
 });
 
 it('quickly animates the incoming peer after unmounting the previous editor', () => {

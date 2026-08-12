@@ -123,11 +123,14 @@ export const PageSectionShelf = () => {
 		setCurrentPageRowId,
 		currentPageRow,
 		updatePageRow,
+		updatePageSection,
 		deletePageRow,
+		isSaving,
 		setIsSaving,
 	} = pageBuilderContext;
 	const [showRowDeleteModal, setShowRowDeleteModal] = useState(false);
 	const [showCustomRowColumnDeleteModal, setShowCustomRowColumnDeleteModal] = useState(false);
+	const [isDuplicatingRow, setIsDuplicatingRow] = useState(false);
 	const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
 	const [selectedCustomRowColumn, setSelectedCustomRowColumn] = useState<
 		{ pageRowId: string; pageRowColumnId: string; label: string } | undefined
@@ -205,6 +208,44 @@ export const PageSectionShelf = () => {
 		}
 	}, [activeSelectedCustomRowColumn, currentPageRow, handleError, setIsSaving, updatePageRow]);
 
+	const handleRowDuplicate = useCallback(async () => {
+		if (isDuplicatingRow) {
+			return;
+		}
+
+		setIsDuplicatingRow(true);
+		setIsSaving(true);
+
+		try {
+			if (!currentPageRow || !currentPageSection) {
+				throw new Error('currentPageRow or currentPageSection is undefined.');
+			}
+
+			if (currentPageRow.rowTypeId === ROW_TYPE_ID.MAILING_LIST) {
+				throw new Error('Subscribe rows cannot be duplicated.');
+			}
+
+			const { pageRow, pageRows } = await pagesService.duplicatePageRow(currentPageRow.pageRowId).fetch();
+
+			updatePageSection({ ...currentPageSection, pageRows });
+			setSelectedCustomRowColumn(undefined);
+			setCurrentPageRowId(pageRow.pageRowId);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsDuplicatingRow(false);
+			setIsSaving(false);
+		}
+	}, [
+		currentPageRow,
+		currentPageSection,
+		handleError,
+		isDuplicatingRow,
+		setCurrentPageRowId,
+		setIsSaving,
+		updatePageSection,
+	]);
+
 	if (!currentPageSection) {
 		return null;
 	}
@@ -221,6 +262,12 @@ export const PageSectionShelf = () => {
 	const currentCustomRowPageKey = activeSelectedCustomRowColumn
 		? `column-${activeSelectedCustomRowColumn.pageRowColumnId}`
 		: 'overview';
+	const duplicateButtonDisabled = isDuplicatingRow || isSaving;
+	const duplicateButtonProps = {
+		showDuplicateButton: true,
+		duplicateButtonDisabled,
+		onDuplicateButtonClick: handleRowDuplicate,
+	};
 
 	const currentPage =
 		currentPageSection.pageSectionId === HERO_SECTION_ID ? (
@@ -230,19 +277,35 @@ export const PageSectionShelf = () => {
 		) : currentPageRow ? (
 			<>
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.RESOURCES && (
-					<RowSettingsResources onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+					<RowSettingsResources
+						onDuplicateButtonClick={handleRowDuplicate}
+						duplicateButtonDisabled={duplicateButtonDisabled}
+						onDeleteButtonClick={() => setShowRowDeleteModal(true)}
+					/>
 				)}
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.GROUP_SESSIONS && (
-					<RowSettingsGroupSessions onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+					<RowSettingsGroupSessions
+						onDuplicateButtonClick={handleRowDuplicate}
+						duplicateButtonDisabled={duplicateButtonDisabled}
+						onDeleteButtonClick={() => setShowRowDeleteModal(true)}
+					/>
 				)}
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.TAG_GROUP && (
-					<RowSettingsTagGroup onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+					<RowSettingsTagGroup
+						onDuplicateButtonClick={handleRowDuplicate}
+						duplicateButtonDisabled={duplicateButtonDisabled}
+						onDeleteButtonClick={() => setShowRowDeleteModal(true)}
+					/>
 				)}
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.TAG && (
-					<RowSettingsTag onDeleteButtonClick={() => setShowRowDeleteModal(true)} />
+					<RowSettingsTag
+						onDuplicateButtonClick={handleRowDuplicate}
+						duplicateButtonDisabled={duplicateButtonDisabled}
+						onDeleteButtonClick={() => setShowRowDeleteModal(true)}
+					/>
 				)}
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.CUSTOM_ROW &&
@@ -265,6 +328,7 @@ export const PageSectionShelf = () => {
 						</PageSectionShelfPage>
 					) : (
 						<PageSectionShelfPage
+							{...duplicateButtonProps}
 							showDeleteButton
 							onDeleteButtonClick={() => {
 								setShowRowDeleteModal(true);
@@ -288,6 +352,7 @@ export const PageSectionShelf = () => {
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_BLOCK && (
 					<PageSectionShelfPage
+						{...duplicateButtonProps}
 						showDeleteButton
 						onDeleteButtonClick={() => {
 							setShowRowDeleteModal(true);
@@ -302,6 +367,7 @@ export const PageSectionShelf = () => {
 
 				{currentPageRow.rowTypeId === ROW_TYPE_ID.CALL_TO_ACTION_FULL_WIDTH && (
 					<PageSectionShelfPage
+						{...duplicateButtonProps}
 						showDeleteButton
 						onDeleteButtonClick={() => {
 							setShowRowDeleteModal(true);
@@ -316,6 +382,7 @@ export const PageSectionShelf = () => {
 
 				{isOneColumnRow(currentPageRow) && (
 					<PageSectionShelfPage
+						{...duplicateButtonProps}
 						showDeleteButton
 						onDeleteButtonClick={() => {
 							setShowRowDeleteModal(true);
@@ -330,6 +397,7 @@ export const PageSectionShelf = () => {
 
 				{isTwoColumnRow(currentPageRow) && (
 					<PageSectionShelfPage
+						{...duplicateButtonProps}
 						showDeleteButton
 						onDeleteButtonClick={() => {
 							setShowRowDeleteModal(true);
@@ -344,6 +412,7 @@ export const PageSectionShelf = () => {
 
 				{isThreeColumnImageRow(currentPageRow) && (
 					<PageSectionShelfPage
+						{...duplicateButtonProps}
 						showDeleteButton
 						onDeleteButtonClick={() => {
 							setShowRowDeleteModal(true);

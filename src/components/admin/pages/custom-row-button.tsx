@@ -68,7 +68,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface CustomRowButtonProps {
 	title: string;
 	className?: string;
-	preview?: 'split-two' | 'two-columns' | 'three-columns' | 'empty';
+	preview?: 'headline' | 'split-two' | 'two-columns' | 'three-columns' | 'empty';
 	onClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 }
 
@@ -132,7 +132,14 @@ export const CustomRowButton = ({ title, className, preview = 'split-two', onCli
 			<div className="overlay">
 				<Button onClick={onClick}>{title}</Button>
 			</div>
-			{preview === 'empty' ? (
+			{preview === 'headline' ? (
+				<div className={classNames(enhancedClasses.emptyState, 'text-center')}>
+					<div>
+						<h5 className="mb-4">Headline Row</h5>
+						<p className="mb-0 fw-normal">Use this space to add description text.</p>
+					</div>
+				</div>
+			) : preview === 'empty' ? (
 				<div className={enhancedClasses.emptyState}>Empty Row</div>
 			) : preview === 'split-two' ? (
 				<div className={enhancedClasses.previewRow}>

@@ -262,6 +262,8 @@ export const pagesService = {
 		data: {
 			name?: string;
 			backgroundColorId?: BACKGROUND_COLOR_ID;
+			paddingTopId?: ROW_PADDING_ID;
+			paddingBottomId?: ROW_PADDING_ID;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{
@@ -525,6 +527,15 @@ export const pagesService = {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'DELETE',
 			url: `/pages/row/${pageRowId}`,
+		});
+	},
+	duplicatePageRow(pageRowId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: PageRowUnionModel;
+			pageRows: PageRowUnionModel[];
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageRowId}/duplicate`,
 		});
 	},
 	updatePageRow(

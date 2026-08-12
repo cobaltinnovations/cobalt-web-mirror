@@ -16,9 +16,15 @@ import SvgIcon from '@/components/svg-icon';
 
 interface RowSettingsGroupSessionsProps {
 	onDeleteButtonClick(): void;
+	onDuplicateButtonClick(): void;
+	duplicateButtonDisabled?: boolean;
 }
 
-export const RowSettingsGroupSessions = ({ onDeleteButtonClick }: RowSettingsGroupSessionsProps) => {
+export const RowSettingsGroupSessions = ({
+	onDeleteButtonClick,
+	onDuplicateButtonClick,
+	duplicateButtonDisabled,
+}: RowSettingsGroupSessionsProps) => {
 	const handleError = useHandleError();
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
@@ -110,6 +116,9 @@ export const RowSettingsGroupSessions = ({ onDeleteButtonClick }: RowSettingsGro
 			/>
 
 			<PageSectionShelfPage
+				showDuplicateButton
+				duplicateButtonDisabled={duplicateButtonDisabled}
+				onDuplicateButtonClick={onDuplicateButtonClick}
 				showDeleteButton
 				onDeleteButtonClick={onDeleteButtonClick}
 				showCloseButton
