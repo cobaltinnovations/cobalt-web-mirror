@@ -16,9 +16,15 @@ import SvgIcon from '@/components/svg-icon';
 
 interface RowSettingsResourcesProps {
 	onDeleteButtonClick(): void;
+	onDuplicateButtonClick(): void;
+	duplicateButtonDisabled?: boolean;
 }
 
-export const RowSettingsResources = ({ onDeleteButtonClick }: RowSettingsResourcesProps) => {
+export const RowSettingsResources = ({
+	onDeleteButtonClick,
+	onDuplicateButtonClick,
+	duplicateButtonDisabled,
+}: RowSettingsResourcesProps) => {
 	const handleError = useHandleError();
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
@@ -107,6 +113,9 @@ export const RowSettingsResources = ({ onDeleteButtonClick }: RowSettingsResourc
 			/>
 
 			<PageSectionShelfPage
+				showDuplicateButton
+				duplicateButtonDisabled={duplicateButtonDisabled}
+				onDuplicateButtonClick={onDuplicateButtonClick}
 				showDeleteButton
 				onDeleteButtonClick={onDeleteButtonClick}
 				showCloseButton
