@@ -9,9 +9,15 @@ import InputHelper from '@/components/input-helper';
 
 interface RowSettingsTagGroupProps {
 	onDeleteButtonClick(): void;
+	onDuplicateButtonClick(): void;
+	duplicateButtonDisabled?: boolean;
 }
 
-export const RowSettingsTagGroup = ({ onDeleteButtonClick }: RowSettingsTagGroupProps) => {
+export const RowSettingsTagGroup = ({
+	onDeleteButtonClick,
+	onDuplicateButtonClick,
+	duplicateButtonDisabled,
+}: RowSettingsTagGroupProps) => {
 	const handleError = useHandleError();
 	const { setCurrentPageSectionId, currentPageRow, setCurrentPageRowId, updatePageRow, setIsSaving } =
 		usePageBuilderContext();
@@ -53,6 +59,9 @@ export const RowSettingsTagGroup = ({ onDeleteButtonClick }: RowSettingsTagGroup
 
 	return (
 		<PageSectionShelfPage
+			showDuplicateButton
+			duplicateButtonDisabled={duplicateButtonDisabled}
+			onDuplicateButtonClick={onDuplicateButtonClick}
 			showDeleteButton
 			onDeleteButtonClick={onDeleteButtonClick}
 			showCloseButton

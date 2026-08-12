@@ -529,6 +529,15 @@ export const pagesService = {
 			url: `/pages/row/${pageRowId}`,
 		});
 	},
+	duplicatePageRow(pageRowId: string) {
+		return httpSingleton.orchestrateRequest<{
+			pageRow: PageRowUnionModel;
+			pageRows: PageRowUnionModel[];
+		}>({
+			method: 'POST',
+			url: `/pages/row/${pageRowId}/duplicate`,
+		});
+	},
 	updatePageRow(
 		pageRowId: string,
 		data: {

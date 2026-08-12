@@ -36,6 +36,9 @@ interface PageSectionShelfPageProps {
 	showEditButton?: boolean;
 	onEditButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	customHeaderElements?: JSX.Element;
+	showDuplicateButton?: boolean;
+	duplicateButtonDisabled?: boolean;
+	onDuplicateButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	showDeleteButton?: boolean;
 	onDeleteButtonClick?(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;
 	showCloseButton?: boolean;
@@ -52,6 +55,9 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 	showEditButton,
 	onEditButtonClick,
 	customHeaderElements,
+	showDuplicateButton,
+	duplicateButtonDisabled,
+	onDuplicateButtonClick,
 	showDeleteButton,
 	onDeleteButtonClick,
 	showCloseButton,
@@ -81,6 +87,19 @@ export const PageSectionShelfPage: FC<PropsWithChildren<PageSectionShelfPageProp
 				</div>
 				<div className="d-flex align-items-center">
 					{customHeaderElements}
+					{showDuplicateButton && (
+						<Button
+							type="button"
+							variant="transparent-secondary"
+							className="p-2"
+							onClick={onDuplicateButtonClick}
+							disabled={duplicateButtonDisabled}
+							aria-label="Duplicate row"
+							title="Duplicate row"
+						>
+							<SvgIcon kit="far" icon="clone" size={16} className="d-block" />
+						</Button>
+					)}
 					{showDeleteButton && (
 						<Button variant="transparent-secondary" className="p-2" onClick={onDeleteButtonClick}>
 							<SvgIcon kit="far" icon="trash-can" size={16} className="d-block" />
