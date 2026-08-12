@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -52,6 +53,15 @@ interface ProviderScheduleCardProps {
 	className?: string;
 }
 
+export const formatFirstAvailableAppointmentDate = (date?: string) => {
+	if (!date) {
+		return '';
+	}
+
+	const parsedDate = moment(date, 'YYYY-MM-DD', true);
+	return parsedDate.isValid() ? parsedDate.format('MMMM D, YYYY') : date;
+};
+
 const ProviderScheduleCard = ({
 	scheduleAppointmentDescription,
 	scheduleTypeId,
@@ -65,6 +75,14 @@ const ProviderScheduleCard = ({
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
+	const firstAvailableAppointmentDateDescription = formatFirstAvailableAppointmentDate(
+		firstAvailableAppointment?.date
+	);
+	const schedulingUnavailable =
+		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE
+			? !phoneNumber
+			: !firstAvailableAppointment;
+
 	return (
 		<div className={classNames(classes.providerScheduleCard, className)}>
 			<p className="mb-2 fs-large">
@@ -72,54 +90,59 @@ const ProviderScheduleCard = ({
 			</p>
 			<p className="mb-4">{scheduleAppointmentDescription}</p>
 			<div className={classes.providerNextAppointmentCard}>
-				{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
-					<div className="d-md-flex justify-content-between">
-						<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
-							<div className={classNames(classes.iconOuter, 'me-4')}>
-								<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+				{schedulingUnavailable && <p className="mb-0 text-muted">No appointments are currently available.</p>}
+				{!schedulingUnavailable &&
+					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
+						<div className="d-md-flex justify-content-between">
+							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+								<div className={classNames(classes.iconOuter, 'me-4')}>
+									<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
+								</div>
+								<div>
+									<p className="mb-0">First Available Appointment:</p>
+									<p className="mb-0">
+										<strong>
+											{firstAvailableAppointmentDateDescription}{' '}
+											{firstAvailableAppointment?.timeDescription}
+										</strong>
+									</p>
+								</div>
 							</div>
-							<div>
-								<p className="mb-0">First Available Appointment:</p>
-								<p className="mb-0">
-									<strong>
-										{firstAvailableAppointment?.date} {firstAvailableAppointment?.timeDescription}
-									</strong>
-								</p>
-							</div>
+							<Button variant="primary" onClick={onScheduleAppointmentButtonClick}>
+								Schedule Appointment
+							</Button>
 						</div>
-						<Button variant="primary" onClick={onScheduleAppointmentButtonClick}>
+					)}
+				{!schedulingUnavailable &&
+					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
+						<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
 							Schedule Appointment
 						</Button>
-					</div>
-				)}
-				{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
-					<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
-						Schedule Appointment
-					</Button>
-				)}
-				{scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && (
-					<div className="d-md-flex justify-content-between">
-						<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
-							<div className={classNames(classes.iconOuter, 'me-4')}>
-								<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
+					)}
+				{!schedulingUnavailable &&
+					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && (
+						<div className="d-md-flex justify-content-between">
+							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+								<div className={classNames(classes.iconOuter, 'me-4')}>
+									<SvgIcon kit="far" icon="phone" size={16} className="text-primary" />
+								</div>
+								<div>
+									<p className="mb-0">
+										<strong>Call {phoneNumberDescription} to schedule</strong>
+									</p>
+								</div>
 							</div>
-							<div>
-								<p className="mb-0">
-									<strong>Call {phoneNumberDescription} to schedule</strong>
-								</p>
-							</div>
+							<a
+								className={classNames(
+									'cobalt-button cobalt-button-primary text-decoration-none',
+									classes.callClinicButton
+								)}
+								href={`tel:${phoneNumber}`}
+							>
+								Call Clinic
+							</a>
 						</div>
-						<a
-							className={classNames(
-								'cobalt-button cobalt-button-primary text-decoration-none',
-								classes.callClinicButton
-							)}
-							href={`tel:${phoneNumber}`}
-						>
-							Call Clinic
-						</a>
-					</div>
-				)}
+					)}
 			</div>
 			{showMoreAppointmentsButton && (
 				<Button

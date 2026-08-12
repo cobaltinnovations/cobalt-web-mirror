@@ -187,6 +187,7 @@ export function useScreeningNavigation() {
 					);
 					return;
 				case ScreeningSessionDestinationId.APPOINTMENT_BOOKING_CONFIRMATION:
+				case ScreeningSessionDestinationId.PROVIDER_APPOINTMENT_BOOKING:
 					if (
 						destination.screeningSessionDestinationResultId === ScreeningSessionDestinationResultId.SUCCESS
 					) {

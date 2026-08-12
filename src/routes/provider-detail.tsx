@@ -1,9 +1,17 @@
 import React, { Suspense, useContext, useEffect, useMemo, useRef } from 'react';
-import { Await, LoaderFunctionArgs, defer, useLocation, useRouteLoaderData, useSearchParams } from 'react-router-dom';
+import {
+	Await,
+	LoaderFunctionArgs,
+	defer,
+	redirect,
+	useLocation,
+	useRouteLoaderData,
+	useSearchParams,
+} from 'react-router-dom';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
-import { providerService } from '@/lib/services';
+import { institutionService, providerService } from '@/lib/services';
 import { BookingContext, BookingSource } from '@/contexts/booking-context';
 import { BookingModals, BookingRefHandle } from '@/components/booking-modals';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
@@ -11,6 +19,7 @@ import HeroContainer from '@/components/hero-container';
 import { Loader } from 'react-bootstrap-typeahead';
 import { createUseThemedStyles } from '@/jss/theme';
 import useAccount from '@/hooks/use-account';
+import { getEffectiveBookingV2Enabled, getSubdomain } from '@/lib/utils';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	imageOuter: {
@@ -45,9 +54,23 @@ const loadProviderDetails = async (urlName: string) => {
 	}
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	if (!params.urlName) {
 		throw new Error('params.urlName is undefined');
+	}
+
+	const currentUrl = new URL(request.url);
+	const { institution } = await institutionService
+		.getInstitution({
+			subdomain: getSubdomain(currentUrl),
+			accountSourceId: currentUrl.searchParams.get('accountSourceId'),
+		})
+		.fetch();
+
+	if (getEffectiveBookingV2Enabled(institution)) {
+		const { provider } = await providerService.getProviderById(params.urlName).fetch();
+
+		return redirect(`/provider-info/${provider.providerId}${currentUrl.search}`);
 	}
 
 	return defer({ deferredData: loadProviderDetails(params.urlName) });

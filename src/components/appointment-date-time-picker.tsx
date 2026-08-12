@@ -20,6 +20,7 @@ import {
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { AvailabilityModel, providerService } from '@/lib/services';
+import { shouldFetchInstitutionLocation } from '@/lib/utils';
 
 type TimeSlotGroup = {
 	label: 'Morning' | 'Afternoon' | 'Evening';
@@ -28,21 +29,24 @@ type TimeSlotGroup = {
 
 export const getDefaultAppointmentDateTimePickerValue = (): AppointmentDateTimePickerValue => {
 	return {
-		dateTime: moment(),
+		dateTime: moment.utc(moment().format('YYYY-MM-DD HH:mm:ss'), 'YYYY-MM-DD HH:mm:ss'),
 	};
 };
 
 const createAppointmentDateTime = (date: string | Date, timeSlot: AvailabilityTimeSlot) => {
 	const dateKey = typeof date === 'string' ? date : moment(date).format('YYYY-MM-DD');
 
-	return moment(`${dateKey} ${timeSlot.time}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA']);
+	return moment.utc(`${dateKey} ${timeSlot.time}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA']);
 };
 
 const formatDateKey = (date: Date) => moment(date).format('YYYY-MM-DD');
 const isPastDate = (date: Date, minDate: Date) => moment(date).isBefore(minDate, 'day');
 
 const getTimeSlotHour = (timeSlot: AvailabilityTimeSlot) =>
-	moment(timeSlot.time, ['HH:mm:ss', 'HH:mm', 'h:mmA']).hour();
+	moment.utc(timeSlot.time, ['HH:mm:ss', 'HH:mm', 'h:mmA']).hour();
+
+const getCalendarDate = (dateTime: Moment) =>
+	moment(dateTime.format('YYYY-MM-DD'), 'YYYY-MM-DD', true).hour(12).toDate();
 
 const buildTimeSlotGroups = (timeSlots: AvailabilityTimeSlot[]): TimeSlotGroup[] => {
 	return [
@@ -336,7 +340,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 	};
 
 	const handleTimeSelect = (timeSlot: AvailabilityTimeSlot) => {
-		onChange(getValueForTimeSlot(value, selectedAppointmentDateTime.toDate(), timeSlot));
+		onChange(getValueForTimeSlot(value, selectedAppointmentDateTime.format('YYYY-MM-DD'), timeSlot));
 	};
 
 	const handleAppointmentModalitySelect = (appointmentModalityId: string) => {
@@ -407,7 +411,12 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 					}
 
 					const response = await providerService
-						.getClinicAvailability(config.clinicId, { featureId: config.featureId ?? '' })
+						.getClinicAvailability(config.clinicId, {
+							featureId: config.featureId ?? '',
+							...(shouldFetchInstitutionLocation(config.institutionLocationId) && {
+								institutionLocationId: config.institutionLocationId,
+							}),
+						})
 						.fetch();
 
 					if (!didCancel) {
@@ -424,7 +433,12 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 					}
 
 					const response = await providerService
-						.getProviderAvailability(config.providerId, { featureId: config.featureId ?? '' })
+						.getProviderAvailability(config.providerId, {
+							featureId: config.featureId ?? '',
+							...(shouldFetchInstitutionLocation(config.institutionLocationId) && {
+								institutionLocationId: config.institutionLocationId,
+							}),
+						})
 						.fetch();
 
 					if (!didCancel) {
@@ -478,7 +492,11 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 		);
 
 		if (selectedTimeSlot) {
-			const nextValue = getValueForTimeSlot(value, selectedAppointmentDateTime.toDate(), selectedTimeSlot);
+			const nextValue = getValueForTimeSlot(
+				value,
+				selectedAppointmentDateTime.format('YYYY-MM-DD'),
+				selectedTimeSlot
+			);
 
 			if (
 				!haveSameStringValues(value.appointmentTypeIds, nextValue.appointmentTypeIds) ||
@@ -565,9 +583,10 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 			<div className="d-flex py-8 px-6">
 				<DatePicker
 					inline
-					selected={selectedAppointmentDateTime.toDate()}
+					selected={getCalendarDate(selectedAppointmentDateTime)}
 					onChange={handleDateSelect}
 					minDate={minSelectableDate}
+					filterDate={(date) => !isNoSlotDate(date)}
 					calendarClassName={classes.inlineCalendar}
 					dayClassName={(date) =>
 						classNames({
@@ -634,7 +653,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 								<div className="w-100 d-flex overflow-auto">
 									{timeSlotGroup.slots.map((timeSlot, timeSlotIndex) => {
 										const timeSlotDateTime = createAppointmentDateTime(
-											selectedAppointmentDateTime.toDate(),
+											selectedAppointmentDateTime.format('YYYY-MM-DD'),
 											timeSlot
 										);
 										const isSelected =

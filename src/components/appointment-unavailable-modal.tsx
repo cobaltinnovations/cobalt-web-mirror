@@ -12,10 +12,10 @@ const useAppointmentUnavailableStyles = createUseStyles({
 });
 
 interface AppointmentUnavailableModalProps extends ModalProps {
-	//
+	onViewAppointments?(): void;
 }
 
-const AppointmentUnavailableModal: FC<AppointmentUnavailableModalProps> = ({ onConfirm, ...props }) => {
+const AppointmentUnavailableModal: FC<AppointmentUnavailableModalProps> = ({ onViewAppointments, ...props }) => {
 	useTrackModalView('AppointmentUnavailableModal', props.show);
 	const classes = useAppointmentUnavailableStyles();
 	const navigate = useNavigate();
@@ -38,6 +38,11 @@ const AppointmentUnavailableModal: FC<AppointmentUnavailableModalProps> = ({ onC
 					<Button
 						variant="primary"
 						onClick={() => {
+							if (onViewAppointments) {
+								onViewAppointments();
+								return;
+							}
+
 							const exitUrl = getExitBookingLocation(location.state);
 							navigate(exitUrl);
 						}}

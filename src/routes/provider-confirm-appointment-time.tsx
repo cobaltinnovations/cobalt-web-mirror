@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import moment from 'moment';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
@@ -32,11 +31,14 @@ import {
 	providerService,
 } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
-import { shouldFetchInstitutionLocation } from '@/lib/utils';
+import {
+	PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM,
+	parseProviderAppointmentDateTime,
+	setProviderIdToScheduleSearchParam,
+	shouldFetchInstitutionLocation,
+} from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
 import { useScreeningNavigation } from '@/pages/screening/screening.hooks';
-
-const providerIdToScheduleSearchParam = 'providerIdToSchedule';
 
 const buildProviderBookAppointmentUrl = ({
 	currentSearchString,
@@ -76,9 +78,9 @@ const buildProviderBookAppointmentUrl = ({
 	}
 
 	if (providerIdToSchedule) {
-		params.set(providerIdToScheduleSearchParam, providerIdToSchedule);
+		params.set(PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM, providerIdToSchedule);
 	} else {
-		params.delete(providerIdToScheduleSearchParam);
+		params.delete(PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM);
 	}
 
 	params.set('date', value.dateTime.format('YYYY-MM-DD'));
@@ -136,10 +138,8 @@ const getAppointmentDateTimePickerValueFromSearchParams = (
 	const appointmentTypeId = searchParams.get('appointmentTypeId') ?? undefined;
 	const epicDepartmentId = searchParams.get('epicDepartmentId') ?? undefined;
 	const epicAppointmentFhirId = searchParams.get('epicAppointmentFhirId') ?? undefined;
-	const providerIdToSchedule = searchParams.get(providerIdToScheduleSearchParam) ?? undefined;
-	const dateTime = date
-		? moment(`${date} ${time ?? ''}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA'])
-		: undefined;
+	const providerIdToSchedule = searchParams.get(PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM) ?? undefined;
+	const dateTime = parseProviderAppointmentDateTime(date, time);
 
 	return {
 		dateTime: dateTime?.isValid() ? dateTime : defaultValue.dateTime,
@@ -174,7 +174,6 @@ export const Component = () => {
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
-	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
 	const appointmentSelectionTypeId = useMemo(() => {
 		const value = searchParams.get('appointmentSelectionTypeId');
 		return isProviderAppointmentSelectionTypeId(value) ? value : undefined;
@@ -253,7 +252,7 @@ export const Component = () => {
 			: Promise.resolve(undefined);
 		const availabilityQueryParams = {
 			featureId: appointmentDateTimePickerConfig?.featureId ?? '',
-			...(appointmentTypeId ? { appointmentTypeId } : {}),
+			...(shouldFetchInstitutionLocation(institutionLocationId) ? { institutionLocationId } : {}),
 		};
 
 		if (providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER && providerId) {
@@ -295,7 +294,6 @@ export const Component = () => {
 		throw new Error('Required query parameters are undefined.');
 	}, [
 		appointmentDateTimePickerConfig?.featureId,
-		appointmentTypeId,
 		clinicId,
 		institutionLocationId,
 		providerId,
@@ -312,49 +310,48 @@ export const Component = () => {
 
 	const syncAppointmentDateTimePickerValueToSearchParams = useCallback(
 		(value: AppointmentDateTimePickerValue) => {
-			const params = new URLSearchParams(searchString);
-			const providerIdToSchedule =
-				value.providerId ??
-				(providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER ? providerId : '');
+			setSearchParams(
+				(currentSearchParams) => {
+					const params = new URLSearchParams(currentSearchParams);
+					const providerIdToSchedule =
+						value.providerId ??
+						(providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER ? providerId : '');
 
-			if (value.appointmentModalityId) {
-				params.set('appointmentModalityId', value.appointmentModalityId);
-			} else {
-				params.delete('appointmentModalityId');
-			}
+					if (value.appointmentModalityId) {
+						params.set('appointmentModalityId', value.appointmentModalityId);
+					} else {
+						params.delete('appointmentModalityId');
+					}
 
-			if (value.appointmentTypeId) {
-				params.set('appointmentTypeId', value.appointmentTypeId);
-			} else {
-				params.delete('appointmentTypeId');
-			}
+					if (value.appointmentTypeId) {
+						params.set('appointmentTypeId', value.appointmentTypeId);
+					} else {
+						params.delete('appointmentTypeId');
+					}
 
-			if (value.epicDepartmentId) {
-				params.set('epicDepartmentId', value.epicDepartmentId);
-			} else {
-				params.delete('epicDepartmentId');
-			}
+					if (value.epicDepartmentId) {
+						params.set('epicDepartmentId', value.epicDepartmentId);
+					} else {
+						params.delete('epicDepartmentId');
+					}
 
-			if (value.epicAppointmentFhirId) {
-				params.set('epicAppointmentFhirId', value.epicAppointmentFhirId);
-			} else {
-				params.delete('epicAppointmentFhirId');
-			}
+					if (value.epicAppointmentFhirId) {
+						params.set('epicAppointmentFhirId', value.epicAppointmentFhirId);
+					} else {
+						params.delete('epicAppointmentFhirId');
+					}
 
-			if (providerIdToSchedule) {
-				params.set(providerIdToScheduleSearchParam, providerIdToSchedule);
-			} else {
-				params.delete(providerIdToScheduleSearchParam);
-			}
+					setProviderIdToScheduleSearchParam(params, providerIdToSchedule);
 
-			params.set('date', value.dateTime.format('YYYY-MM-DD'));
-			params.set('time', value.dateTime.format('HH:mm:ss'));
+					params.set('date', value.dateTime.format('YYYY-MM-DD'));
+					params.set('time', value.dateTime.format('HH:mm:ss'));
 
-			if (params.toString() !== searchString) {
-				setSearchParams(params, { replace: true });
-			}
+					return params.toString() === currentSearchParams.toString() ? currentSearchParams : params;
+				},
+				{ replace: true }
+			);
 		},
-		[providerId, providerSearchResultTypeId, searchString, setSearchParams]
+		[providerId, providerSearchResultTypeId, setSearchParams]
 	);
 
 	const handleAppointmentDateTimePickerChange = useCallback(

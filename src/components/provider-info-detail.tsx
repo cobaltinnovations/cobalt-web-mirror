@@ -24,6 +24,8 @@ import {
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
 	buildBookingV2UrlWithV1Fallback,
 	getBookingV1FallbackUrlFromSearchParams,
+	setFirstAvailableAppointmentSearchParams,
+	shouldFetchInstitutionLocation,
 } from '@/lib/utils';
 
 const useStyles = createUseThemedStyles((theme) => ({
@@ -95,7 +97,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 
 		const availabilityQueryParams = {
 			...(featureId ? { featureId } : {}),
-			...(institutionLocationId ? { institutionLocationId } : {}),
+			...(shouldFetchInstitutionLocation(institutionLocationId) ? { institutionLocationId } : {}),
 		};
 
 		if (providerId) {
@@ -254,20 +256,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 
 	params.set('appointmentSelectionTypeId', appointmentSelectionTypeId);
 
-	params.set('date', firstAvailableAppointment.date);
-	params.set('time', firstAvailableAppointment.time);
-
-	if (firstAvailableAppointment.appointmentTypeId) {
-		params.set('appointmentTypeId', firstAvailableAppointment.appointmentTypeId);
-	}
-
-	if (firstAvailableAppointment.epicDepartmentId) {
-		params.set('epicDepartmentId', firstAvailableAppointment.epicDepartmentId);
-	}
-
-	if (firstAvailableAppointment.epicAppointmentFhirId) {
-		params.set('epicAppointmentFhirId', firstAvailableAppointment.epicAppointmentFhirId);
-	}
+	setFirstAvailableAppointmentSearchParams(params, firstAvailableAppointment);
 
 	return buildBookingV2UrlWithV1Fallback(
 		`/provider-confirm-appointment-time?${params.toString()}`,
@@ -330,6 +319,11 @@ const appointmentBookingContextForProviderAvailability = ({
 		context.date = firstAvailableAppointment.date;
 		context.time = firstAvailableAppointment.time;
 
+		if (firstAvailableAppointment.providerId) {
+			context.providerId = firstAvailableAppointment.providerId;
+			context.providerIdToSchedule = firstAvailableAppointment.providerId;
+		}
+
 		if (firstAvailableAppointment.appointmentTypeId) {
 			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
 		}
@@ -374,6 +368,10 @@ const getAppointmentSelectionTypeId = ({
 	availability: AvailabilityModel;
 	phoneNumber?: string;
 }) => {
+	if (availability.appointmentSelectionTypeId) {
+		return availability.appointmentSelectionTypeId;
+	}
+
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 
 	if (!firstAvailableAppointment) {
@@ -448,6 +446,7 @@ const ProviderInfoDetailSchedule = ({
 		useScreeningFlow({
 			screeningFlowId: screeningRequirement?.screeningFlowId,
 			instantiateOnLoad: false,
+			checkCompletionState: false,
 			disabled: !screeningRequired,
 			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
 			screeningQuestionSearch,

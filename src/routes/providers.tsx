@@ -30,6 +30,7 @@ import {
 	getEffectiveProviderSearchFeatureId,
 	getPersistedInstitutionLocationId,
 	isAllInstitutionLocationsId,
+	setFirstAvailableAppointmentSearchParams,
 } from '@/lib/utils';
 
 export const loader = () => {
@@ -88,20 +89,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 		params.set('appointmentModalityId', appointmentModalityId);
 	}
 
-	params.set('date', firstAvailableAppointment.date);
-	params.set('time', firstAvailableAppointment.time);
-
-	if (firstAvailableAppointment.appointmentTypeId) {
-		params.set('appointmentTypeId', firstAvailableAppointment.appointmentTypeId);
-	}
-
-	if (firstAvailableAppointment.epicDepartmentId) {
-		params.set('epicDepartmentId', firstAvailableAppointment.epicDepartmentId);
-	}
-
-	if (firstAvailableAppointment.epicAppointmentFhirId) {
-		params.set('epicAppointmentFhirId', firstAvailableAppointment.epicAppointmentFhirId);
-	}
+	setFirstAvailableAppointmentSearchParams(params, firstAvailableAppointment);
 
 	return buildBookingV2UrlWithV1Fallback(
 		`/provider-confirm-appointment-time?${params.toString()}`,
@@ -164,6 +152,11 @@ const appointmentBookingContextForProviderSearchResult = ({
 		context.date = firstAvailableAppointment.date;
 		context.time = firstAvailableAppointment.time;
 
+		if (firstAvailableAppointment.providerId) {
+			context.providerId = firstAvailableAppointment.providerId;
+			context.providerIdToSchedule = firstAvailableAppointment.providerId;
+		}
+
 		if (firstAvailableAppointment.appointmentTypeId) {
 			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
 		}
@@ -188,6 +181,55 @@ interface ProviderSearchResultWithScreeningProps {
 	onViewAppointmentsButtonClick(): void;
 }
 
+interface ProviderScreeningLauncherProps {
+	screeningFlowId: string;
+	screeningQuestionSearch: string;
+	appointmentBookingContext?: Record<string, string>;
+}
+
+const ProviderScreeningLauncher = ({
+	screeningFlowId,
+	screeningQuestionSearch,
+	appointmentBookingContext,
+}: ProviderScreeningLauncherProps) => {
+	const didStartRef = useRef(false);
+	const handleError = useHandleError();
+	const {
+		didCheckScreeningSessions,
+		startScreeningFlow,
+		renderedCollectPhoneModal,
+		renderedPreScreeningLoader,
+		renderedAccountSourcesModal,
+	} = useScreeningFlow({
+		screeningFlowId,
+		instantiateOnLoad: false,
+		checkCompletionState: false,
+		screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+		screeningQuestionSearch,
+		...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
+	});
+
+	useEffect(() => {
+		if (!didCheckScreeningSessions || didStartRef.current) {
+			return;
+		}
+
+		didStartRef.current = true;
+		startScreeningFlow(true).catch(handleError);
+	}, [didCheckScreeningSessions, handleError, startScreeningFlow]);
+
+	return (
+		<>
+			{renderedPreScreeningLoader ?? (
+				<>
+					{renderedCollectPhoneModal}
+					{renderedAccountSourcesModal}
+				</>
+			)}
+		</>
+	);
+};
+
 const ProviderSearchResultWithScreening = ({
 	featureId,
 	institutionLocationId,
@@ -197,6 +239,7 @@ const ProviderSearchResultWithScreening = ({
 }: ProviderSearchResultWithScreeningProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const [screeningLaunchSequence, setScreeningLaunchSequence] = useState(0);
 	const bookingV1FallbackUrl = useMemo(
 		() => getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search)),
 		[location.search]
@@ -226,24 +269,16 @@ const ProviderSearchResultWithScreening = ({
 
 		return params.toString();
 	}, [bookingV1FallbackUrl, location.pathname, location.search]);
-	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
-		useScreeningFlow({
-			screeningFlowId: provider.screeningRequirement?.screeningFlowId,
-			instantiateOnLoad: false,
-			disabled: !screeningRequired,
-			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
-			screeningQuestionSearch,
-			...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
-		});
-
-	if (renderedPreScreeningLoader) {
-		return renderedPreScreeningLoader;
-	}
-
 	return (
 		<React.Fragment>
-			{renderedCollectPhoneModal}
-			{renderedAccountSourcesModal}
+			{screeningRequired && screeningLaunchSequence > 0 && provider.screeningRequirement?.screeningFlowId && (
+				<ProviderScreeningLauncher
+					key={screeningLaunchSequence}
+					screeningFlowId={provider.screeningRequirement.screeningFlowId}
+					screeningQuestionSearch={screeningQuestionSearch}
+					appointmentBookingContext={appointmentBookingContext}
+				/>
+			)}
 			<ProviderSearchResult
 				className="mb-6"
 				provider={provider}
@@ -251,7 +286,7 @@ const ProviderSearchResultWithScreening = ({
 				onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
 				onScheduleAppointmentButtonClick={() => {
 					if (screeningRequired) {
-						startScreeningFlow(true);
+						setScreeningLaunchSequence((previousSequence) => previousSequence + 1);
 						return;
 					}
 
@@ -280,15 +315,13 @@ export const Component = () => {
 	const careTypeRef = useRef<HTMLInputElement>(null);
 	const employerRef = useRef<HTMLInputElement>(null);
 	const forcedLocationPersistenceKeyRef = useRef<string | undefined>(undefined);
+	const employerSelectionSequenceRef = useRef(0);
 
 	/* -------------------------------- */
 	/* Search Params */
 	/* -------------------------------- */
 	const [searchParams, setSearchParams] = useSearchParams();
-	const featureId = useMemo(
-		() => getEffectiveProviderSearchFeatureId(searchParams.get('featureId')),
-		[searchParams]
-	);
+	const featureId = useMemo(() => getEffectiveProviderSearchFeatureId(searchParams.get('featureId')), [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const bookingV1FallbackUrl = useMemo(() => getBookingV1FallbackUrlFromSearchParams(searchParams), [searchParams]);
 	const forceLocation = useMemo(() => {
@@ -300,10 +333,15 @@ export const Component = () => {
 			return;
 		}
 
-		const nextSearchParams = new URLSearchParams(searchParams);
-		nextSearchParams.set('institutionLocationId', account.institutionLocationId);
-		setSearchParams(nextSearchParams, { replace: true });
-	}, [account?.institutionLocationId, institutionLocationId, searchParams, setSearchParams]);
+		setSearchParams(
+			(currentSearchParams) => {
+				const nextSearchParams = new URLSearchParams(currentSearchParams);
+				nextSearchParams.set('institutionLocationId', account.institutionLocationId ?? '');
+				return nextSearchParams;
+			},
+			{ replace: true }
+		);
+	}, [account?.institutionLocationId, institutionLocationId, setSearchParams]);
 
 	/* -------------------------------- */
 	/* Filters */
@@ -327,6 +365,7 @@ export const Component = () => {
 		if (!account || !institutionLocationId) {
 			return;
 		}
+		const institutionLocationIdBeingPersisted = institutionLocationId;
 
 		try {
 			const accountInstitutionLocationId = getPersistedInstitutionLocationId(institutionLocationId);
@@ -337,22 +376,30 @@ export const Component = () => {
 				})
 				.fetch();
 
-			const nextSearchParams = new URLSearchParams(searchParams);
+			setSearchParams(
+				(currentSearchParams) => {
+					if (currentSearchParams.get('institutionLocationId') !== institutionLocationIdBeingPersisted) {
+						return currentSearchParams;
+					}
 
-			if (response.account.institutionLocationId) {
-				nextSearchParams.set('institutionLocationId', response.account.institutionLocationId);
-			} else if (isAllInstitutionLocationsId(institutionLocationId)) {
-				nextSearchParams.set('institutionLocationId', ALL_INSTITUTION_LOCATIONS_ID);
-			} else {
-				nextSearchParams.delete('institutionLocationId');
-			}
-			nextSearchParams.delete('forceLocation');
+					const nextSearchParams = new URLSearchParams(currentSearchParams);
 
-			setSearchParams(nextSearchParams, { replace: true });
+					if (response.account.institutionLocationId) {
+						nextSearchParams.set('institutionLocationId', response.account.institutionLocationId);
+					} else if (isAllInstitutionLocationsId(institutionLocationIdBeingPersisted)) {
+						nextSearchParams.set('institutionLocationId', ALL_INSTITUTION_LOCATIONS_ID);
+					} else {
+						nextSearchParams.delete('institutionLocationId');
+					}
+					nextSearchParams.delete('forceLocation');
+					return nextSearchParams;
+				},
+				{ replace: true }
+			);
 		} catch (error) {
 			handleError(error);
 		}
-	}, [account, handleError, institutionLocationId, searchParams, setSearchParams]);
+	}, [account, handleError, institutionLocationId, setSearchParams]);
 	useEffect(() => {
 		if (!account || !shouldPersistForcedLocation) {
 			return;
@@ -372,6 +419,10 @@ export const Component = () => {
 	/* List */
 	/* -------------------------------- */
 	const [providers, setProviders] = useState<ProviderSearchResultModel[]>([]);
+	const providerSearchRequestRef = useRef<ReturnType<typeof providerService.searchProviders>>();
+	const providerSearchSequenceRef = useRef(0);
+	const providerSearchFilterKeyRef = useRef('');
+	providerSearchFilterKeyRef.current = `${featureId}|${institutionLocationId}`;
 	const providerNoDataConfig = useMemo(() => {
 		if (featureId && institutionLocationId && providers.length > 0) {
 			return;
@@ -465,70 +516,123 @@ export const Component = () => {
 		setInstitutionLocations(institutionLocationsResponse.locations);
 	}, []);
 
+	const abortProviderSearch = useCallback(() => {
+		providerSearchSequenceRef.current += 1;
+		providerSearchRequestRef.current?.abort();
+		providerSearchRequestRef.current = undefined;
+	}, []);
+
 	const fetchProviders = useCallback(async () => {
+		const searchSequence = ++providerSearchSequenceRef.current;
+		const searchFilterKey = `${featureId}|${institutionLocationId}`;
+		providerSearchRequestRef.current?.abort();
+
 		if (!featureId || !institutionLocationId) {
-			setProviders([]);
+			if (searchSequence === providerSearchSequenceRef.current) {
+				setProviders([]);
+			}
 			return;
 		}
+		setProviders([]);
 
-		const response = await providerService
-			.searchProviders({
-				featureId,
-				institutionLocationId,
-			})
-			.fetch();
+		const request = providerService.searchProviders({
+			featureId,
+			institutionLocationId,
+		});
+		providerSearchRequestRef.current = request;
 
-		setProviders(response.providers);
+		try {
+			const response = await request.fetch();
+
+			if (
+				searchSequence === providerSearchSequenceRef.current &&
+				searchFilterKey === providerSearchFilterKeyRef.current
+			) {
+				setProviders(response.providers);
+			}
+		} catch (error) {
+			if (
+				searchSequence === providerSearchSequenceRef.current &&
+				searchFilterKey === providerSearchFilterKeyRef.current
+			) {
+				throw error;
+			}
+		} finally {
+			if (providerSearchRequestRef.current === request) {
+				providerSearchRequestRef.current = undefined;
+			}
+		}
 	}, [featureId, institutionLocationId]);
 
 	const handleCareTypeSelectChange = useCallback(
 		async ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
-			const nextSearchParams = new URLSearchParams(searchParams);
+			const selectedFeatureId = currentTarget.value;
+			setSearchParams(
+				(currentSearchParams) => {
+					const nextSearchParams = new URLSearchParams(currentSearchParams);
 
-			if (currentTarget.value) {
-				nextSearchParams.set('featureId', currentTarget.value);
-			} else {
-				nextSearchParams.delete('featureId');
-			}
+					if (selectedFeatureId) {
+						nextSearchParams.set('featureId', selectedFeatureId);
+					} else {
+						nextSearchParams.delete('featureId');
+					}
 
-			setSearchParams(nextSearchParams, { replace: true });
+					return nextSearchParams;
+				},
+				{ replace: true }
+			);
 		},
-		[searchParams, setSearchParams]
+		[setSearchParams]
 	);
 
 	const handleEmployerSelectChange = useCallback(
 		async ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
-			const nextSearchParams = new URLSearchParams(searchParams);
+			const selectionSequence = ++employerSelectionSequenceRef.current;
+			const selectedInstitutionLocationId = currentTarget.value;
 
-			if (currentTarget.value) {
+			if (selectedInstitutionLocationId) {
+				let persistedInstitutionLocationId = selectedInstitutionLocationId;
 				try {
 					if (account) {
 						const response = await accountService
 							.setAccountLocation(account.accountId, {
 								accountId: account.accountId,
-								institutionLocationId: getPersistedInstitutionLocationId(currentTarget.value),
+								institutionLocationId: getPersistedInstitutionLocationId(selectedInstitutionLocationId),
 							})
 							.fetch();
 
 						if (response.account.institutionLocationId) {
-							nextSearchParams.set('institutionLocationId', response.account.institutionLocationId);
-						} else {
-							nextSearchParams.set('institutionLocationId', currentTarget.value);
+							persistedInstitutionLocationId = response.account.institutionLocationId;
 						}
-					} else {
-						nextSearchParams.set('institutionLocationId', currentTarget.value);
 					}
 				} catch (error) {
 					handleError(error);
 				} finally {
-					setSearchParams(nextSearchParams, { replace: true });
+					if (selectionSequence !== employerSelectionSequenceRef.current) {
+						return;
+					}
+
+					setSearchParams(
+						(currentSearchParams) => {
+							const nextSearchParams = new URLSearchParams(currentSearchParams);
+							nextSearchParams.set('institutionLocationId', persistedInstitutionLocationId);
+							return nextSearchParams;
+						},
+						{ replace: true }
+					);
 				}
 			} else {
-				nextSearchParams.delete('institutionLocationId');
-				setSearchParams(nextSearchParams, { replace: true });
+				setSearchParams(
+					(currentSearchParams) => {
+						const nextSearchParams = new URLSearchParams(currentSearchParams);
+						nextSearchParams.delete('institutionLocationId');
+						return nextSearchParams;
+					},
+					{ replace: true }
+				);
 			}
 		},
-		[account, handleError, searchParams, setSearchParams]
+		[account, handleError, setSearchParams]
 	);
 
 	return (
@@ -619,7 +723,7 @@ export const Component = () => {
 						</AsyncWrapper>
 					</Col>
 				</Row>
-				<AsyncWrapper fetchData={fetchProviders}>
+				<AsyncWrapper fetchData={fetchProviders} abortFetch={abortProviderSearch}>
 					<Row>
 						<Col>
 							{featureId && institutionLocationId && (

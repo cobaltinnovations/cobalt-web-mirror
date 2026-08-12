@@ -18,6 +18,7 @@ import {
 	ProviderVisitType,
 	FeatureId,
 	ProviderSearchResultModel,
+	ProviderAppointmentSelectionTypeId,
 	AppointmentModality,
 	FirstAvailableAppointmentModel,
 	ScreeningRequirement,
@@ -166,6 +167,7 @@ interface GetProviderByIdResponse {
 export interface AvailabilityModel {
 	appointmentTypes: AppointmentTypeSummary[];
 	appointmentModalities: AppointmentModality[];
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
 	providerId?: string;
 	providerName?: string;
 	clinicId?: string;
@@ -332,7 +334,13 @@ export const providerService = {
 
 	getProviderAvailability(
 		providerId: string,
-		queryParams?: { featureId?: string; startDate?: string; endDate?: string; appointmentTypeId?: string }
+		queryParams?: {
+			featureId?: string;
+			institutionLocationId?: string;
+			startDate?: string;
+			endDate?: string;
+			appointmentTypeId?: string;
+		}
 	) {
 		const params = new URLSearchParams({ ...queryParams });
 
@@ -345,7 +353,13 @@ export const providerService = {
 	},
 	getClinicAvailability(
 		clinicId: string,
-		queryParams?: { featureId?: string; startDate?: string; endDate?: string; appointmentTypeId?: string }
+		queryParams?: {
+			featureId?: string;
+			institutionLocationId?: string;
+			startDate?: string;
+			endDate?: string;
+			appointmentTypeId?: string;
+		}
 	) {
 		const params = new URLSearchParams({ ...queryParams });
 

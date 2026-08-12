@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import moment from 'moment';
 
 import {
 	Clinic,
@@ -12,6 +11,7 @@ import {
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import {
+	accountService,
 	appointmentService,
 	AvailabilityModel,
 	clinicService,
@@ -28,16 +28,19 @@ import {
 } from '@/components/provider-appointment-modality-summary';
 import SvgIcon from '@/components/svg-icon';
 import useHandleError from '@/hooks/use-handle-error';
-import { PROVIDER_BOOKING_EXPERIENCE_ID, shouldFetchInstitutionLocation } from '@/lib/utils';
+import {
+	parseProviderAppointmentDateTime,
+	PROVIDER_BOOKING_EXPERIENCE_ID,
+	shouldFetchInstitutionLocation,
+} from '@/lib/utils';
+import useFlags from '@/hooks/use-flags';
+import AppointmentUnavailableModal from '@/components/appointment-unavailable-modal';
+import { CobaltError } from '@/lib/http-client';
 
 const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) => {
 	const date = searchParams.get('date');
 	const time = searchParams.get('time');
-	const dateTime = date
-		? moment(`${date} ${time ?? ''}`, ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD h:mmA'])
-		: undefined;
-
-	return dateTime?.isValid() ? dateTime : undefined;
+	return parseProviderAppointmentDateTime(date, time);
 };
 
 const getAppointmentTypeDescriptionFromAvailability = ({
@@ -62,13 +65,9 @@ const getAppointmentTypeDescriptionFromAvailability = ({
 		(availability) => availability.date === appointmentDateTime.format('YYYY-MM-DD')
 	);
 	const selectedTimeSlot = selectedAvailability?.times.find((timeSlot) => {
-		const timeSlotDateTime = moment(`${selectedAvailability.date} ${timeSlot.time}`, [
-			'YYYY-MM-DD HH:mm:ss',
-			'YYYY-MM-DD HH:mm',
-			'YYYY-MM-DD h:mmA',
-		]);
+		const timeSlotDateTime = parseProviderAppointmentDateTime(selectedAvailability.date, timeSlot.time);
 
-		return timeSlotDateTime.isSame(appointmentDateTime, 'minute');
+		return timeSlotDateTime?.isSame(appointmentDateTime, 'minute');
 	});
 
 	if (selectedTimeSlot?.appointmentTypeDescription) {
@@ -89,7 +88,17 @@ export const loader = () => {
 export const Component = () => {
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
-	const handleError = useHandleError();
+	const { addFlag } = useFlags();
+	const [showUnavailableModal, setShowUnavailableModal] = useState(false);
+	const appointmentCreationErrorHandler = useCallback((error: CobaltError) => {
+		if (error.apiError?.metadata?.appointmentTimeslotUnavailable) {
+			setShowUnavailableModal(true);
+			return true;
+		}
+
+		return false;
+	}, []);
+	const handleError = useHandleError(appointmentCreationErrorHandler);
 
 	const [searchParams] = useSearchParams();
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
@@ -122,6 +131,8 @@ export const Component = () => {
 	const [selectedAppointmentTypeDescription, setSelectedAppointmentTypeDescription] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const submissionInFlightRef = useRef(false);
+	const [confirmationCodeRequested, setConfirmationCodeRequested] = useState(false);
+	const [confirmationCodeInputValue, setConfirmationCodeInputValue] = useState('');
 	const [formValues, setFormValues] = useState({
 		firstName: account?.firstName ?? '',
 		lastName: account?.lastName ?? '',
@@ -135,6 +146,7 @@ export const Component = () => {
 			: Promise.resolve(undefined);
 		const availabilityQueryParams = {
 			featureId,
+			...(shouldFetchInstitutionLocation(institutionLocationId) ? { institutionLocationId } : {}),
 			...(appointmentTypeId ? { appointmentTypeId } : {}),
 		};
 
@@ -199,57 +211,158 @@ export const Component = () => {
 		}));
 	};
 
-	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+	const createAppointmentAndNavigate = async () => {
+		if (!providerIdToSchedule) {
+			throw new Error('Provider ID to schedule is undefined.');
+		}
+
+		if (!appointmentTypeId) {
+			throw new Error('Appointment type ID is undefined.');
+		}
+
+		if (!appointmentDateTime) {
+			throw new Error('Appointment date and time are undefined.');
+		}
+
+		if (!appointmentModalityId) {
+			throw new Error('Appointment modality ID is undefined.');
+		}
+
+		await appointmentService
+			.createAppointment({
+				bookingExperienceId: PROVIDER_BOOKING_EXPERIENCE_ID,
+				providerId: providerIdToSchedule,
+				accountId: account?.accountId,
+				firstName: formValues.firstName,
+				lastName: formValues.lastName,
+				date: appointmentDateTime?.format('YYYY-MM-DD') ?? '',
+				time: appointmentDateTime?.format('HH:mm') ?? '',
+				emailAddress: formValues.emailAddress,
+				phoneNumber: formValues.phoneNumber,
+				appointmentTypeId: appointmentTypeId,
+				appointmentModalityId,
+				epicAppointmentFhirId,
+			})
+			.fetch();
+
+		const queryString = searchParams.toString();
+		navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
+	};
+
+	const beginSubmission = () => {
+		if (submissionInFlightRef.current) {
+			return false;
+		}
+
+		submissionInFlightRef.current = true;
+		setIsSubmitting(true);
+		return true;
+	};
+
+	const endSubmission = () => {
+		submissionInFlightRef.current = false;
+		setIsSubmitting(false);
+	};
+
+	const handleContactInformationFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		if (submissionInFlightRef.current) {
+		if (!beginSubmission()) {
 			return;
 		}
 
 		try {
-			if (!providerIdToSchedule) {
-				throw new Error('Provider ID to schedule is undefined.');
+			if (!account) {
+				throw new Error('Account is undefined.');
 			}
 
-			if (!appointmentTypeId) {
-				throw new Error('Appointment type ID is undefined.');
-			}
-
-			if (!appointmentDateTime) {
-				throw new Error('Appointment date and time are undefined.');
-			}
-
-			if (!appointmentModalityId) {
-				throw new Error('Appointment modality ID is undefined.');
-			}
-
-			submissionInFlightRef.current = true;
-			setIsSubmitting(true);
-
-			await appointmentService
-				.createAppointment({
-					bookingExperienceId: PROVIDER_BOOKING_EXPERIENCE_ID,
-					providerId: providerIdToSchedule,
-					accountId: account?.accountId,
-					firstName: formValues.firstName,
-					lastName: formValues.lastName,
-					date: appointmentDateTime?.format('YYYY-MM-DD') ?? '',
-					time: appointmentDateTime?.format('HH:mm') ?? '',
+			const response = await accountService
+				.postEmailVerificationCode(account.accountId, {
 					emailAddress: formValues.emailAddress,
-					phoneNumber: formValues.phoneNumber,
-					appointmentTypeId: appointmentTypeId,
-					appointmentModalityId,
-					epicAppointmentFhirId,
+					accountEmailVerificationFlowTypeId: 'APPOINTMENT_BOOKING',
 				})
 				.fetch();
 
-			const queryString = searchParams.toString();
-			navigate(queryString ? `/provider-booking-complete?${queryString}` : '/provider-booking-complete');
+			if (response.verified) {
+				await createAppointmentAndNavigate();
+				return;
+			}
+
+			setConfirmationCodeInputValue('');
+			setConfirmationCodeRequested(true);
+			addFlag({
+				variant: 'success',
+				title: 'Confirmation code sent',
+				description: 'Check your email for the confirmation code',
+				actions: [],
+			});
 		} catch (error) {
 			handleError(error);
 		} finally {
-			submissionInFlightRef.current = false;
-			setIsSubmitting(false);
+			endSubmission();
+		}
+	};
+
+	const handleConfirmationCodeFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		if (!beginSubmission()) {
+			return;
+		}
+
+		try {
+			if (!account) {
+				throw new Error('Account is undefined.');
+			}
+
+			await accountService
+				.postApplyEmailVerificationCode(account.accountId, {
+					emailAddress: formValues.emailAddress,
+					code: confirmationCodeInputValue,
+				})
+				.fetch();
+
+			await createAppointmentAndNavigate();
+		} catch (error) {
+			handleError(error);
+		} finally {
+			endSubmission();
+		}
+	};
+
+	const handleResendCodeButtonClick = async () => {
+		if (!beginSubmission()) {
+			return;
+		}
+
+		try {
+			if (!account) {
+				throw new Error('Account is undefined.');
+			}
+
+			const response = await accountService
+				.postEmailVerificationCode(account.accountId, {
+					emailAddress: formValues.emailAddress,
+					accountEmailVerificationFlowTypeId: 'APPOINTMENT_BOOKING',
+					forceVerification: true,
+				})
+				.fetch();
+
+			if (response.verified) {
+				await createAppointmentAndNavigate();
+				return;
+			}
+
+			addFlag({
+				variant: 'success',
+				title: 'Confirmation code sent',
+				description: 'Check your email for the confirmation code',
+				actions: [],
+			});
+		} catch (error) {
+			handleError(error);
+		} finally {
+			endSubmission();
 		}
 	};
 
@@ -258,6 +371,22 @@ export const Component = () => {
 			<Helmet>
 				<title>{institution.platformName ?? 'Cobalt'} | Book Appointment</title>
 			</Helmet>
+			<AppointmentUnavailableModal
+				show={showUnavailableModal}
+				onHide={() => {
+					setShowUnavailableModal(false);
+				}}
+				onViewAppointments={() => {
+					setShowUnavailableModal(false);
+					const queryString = searchParams.toString();
+					navigate(
+						queryString
+							? `/provider-confirm-appointment-time?${queryString}`
+							: '/provider-confirm-appointment-time',
+						{ replace: true }
+					);
+				}}
+			/>
 
 			<AsyncWrapper fetchData={fetchData}>
 				<FullscreenBar
@@ -282,50 +411,105 @@ export const Component = () => {
 					<Row className="mb-10">
 						<Col lg={8} className="mb-6 mb-lg-0">
 							<div className="bg-white border rounded-4 py-8 px-6">
-								<h4 className="mb-4">Additional Info</h4>
+								<h4 className="mb-4">
+									{confirmationCodeRequested ? 'Verify Email Address' : 'Additional Info'}
+								</h4>
 								<p className="mb-8 fs-large">
-									Your provider will receive this information and may use it to contact you about your
-									appointment. Please make sure it is entered correctly.
+									{confirmationCodeRequested
+										? `Enter the confirmation code sent to ${formValues.emailAddress} to finish booking.`
+										: "Your provider will receive this information and may use it to contact you about your appointment. We'll verify the email address before booking, so please make sure it is entered correctly."}
 								</p>
 
-								<Form id="provider-book-appointment-form" onSubmit={handleFormSubmit}>
-									<InputHelper
-										required
-										className="mb-4"
-										name="firstName"
-										label="First Name"
-										value={formValues.firstName}
-										onChange={handleFormValueChange}
-									/>
-									<InputHelper
-										required
-										className="mb-4"
-										name="lastName"
-										label="Last Name"
-										value={formValues.lastName}
-										onChange={handleFormValueChange}
-									/>
-									<InputHelper
-										required
-										className="mb-4"
-										type="email"
-										name="emailAddress"
-										label="Email Address"
-										value={formValues.emailAddress}
-										onChange={handleFormValueChange}
-									/>
-									<InputHelper
-										required
-										className="mb-2"
-										type="tel"
-										name="phoneNumber"
-										label="Phone Number"
-										value={formValues.phoneNumber}
-										onChange={handleFormValueChange}
-									/>
-									<p className="mb-0 text-muted small">
-										Used for appointment updates and to help your provider reach you if needed.
-									</p>
+								<Form
+									id="provider-book-appointment-form"
+									onSubmit={
+										confirmationCodeRequested
+											? handleConfirmationCodeFormSubmit
+											: handleContactInformationFormSubmit
+									}
+								>
+									{confirmationCodeRequested ? (
+										<>
+											<InputHelper
+												required
+												className="mb-6"
+												type="text"
+												label="Confirmation Code"
+												value={confirmationCodeInputValue}
+												disabled={isSubmitting}
+												onChange={({ currentTarget }) => {
+													setConfirmationCodeInputValue(currentTarget.value);
+												}}
+											/>
+											<div className="d-flex align-items-center justify-content-between">
+												<Button
+													type="button"
+													variant="link"
+													className="p-0"
+													disabled={isSubmitting}
+													onClick={() => {
+														setConfirmationCodeRequested(false);
+														setConfirmationCodeInputValue('');
+													}}
+												>
+													Change email address
+												</Button>
+												<Button
+													type="button"
+													variant="light"
+													disabled={isSubmitting}
+													onClick={handleResendCodeButtonClick}
+												>
+													Resend Code
+												</Button>
+											</div>
+										</>
+									) : (
+										<>
+											<InputHelper
+												required
+												className="mb-4"
+												name="firstName"
+												label="First Name"
+												value={formValues.firstName}
+												disabled={isSubmitting}
+												onChange={handleFormValueChange}
+											/>
+											<InputHelper
+												required
+												className="mb-4"
+												name="lastName"
+												label="Last Name"
+												value={formValues.lastName}
+												disabled={isSubmitting}
+												onChange={handleFormValueChange}
+											/>
+											<InputHelper
+												required
+												className="mb-4"
+												type="email"
+												name="emailAddress"
+												label="Email Address"
+												value={formValues.emailAddress}
+												disabled={isSubmitting}
+												onChange={handleFormValueChange}
+											/>
+											<InputHelper
+												required
+												className="mb-2"
+												type="tel"
+												name="phoneNumber"
+												label="Phone Number"
+												value={formValues.phoneNumber}
+												disabled={isSubmitting}
+												onChange={handleFormValueChange}
+											/>
+											<p className="mb-0 text-muted small">
+												Used for appointment updates and to help your provider reach you if
+												needed.
+											</p>
+										</>
+									)}
 								</Form>
 							</div>
 						</Col>
@@ -388,7 +572,7 @@ export const Component = () => {
 									className="w-100 mt-6"
 									disabled={isSubmitting}
 								>
-									Book Appointment
+									{confirmationCodeRequested ? 'Verify & Book Appointment' : 'Book Appointment'}
 								</Button>
 							</div>
 						</Col>

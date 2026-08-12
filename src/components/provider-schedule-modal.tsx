@@ -8,7 +8,7 @@ import AppointmentDateTimePicker, {
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
 import { createUseThemedStyles } from '@/jss/theme';
-import { buildBookingV2UrlWithV1Fallback } from '@/lib/utils';
+import { buildBookingV2UrlWithV1Fallback, setProviderIdToScheduleSearchParam } from '@/lib/utils';
 
 const useStyles = createUseThemedStyles(() => ({
 	providerScheduleModal: {
@@ -52,6 +52,8 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 	if (config?.providerId) {
 		params.set('providerId', config.providerId);
 	}
+
+	setProviderIdToScheduleSearchParam(params, value.providerId);
 
 	if (config?.providerSearchResultTypeId) {
 		params.set('providerSearchResultTypeId', config.providerSearchResultTypeId);

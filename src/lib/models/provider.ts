@@ -222,6 +222,7 @@ export interface ProviderAppointmentModality {
 }
 
 export interface FirstAvailableAppointmentModel {
+	providerId?: string;
 	date: string;
 	time: string;
 	dateTime: string;
