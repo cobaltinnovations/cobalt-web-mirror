@@ -129,6 +129,9 @@ export const AdminHeader = () => {
 	const reportsMatch = useMatch({
 		path: '/admin/reports/*',
 	});
+	const encountersMatch = useMatch({
+		path: '/admin/encounters/*',
+	});
 	const analyticsMatch = useMatch({
 		path: '/admin/analytics/*',
 	});
@@ -188,6 +191,13 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
+			{
+				testId: '',
+				navigationItemId: 'ENCOUNTERS',
+				to: '/admin/encounters',
+				title: 'Encounters',
+				active: !!encountersMatch,
+			},
 			// {
 			// 	testId: '',
 			// 	navigationItemId: 'SCHEDULING',
@@ -251,6 +261,7 @@ export const AdminHeader = () => {
 			account?.accountCapabilityFlags.canViewStudyInsights,
 			analyticsMatch,
 			debugMatch,
+			encountersMatch,
 			groupSessionsMatch,
 			institution.analyticsProfileId,
 			pagesMatch,

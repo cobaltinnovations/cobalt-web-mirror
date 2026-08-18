@@ -1169,6 +1169,11 @@ export const routes: RouteObject[] = [
 								element: <Reports />,
 							},
 							{
+								id: 'admin-encounters',
+								path: 'encounters',
+								lazy: () => import('@/routes/admin/encounters/encounters'),
+							},
+							{
 								id: 'admin-scheduling',
 								path: 'scheduling',
 								element: <>TODO: Scheduling</>,
