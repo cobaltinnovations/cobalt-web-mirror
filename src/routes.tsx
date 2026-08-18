@@ -1172,6 +1172,13 @@ export const routes: RouteObject[] = [
 								id: 'admin-encounters',
 								path: 'encounters',
 								lazy: () => import('@/routes/admin/encounters/encounters'),
+								children: [
+									{
+										id: 'admin-encounter-shelf',
+										path: ':encounterId',
+										lazy: () => import('@/routes/admin/encounters/encounter-shelf'),
+									},
+								],
 							},
 							{
 								id: 'admin-scheduling',

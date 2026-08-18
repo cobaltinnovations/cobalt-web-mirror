@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { Col, Container, Offcanvas, Row } from 'react-bootstrap';
+import { Outlet, useLocation, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 
 import InputHelperSearch from '@/components/input-helper-search';
 import TabBar from '@/components/tab-bar';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/table';
+import { createUseThemedStyles } from '@/jss/theme';
 
 type EncounterStatus = 'open' | 'closed';
 
@@ -16,11 +17,23 @@ interface Encounter {
 	appointmentTime: string;
 }
 
+const useStyles = createUseThemedStyles((theme) => ({
+	encounterShelf: {
+		width: '95% !important',
+		maxWidth: '800px !important',
+		backgroundColor: theme.colors.n0,
+	},
+}));
+
 export async function loader() {
 	return null;
 }
 
 export const Component = () => {
+	const classes = useStyles();
+	const location = useLocation();
+	const navigate = useNavigate();
+	const encounterShelfMatch = useMatch('/admin/encounters/:encounterId');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const activeStatus = useMemo<EncounterStatus>(
 		() => (searchParams.get('status') === 'closed' ? 'closed' : 'open'),
@@ -80,63 +93,87 @@ export const Component = () => {
 	};
 
 	return (
-		<Container fluid className="px-8 py-8">
-			<Row>
-				<Col>
-					<div className="mb-6 d-flex align-items-center justify-content-between gap-4">
-						<h2 className="mb-0">Encounters</h2>
-						<InputHelperSearch style={{ width: 335 }} placeholder="Search" onClear={() => undefined} />
-					</div>
-					<hr />
-				</Col>
-			</Row>
+		<>
+			<Container fluid className="px-8 py-8">
+				<Row>
+					<Col>
+						<div className="mb-6 d-flex align-items-center justify-content-between gap-4">
+							<h2 className="mb-0">Encounters</h2>
+							<InputHelperSearch style={{ width: 335 }} placeholder="Search" onClear={() => undefined} />
+						</div>
+						<hr />
+					</Col>
+				</Row>
 
-			<Row className="mb-8">
-				<Col>
-					<TabBar
-						value={activeStatus}
-						tabs={[
-							{ value: 'open', title: 'Open' },
-							{ value: 'closed', title: 'Closed' },
-						]}
-						onTabClick={handleTabClick}
-					/>
-				</Col>
-			</Row>
+				<Row className="mb-8">
+					<Col>
+						<TabBar
+							value={activeStatus}
+							tabs={[
+								{ value: 'open', title: 'Open' },
+								{ value: 'closed', title: 'Closed' },
+							]}
+							onTabClick={handleTabClick}
+						/>
+					</Col>
+				</Row>
 
-			<Row>
-				<Col>
-					<Table>
-						<TableHead>
-							<TableRow>
-								<TableCell header minWidth="max-content">
-									Created
-								</TableCell>
-								<TableCell header width="45%">
-									Patient
-								</TableCell>
-								<TableCell header width="45%">
-									Appointment Date
-								</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{encounters.map((encounter) => (
-								<TableRow key={encounter.encounterId}>
-									<TableCell className="text-nowrap" minWidth="max-content">
-										{encounter.created}
+				<Row>
+					<Col>
+						<Table>
+							<TableHead>
+								<TableRow>
+									<TableCell header minWidth="max-content">
+										Created
 									</TableCell>
-									<TableCell width="45%">{encounter.patientName}</TableCell>
-									<TableCell width="45%">
-										<span>{encounter.appointmentDate}</span>
-										<span>{encounter.appointmentTime}</span>
+									<TableCell header width="45%">
+										Patient
+									</TableCell>
+									<TableCell header width="45%">
+										Appointment Date
 									</TableCell>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</Col>
-			</Row>
-		</Container>
+							</TableHead>
+							<TableBody>
+								{encounters.map((encounter) => (
+									<TableRow
+										key={encounter.encounterId}
+										onClick={() => {
+											navigate({
+												pathname: `/admin/encounters/${encounter.encounterId}`,
+												search: location.search,
+											});
+										}}
+									>
+										<TableCell className="text-nowrap" minWidth="max-content">
+											{encounter.created}
+										</TableCell>
+										<TableCell width="45%">{encounter.patientName}</TableCell>
+										<TableCell width="45%">
+											<span>{encounter.appointmentDate}</span>
+											<span>{encounter.appointmentTime}</span>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</Col>
+				</Row>
+			</Container>
+
+			<Offcanvas
+				className={classes.encounterShelf}
+				show={!!encounterShelfMatch}
+				placement="end"
+				onHide={() => {
+					navigate({
+						pathname: '/admin/encounters',
+						search: location.search,
+					});
+				}}
+			>
+				<Outlet />
+			</Offcanvas>
+		</>
 	);
 };
