@@ -5,6 +5,7 @@ export * from './appointments';
 export * from './assessment';
 export * from './calendar-event-models';
 export * from './call-to-action-models';
+export * from './care-encounter-models';
 export * from './care-resource-models';
 export * from './chart-models';
 export * from './color-ids';
