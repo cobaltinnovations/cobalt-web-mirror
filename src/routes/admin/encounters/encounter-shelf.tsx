@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Button, Card, Col, Container, Row, Tab } from 'react-bootstrap';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
 import TabBar from '@/components/tab-bar';
 import { createUseThemedStyles } from '@/jss/theme';
+import { CareEncounterModel } from '@/lib/models';
+import { careEncounterService } from '@/lib/services';
 import { CloseEncounterModal } from './close-encounter-modal';
 
 type EncounterShelfTab = 'encounter-details' | 'contact-history' | 'notes';
@@ -34,50 +37,101 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: 32,
 		borderBottom: `1px solid ${theme.colors.border}`,
 	},
-	questionList: {
-		padding: 0,
-		margin: 0,
-		listStyle: 'none',
-		counterReset: 'encounter-question',
-	},
-	question: {
-		position: 'relative',
-		padding: '0 0 20px 40px',
-		marginBottom: 20,
-		counterIncrement: 'encounter-question',
-		borderBottom: `1px solid ${theme.colors.border}`,
-		'&:before': {
-			top: 0,
-			left: 0,
-			position: 'absolute',
-			content: 'counter(encounter-question) ")"',
-		},
-		'&:last-child': {
-			paddingBottom: 0,
-			marginBottom: 0,
-			borderBottom: 0,
-		},
-	},
 }));
 
 export const Component = () => {
-	const classes = useStyles();
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { encounterId } = useParams<{ encounterId: string }>();
 	const [activeTab, setActiveTab] = useState<EncounterShelfTab>('encounter-details');
 	const [showCloseEncounterModal, setShowCloseEncounterModal] = useState(false);
+	const [careEncounter, setCareEncounter] = useState<CareEncounterModel | null>(null);
+	const careEncounterRequestRef = useRef<ReturnType<typeof careEncounterService.getCareEncounter>>();
+
+	const fetchCareEncounter = useCallback(async () => {
+		if (!encounterId) {
+			return;
+		}
+
+		careEncounterRequestRef.current?.abort();
+
+		const request = careEncounterService.getCareEncounter(encounterId);
+		careEncounterRequestRef.current = request;
+
+		try {
+			const response = await request.fetch();
+
+			if (request === careEncounterRequestRef.current) {
+				setCareEncounter(response.careEncounter);
+			}
+		} finally {
+			if (request === careEncounterRequestRef.current) {
+				careEncounterRequestRef.current = undefined;
+			}
+		}
+	}, [encounterId]);
+
+	const abortFetchCareEncounter = useCallback(() => {
+		careEncounterRequestRef.current?.abort();
+		careEncounterRequestRef.current = undefined;
+	}, []);
 
 	if (!encounterId) {
 		throw new Error('Unknown encounter');
 	}
 
 	return (
+		<AsyncWrapper
+			key={encounterId}
+			fetchData={fetchCareEncounter}
+			abortFetch={abortFetchCareEncounter}
+			showBackButton={false}
+		>
+			{careEncounter && (
+				<EncounterShelfContent
+					careEncounter={careEncounter}
+					activeTab={activeTab}
+					showCloseEncounterModal={showCloseEncounterModal}
+					onActiveTabChange={setActiveTab}
+					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
+					onClose={() => {
+						navigate({
+							pathname: '..',
+							search: location.search,
+						});
+					}}
+				/>
+			)}
+		</AsyncWrapper>
+	);
+};
+
+interface EncounterShelfContentProps {
+	careEncounter: CareEncounterModel;
+	activeTab: EncounterShelfTab;
+	showCloseEncounterModal: boolean;
+	onActiveTabChange(activeTab: EncounterShelfTab): void;
+	onShowCloseEncounterModalChange(show: boolean): void;
+	onClose(): void;
+}
+
+const EncounterShelfContent = ({
+	careEncounter,
+	activeTab,
+	showCloseEncounterModal,
+	onActiveTabChange,
+	onShowCloseEncounterModalChange,
+	onClose,
+}: EncounterShelfContentProps) => {
+	const classes = useStyles();
+	const notes = careEncounter.notes?.trim();
+
+	return (
 		<Tab.Container id="encounter-shelf-tabs" activeKey={activeTab} mountOnEnter unmountOnExit>
 			<CloseEncounterModal
 				show={showCloseEncounterModal}
 				onHide={() => {
-					setShowCloseEncounterModal(false);
+					onShowCloseEncounterModalChange(false);
 				}}
 			/>
 
@@ -86,19 +140,15 @@ export const Component = () => {
 					variant="transparent-secondary"
 					className={`${classes.closeButton} p-2 position-absolute`}
 					aria-label="Close encounter details"
-					onClick={() => {
-						navigate({
-							pathname: '..',
-							search: location.search,
-						});
-					}}
+					onClick={onClose}
 				>
 					<SvgIcon kit="far" icon="xmark" size={16} className="d-block" />
 				</Button>
 
-				<h4 className="mb-2">Firstname Lastname</h4>
+				<h4 className="mb-2">{careEncounter.patientFullName}</h4>
 				<p className="mb-6 fs-large">
-					Care Navigator: <span className="fw-bold">Navigator Name</span>
+					Care Navigator:{' '}
+					<span className="fw-bold">{careEncounter.appointment.provider?.name ?? 'Unassigned'}</span>
 				</p>
 
 				<TabBar
@@ -107,10 +157,10 @@ export const Component = () => {
 					tabs={[
 						{ value: 'encounter-details', title: 'Encounter Details' },
 						{ value: 'contact-history', title: 'Contact History (0)' },
-						{ value: 'notes', title: 'Notes (0)' },
+						{ value: 'notes', title: `Notes (${notes ? 1 : 0})` },
 					]}
 					onTabClick={(value) => {
-						setActiveTab(value as EncounterShelfTab);
+						onActiveTabChange(value as EncounterShelfTab);
 					}}
 				/>
 			</div>
@@ -126,7 +176,7 @@ export const Component = () => {
 										variant="light"
 										size="sm"
 										onClick={() => {
-											setShowCloseEncounterModal(true);
+											onShowCloseEncounterModalChange(true);
 										}}
 									>
 										Close Encounter
@@ -140,7 +190,7 @@ export const Component = () => {
 											<p className="mb-0">Date Created</p>
 										</Col>
 										<Col xs={9}>
-											<p className="mb-0">Nov 12, 2022</p>
+											<p className="mb-0">{careEncounter.createdDateDescription}</p>
 										</Col>
 									</Row>
 									<Row>
@@ -148,7 +198,7 @@ export const Component = () => {
 											<p className="mb-0">Created By</p>
 										</Col>
 										<Col xs={9}>
-											<p className="mb-0">webform</p>
+											<p className="mb-0">Unknown</p>
 										</Col>
 									</Row>
 								</Container>
@@ -169,7 +219,9 @@ export const Component = () => {
 											<p className="mb-0">Email</p>
 										</Col>
 										<Col xs={9}>
-											<p className="mb-0">address@email.com</p>
+											<p className="mb-0">
+												{careEncounter.appointment.account?.emailAddress ?? 'Unknown'}
+											</p>
 										</Col>
 									</Row>
 								</Container>
@@ -184,27 +236,7 @@ export const Component = () => {
 								<Card.Title>Screening Answers</Card.Title>
 							</Card.Header>
 							<Card.Body>
-								<ol className={classes.questionList}>
-									<li className={classes.question}>
-										<p className="mb-3">Who are you seeking support for?</p>
-										<p className="mb-0 fw-bold">Myself</p>
-									</li>
-									<li className={classes.question}>
-										<p className="mb-3">Who is your current employer?</p>
-										<p className="mb-0 fw-bold">UPHS (University Pennsylvania Health System)</p>
-									</li>
-									<li className={classes.question}>
-										<p className="mb-3">
-											Select your current behavioral health insurance plan from the list below.
-										</p>
-										<p className="mb-0 fw-bold">Aetna Behavioral Health Network</p>
-									</li>
-									<li className={classes.question}>
-										<p className="mb-3">What kind of support are you looking for today?</p>
-										<p className="mb-3 fw-bold">Something else / I’m not sure</p>
-										<p className="mb-0 fw-bold">User input text here if available...</p>
-									</li>
-								</ol>
+								<NoData title="No Screening Answers" actions={[]} />
 							</Card.Body>
 						</Card>
 					</section>
@@ -218,7 +250,7 @@ export const Component = () => {
 
 				<Tab.Pane eventKey="notes" className={classes.tabPane}>
 					<section className={classes.section}>
-						<NoData title="No Notes" actions={[]} />
+						{notes ? <p className="mb-0">{notes}</p> : <NoData title="No Notes" actions={[]} />}
 					</section>
 				</Tab.Pane>
 			</Tab.Content>

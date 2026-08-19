@@ -35,3 +35,16 @@ it('requests admin care encounters with every supported listing parameter', () =
 
 	orchestrateRequestSpy.mockRestore();
 });
+
+it('requests an admin care encounter by ID', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.getCareEncounter('care-encounter-1');
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'get',
+		url: '/admin/care-encounters/care-encounter-1',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});

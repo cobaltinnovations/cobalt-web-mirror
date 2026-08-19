@@ -19,11 +19,24 @@ export interface GetCareEncountersResponseBody {
 	careEncounters: CareEncounterModel[];
 }
 
+export interface GetCareEncounterResponseBody {
+	careEncounter: CareEncounterModel;
+	otherCareEncounters: CareEncounterModel[];
+	otherCareEncountersTotalCount: number;
+	otherCareEncountersTotalCountDescription: string;
+}
+
 export const careEncounterService = {
 	getCareEncounters(queryParameters?: GetCareEncountersQueryParameters) {
 		return httpSingleton.orchestrateRequest<GetCareEncountersResponseBody>({
 			method: 'get',
 			url: buildQueryParamUrl('/admin/care-encounters', queryParameters),
+		});
+	},
+	getCareEncounter(careEncounterId: string) {
+		return httpSingleton.orchestrateRequest<GetCareEncounterResponseBody>({
+			method: 'get',
+			url: `/admin/care-encounters/${careEncounterId}`,
 		});
 	},
 };

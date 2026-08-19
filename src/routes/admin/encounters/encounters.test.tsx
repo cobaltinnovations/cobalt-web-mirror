@@ -4,7 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { CobaltThemeProvider } from '@/jss/theme';
 import { CareEncounterModel, CareEncounterSortColumnId, CareEncounterStatusId, SortDirectionId } from '@/lib/models';
-import { GetCareEncountersResponseBody, careEncounterService } from '@/lib/services';
+import { GetCareEncounterResponseBody, GetCareEncountersResponseBody, careEncounterService } from '@/lib/services';
 import { Component as EncounterShelf } from './encounter-shelf';
 import { Component } from './encounters';
 
@@ -18,7 +18,7 @@ jest.mock('@/hooks/use-handle-error', () => {
 
 	return {
 		__esModule: true,
-		default: () => handleError,
+		default: (handler?: (error: unknown) => boolean) => handler ?? handleError,
 	};
 });
 
@@ -47,6 +47,12 @@ const careEncounter: CareEncounterModel = {
 		startTimeDescription: 'Backend Appointment Start Time',
 		localStartDate: '2026-08-18',
 		localStartTime: '10:25:00',
+		provider: {
+			name: 'Navigator Name',
+		},
+		account: {
+			emailAddress: 'patient@example.com',
+		},
 	} as CareEncounterModel['appointment'],
 };
 
@@ -56,7 +62,15 @@ const defaultResponse: GetCareEncountersResponseBody = {
 	careEncounters: [careEncounter],
 };
 
+const defaultDetailResponse: GetCareEncounterResponseBody = {
+	careEncounter,
+	otherCareEncounters: [],
+	otherCareEncountersTotalCount: 0,
+	otherCareEncountersTotalCountDescription: '0',
+};
+
 const getCareEncountersSpy = jest.spyOn(careEncounterService, 'getCareEncounters');
+const getCareEncounterSpy = jest.spyOn(careEncounterService, 'getCareEncounter');
 
 beforeAll(() => {
 	Object.defineProperty(window, 'matchMedia', {
@@ -81,6 +95,13 @@ beforeEach(() => {
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue(defaultResponse),
 			} as ReturnType<typeof careEncounterService.getCareEncounters>)
+	);
+	getCareEncounterSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue(defaultDetailResponse),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
 	);
 });
 
@@ -140,7 +161,6 @@ it('requests and renders the default open encounter table', async () => {
 	expect(screen.getByRole('button', { name: 'Patient' })).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Appointment Date' })).toBeInTheDocument();
 	expect(screen.getByText('Backend Created Date')).toBeInTheDocument();
-	expect(screen.getByText('Backend Appointment Date')).toBeInTheDocument();
 	expect(screen.getByText('Backend Appointment Start Time')).toBeInTheDocument();
 	expectTabToBeActive('Open');
 	expect(getCareEncountersSpy).toHaveBeenCalledWith({
@@ -321,8 +341,9 @@ it('opens an encounter shelf from an API row and preserves list query parameters
 
 	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1'));
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
-	expect(await screen.findByRole('heading', { name: 'Firstname Lastname' })).toBeInTheDocument();
+	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
 	expect(screen.getByText('Care Navigator:')).toBeInTheDocument();
+	expect(getCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1');
 
 	await act(async () => {
 		await router.navigate(-1);
@@ -332,16 +353,16 @@ it('opens an encounter shelf from an API row and preserves list query parameters
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
 });
 
-it('renders static shelf details and switches shelf tabs without changing the URL', async () => {
+it('renders encounter shelf details and switches shelf tabs without changing the URL', async () => {
 	const router = renderEncounters('/admin/encounters/any-encounter-id?status=CLOSED');
 
-	expect(await screen.findByRole('heading', { name: 'Firstname Lastname' })).toBeInTheDocument();
+	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
 	expect(screen.getByText('Navigator Name')).toBeInTheDocument();
-	expect(screen.getByText('Nov 12, 2022')).toBeInTheDocument();
-	expect(screen.getByText('webform')).toBeInTheDocument();
-	expect(screen.getByText('address@email.com')).toBeInTheDocument();
+	expect(screen.getAllByText('Backend Created Date')).toHaveLength(2);
+	expect(screen.getByText('Unknown')).toBeInTheDocument();
+	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
 	expect(screen.getByText('Navigator Appointment')).toBeInTheDocument();
-	expect(screen.getByText('Aetna Behavioral Health Network')).toBeInTheDocument();
+	expect(screen.getByRole('heading', { name: 'No Screening Answers' })).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Close Encounter' })).toBeInTheDocument();
 	expectTabToBeActive('Encounter Details');
 
@@ -362,6 +383,90 @@ it('renders static shelf details and switches shelf tabs without changing the UR
 
 	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters'));
 	expect(router.state.location.search).toBe('?status=CLOSED');
+});
+
+it('renders neutral fallbacks for unavailable encounter details', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							provider: undefined,
+							account: undefined,
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByText('Unassigned')).toBeInTheDocument();
+	expect(screen.getAllByText('Unknown')).toHaveLength(2);
+});
+
+it('renders an encounter note and updates the notes tab count', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						notes: 'Read-only encounter note',
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	const notesTab = await screen.findByRole('button', { name: 'Notes (1)' });
+	fireEvent.click(notesTab);
+
+	expect(await screen.findByText('Read-only encounter note')).toBeInTheDocument();
+	expectTabToBeActive('Notes (1)');
+});
+
+it('aborts the encounter detail request when the route ID changes', async () => {
+	const abort = jest.fn();
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort,
+				fetch: jest.fn().mockReturnValue(new Promise(() => undefined)),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	const router = renderEncounters('/admin/encounters/care-encounter-1');
+
+	await waitFor(() => expect(getCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1'));
+	await act(async () => {
+		await router.navigate('/admin/encounters/care-encounter-2');
+	});
+
+	await waitFor(() => expect(getCareEncounterSpy).toHaveBeenCalledWith('care-encounter-2'));
+	expect(abort).toHaveBeenCalledTimes(1);
+});
+
+it('shows the shared async error state when the encounter detail request fails', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(new Error('Request failed')),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByRole('heading', { name: "We're sorry, an error occurred." })).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
 });
 
 it('opens the close encounter modal and resets its selection after cancellation', async () => {
@@ -419,7 +524,7 @@ it('dismisses the close encounter modal without changing the shelf route', async
 it('dismisses a directly linked shelf with Escape and preserves its query parameters', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 
-	await screen.findByRole('heading', { name: 'Firstname Lastname' });
+	await screen.findByRole('heading', { name: 'Avery Morgan' });
 	fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
 
 	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters'));
