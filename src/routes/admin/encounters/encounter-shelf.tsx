@@ -6,6 +6,7 @@ import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
 import TabBar from '@/components/tab-bar';
 import { createUseThemedStyles } from '@/jss/theme';
+import { CloseEncounterModal } from './close-encounter-modal';
 
 type EncounterShelfTab = 'encounter-details' | 'contact-history' | 'notes';
 
@@ -65,6 +66,7 @@ export const Component = () => {
 	const navigate = useNavigate();
 	const { encounterId } = useParams<{ encounterId: string }>();
 	const [activeTab, setActiveTab] = useState<EncounterShelfTab>('encounter-details');
+	const [showCloseEncounterModal, setShowCloseEncounterModal] = useState(false);
 
 	if (!encounterId) {
 		throw new Error('Unknown encounter');
@@ -72,6 +74,13 @@ export const Component = () => {
 
 	return (
 		<Tab.Container id="encounter-shelf-tabs" activeKey={activeTab} mountOnEnter unmountOnExit>
+			<CloseEncounterModal
+				show={showCloseEncounterModal}
+				onHide={() => {
+					setShowCloseEncounterModal(false);
+				}}
+			/>
+
 			<div className={classes.header}>
 				<Button
 					variant="transparent-secondary"
@@ -113,7 +122,15 @@ export const Component = () => {
 							<Card.Header>
 								<Card.Title>Encounter</Card.Title>
 								<div className="button-container">
-									<span className="fw-semibold">Close Encounter</span>
+									<Button
+										variant="light"
+										size="sm"
+										onClick={() => {
+											setShowCloseEncounterModal(true);
+										}}
+									>
+										Close Encounter
+									</Button>
 								</div>
 							</Card.Header>
 							<Card.Body>

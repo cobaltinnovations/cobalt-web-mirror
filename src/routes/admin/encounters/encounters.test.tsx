@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { CobaltThemeProvider } from '@/jss/theme';
@@ -55,6 +55,17 @@ const renderEncounters = (initialEntry = '/admin/encounters') => {
 
 const expectTabToBeActive = (name: string) => {
 	expect(screen.getByRole('button', { name }).parentElement).toHaveClass('active');
+};
+
+const findCloseEncounterDialog = async () => {
+	const reasonLabel = await screen.findByText('Reason for Closure:');
+	const dialog = reasonLabel.closest('[role="dialog"]');
+
+	if (!dialog) {
+		throw new Error('Close Encounter dialog not found.');
+	}
+
+	return dialog as HTMLElement;
 };
 
 it('renders the encounters page with open encounters and an inert search field', () => {
@@ -122,8 +133,7 @@ it('renders static shelf details and switches shelf tabs without changing the UR
 	expect(screen.getByText('address@email.com')).toBeInTheDocument();
 	expect(screen.getByText('Navigator Appointment')).toBeInTheDocument();
 	expect(screen.getByText('Aetna Behavioral Health Network')).toBeInTheDocument();
-	expect(screen.getByText('Close Encounter')).toBeInTheDocument();
-	expect(screen.queryByRole('button', { name: 'Close Encounter' })).not.toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Close Encounter' })).toBeInTheDocument();
 	expectTabToBeActive('Encounter Details');
 
 	const shelfUrl = `${router.state.location.pathname}${router.state.location.search}`;
@@ -143,6 +153,58 @@ it('renders static shelf details and switches shelf tabs without changing the UR
 
 	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters'));
 	expect(router.state.location.search).toBe('?status=closed');
+});
+
+it('opens the close encounter modal and resets its selection after cancellation', async () => {
+	const router = renderEncounters('/admin/encounters/encounter-1?status=open');
+
+	const openModalButton = await screen.findByRole('button', { name: 'Close Encounter' });
+	fireEvent.click(openModalButton);
+
+	let dialog = await findCloseEncounterDialog();
+	let modal = within(dialog);
+	const closeEncounterButton = modal.getByRole('button', { name: 'Close Encounter' });
+
+	expect(modal.getAllByText('Close Encounter')).toHaveLength(2);
+	expect(modal.getByText('Reason for Closure:')).toBeInTheDocument();
+	expect(modal.getAllByRole('radio')).toHaveLength(6);
+	expect(modal.getAllByRole('radio', { name: 'Option' })).toHaveLength(5);
+	expect(modal.getByRole('radio', { name: 'Other' })).toBeInTheDocument();
+	expect(closeEncounterButton).toBeDisabled();
+
+	fireEvent.click(modal.getByRole('radio', { name: 'Other' }));
+	expect(closeEncounterButton).toBeEnabled();
+
+	fireEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+	await waitFor(() => expect(screen.queryByText('Reason for Closure:')).not.toBeInTheDocument());
+	expect(router.state.location.pathname).toBe('/admin/encounters/encounter-1');
+	expect(router.state.location.search).toBe('?status=open');
+
+	fireEvent.click(openModalButton);
+	dialog = await findCloseEncounterDialog();
+	modal = within(dialog);
+	expect(modal.getByRole('button', { name: 'Close Encounter' })).toBeDisabled();
+});
+
+it('dismisses the close encounter modal without changing the shelf route', async () => {
+	const router = renderEncounters('/admin/encounters/encounter-2?source=admin&status=open');
+
+	const openModalButton = await screen.findByRole('button', { name: 'Close Encounter' });
+	fireEvent.click(openModalButton);
+
+	let dialog = await findCloseEncounterDialog();
+	fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+	await waitFor(() => expect(screen.queryByText('Reason for Closure:')).not.toBeInTheDocument());
+
+	fireEvent.click(openModalButton);
+	dialog = await findCloseEncounterDialog();
+	const modal = within(dialog);
+	fireEvent.click(modal.getAllByRole('radio', { name: 'Option' })[0]);
+	fireEvent.click(modal.getByRole('button', { name: 'Close Encounter' }));
+
+	await waitFor(() => expect(screen.queryByText('Reason for Closure:')).not.toBeInTheDocument());
+	expect(router.state.location.pathname).toBe('/admin/encounters/encounter-2');
+	expect(router.state.location.search).toBe('?source=admin&status=open');
 });
 
 it('dismisses a directly linked shelf with Escape and preserves its query parameters', async () => {
