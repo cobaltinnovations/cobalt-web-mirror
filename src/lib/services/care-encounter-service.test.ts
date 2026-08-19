@@ -1,4 +1,9 @@
-import { CareEncounterSortColumnId, CareEncounterStatusId, SortDirectionId } from '@/lib/models';
+import {
+	CareEncounterCancellationReasonId,
+	CareEncounterSortColumnId,
+	CareEncounterStatusId,
+	SortDirectionId,
+} from '@/lib/models';
 import { httpSingleton } from '@/lib/singletons/http-singleton';
 import { careEncounterService } from './care-encounter-service';
 
@@ -43,6 +48,85 @@ it('requests an admin care encounter by ID', () => {
 
 	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
 		method: 'get',
+		url: '/admin/care-encounters/care-encounter-1',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('creates an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		appointmentId: 'appointment-1',
+		notes: 'Initial notes',
+	};
+
+	careEncounterService.createCareEncounter(data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'post',
+		url: '/admin/care-encounters',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('updates an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		notes: 'Updated notes',
+	};
+
+	careEncounterService.updateCareEncounter('care-encounter-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('requests care encounter cancellation reasons', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.getCareEncounterCancellationReasons();
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'get',
+		url: '/admin/care-encounter-cancellation-reasons',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('cancels an admin care encounter with its cancellation reason', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.OTHER,
+		careEncounterCancellationReasonOtherText: 'A different reason',
+	};
+
+	careEncounterService.cancelCareEncounter('care-encounter-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/cancel',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('deletes an admin care encounter without expecting a response body', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.deleteCareEncounter('care-encounter-1');
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'delete',
 		url: '/admin/care-encounters/care-encounter-1',
 	});
 
