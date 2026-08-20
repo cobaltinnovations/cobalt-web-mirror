@@ -14,6 +14,10 @@ import { careEncounterService } from '@/lib/services';
 
 const PAGE_SIZE = 25;
 
+export interface EncountersOutletContext {
+	refreshCareEncounters(): Promise<void>;
+}
+
 const useStyles = createUseThemedStyles((theme) => ({
 	encounterShelf: {
 		width: '95% !important',
@@ -319,7 +323,7 @@ export const Component = () => {
 					});
 				}}
 			>
-				<Outlet />
+				<Outlet context={{ refreshCareEncounters: fetchCareEncounters }} />
 			</Offcanvas>
 		</>
 	);

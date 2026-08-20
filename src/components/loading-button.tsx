@@ -27,6 +27,7 @@ const LoadingButton = ({ isLoading, disabled, onClick, children, className, ...b
 	return (
 		<Button
 			className={classNames('position-relative', className)}
+			disabled={disabled}
 			onClick={(event) => {
 				if (isLoading) {
 					event.preventDefault();

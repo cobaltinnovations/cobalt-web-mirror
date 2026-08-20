@@ -3,10 +3,19 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { CobaltThemeProvider } from '@/jss/theme';
-import { CareEncounterModel, CareEncounterSortColumnId, CareEncounterStatusId, SortDirectionId } from '@/lib/models';
+import {
+	CareEncounterCancellationReasonId,
+	CareEncounterModel,
+	CareEncounterSortColumnId,
+	CareEncounterStatusId,
+	SortDirectionId,
+} from '@/lib/models';
 import { GetCareEncounterResponseBody, GetCareEncountersResponseBody, careEncounterService } from '@/lib/services';
 import { Component as EncounterShelf } from './encounter-shelf';
 import { Component } from './encounters';
+
+const mockAddFlag = jest.fn();
+const mockHandleError = jest.fn();
 
 jest.mock('@/components/svg-icon', () => ({
 	__esModule: true,
@@ -14,13 +23,16 @@ jest.mock('@/components/svg-icon', () => ({
 }));
 
 jest.mock('@/hooks/use-handle-error', () => {
-	const handleError = jest.fn();
-
 	return {
 		__esModule: true,
-		default: (handler?: (error: unknown) => boolean) => handler ?? handleError,
+		default: (handler?: (error: unknown) => boolean) => handler ?? mockHandleError,
 	};
 });
+
+jest.mock('@/hooks/use-flags', () => ({
+	__esModule: true,
+	default: () => ({ addFlag: mockAddFlag }),
+}));
 
 const careEncounter: CareEncounterModel = {
 	careEncounterId: 'care-encounter-1',
@@ -69,8 +81,57 @@ const defaultDetailResponse: GetCareEncounterResponseBody = {
 	otherCareEncountersTotalCountDescription: '0',
 };
 
+const careEncounterCancellationReasons = [
+	{
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.PATIENT_REQUESTED,
+		description: 'Patient requested',
+		displayOrder: 1,
+		freeformTextRequired: false,
+	},
+	{
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.NO_LONGER_NEEDED,
+		description: 'No longer needed',
+		displayOrder: 2,
+		freeformTextRequired: false,
+	},
+	{
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.UNABLE_TO_REACH_PATIENT,
+		description: 'Unable to reach patient',
+		displayOrder: 3,
+		freeformTextRequired: false,
+	},
+	{
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.SCHEDULING_CONFLICT,
+		description: 'Scheduling conflict',
+		displayOrder: 4,
+		freeformTextRequired: false,
+	},
+	{
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.DUPLICATE_BOOKING,
+		description: 'Duplicate booking',
+		displayOrder: 5,
+		freeformTextRequired: false,
+	},
+	{
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.OTHER,
+		description: 'Other',
+		displayOrder: 6,
+		freeformTextRequired: true,
+	},
+];
+
+const canceledCareEncounter: CareEncounterModel = {
+	...careEncounter,
+	careEncounterStatusId: CareEncounterStatusId.CANCELED,
+	careEncounterStatusDisplayLabel: 'Canceled',
+	careEncounterCancellationReasonId: CareEncounterCancellationReasonId.PATIENT_REQUESTED,
+};
+
 const getCareEncountersSpy = jest.spyOn(careEncounterService, 'getCareEncounters');
 const getCareEncounterSpy = jest.spyOn(careEncounterService, 'getCareEncounter');
+const getCareEncounterCancellationReasonsSpy = jest.spyOn(careEncounterService, 'getCareEncounterCancellationReasons');
+const cancelCareEncounterSpy = jest.spyOn(careEncounterService, 'cancelCareEncounter');
+const updateCareEncounterSpy = jest.spyOn(careEncounterService, 'updateCareEncounter');
 
 beforeAll(() => {
 	Object.defineProperty(window, 'matchMedia', {
@@ -102,6 +163,20 @@ beforeEach(() => {
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue(defaultDetailResponse),
 			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	getCareEncounterCancellationReasonsSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounterCancellationReasons }),
+			} as ReturnType<typeof careEncounterService.getCareEncounterCancellationReasons>)
+	);
+	cancelCareEncounterSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounter: canceledCareEncounter }),
+			} as ReturnType<typeof careEncounterService.cancelCareEncounter>)
 	);
 });
 
@@ -149,6 +224,23 @@ const findCloseEncounterDialog = async () => {
 	}
 
 	return dialog as HTMLElement;
+};
+
+const findEditContactDialog = async () => {
+	const title = await screen.findByText('Edit Primary Contact');
+	const dialog = title.closest('[role="dialog"]');
+
+	if (!dialog) {
+		throw new Error('Edit Primary Contact dialog not found.');
+	}
+
+	return dialog as HTMLElement;
+};
+
+const clickAndFlush = async (element: HTMLElement) => {
+	await act(async () => {
+		fireEvent.click(element);
+	});
 };
 
 it('requests and renders the default open encounter table', async () => {
@@ -376,6 +468,8 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	fireEvent.click(screen.getByRole('button', { name: 'Notes (0)' }));
 
 	expect(await screen.findByRole('heading', { name: 'No Notes' })).toBeInTheDocument();
+	expect(screen.getByRole('textbox', { name: 'Your Note:' })).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Add Note' })).toBeDisabled();
 	expectTabToBeActive('Notes (0)');
 	expect(`${router.state.location.pathname}${router.state.location.search}`).toBe(shelfUrl);
 
@@ -383,6 +477,65 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 
 	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters'));
 	expect(router.state.location.search).toBe('?status=CLOSED');
+});
+
+it('opens the edit contact modal with the shelf email and resets unsaved changes on entry', async () => {
+	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
+	const editContactButton = await screen.findByRole('button', { name: 'Edit Contact' });
+
+	await clickAndFlush(editContactButton);
+
+	let dialog = await findEditContactDialog();
+	let modal = within(dialog);
+	let emailInput = modal.getByRole('textbox', { name: 'Email Address' });
+
+	expect(emailInput).toHaveValue('patient@example.com');
+	fireEvent.change(emailInput, { target: { value: 'edited@example.com' } });
+	expect(emailInput).toHaveValue('edited@example.com');
+
+	await clickAndFlush(modal.getByRole('button', { name: 'Cancel' }));
+	await waitFor(() => expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument());
+	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
+
+	await clickAndFlush(editContactButton);
+	dialog = await findEditContactDialog();
+	modal = within(dialog);
+	emailInput = modal.getByRole('textbox', { name: 'Email Address' });
+	expect(emailInput).toHaveValue('patient@example.com');
+
+	fireEvent.change(emailInput, { target: { value: 'saved-nowhere@example.com' } });
+	await clickAndFlush(modal.getByRole('button', { name: 'Save' }));
+
+	await waitFor(() => expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument());
+	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
+	expect(cancelCareEncounterSpy).not.toHaveBeenCalled();
+	expect(mockAddFlag).not.toHaveBeenCalled();
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('dismisses the edit contact modal through X, backdrop, and Escape without closing the shelf', async () => {
+	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
+	const editContactButton = await screen.findByRole('button', { name: 'Edit Contact' });
+
+	await clickAndFlush(editContactButton);
+	let dialog = await findEditContactDialog();
+	await clickAndFlush(within(dialog).getByRole('button', { name: 'Close' }));
+	await waitFor(() => expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument());
+
+	await clickAndFlush(editContactButton);
+	dialog = await findEditContactDialog();
+	await clickAndFlush(dialog);
+	await waitFor(() => expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument());
+
+	await clickAndFlush(editContactButton);
+	await findEditContactDialog();
+	fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+	await waitFor(() => expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument());
+
+	expect(screen.getByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
 });
 
 it('renders neutral fallbacks for unavailable encounter details', async () => {
@@ -408,6 +561,10 @@ it('renders neutral fallbacks for unavailable encounter details', async () => {
 
 	expect(await screen.findByText('Unassigned')).toBeInTheDocument();
 	expect(screen.getAllByText('Unknown')).toHaveLength(2);
+
+	await clickAndFlush(screen.getByRole('button', { name: 'Edit Contact' }));
+	const dialog = await findEditContactDialog();
+	expect(within(dialog).getByRole('textbox', { name: 'Email Address' })).toHaveValue('');
 });
 
 it('renders an encounter note and updates the notes tab count', async () => {
@@ -431,7 +588,31 @@ it('renders an encounter note and updates the notes tab count', async () => {
 	fireEvent.click(notesTab);
 
 	expect(await screen.findByText('Read-only encounter note')).toBeInTheDocument();
+	expect(screen.getAllByText('Navigator Name')).toHaveLength(2);
+	expect(screen.getByText('Jul 28, 2026 at 10:00 AM')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Edit Note' })).toBeInTheDocument();
+	expect(screen.getByRole('textbox', { name: 'Your Note:' })).toBeInTheDocument();
 	expectTabToBeActive('Notes (1)');
+});
+
+it('keeps the add-note form local without updating the encounter', async () => {
+	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
+	const notesTab = await screen.findByRole('button', { name: 'Notes (0)' });
+	fireEvent.click(notesTab);
+
+	const noteInput = screen.getByRole('textbox', { name: 'Your Note:' });
+	const addNoteButton = screen.getByRole('button', { name: 'Add Note' });
+
+	expect(addNoteButton).toBeDisabled();
+	fireEvent.change(noteInput, { target: { value: 'A local-only note' } });
+	expect(addNoteButton).toBeEnabled();
+	await clickAndFlush(addNoteButton);
+
+	expect(noteInput).toHaveValue('A local-only note');
+	expect(updateCareEncounterSpy).not.toHaveBeenCalled();
+	expect(screen.getByRole('heading', { name: 'No Notes' })).toBeInTheDocument();
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
 });
 
 it('aborts the encounter detail request when the route ID changes', async () => {
@@ -469,11 +650,13 @@ it('shows the shared async error state when the encounter detail request fails',
 	expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
 });
 
-it('opens the close encounter modal and resets its selection after cancellation', async () => {
+it('loads close encounter reasons on entry and resets its selection when reopened', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?status=OPEN');
 
 	const openModalButton = await screen.findByRole('button', { name: 'Close Encounter' });
-	fireEvent.click(openModalButton);
+	expect(getCareEncounterCancellationReasonsSpy).not.toHaveBeenCalled();
+
+	await clickAndFlush(openModalButton);
 
 	let dialog = await findCloseEncounterDialog();
 	let modal = within(dialog);
@@ -481,12 +664,12 @@ it('opens the close encounter modal and resets its selection after cancellation'
 
 	expect(modal.getAllByText('Close Encounter')).toHaveLength(2);
 	expect(modal.getByText('Reason for Closure:')).toBeInTheDocument();
+	expect(await modal.findByRole('radio', { name: 'Patient requested' })).toBeInTheDocument();
 	expect(modal.getAllByRole('radio')).toHaveLength(6);
-	expect(modal.getAllByRole('radio', { name: 'Option' })).toHaveLength(5);
-	expect(modal.getByRole('radio', { name: 'Other' })).toBeInTheDocument();
+	expect(getCareEncounterCancellationReasonsSpy).toHaveBeenCalledTimes(1);
 	expect(closeEncounterButton).toBeDisabled();
 
-	fireEvent.click(modal.getByRole('radio', { name: 'Other' }));
+	fireEvent.click(modal.getByRole('radio', { name: 'Patient requested' }));
 	expect(closeEncounterButton).toBeEnabled();
 
 	fireEvent.click(modal.getByRole('button', { name: 'Cancel' }));
@@ -494,31 +677,165 @@ it('opens the close encounter modal and resets its selection after cancellation'
 	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
 	expect(router.state.location.search).toBe('?status=OPEN');
 
-	fireEvent.click(openModalButton);
+	await clickAndFlush(openModalButton);
 	dialog = await findCloseEncounterDialog();
 	modal = within(dialog);
+	await modal.findByRole('radio', { name: 'Patient requested' });
 	expect(modal.getByRole('button', { name: 'Close Encounter' })).toBeDisabled();
+	expect(modal.getAllByRole('radio').every((radio) => !(radio as HTMLInputElement).checked)).toBe(true);
+	expect(getCareEncounterCancellationReasonsSpy).toHaveBeenCalledTimes(2);
 });
 
-it('dismisses the close encounter modal without changing the shelf route', async () => {
+it('cancels an encounter, updates the shelf, and refreshes the table without changing the route', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 
 	const openModalButton = await screen.findByRole('button', { name: 'Close Encounter' });
-	fireEvent.click(openModalButton);
+	await clickAndFlush(openModalButton);
 
 	let dialog = await findCloseEncounterDialog();
 	fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
 	await waitFor(() => expect(screen.queryByText('Reason for Closure:')).not.toBeInTheDocument());
 
-	fireEvent.click(openModalButton);
+	await clickAndFlush(openModalButton);
 	dialog = await findCloseEncounterDialog();
 	const modal = within(dialog);
-	fireEvent.click(modal.getAllByRole('radio', { name: 'Option' })[0]);
-	fireEvent.click(modal.getByRole('button', { name: 'Close Encounter' }));
+	fireEvent.click(await modal.findByRole('radio', { name: 'Patient requested' }));
+	await clickAndFlush(modal.getByRole('button', { name: 'Close Encounter' }));
 
 	await waitFor(() => expect(screen.queryByText('Reason for Closure:')).not.toBeInTheDocument());
+	expect(cancelCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1', {
+		careEncounterCancellationReasonId: CareEncounterCancellationReasonId.PATIENT_REQUESTED,
+	});
+	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
+	expect(screen.queryByRole('button', { name: 'Close Encounter' })).not.toBeInTheDocument();
+	expect(mockAddFlag).toHaveBeenCalledWith({
+		variant: 'success',
+		title: 'Encounter Closed',
+		actions: [],
+	});
 	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('requires and trims freeform text for a cancellation reason that requires it', async () => {
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Close Encounter' }));
+	const dialog = await findCloseEncounterDialog();
+	const modal = within(dialog);
+	fireEvent.click(await modal.findByRole('radio', { name: 'Other' }));
+
+	const otherReasonInput = modal.getByRole('textbox', { name: 'Other reason' });
+	const closeEncounterButton = modal.getByRole('button', { name: 'Close Encounter' });
+	expect(otherReasonInput).toHaveAttribute('maxlength', '2000');
+	expect(closeEncounterButton).toBeDisabled();
+
+	fireEvent.change(otherReasonInput, { target: { value: '   ' } });
+	expect(closeEncounterButton).toBeDisabled();
+
+	fireEvent.change(otherReasonInput, { target: { value: '  A different reason  ' } });
+	expect(closeEncounterButton).toBeEnabled();
+	await clickAndFlush(closeEncounterButton);
+
+	await waitFor(() =>
+		expect(cancelCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1', {
+			careEncounterCancellationReasonId: CareEncounterCancellationReasonId.OTHER,
+			careEncounterCancellationReasonOtherText: 'A different reason',
+		})
+	);
+});
+
+it('disables close encounter modal controls while loading reasons', async () => {
+	getCareEncounterCancellationReasonsSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockReturnValue(new Promise(() => undefined)),
+			} as ReturnType<typeof careEncounterService.getCareEncounterCancellationReasons>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Close Encounter' }));
+	const dialog = await findCloseEncounterDialog();
+	const modal = within(dialog);
+
+	await waitFor(() => expect(modal.getByRole('button', { name: 'Cancel' })).toBeDisabled());
+	expect(modal.getByRole('button', { name: 'Close Encounter' })).toBeDisabled();
+});
+
+it('disables close encounter modal controls and prevents duplicate submissions while saving', async () => {
+	let resolveCancelRequest!: (response: { careEncounter: CareEncounterModel }) => void;
+	const cancelRequest = new Promise<{ careEncounter: CareEncounterModel }>((resolve) => {
+		resolveCancelRequest = resolve;
+	});
+	cancelCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockReturnValue(cancelRequest),
+			} as ReturnType<typeof careEncounterService.cancelCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Close Encounter' }));
+	const dialog = await findCloseEncounterDialog();
+	const modal = within(dialog);
+	const patientRequestedReason = await modal.findByRole('radio', { name: 'Patient requested' });
+	const closeEncounterButton = modal.getByRole('button', { name: 'Close Encounter' });
+	fireEvent.click(patientRequestedReason);
+	fireEvent.click(closeEncounterButton);
+
+	await waitFor(() => expect(modal.getByRole('button', { name: 'Cancel' })).toBeDisabled());
+	expect(closeEncounterButton).toBeDisabled();
+	expect(patientRequestedReason).toBeDisabled();
+	fireEvent.click(closeEncounterButton);
+	expect(cancelCareEncounterSpy).toHaveBeenCalledTimes(1);
+
+	await act(async () => {
+		resolveCancelRequest({ careEncounter: canceledCareEncounter });
+	});
+});
+
+it('reports reason loading errors through the shared error handler', async () => {
+	const error = new Error('Unable to load reasons');
+	getCareEncounterCancellationReasonsSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(error),
+			} as ReturnType<typeof careEncounterService.getCareEncounterCancellationReasons>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Close Encounter' }));
+	const dialog = await findCloseEncounterDialog();
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(await within(dialog).findByText('No closure reasons found.')).toBeInTheDocument();
+});
+
+it('keeps the close encounter modal open when cancellation fails', async () => {
+	const error = new Error('Unable to close encounter');
+	cancelCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(error),
+			} as ReturnType<typeof careEncounterService.cancelCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Close Encounter' }));
+	const dialog = await findCloseEncounterDialog();
+	const modal = within(dialog);
+	const patientRequestedReason = await modal.findByRole('radio', { name: 'Patient requested' });
+	fireEvent.click(patientRequestedReason);
+	await clickAndFlush(modal.getByRole('button', { name: 'Close Encounter' }));
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(dialog).toBeInTheDocument();
+	expect(patientRequestedReason).toBeChecked();
+	expect(getCareEncountersSpy).toHaveBeenCalledTimes(1);
 });
 
 it('dismisses a directly linked shelf with Escape and preserves its query parameters', async () => {

@@ -1,15 +1,20 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Button, Card, Col, Container, Row, Tab } from 'react-bootstrap';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
 import AsyncWrapper from '@/components/async-page';
 import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
 import TabBar from '@/components/tab-bar';
+import useFlags from '@/hooks/use-flags';
+import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { CareEncounterModel } from '@/lib/models';
-import { careEncounterService } from '@/lib/services';
+import { CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
+import { CancelCareEncounterRequestBody, careEncounterService } from '@/lib/services';
 import { CloseEncounterModal } from './close-encounter-modal';
+import { EditContactModal } from './edit-contact-modal';
+import { EncounterNotes } from './encounter-notes';
+import type { EncountersOutletContext } from './encounters';
 
 type EncounterShelfTab = 'encounter-details' | 'contact-history' | 'notes';
 
@@ -33,6 +38,11 @@ const useStyles = createUseThemedStyles((theme) => ({
 		overflowY: 'auto',
 		backgroundColor: theme.colors.background,
 	},
+	notesPane: {
+		height: '100%',
+		overflow: 'hidden',
+		backgroundColor: theme.colors.background,
+	},
 	section: {
 		padding: 32,
 		borderBottom: `1px solid ${theme.colors.border}`,
@@ -42,9 +52,13 @@ const useStyles = createUseThemedStyles((theme) => ({
 export const Component = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
+	const handleError = useHandleError();
+	const { addFlag } = useFlags();
+	const { refreshCareEncounters } = useOutletContext<EncountersOutletContext>();
 	const { encounterId } = useParams<{ encounterId: string }>();
 	const [activeTab, setActiveTab] = useState<EncounterShelfTab>('encounter-details');
 	const [showCloseEncounterModal, setShowCloseEncounterModal] = useState(false);
+	const [showEditContactModal, setShowEditContactModal] = useState(false);
 	const [careEncounter, setCareEncounter] = useState<CareEncounterModel | null>(null);
 	const careEncounterRequestRef = useRef<ReturnType<typeof careEncounterService.getCareEncounter>>();
 
@@ -76,6 +90,30 @@ export const Component = () => {
 		careEncounterRequestRef.current = undefined;
 	}, []);
 
+	const handleCloseEncounterModalSave = useCallback(
+		async (data: CancelCareEncounterRequestBody) => {
+			if (!encounterId) {
+				return;
+			}
+
+			try {
+				const response = await careEncounterService.cancelCareEncounter(encounterId, data).fetch();
+
+				setCareEncounter(response.careEncounter);
+				setShowCloseEncounterModal(false);
+				addFlag({
+					variant: 'success',
+					title: 'Encounter Closed',
+					actions: [],
+				});
+				await refreshCareEncounters();
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, encounterId, handleError, refreshCareEncounters]
+	);
+
 	if (!encounterId) {
 		throw new Error('Unknown encounter');
 	}
@@ -92,8 +130,11 @@ export const Component = () => {
 					careEncounter={careEncounter}
 					activeTab={activeTab}
 					showCloseEncounterModal={showCloseEncounterModal}
+					showEditContactModal={showEditContactModal}
 					onActiveTabChange={setActiveTab}
+					onCloseEncounterModalSave={handleCloseEncounterModalSave}
 					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
+					onShowEditContactModalChange={setShowEditContactModal}
 					onClose={() => {
 						navigate({
 							pathname: '..',
@@ -110,8 +151,11 @@ interface EncounterShelfContentProps {
 	careEncounter: CareEncounterModel;
 	activeTab: EncounterShelfTab;
 	showCloseEncounterModal: boolean;
+	showEditContactModal: boolean;
 	onActiveTabChange(activeTab: EncounterShelfTab): void;
+	onCloseEncounterModalSave(data: CancelCareEncounterRequestBody): Promise<void>;
 	onShowCloseEncounterModalChange(show: boolean): void;
+	onShowEditContactModalChange(show: boolean): void;
 	onClose(): void;
 }
 
@@ -119,19 +163,31 @@ const EncounterShelfContent = ({
 	careEncounter,
 	activeTab,
 	showCloseEncounterModal,
+	showEditContactModal,
 	onActiveTabChange,
+	onCloseEncounterModalSave,
 	onShowCloseEncounterModalChange,
+	onShowEditContactModalChange,
 	onClose,
 }: EncounterShelfContentProps) => {
 	const classes = useStyles();
+	const emailAddress = careEncounter.appointment.account?.emailAddress;
 	const notes = careEncounter.notes?.trim();
 
 	return (
 		<Tab.Container id="encounter-shelf-tabs" activeKey={activeTab} mountOnEnter unmountOnExit>
 			<CloseEncounterModal
 				show={showCloseEncounterModal}
+				onSave={onCloseEncounterModalSave}
 				onHide={() => {
 					onShowCloseEncounterModalChange(false);
+				}}
+			/>
+			<EditContactModal
+				emailAddress={emailAddress ?? ''}
+				show={showEditContactModal}
+				onHide={() => {
+					onShowEditContactModalChange(false);
 				}}
 			/>
 
@@ -171,17 +227,19 @@ const EncounterShelfContent = ({
 						<Card bsPrefix="ic-card" className="mb-6">
 							<Card.Header>
 								<Card.Title>Encounter</Card.Title>
-								<div className="button-container">
-									<Button
-										variant="light"
-										size="sm"
-										onClick={() => {
-											onShowCloseEncounterModalChange(true);
-										}}
-									>
-										Close Encounter
-									</Button>
-								</div>
+								{careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN && (
+									<div className="button-container">
+										<Button
+											variant="light"
+											size="sm"
+											onClick={() => {
+												onShowCloseEncounterModalChange(true);
+											}}
+										>
+											Close Encounter
+										</Button>
+									</div>
+								)}
 							</Card.Header>
 							<Card.Body>
 								<Container fluid>
@@ -209,7 +267,16 @@ const EncounterShelfContent = ({
 							<Card.Header>
 								<Card.Title>Contact</Card.Title>
 								<div className="button-container">
-									<SvgIcon kit="far" icon="pen" size={16} />
+									<Button
+										variant="transparent-secondary"
+										className="p-2"
+										aria-label="Edit Contact"
+										onClick={() => {
+											onShowEditContactModalChange(true);
+										}}
+									>
+										<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
+									</Button>
 								</div>
 							</Card.Header>
 							<Card.Body>
@@ -219,9 +286,7 @@ const EncounterShelfContent = ({
 											<p className="mb-0">Email</p>
 										</Col>
 										<Col xs={9}>
-											<p className="mb-0">
-												{careEncounter.appointment.account?.emailAddress ?? 'Unknown'}
-											</p>
+											<p className="mb-0">{emailAddress ?? 'Unknown'}</p>
 										</Col>
 									</Row>
 								</Container>
@@ -248,10 +313,8 @@ const EncounterShelfContent = ({
 					</section>
 				</Tab.Pane>
 
-				<Tab.Pane eventKey="notes" className={classes.tabPane}>
-					<section className={classes.section}>
-						{notes ? <p className="mb-0">{notes}</p> : <NoData title="No Notes" actions={[]} />}
-					</section>
+				<Tab.Pane eventKey="notes" className={classes.notesPane}>
+					<EncounterNotes careEncounter={careEncounter} />
 				</Tab.Pane>
 			</Tab.Content>
 		</Tab.Container>
