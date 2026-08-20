@@ -42,6 +42,7 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 	},
 	sortableButton: {
 		padding: 0,
+		minHeight: 'auto',
 		alignItems: 'center',
 		display: 'inline-flex',
 		justifyContent: 'center',

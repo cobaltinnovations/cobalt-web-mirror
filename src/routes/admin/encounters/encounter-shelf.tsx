@@ -11,8 +11,10 @@ import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
 import { CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
 import { CancelCareEncounterRequestBody, careEncounterService } from '@/lib/services';
+import { CancelAppointmentModal } from './cancel-appointment-modal';
 import { CloseEncounterModal } from './close-encounter-modal';
 import { EditContactModal } from './edit-contact-modal';
+import { EncounterAppointmentCard } from './encounter-appointment-card';
 import { EncounterNotes } from './encounter-notes';
 import type { EncountersOutletContext } from './encounters';
 
@@ -57,6 +59,7 @@ export const Component = () => {
 	const { refreshCareEncounters } = useOutletContext<EncountersOutletContext>();
 	const { encounterId } = useParams<{ encounterId: string }>();
 	const [activeTab, setActiveTab] = useState<EncounterShelfTab>('encounter-details');
+	const [showCancelAppointmentModal, setShowCancelAppointmentModal] = useState(false);
 	const [showCloseEncounterModal, setShowCloseEncounterModal] = useState(false);
 	const [showEditContactModal, setShowEditContactModal] = useState(false);
 	const [careEncounter, setCareEncounter] = useState<CareEncounterModel | null>(null);
@@ -129,10 +132,12 @@ export const Component = () => {
 				<EncounterShelfContent
 					careEncounter={careEncounter}
 					activeTab={activeTab}
+					showCancelAppointmentModal={showCancelAppointmentModal}
 					showCloseEncounterModal={showCloseEncounterModal}
 					showEditContactModal={showEditContactModal}
 					onActiveTabChange={setActiveTab}
 					onCloseEncounterModalSave={handleCloseEncounterModalSave}
+					onShowCancelAppointmentModalChange={setShowCancelAppointmentModal}
 					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
 					onShowEditContactModalChange={setShowEditContactModal}
 					onClose={() => {
@@ -150,10 +155,12 @@ export const Component = () => {
 interface EncounterShelfContentProps {
 	careEncounter: CareEncounterModel;
 	activeTab: EncounterShelfTab;
+	showCancelAppointmentModal: boolean;
 	showCloseEncounterModal: boolean;
 	showEditContactModal: boolean;
 	onActiveTabChange(activeTab: EncounterShelfTab): void;
 	onCloseEncounterModalSave(data: CancelCareEncounterRequestBody): Promise<void>;
+	onShowCancelAppointmentModalChange(show: boolean): void;
 	onShowCloseEncounterModalChange(show: boolean): void;
 	onShowEditContactModalChange(show: boolean): void;
 	onClose(): void;
@@ -162,10 +169,12 @@ interface EncounterShelfContentProps {
 const EncounterShelfContent = ({
 	careEncounter,
 	activeTab,
+	showCancelAppointmentModal,
 	showCloseEncounterModal,
 	showEditContactModal,
 	onActiveTabChange,
 	onCloseEncounterModalSave,
+	onShowCancelAppointmentModalChange,
 	onShowCloseEncounterModalChange,
 	onShowEditContactModalChange,
 	onClose,
@@ -176,6 +185,12 @@ const EncounterShelfContent = ({
 
 	return (
 		<Tab.Container id="encounter-shelf-tabs" activeKey={activeTab} mountOnEnter unmountOnExit>
+			<CancelAppointmentModal
+				show={showCancelAppointmentModal}
+				onHide={() => {
+					onShowCancelAppointmentModalChange(false);
+				}}
+			/>
 			<CloseEncounterModal
 				show={showCloseEncounterModal}
 				onSave={onCloseEncounterModalSave}
@@ -296,7 +311,7 @@ const EncounterShelfContent = ({
 
 					<section className={classes.section}>
 						<h4 className="mb-6">Navigator Appointment</h4>
-						<Card bsPrefix="ic-card">
+						<Card bsPrefix="ic-card" className="mb-6">
 							<Card.Header>
 								<Card.Title>Screening Answers</Card.Title>
 							</Card.Header>
@@ -304,6 +319,12 @@ const EncounterShelfContent = ({
 								<NoData title="No Screening Answers" actions={[]} />
 							</Card.Body>
 						</Card>
+						<EncounterAppointmentCard
+							appointment={careEncounter.appointment}
+							onCancel={() => {
+								onShowCancelAppointmentModalChange(true);
+							}}
+						/>
 					</section>
 				</Tab.Pane>
 

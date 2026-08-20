@@ -59,6 +59,8 @@ const careEncounter: CareEncounterModel = {
 		startTimeDescription: 'Backend Appointment Start Time',
 		localStartDate: '2026-08-18',
 		localStartTime: '10:25:00',
+		videoconferenceUrl: 'https://video.example.com/appointment-1',
+		canceled: false,
 		provider: {
 			name: 'Navigator Name',
 		},
@@ -232,6 +234,17 @@ const findEditContactDialog = async () => {
 
 	if (!dialog) {
 		throw new Error('Edit Primary Contact dialog not found.');
+	}
+
+	return dialog as HTMLElement;
+};
+
+const findCancelAppointmentDialog = async () => {
+	const confirmation = await screen.findByText('Are you sure you want to cancel the appointment?');
+	const dialog = confirmation.closest('[role="dialog"]');
+
+	if (!dialog) {
+		throw new Error('Cancel Appointment dialog not found.');
 	}
 
 	return dialog as HTMLElement;
@@ -477,6 +490,113 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 
 	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters'));
 	expect(router.state.location.search).toBe('?status=CLOSED');
+});
+
+it('renders the current appointment and opens its static cancellation modal', async () => {
+	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
+
+	const appointmentCard = (await screen.findByText('Appointment')).closest('.ic-card');
+	if (!appointmentCard) {
+		throw new Error('Appointment card not found.');
+	}
+	const appointment = within(appointmentCard as HTMLElement);
+
+	expect(appointment.getByText('Backend Appointment Start Time')).toBeInTheDocument();
+	expect(appointment.getByRole('button', { name: 'Join Video Call' })).toHaveAttribute(
+		'href',
+		'https://video.example.com/appointment-1'
+	);
+	expect(appointment.getByRole('button', { name: 'Join Video Call' })).toHaveAttribute('target', '_blank');
+	expect(appointment.getByRole('button', { name: 'Join Video Call' })).toHaveAttribute('rel', 'noopener noreferrer');
+
+	await clickAndFlush(appointment.getByRole('button', { name: 'Edit' }));
+	const cancelMenuItem = await screen.findByRole('button', { name: 'Cancel' });
+	expect(screen.getAllByRole('button', { name: 'Cancel' })).toHaveLength(1);
+	await clickAndFlush(cancelMenuItem);
+
+	let dialog = await findCancelAppointmentDialog();
+	let modal = within(dialog);
+	let noteInput = modal.getByRole('textbox', { name: 'Note about cancellation' });
+
+	expect(modal.getByText('This note will appear in the cancellation email to the patient.')).toBeInTheDocument();
+	expect(noteInput).toBeRequired();
+	fireEvent.change(noteInput, { target: { value: 'Local-only cancellation note' } });
+	await clickAndFlush(modal.getByRole('button', { name: 'Cancel Appointment' }));
+
+	expect(await findCancelAppointmentDialog()).toBeInTheDocument();
+	expect(noteInput).toHaveValue('Local-only cancellation note');
+	expect(cancelCareEncounterSpy).not.toHaveBeenCalled();
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+
+	await clickAndFlush(modal.getByRole('button', { name: 'Keep Appointment' }));
+	await waitFor(() =>
+		expect(screen.queryByText('Are you sure you want to cancel the appointment?')).not.toBeInTheDocument()
+	);
+
+	await clickAndFlush(appointment.getByRole('button', { name: 'Edit' }));
+	await clickAndFlush(await screen.findByRole('button', { name: 'Cancel' }));
+	dialog = await findCancelAppointmentDialog();
+	modal = within(dialog);
+	noteInput = modal.getByRole('textbox', { name: 'Note about cancellation' });
+	expect(noteInput).toHaveValue('');
+});
+
+it('dismisses the cancellation modal without closing the encounter shelf', async () => {
+	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
+	const openModal = async () => {
+		await clickAndFlush(await screen.findByRole('button', { name: 'Edit' }));
+		await clickAndFlush(await screen.findByRole('button', { name: 'Cancel' }));
+		return findCancelAppointmentDialog();
+	};
+
+	let dialog = await openModal();
+	await clickAndFlush(within(dialog).getByRole('button', { name: 'Close' }));
+	await waitFor(() =>
+		expect(screen.queryByText('Are you sure you want to cancel the appointment?')).not.toBeInTheDocument()
+	);
+
+	dialog = await openModal();
+	await clickAndFlush(dialog);
+	await waitFor(() =>
+		expect(screen.queryByText('Are you sure you want to cancel the appointment?')).not.toBeInTheDocument()
+	);
+
+	await openModal();
+	fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+	await waitFor(() =>
+		expect(screen.queryByText('Are you sure you want to cancel the appointment?')).not.toBeInTheDocument()
+	);
+
+	expect(screen.getByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('renders the canceled appointment placeholder instead of appointment actions', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							canceled: true,
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByText('TODO: Cancelled Card')).toBeInTheDocument();
+	expect(screen.queryByText('Appointment')).not.toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Join Video Call' })).not.toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
 });
 
 it('opens the edit contact modal with the shelf email and resets unsaved changes on entry', async () => {
