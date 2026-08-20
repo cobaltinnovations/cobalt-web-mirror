@@ -1,6 +1,8 @@
 import {
 	CareEncounterCancellationReasonId,
 	CareEncounterCancellationReasonModel,
+	CareEncounterAssignmentScopeId,
+	CareEncounterListModel,
 	CareEncounterModel,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
@@ -16,6 +18,7 @@ export interface GetCareEncountersQueryParameters {
 	endDate?: string;
 	searchQuery?: string;
 	careEncounterStatusId?: CareEncounterStatusId;
+	careEncounterAssignmentScopeId?: CareEncounterAssignmentScopeId;
 	careEncounterSortColumnId?: CareEncounterSortColumnId;
 	sortDirectionId?: SortDirectionId;
 }
@@ -23,12 +26,12 @@ export interface GetCareEncountersQueryParameters {
 export interface GetCareEncountersResponseBody {
 	totalCount: number;
 	totalCountDescription: string;
-	careEncounters: CareEncounterModel[];
+	careEncounters: CareEncounterListModel[];
 }
 
 export interface GetCareEncounterResponseBody {
 	careEncounter: CareEncounterModel;
-	otherCareEncounters: CareEncounterModel[];
+	otherCareEncounters: CareEncounterListModel[];
 	otherCareEncountersTotalCount: number;
 	otherCareEncountersTotalCountDescription: string;
 }
@@ -43,7 +46,12 @@ export interface CreateCareEncounterRequestBody {
 }
 
 export interface UpdateCareEncounterRequestBody {
+	emailAddress?: string;
 	notes?: string;
+}
+
+export interface AssignCareEncounterRequestBody {
+	careNavigatorAccountId?: string | null;
 }
 
 export interface GetCareEncounterCancellationReasonsResponseBody {
@@ -53,6 +61,10 @@ export interface GetCareEncounterCancellationReasonsResponseBody {
 export interface CancelCareEncounterRequestBody {
 	careEncounterCancellationReasonId: CareEncounterCancellationReasonId;
 	careEncounterCancellationReasonOtherText?: string;
+}
+
+export interface CancelCareEncounterAppointmentRequestBody {
+	cancellationReason: string;
 }
 
 export const careEncounterService = {
@@ -82,6 +94,19 @@ export const careEncounterService = {
 			data,
 		});
 	},
+	closeCareEncounter(careEncounterId: string) {
+		return httpSingleton.orchestrateRequest<CareEncounterResponseBody>({
+			method: 'put',
+			url: `/admin/care-encounters/${careEncounterId}/close`,
+		});
+	},
+	assignCareEncounter(careEncounterId: string, data: AssignCareEncounterRequestBody) {
+		return httpSingleton.orchestrateRequest<CareEncounterResponseBody>({
+			method: 'put',
+			url: `/admin/care-encounters/${careEncounterId}/assignment`,
+			data,
+		});
+	},
 	getCareEncounterCancellationReasons() {
 		return httpSingleton.orchestrateRequest<GetCareEncounterCancellationReasonsResponseBody>({
 			method: 'get',
@@ -92,6 +117,17 @@ export const careEncounterService = {
 		return httpSingleton.orchestrateRequest<CareEncounterResponseBody>({
 			method: 'put',
 			url: `/admin/care-encounters/${careEncounterId}/cancel`,
+			data,
+		});
+	},
+	cancelCareEncounterAppointment(
+		careEncounterId: string,
+		appointmentId: string,
+		data: CancelCareEncounterAppointmentRequestBody
+	) {
+		return httpSingleton.orchestrateRequest<CareEncounterResponseBody>({
+			method: 'put',
+			url: `/admin/care-encounters/${careEncounterId}/appointments/${appointmentId}/cancel`,
 			data,
 		});
 	},

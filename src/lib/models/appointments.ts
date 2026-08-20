@@ -1,5 +1,6 @@
 import { Provider } from '@/lib/models/provider';
 import { AccountModel } from '@/lib/models/account';
+import { ScreeningSessionResult } from './screening-models';
 
 export enum ATTENDANCE_STATUS_ID {
 	UNKNOWN = 'UNKNOWN',
@@ -43,6 +44,9 @@ export enum VideoconferencePlatformId {
 export interface AppointmentModel {
 	appointmentId: string;
 	accountId: string;
+	careEncounterId?: string;
+	screeningSessionId?: string;
+	screeningSessionResult?: ScreeningSessionResult;
 	firstName?: string;
 	lastName?: string;
 	appointmentTypeId: string;
@@ -65,6 +69,8 @@ export interface AppointmentModel {
 	canceled: boolean;
 	canceledAt?: string;
 	canceledAtDescription?: string;
+	canceledByAccountId?: string;
+	cancellationReason?: string;
 	created: string;
 	createdDescription: string;
 	provider?: Partial<Provider>;

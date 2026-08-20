@@ -9,12 +9,18 @@ import TabBar from '@/components/tab-bar';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
-import { CancelCareEncounterRequestBody, careEncounterService } from '@/lib/services';
+import { AppointmentModel, CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
+import {
+	CancelCareEncounterAppointmentRequestBody,
+	CancelCareEncounterRequestBody,
+	careEncounterService,
+} from '@/lib/services';
+import { AppointmentDetailsModal } from './appointment-details-modal';
 import { CancelAppointmentModal } from './cancel-appointment-modal';
 import { CloseEncounterModal } from './close-encounter-modal';
 import { EditContactModal } from './edit-contact-modal';
 import { EncounterAppointmentCard } from './encounter-appointment-card';
+import { EncounterAppointmentHistoryCard } from './encounter-appointment-history-card';
 import { EncounterNotes } from './encounter-notes';
 import type { EncountersOutletContext } from './encounters';
 
@@ -117,6 +123,32 @@ export const Component = () => {
 		[addFlag, encounterId, handleError, refreshCareEncounters]
 	);
 
+	const handleCancelAppointmentModalSave = useCallback(
+		async (data: CancelCareEncounterAppointmentRequestBody) => {
+			if (!encounterId || !careEncounter) {
+				return;
+			}
+
+			try {
+				const response = await careEncounterService
+					.cancelCareEncounterAppointment(encounterId, careEncounter.appointment.appointmentId, data)
+					.fetch();
+
+				setCareEncounter(response.careEncounter);
+				setShowCancelAppointmentModal(false);
+				addFlag({
+					variant: 'success',
+					title: 'Appointment Canceled',
+					actions: [],
+				});
+				await refreshCareEncounters();
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, careEncounter, encounterId, handleError, refreshCareEncounters]
+	);
+
 	if (!encounterId) {
 		throw new Error('Unknown encounter');
 	}
@@ -136,6 +168,7 @@ export const Component = () => {
 					showCloseEncounterModal={showCloseEncounterModal}
 					showEditContactModal={showEditContactModal}
 					onActiveTabChange={setActiveTab}
+					onCancelAppointmentModalSave={handleCancelAppointmentModalSave}
 					onCloseEncounterModalSave={handleCloseEncounterModalSave}
 					onShowCancelAppointmentModalChange={setShowCancelAppointmentModal}
 					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
@@ -159,6 +192,7 @@ interface EncounterShelfContentProps {
 	showCloseEncounterModal: boolean;
 	showEditContactModal: boolean;
 	onActiveTabChange(activeTab: EncounterShelfTab): void;
+	onCancelAppointmentModalSave(data: CancelCareEncounterAppointmentRequestBody): Promise<void>;
 	onCloseEncounterModalSave(data: CancelCareEncounterRequestBody): Promise<void>;
 	onShowCancelAppointmentModalChange(show: boolean): void;
 	onShowCloseEncounterModalChange(show: boolean): void;
@@ -173,6 +207,7 @@ const EncounterShelfContent = ({
 	showCloseEncounterModal,
 	showEditContactModal,
 	onActiveTabChange,
+	onCancelAppointmentModalSave,
 	onCloseEncounterModalSave,
 	onShowCancelAppointmentModalChange,
 	onShowCloseEncounterModalChange,
@@ -182,11 +217,20 @@ const EncounterShelfContent = ({
 	const classes = useStyles();
 	const emailAddress = careEncounter.appointment.account?.emailAddress;
 	const notes = careEncounter.notes?.trim();
+	const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel>();
 
 	return (
 		<Tab.Container id="encounter-shelf-tabs" activeKey={activeTab} mountOnEnter unmountOnExit>
+			<AppointmentDetailsModal
+				appointment={selectedAppointment}
+				show={Boolean(selectedAppointment)}
+				onHide={() => {
+					setSelectedAppointment(undefined);
+				}}
+			/>
 			<CancelAppointmentModal
 				show={showCancelAppointmentModal}
+				onSave={onCancelAppointmentModalSave}
 				onHide={() => {
 					onShowCancelAppointmentModalChange(false);
 				}}
@@ -319,11 +363,17 @@ const EncounterShelfContent = ({
 								<NoData title="No Screening Answers" actions={[]} />
 							</Card.Body>
 						</Card>
-						<EncounterAppointmentCard
-							appointment={careEncounter.appointment}
-							onCancel={() => {
-								onShowCancelAppointmentModalChange(true);
-							}}
+						<div className="mb-6">
+							<EncounterAppointmentCard
+								appointment={careEncounter.appointment}
+								onCancel={() => {
+									onShowCancelAppointmentModalChange(true);
+								}}
+							/>
+						</div>
+						<EncounterAppointmentHistoryCard
+							appointments={careEncounter.appointmentHistory}
+							onSelect={setSelectedAppointment}
 						/>
 					</section>
 				</Tab.Pane>

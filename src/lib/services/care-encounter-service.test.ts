@@ -1,4 +1,5 @@
 import {
+	CareEncounterAssignmentScopeId,
 	CareEncounterCancellationReasonId,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
@@ -17,6 +18,7 @@ it('requests admin care encounters with every supported listing parameter', () =
 		endDate: '2026-08-31',
 		searchQuery: 'Avery Morgan',
 		careEncounterStatusId: CareEncounterStatusId.CLOSED,
+		careEncounterAssignmentScopeId: CareEncounterAssignmentScopeId.SELF,
 		careEncounterSortColumnId: CareEncounterSortColumnId.CREATED,
 		sortDirectionId: SortDirectionId.ASCENDING,
 	});
@@ -34,6 +36,7 @@ it('requests admin care encounters with every supported listing parameter', () =
 		endDate: '2026-08-31',
 		searchQuery: 'Avery Morgan',
 		careEncounterStatusId: 'CLOSED',
+		careEncounterAssignmentScopeId: 'SELF',
 		careEncounterSortColumnId: 'CREATED',
 		sortDirectionId: 'ASCENDING',
 	});
@@ -75,6 +78,7 @@ it('creates an admin care encounter', () => {
 it('updates an admin care encounter', () => {
 	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
 	const data = {
+		emailAddress: 'patient@example.com',
 		notes: 'Updated notes',
 	};
 
@@ -83,6 +87,36 @@ it('updates an admin care encounter', () => {
 	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
 		method: 'put',
 		url: '/admin/care-encounters/care-encounter-1',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('closes an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.closeCareEncounter('care-encounter-1');
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/close',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('assigns an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		careNavigatorAccountId: 'care-navigator-1',
+	};
+
+	careEncounterService.assignCareEncounter('care-encounter-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/assignment',
 		data,
 	});
 
@@ -114,6 +148,23 @@ it('cancels an admin care encounter with its cancellation reason', () => {
 	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
 		method: 'put',
 		url: '/admin/care-encounters/care-encounter-1/cancel',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('cancels a care encounter appointment with its cancellation reason', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		cancellationReason: 'Patient is no longer available.',
+	};
+
+	careEncounterService.cancelCareEncounterAppointment('care-encounter-1', 'appointment-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/appointments/appointment-1/cancel',
 		data,
 	});
 

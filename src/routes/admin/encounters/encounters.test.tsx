@@ -4,7 +4,9 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { CobaltThemeProvider } from '@/jss/theme';
 import {
+	ATTENDANCE_STATUS_ID,
 	CareEncounterCancellationReasonId,
+	CareEncounterListModel,
 	CareEncounterModel,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
@@ -34,6 +36,15 @@ jest.mock('@/hooks/use-flags', () => ({
 	default: () => ({ addFlag: mockAddFlag }),
 }));
 
+const historicalAppointment = {
+	appointmentId: 'appointment-history-1',
+	accountId: 'account-1',
+	startTimeDescription: 'Aug 10, 2026 at 2:30 PM',
+	canceled: true,
+	canceledAtDescription: 'Aug 11, 2026 at 9:15 AM',
+	attendanceStatusId: ATTENDANCE_STATUS_ID.CANCELED,
+} as CareEncounterModel['appointment'];
+
 const careEncounter: CareEncounterModel = {
 	careEncounterId: 'care-encounter-1',
 	appointmentId: 'appointment-1',
@@ -51,6 +62,7 @@ const careEncounter: CareEncounterModel = {
 	createdDateDescription: 'Backend Created Date',
 	lastUpdated: '2026-07-28T14:00:00Z',
 	lastUpdatedDescription: 'Jul 28, 2026 at 10:00 AM',
+	appointmentHistory: [historicalAppointment],
 	appointment: {
 		appointmentId: 'appointment-1',
 		accountId: 'account-1',
@@ -70,10 +82,28 @@ const careEncounter: CareEncounterModel = {
 	} as CareEncounterModel['appointment'],
 };
 
+const careEncounterList: CareEncounterListModel = {
+	...careEncounter,
+	appointment: {
+		appointmentId: 'appointment-1',
+		providerId: 'provider-1',
+		appointmentTypeId: 'appointment-type-1',
+		attendanceStatusId: ATTENDANCE_STATUS_ID.UNKNOWN,
+		title: 'Care Navigator Appointment',
+		startTime: '2026-08-18T14:25:00Z',
+		startTimeDescription: 'Backend Appointment Start Time',
+		endTime: '2026-08-18T14:55:00Z',
+		endTimeDescription: 'Backend Appointment End Time',
+		timeZone: 'America/New_York',
+		canceledForReschedule: false,
+		canceled: false,
+	},
+};
+
 const defaultResponse: GetCareEncountersResponseBody = {
 	totalCount: 1,
 	totalCountDescription: '1',
-	careEncounters: [careEncounter],
+	careEncounters: [careEncounterList],
 };
 
 const defaultDetailResponse: GetCareEncounterResponseBody = {
@@ -129,10 +159,21 @@ const canceledCareEncounter: CareEncounterModel = {
 	careEncounterCancellationReasonId: CareEncounterCancellationReasonId.PATIENT_REQUESTED,
 };
 
+const careEncounterWithCanceledAppointment: CareEncounterModel = {
+	...careEncounter,
+	appointment: {
+		...careEncounter.appointment,
+		canceled: true,
+		canceledAtDescription: 'Aug 20, 2026 at 1:30 PM',
+		cancellationReason: 'Patient unable to attend',
+	},
+};
+
 const getCareEncountersSpy = jest.spyOn(careEncounterService, 'getCareEncounters');
 const getCareEncounterSpy = jest.spyOn(careEncounterService, 'getCareEncounter');
 const getCareEncounterCancellationReasonsSpy = jest.spyOn(careEncounterService, 'getCareEncounterCancellationReasons');
 const cancelCareEncounterSpy = jest.spyOn(careEncounterService, 'cancelCareEncounter');
+const cancelCareEncounterAppointmentSpy = jest.spyOn(careEncounterService, 'cancelCareEncounterAppointment');
 const updateCareEncounterSpy = jest.spyOn(careEncounterService, 'updateCareEncounter');
 
 beforeAll(() => {
@@ -179,6 +220,13 @@ beforeEach(() => {
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue({ careEncounter: canceledCareEncounter }),
 			} as ReturnType<typeof careEncounterService.cancelCareEncounter>)
+	);
+	cancelCareEncounterAppointmentSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounter: careEncounterWithCanceledAppointment }),
+			} as ReturnType<typeof careEncounterService.cancelCareEncounterAppointment>)
 	);
 });
 
@@ -492,7 +540,7 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	expect(router.state.location.search).toBe('?status=CLOSED');
 });
 
-it('renders the current appointment and opens its static cancellation modal', async () => {
+it('cancels the current appointment and refreshes the shelf without changing the route', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 
 	const appointmentCard = (await screen.findByText('Appointment')).closest('.ic-card');
@@ -517,17 +565,14 @@ it('renders the current appointment and opens its static cancellation modal', as
 	let dialog = await findCancelAppointmentDialog();
 	let modal = within(dialog);
 	let noteInput = modal.getByRole('textbox', { name: 'Note about cancellation' });
+	let cancelAppointmentButton = modal.getByRole('button', { name: 'Cancel Appointment' });
 
 	expect(modal.getByText('This note will appear in the cancellation email to the patient.')).toBeInTheDocument();
 	expect(noteInput).toBeRequired();
+	expect(noteInput).toHaveAttribute('maxlength', '2000');
+	expect(cancelAppointmentButton).toBeDisabled();
 	fireEvent.change(noteInput, { target: { value: 'Local-only cancellation note' } });
-	await clickAndFlush(modal.getByRole('button', { name: 'Cancel Appointment' }));
-
-	expect(await findCancelAppointmentDialog()).toBeInTheDocument();
-	expect(noteInput).toHaveValue('Local-only cancellation note');
-	expect(cancelCareEncounterSpy).not.toHaveBeenCalled();
-	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
-	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+	expect(cancelAppointmentButton).toBeEnabled();
 
 	await clickAndFlush(modal.getByRole('button', { name: 'Keep Appointment' }));
 	await waitFor(() =>
@@ -540,6 +585,105 @@ it('renders the current appointment and opens its static cancellation modal', as
 	modal = within(dialog);
 	noteInput = modal.getByRole('textbox', { name: 'Note about cancellation' });
 	expect(noteInput).toHaveValue('');
+
+	fireEvent.change(noteInput, { target: { value: '  Patient unable to attend  ' } });
+	cancelAppointmentButton = modal.getByRole('button', { name: 'Cancel Appointment' });
+	await clickAndFlush(cancelAppointmentButton);
+
+	await waitFor(() =>
+		expect(screen.queryByText('Are you sure you want to cancel the appointment?')).not.toBeInTheDocument()
+	);
+	expect(cancelCareEncounterAppointmentSpy).toHaveBeenCalledWith('care-encounter-1', 'appointment-1', {
+		cancellationReason: 'Patient unable to attend',
+	});
+	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
+	expect(screen.getByText('TODO: Cancelled Card')).toBeInTheDocument();
+	expect(mockAddFlag).toHaveBeenCalledWith({
+		variant: 'success',
+		title: 'Appointment Canceled',
+		actions: [],
+	});
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('keeps the appointment cancellation modal open when cancellation fails', async () => {
+	const error = new Error('Unable to cancel appointment');
+	cancelCareEncounterAppointmentSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(error),
+			} as ReturnType<typeof careEncounterService.cancelCareEncounterAppointment>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Edit' }));
+	await clickAndFlush(await screen.findByRole('button', { name: 'Cancel' }));
+	const dialog = await findCancelAppointmentDialog();
+	const modal = within(dialog);
+	const noteInput = modal.getByRole('textbox', { name: 'Note about cancellation' });
+
+	fireEvent.change(noteInput, { target: { value: 'Patient unavailable' } });
+	await clickAndFlush(modal.getByRole('button', { name: 'Cancel Appointment' }));
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(dialog).toBeInTheDocument();
+	expect(noteInput).toHaveValue('Patient unavailable');
+	expect(mockAddFlag).not.toHaveBeenCalled();
+});
+
+it('renders appointment history and opens read-only appointment details', async () => {
+	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
+	const historyCard = (await screen.findByText('Appointment History')).closest('.ic-card');
+
+	if (!historyCard) {
+		throw new Error('Appointment History card not found.');
+	}
+
+	const history = within(historyCard as HTMLElement);
+	expect(history.getByText('Aug 10, 2026 at 2:30 PM')).toBeInTheDocument();
+	expect(history.getByText('Canceled')).toBeInTheDocument();
+
+	await clickAndFlush(history.getByRole('button', { name: 'View appointment details for Aug 10, 2026 at 2:30 PM' }));
+
+	const title = await screen.findByText('Appointment Details');
+	const dialog = title.closest('[role="dialog"]');
+	if (!dialog) {
+		throw new Error('Appointment Details dialog not found.');
+	}
+	const details = within(dialog as HTMLElement);
+
+	expect(details.getByText('Appointment Date')).toBeInTheDocument();
+	expect(details.getByText('Aug 10, 2026 at 2:30 PM')).toBeInTheDocument();
+	expect(details.getByText('Canceled Date')).toBeInTheDocument();
+	expect(details.getByText('Aug 11, 2026 at 9:15 AM')).toBeInTheDocument();
+
+	await clickAndFlush(details.getByRole('button', { name: 'Close' }));
+	await waitFor(() => expect(screen.queryByText('Appointment Details')).not.toBeInTheDocument());
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('does not render appointment history when the response history is empty', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointmentHistory: [],
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByText('Appointment')).toBeInTheDocument();
+	expect(screen.queryByText('Appointment History')).not.toBeInTheDocument();
 });
 
 it('dismisses the cancellation modal without closing the encounter shelf', async () => {

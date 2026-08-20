@@ -1,4 +1,4 @@
-import { AppointmentModel } from './appointments';
+import { AppointmentModel, ATTENDANCE_STATUS_ID } from './appointments';
 
 export enum CareEncounterStatusId {
 	OPEN = 'OPEN',
@@ -23,6 +23,12 @@ export enum CareEncounterSortColumnId {
 	LAST_UPDATED = 'LAST_UPDATED',
 }
 
+export enum CareEncounterAssignmentScopeId {
+	ALL = 'ALL',
+	SELF = 'SELF',
+	UNASSIGNED = 'UNASSIGNED',
+}
+
 export interface CareEncounterCancellationReasonModel {
 	careEncounterCancellationReasonId: CareEncounterCancellationReasonId;
 	description: string;
@@ -30,10 +36,12 @@ export interface CareEncounterCancellationReasonModel {
 	freeformTextRequired: boolean;
 }
 
-export interface CareEncounterModel {
+interface CareEncounterBaseModel {
 	careEncounterId: string;
 	appointmentId: string;
 	accountId: string;
+	careNavigatorAccountId?: string;
+	careNavigatorDisplayName?: string;
 	careEncounterStatusId: CareEncounterStatusId;
 	careEncounterStatusDisplayLabel: string;
 	patientFullName: string;
@@ -42,6 +50,7 @@ export interface CareEncounterModel {
 	notes?: string;
 	closedAt?: string;
 	closedAtDescription?: string;
+	closedByAccountId?: string;
 	canceledByAccountId?: string;
 	careEncounterCancellationReasonId?: CareEncounterCancellationReasonId;
 	careEncounterCancellationReasonOtherText?: string;
@@ -53,5 +62,29 @@ export interface CareEncounterModel {
 	createdDateDescription: string;
 	lastUpdated: string;
 	lastUpdatedDescription: string;
+}
+
+export interface CareEncounterAppointmentModel {
+	appointmentId: string;
+	providerId: string;
+	appointmentTypeId?: string;
+	attendanceStatusId: ATTENDANCE_STATUS_ID;
+	title: string;
+	startTime: string;
+	startTimeDescription: string;
+	endTime: string;
+	endTimeDescription: string;
+	timeZone: string;
+	canceledForReschedule: boolean;
+	canceled?: boolean;
+}
+
+export interface CareEncounterListModel extends CareEncounterBaseModel {
+	appointment: CareEncounterAppointmentModel;
+}
+
+export interface CareEncounterModel extends CareEncounterBaseModel {
+	emailAddress?: string;
 	appointment: AppointmentModel;
+	appointmentHistory: AppointmentModel[];
 }

@@ -9,7 +9,12 @@ import { SORT_DIRECTION, Table, TableBody, TableCell, TableHead, TablePagination
 import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { CareEncounterModel, CareEncounterSortColumnId, CareEncounterStatusId, SortDirectionId } from '@/lib/models';
+import {
+	CareEncounterListModel,
+	CareEncounterSortColumnId,
+	CareEncounterStatusId,
+	SortDirectionId,
+} from '@/lib/models';
 import { careEncounterService } from '@/lib/services';
 
 const PAGE_SIZE = 25;
@@ -43,7 +48,7 @@ export const Component = () => {
 	const urlSearchQuery = searchParams.get('searchQuery') ?? '';
 
 	const [isLoading, setIsLoading] = useState(true);
-	const [careEncounters, setCareEncounters] = useState<CareEncounterModel[]>([]);
+	const [careEncounters, setCareEncounters] = useState<CareEncounterListModel[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [searchInputValue, setSearchInputValue] = useState(urlSearchQuery);
 	const [debouncedSearchQuery, setDebouncedSearchQuery] = useDebouncedState(searchInputValue);
@@ -276,11 +281,7 @@ export const Component = () => {
 										<TableCell className="text-nowrap" minWidth="max-content">
 											{careEncounter.createdDateDescription}
 										</TableCell>
-										<TableCell width="45%">
-											{[careEncounter.appointment.firstName, careEncounter.appointment.lastName]
-												.filter(Boolean)
-												.join(' ')}
-										</TableCell>
+										<TableCell width="45%">{careEncounter.patientFullName}</TableCell>
 										<TableCell width="45%">
 											<span className="d-block">
 												{careEncounter.appointment.startTimeDescription}

@@ -3,7 +3,9 @@ import { Button, Modal, ModalProps } from 'react-bootstrap';
 import { createUseStyles } from 'react-jss';
 
 import InputHelper from '@/components/input-helper';
+import LoadingButton from '@/components/loading-button';
 import SvgIcon from '@/components/svg-icon';
+import { CancelCareEncounterAppointmentRequestBody } from '@/lib/services';
 
 const useStyles = createUseStyles({
 	modal: {
@@ -11,13 +13,34 @@ const useStyles = createUseStyles({
 	},
 });
 
-export const CancelAppointmentModal: FC<ModalProps> = ({ onHide, ...props }) => {
+interface Props extends ModalProps {
+	onSave(data: CancelCareEncounterAppointmentRequestBody): Promise<void>;
+}
+
+export const CancelAppointmentModal: FC<Props> = ({ onHide, onSave, ...props }) => {
 	const classes = useStyles();
 	const [cancellationNote, setCancellationNote] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
+	const normalizedCancellationNote = cancellationNote.trim();
 
 	const handleOnEnter = useCallback(() => {
 		setCancellationNote('');
+		setIsLoading(false);
 	}, []);
+
+	const handleSave = useCallback(async () => {
+		if (!normalizedCancellationNote) {
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			await onSave({ cancellationReason: normalizedCancellationNote });
+		} finally {
+			setIsLoading(false);
+		}
+	}, [normalizedCancellationNote, onSave]);
 
 	return (
 		<Modal {...props} dialogClassName={classes.modal} centered onEnter={handleOnEnter} onHide={onHide}>
@@ -31,6 +54,7 @@ export const CancelAppointmentModal: FC<ModalProps> = ({ onHide, ...props }) => 
 					label="Note about cancellation"
 					aria-label="Note about cancellation"
 					required
+					disabled={isLoading}
 					value={cancellationNote}
 					onChange={({ currentTarget }) => {
 						setCancellationNote(currentTarget.value);
@@ -42,17 +66,17 @@ export const CancelAppointmentModal: FC<ModalProps> = ({ onHide, ...props }) => 
 				</div>
 			</Modal.Body>
 			<Modal.Footer className="text-right">
-				<Button variant="outline-primary" className="me-2" onClick={onHide}>
+				<Button variant="outline-primary" className="me-2" onClick={onHide} disabled={isLoading}>
 					Keep Appointment
 				</Button>
-				<Button
+				<LoadingButton
 					variant="danger"
-					onClick={() => {
-						return;
-					}}
+					isLoading={isLoading}
+					disabled={isLoading || !normalizedCancellationNote}
+					onClick={handleSave}
 				>
 					Cancel Appointment
-				</Button>
+				</LoadingButton>
 			</Modal.Footer>
 		</Modal>
 	);

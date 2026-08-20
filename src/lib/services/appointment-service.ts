@@ -32,6 +32,10 @@ export interface CreateAppointmentData {
 export type RescheduleAppointmentData = Partial<CreateAppointmentData> &
 	Pick<CreateAppointmentData, 'bookingExperienceId'>;
 
+export interface CancelAppointmentData {
+	cancellationReason?: string;
+}
+
 export interface AppointmentBookingRequirementsData {
 	accountId?: string;
 	providerId: string;
@@ -123,11 +127,11 @@ export const appointmentService = {
 			url: `/appointments?${params.toString()}`,
 		});
 	},
-	cancelAppointment(appointmentId: string) {
+	cancelAppointment(appointmentId: string, data: CancelAppointmentData = {}) {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'put',
 			url: `/appointments/${appointmentId}/cancel`,
-			data: {},
+			data,
 		});
 	},
 	getAppointment(appointmentId?: string) {
