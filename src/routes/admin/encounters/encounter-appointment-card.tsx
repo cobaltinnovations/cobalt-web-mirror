@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Card, Dropdown } from 'react-bootstrap';
 
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
+import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import { AppointmentModel } from '@/lib/models';
@@ -54,7 +55,7 @@ export const EncounterAppointmentCard = ({ appointment, onCancel }: Props) => {
 	const classes = useStyles();
 
 	if (appointment.canceled) {
-		return <p className="mb-0">TODO: Cancelled Card</p>;
+		return <NoData title="No Active Appointment" actions={[]} />;
 	}
 
 	return (

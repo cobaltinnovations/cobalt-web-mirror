@@ -22,6 +22,7 @@ import { EditContactModal } from './edit-contact-modal';
 import { EncounterAppointmentCard } from './encounter-appointment-card';
 import { EncounterAppointmentHistoryCard } from './encounter-appointment-history-card';
 import { EncounterNotes } from './encounter-notes';
+import { EncounterScreeningAnswersCard } from './encounter-screening-answers-card';
 import type { EncountersOutletContext } from './encounters';
 
 type EncounterShelfTab = 'encounter-details' | 'contact-history' | 'notes';
@@ -355,14 +356,11 @@ const EncounterShelfContent = ({
 
 					<section className={classes.section}>
 						<h4 className="mb-6">Navigator Appointment</h4>
-						<Card bsPrefix="ic-card" className="mb-6">
-							<Card.Header>
-								<Card.Title>Screening Answers</Card.Title>
-							</Card.Header>
-							<Card.Body>
-								<NoData title="No Screening Answers" actions={[]} />
-							</Card.Body>
-						</Card>
+						{!careEncounter.appointment.canceled && (
+							<EncounterScreeningAnswersCard
+								screeningSessionResult={careEncounter.appointment.screeningSessionResult}
+							/>
+						)}
 						<div className="mb-6">
 							<EncounterAppointmentCard
 								appointment={careEncounter.appointment}

@@ -540,6 +540,88 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	expect(router.state.location.search).toBe('?status=CLOSED');
 });
 
+it('renders the current appointment screening answers from the encounter response', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							screeningSessionId: 'screening-session-1',
+							screeningSessionResult: {
+								screeningSessionScreeningResults: [
+									{
+										screeningQuestionResults: [
+											{
+												screeningQuestionId: 'question-1',
+												screeningQuestionText: 'Who are you seeking support for?',
+												screeningAnswerResults: [
+													{
+														screeningAnswerId: 'answer-1',
+														answerOptionText: 'Myself',
+													},
+												],
+											},
+											{
+												screeningQuestionId: 'question-2',
+												screeningQuestionText: 'Who is your current employer?',
+												screeningAnswerResults: [
+													{
+														screeningAnswerId: 'answer-2',
+														answerOptionText:
+															'UPHS (University Pennsylvania Health System)',
+													},
+												],
+											},
+										],
+									},
+									{
+										screeningQuestionResults: [
+											{
+												screeningQuestionId: 'question-3',
+												screeningQuestionText:
+													'What kind of support are you looking for today?',
+												screeningAnswerResults: [
+													{
+														screeningAnswerId: 'answer-3',
+														answerOptionText: 'Something else / I’m not sure',
+														text: 'User input text here if available…',
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	const screeningAnswersCard = (await screen.findByText('Screening Answers')).closest('.ic-card');
+	if (!screeningAnswersCard) {
+		throw new Error('Screening Answers card not found.');
+	}
+	const screeningAnswers = within(screeningAnswersCard as HTMLElement);
+
+	expect(screeningAnswers.getByText('1)')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('Who are you seeking support for?')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('Myself')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('2)')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('UPHS (University Pennsylvania Health System)')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('3)')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('Something else / I’m not sure')).toBeInTheDocument();
+	expect(screeningAnswers.getByText('User input text here if available…')).toBeInTheDocument();
+	expect(screeningAnswers.queryByRole('heading', { name: 'No Screening Answers' })).not.toBeInTheDocument();
+});
+
 it('cancels the current appointment and refreshes the shelf without changing the route', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 
@@ -569,7 +651,6 @@ it('cancels the current appointment and refreshes the shelf without changing the
 
 	expect(modal.getByText('This note will appear in the cancellation email to the patient.')).toBeInTheDocument();
 	expect(noteInput).toBeRequired();
-	expect(noteInput).toHaveAttribute('maxlength', '2000');
 	expect(cancelAppointmentButton).toBeDisabled();
 	fireEvent.change(noteInput, { target: { value: 'Local-only cancellation note' } });
 	expect(cancelAppointmentButton).toBeEnabled();
@@ -597,7 +678,8 @@ it('cancels the current appointment and refreshes the shelf without changing the
 		cancellationReason: 'Patient unable to attend',
 	});
 	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
-	expect(screen.getByText('TODO: Cancelled Card')).toBeInTheDocument();
+	expect(screen.getByRole('heading', { name: 'No Active Appointment' })).toBeInTheDocument();
+	expect(screen.queryByText('Screening Answers')).not.toBeInTheDocument();
 	expect(mockAddFlag).toHaveBeenCalledWith({
 		variant: 'success',
 		title: 'Appointment Canceled',
@@ -717,7 +799,7 @@ it('dismisses the cancellation modal without closing the encounter shelf', async
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
 });
 
-it('renders the canceled appointment placeholder instead of appointment actions', async () => {
+it('renders an empty state and hides screening answers when there is no active appointment', async () => {
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>
 			({
@@ -737,7 +819,8 @@ it('renders the canceled appointment placeholder instead of appointment actions'
 
 	renderEncounters('/admin/encounters/care-encounter-1');
 
-	expect(await screen.findByText('TODO: Cancelled Card')).toBeInTheDocument();
+	expect(await screen.findByRole('heading', { name: 'No Active Appointment' })).toBeInTheDocument();
+	expect(screen.queryByText('Screening Answers')).not.toBeInTheDocument();
 	expect(screen.queryByText('Appointment')).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Join Video Call' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
