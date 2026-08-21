@@ -39,9 +39,29 @@ jest.mock('@/hooks/use-flags', () => ({
 const historicalAppointment = {
 	appointmentId: 'appointment-history-1',
 	accountId: 'account-1',
+	screeningSessionId: 'screening-session-history-1',
+	screeningSessionResult: {
+		screeningSessionScreeningResults: [
+			{
+				screeningQuestionResults: [
+					{
+						screeningQuestionId: 'history-question-1',
+						screeningQuestionText: 'Historical screening question?',
+						screeningAnswerResults: [
+							{
+								screeningAnswerId: 'history-answer-1',
+								answerOptionText: 'Historical screening answer',
+							},
+						],
+					},
+				],
+			},
+		],
+	},
 	startTimeDescription: 'Aug 10, 2026 at 2:30 PM',
 	canceled: true,
 	canceledAtDescription: 'Aug 11, 2026 at 9:15 AM',
+	cancellationReason: 'Patient unavailable',
 	attendanceStatusId: ATTENDANCE_STATUS_ID.CANCELED,
 } as CareEncounterModel['appointment'];
 
@@ -758,11 +778,52 @@ it('renders appointment history and opens read-only appointment details', async 
 	expect(details.getByText('Aug 10, 2026 at 2:30 PM')).toBeInTheDocument();
 	expect(details.getByText('Canceled Date')).toBeInTheDocument();
 	expect(details.getByText('Aug 11, 2026 at 9:15 AM')).toBeInTheDocument();
+	expect(details.getByText('Cancellation Reason')).toBeInTheDocument();
+	expect(details.getByText('Patient unavailable')).toBeInTheDocument();
+	expect(details.getByRole('heading', { name: 'Screening Answers' })).toBeInTheDocument();
+	expect(details.getByText('1)')).toBeInTheDocument();
+	expect(details.getByText('Historical screening question?')).toBeInTheDocument();
+	expect(details.getByText('Historical screening answer')).toBeInTheDocument();
+	expect(details.queryByRole('heading', { name: 'No Screening Answers' })).not.toBeInTheDocument();
 
 	await clickAndFlush(details.getByRole('button', { name: 'Close' }));
 	await waitFor(() => expect(screen.queryByText('Appointment Details')).not.toBeInTheDocument());
 	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('renders an empty screening-answer state for a historical appointment without results', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointmentHistory: [
+							{
+								...historicalAppointment,
+								screeningSessionId: undefined,
+								screeningSessionResult: undefined,
+							},
+						],
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(
+		await screen.findByRole('button', { name: 'View appointment details for Aug 10, 2026 at 2:30 PM' })
+	);
+	const title = await screen.findByText('Appointment Details');
+	const dialog = title.closest('[role="dialog"]');
+	if (!dialog) {
+		throw new Error('Appointment Details dialog not found.');
+	}
+
+	expect(within(dialog as HTMLElement).getByRole('heading', { name: 'No Screening Answers' })).toBeInTheDocument();
 });
 
 it('does not render appointment history when the response history is empty', async () => {
