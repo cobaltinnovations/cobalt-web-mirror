@@ -9,6 +9,12 @@ export enum ATTENDANCE_STATUS_ID {
 	ATTENDED = 'ATTENDED',
 }
 
+export enum AppointmentTimeStatusId {
+	SCHEDULED = 'SCHEDULED',
+	IN_SESSION = 'IN_SESSION',
+	PASSED = 'PASSED',
+}
+
 export enum BookingExperienceId {
 	V1 = 'V1',
 	V2 = 'V2',
@@ -79,7 +85,7 @@ export interface AppointmentModel {
 	appointmentDescription: string;
 	appointmentType?: AppointmentType;
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
-	inSession: boolean;
+	appointmentTimeStatusId: AppointmentTimeStatusId;
 	canceledForReschedule: boolean;
 	rescheduledAppointmentId?: string;
 	patientOrderId?: string;

@@ -5,6 +5,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { CobaltThemeProvider } from '@/jss/theme';
 import {
 	ATTENDANCE_STATUS_ID,
+	AppointmentTimeStatusId,
 	CareEncounterCancellationReasonId,
 	CareEncounterListModel,
 	CareEncounterModel,
@@ -63,7 +64,7 @@ const historicalAppointment = {
 	canceledAtDescription: 'Aug 11, 2026 at 9:15 AM',
 	cancellationReason: 'Patient unavailable',
 	attendanceStatusId: ATTENDANCE_STATUS_ID.CANCELED,
-	inSession: false,
+	appointmentTimeStatusId: AppointmentTimeStatusId.PASSED,
 } as CareEncounterModel['appointment'];
 
 const careEncounter: CareEncounterModel = {
@@ -89,7 +90,7 @@ const careEncounter: CareEncounterModel = {
 		accountId: 'account-1',
 		firstName: 'Avery',
 		lastName: 'Morgan',
-		inSession: false,
+		appointmentTimeStatusId: AppointmentTimeStatusId.SCHEDULED,
 		startTimeDescription: 'Backend Appointment Start Time',
 		localStartDate: '2026-08-18',
 		localStartTime: '10:25:00',
@@ -111,7 +112,7 @@ const careEncounterList: CareEncounterListModel = {
 		providerId: 'provider-1',
 		appointmentTypeId: 'appointment-type-1',
 		attendanceStatusId: ATTENDANCE_STATUS_ID.UNKNOWN,
-		inSession: false,
+		appointmentTimeStatusId: AppointmentTimeStatusId.SCHEDULED,
 		title: 'Care Navigator Appointment',
 		startTime: '2026-08-18T14:25:00Z',
 		startTimeDescription: 'Backend Appointment Start Time',
@@ -185,6 +186,17 @@ const careEncounterCancellationReasons = [
 	},
 ];
 
+const careEncounterAttendanceStatuses = [
+	{
+		attendanceStatusId: ATTENDANCE_STATUS_ID.ATTENDED,
+		description: 'Attended',
+	},
+	{
+		attendanceStatusId: ATTENDANCE_STATUS_ID.MISSED,
+		description: 'Missed',
+	},
+];
+
 const canceledCareEncounter: CareEncounterModel = {
 	...careEncounter,
 	careEncounterStatusId: CareEncounterStatusId.CANCELED,
@@ -205,8 +217,13 @@ const careEncounterWithCanceledAppointment: CareEncounterModel = {
 const getCareEncountersSpy = jest.spyOn(careEncounterService, 'getCareEncounters');
 const getCareEncounterSpy = jest.spyOn(careEncounterService, 'getCareEncounter');
 const getCareEncounterCancellationReasonsSpy = jest.spyOn(careEncounterService, 'getCareEncounterCancellationReasons');
+const getCareEncounterAttendanceStatusesSpy = jest.spyOn(careEncounterService, 'getCareEncounterAttendanceStatuses');
 const cancelCareEncounterSpy = jest.spyOn(careEncounterService, 'cancelCareEncounter');
 const cancelCareEncounterAppointmentSpy = jest.spyOn(careEncounterService, 'cancelCareEncounterAppointment');
+const changeCareEncounterAppointmentAttendanceStatusSpy = jest.spyOn(
+	careEncounterService,
+	'changeCareEncounterAppointmentAttendanceStatus'
+);
 const updateCareEncounterSpy = jest.spyOn(careEncounterService, 'updateCareEncounter');
 
 beforeAll(() => {
@@ -247,6 +264,13 @@ beforeEach(() => {
 				fetch: jest.fn().mockResolvedValue({ careEncounterCancellationReasons }),
 			} as ReturnType<typeof careEncounterService.getCareEncounterCancellationReasons>)
 	);
+	getCareEncounterAttendanceStatusesSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ attendanceStatuses: careEncounterAttendanceStatuses }),
+			} as ReturnType<typeof careEncounterService.getCareEncounterAttendanceStatuses>)
+	);
 	cancelCareEncounterSpy.mockImplementation(
 		() =>
 			({
@@ -260,6 +284,22 @@ beforeEach(() => {
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue({ careEncounter: careEncounterWithCanceledAppointment }),
 			} as ReturnType<typeof careEncounterService.cancelCareEncounterAppointment>)
+	);
+	changeCareEncounterAppointmentAttendanceStatusSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							appointmentTimeStatusId: AppointmentTimeStatusId.IN_SESSION,
+							attendanceStatusId: ATTENDANCE_STATUS_ID.ATTENDED,
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.changeCareEncounterAppointmentAttendanceStatus>)
 	);
 });
 
@@ -653,6 +693,209 @@ it('renders the current appointment screening answers from the encounter respons
 	expect(screeningAnswers.getByText('Something else / I’m not sure')).toBeInTheDocument();
 	expect(screeningAnswers.getByText('User input text here if available…')).toBeInTheDocument();
 	expect(screeningAnswers.queryByRole('heading', { name: 'No Screening Answers' })).not.toBeInTheDocument();
+});
+
+it('does not load or render attendance controls for a scheduled appointment', async () => {
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	const appointmentCard = (await screen.findByText('Appointment')).closest('.ic-card');
+	if (!appointmentCard) {
+		throw new Error('Appointment card not found.');
+	}
+	const appointment = within(appointmentCard as HTMLElement);
+
+	expect(appointment.queryByText('Appointment in session')).not.toBeInTheDocument();
+	expect(appointment.queryByRole('combobox')).not.toBeInTheDocument();
+	expect(appointment.getByRole('button', { name: 'Edit' })).toBeEnabled();
+	expect(getCareEncounterAttendanceStatusesSpy).not.toHaveBeenCalled();
+});
+
+it('renders in-session attendance controls and saves the selected status', async () => {
+	let resolveAttendanceUpdate: (response: { careEncounter: CareEncounterModel }) => void = () => undefined;
+	const attendanceUpdatePromise = new Promise<{ careEncounter: CareEncounterModel }>((resolve) => {
+		resolveAttendanceUpdate = resolve;
+	});
+	const inSessionCareEncounter: CareEncounterModel = {
+		...careEncounter,
+		appointment: {
+			...careEncounter.appointment,
+			appointmentTimeStatusId: AppointmentTimeStatusId.IN_SESSION,
+			attendanceStatusId: ATTENDANCE_STATUS_ID.UNKNOWN,
+		},
+	};
+	const missedCareEncounter: CareEncounterModel = {
+		...inSessionCareEncounter,
+		appointment: {
+			...inSessionCareEncounter.appointment,
+			attendanceStatusId: ATTENDANCE_STATUS_ID.MISSED,
+		},
+	};
+
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: inSessionCareEncounter,
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	changeCareEncounterAppointmentAttendanceStatusSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockReturnValue(attendanceUpdatePromise),
+			} as ReturnType<typeof careEncounterService.changeCareEncounterAppointmentAttendanceStatus>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	const alert = await screen.findByText('Appointment in session');
+	const appointmentCard = alert.closest('.ic-card');
+	if (!appointmentCard) {
+		throw new Error('Appointment card not found.');
+	}
+	const appointment = within(appointmentCard as HTMLElement);
+	const attendanceSelect = await appointment.findByRole('combobox');
+
+	await within(attendanceSelect).findByRole('option', { name: 'Attended' });
+	await waitFor(() => expect(attendanceSelect).toBeEnabled());
+	expect(appointment.getByRole('button', { name: 'Edit' })).toBeDisabled();
+	expect(attendanceSelect).toBeRequired();
+	expect(attendanceSelect).toHaveValue('');
+	expect(within(attendanceSelect).getAllByRole('option')[0]).toBeDisabled();
+	expect(within(attendanceSelect).getAllByRole('option')[0]).toHaveAttribute('label', 'Select...');
+	expect(
+		within(attendanceSelect)
+			.getAllByRole('option')
+			.slice(1)
+			.map((option) => option.textContent)
+	).toEqual(['Attended', 'Missed']);
+	expect(getCareEncounterAttendanceStatusesSpy).toHaveBeenCalledTimes(1);
+
+	fireEvent.change(attendanceSelect, { target: { value: ATTENDANCE_STATUS_ID.MISSED } });
+
+	expect(changeCareEncounterAppointmentAttendanceStatusSpy).toHaveBeenCalledWith(
+		'care-encounter-1',
+		'appointment-1',
+		{ attendanceStatusId: ATTENDANCE_STATUS_ID.MISSED }
+	);
+	expect(attendanceSelect).toBeDisabled();
+
+	await act(async () => {
+		resolveAttendanceUpdate({ careEncounter: missedCareEncounter });
+	});
+
+	await waitFor(() => expect(attendanceSelect).toHaveValue(ATTENDANCE_STATUS_ID.MISSED));
+	expect(attendanceSelect).toBeEnabled();
+	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
+	expect(mockAddFlag).toHaveBeenCalledWith({
+		variant: 'success',
+		title: 'Appointment Attendance Updated',
+		actions: [],
+	});
+});
+
+it('renders attendance controls without an alert for a passed appointment', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							appointmentTimeStatusId: AppointmentTimeStatusId.PASSED,
+							attendanceStatusId: ATTENDANCE_STATUS_ID.ATTENDED,
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	const attendanceSelect = await screen.findByRole('combobox');
+	await within(attendanceSelect).findByRole('option', { name: 'Attended' });
+	await waitFor(() => expect(attendanceSelect).toBeEnabled());
+	expect(attendanceSelect).toHaveValue(ATTENDANCE_STATUS_ID.ATTENDED);
+	expect(screen.queryByText('Appointment in session')).not.toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Edit' })).toBeDisabled();
+	expect(getCareEncounterAttendanceStatusesSpy).toHaveBeenCalledTimes(1);
+});
+
+it('reports attendance status loading failures', async () => {
+	const statusesError = new Error('Unable to load attendance statuses');
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							appointmentTimeStatusId: AppointmentTimeStatusId.PASSED,
+							attendanceStatusId: ATTENDANCE_STATUS_ID.UNKNOWN,
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	getCareEncounterAttendanceStatusesSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(statusesError),
+			} as ReturnType<typeof careEncounterService.getCareEncounterAttendanceStatuses>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(statusesError));
+	expect(screen.getByRole('combobox')).toHaveValue('');
+	expect(screen.getByRole('combobox')).toBeDisabled();
+});
+
+it('reports attendance saving failures without changing the selection', async () => {
+	const updateError = new Error('Unable to update attendance');
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						appointment: {
+							...careEncounter.appointment,
+							appointmentTimeStatusId: AppointmentTimeStatusId.PASSED,
+							attendanceStatusId: ATTENDANCE_STATUS_ID.UNKNOWN,
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	changeCareEncounterAppointmentAttendanceStatusSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(updateError),
+			} as ReturnType<typeof careEncounterService.changeCareEncounterAppointmentAttendanceStatus>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+	const attendanceSelect = await screen.findByRole('combobox');
+	await within(attendanceSelect).findByRole('option', { name: 'Attended' });
+	await waitFor(() => expect(attendanceSelect).toBeEnabled());
+	fireEvent.change(attendanceSelect, { target: { value: ATTENDANCE_STATUS_ID.ATTENDED } });
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(updateError));
+	expect(attendanceSelect).toHaveValue('');
+	expect(mockAddFlag).not.toHaveBeenCalled();
 });
 
 it('cancels the current appointment and refreshes the shelf without changing the route', async () => {

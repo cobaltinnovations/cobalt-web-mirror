@@ -1,4 +1,4 @@
-import { AppointmentModel, ATTENDANCE_STATUS_ID } from './appointments';
+import { AppointmentModel, AppointmentTimeStatusId, ATTENDANCE_STATUS_ID } from './appointments';
 
 export enum CareEncounterStatusId {
 	OPEN = 'OPEN',
@@ -74,7 +74,7 @@ export interface CareEncounterAppointmentModel {
 	providerId: string;
 	appointmentTypeId?: string;
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
-	inSession: boolean;
+	appointmentTimeStatusId: AppointmentTimeStatusId;
 	title: string;
 	startTime: string;
 	startTimeDescription: string;

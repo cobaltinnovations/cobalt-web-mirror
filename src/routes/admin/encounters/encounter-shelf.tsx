@@ -9,7 +9,13 @@ import TabBar from '@/components/tab-bar';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { AppointmentModel, CareEncounterListModel, CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
+import {
+	AppointmentModel,
+	ATTENDANCE_STATUS_ID,
+	CareEncounterListModel,
+	CareEncounterModel,
+	CareEncounterStatusId,
+} from '@/lib/models';
 import {
 	CancelCareEncounterAppointmentRequestBody,
 	CancelCareEncounterRequestBody,
@@ -157,6 +163,35 @@ export const Component = () => {
 		[addFlag, careEncounter, encounterId, handleError, refreshCareEncounters]
 	);
 
+	const handleAttendanceStatusChange = useCallback(
+		async (attendanceStatusId: ATTENDANCE_STATUS_ID) => {
+			if (!encounterId || !careEncounter) {
+				return;
+			}
+
+			try {
+				const response = await careEncounterService
+					.changeCareEncounterAppointmentAttendanceStatus(
+						encounterId,
+						careEncounter.appointment.appointmentId,
+						{ attendanceStatusId }
+					)
+					.fetch();
+
+				setCareEncounter(response.careEncounter);
+				addFlag({
+					variant: 'success',
+					title: 'Appointment Attendance Updated',
+					actions: [],
+				});
+				await refreshCareEncounters();
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, careEncounter, encounterId, handleError, refreshCareEncounters]
+	);
+
 	if (!encounterId) {
 		throw new Error('Unknown encounter');
 	}
@@ -178,6 +213,7 @@ export const Component = () => {
 					showEditContactModal={showEditContactModal}
 					onActiveTabChange={setActiveTab}
 					onCancelAppointmentModalSave={handleCancelAppointmentModalSave}
+					onAttendanceStatusChange={handleAttendanceStatusChange}
 					onCloseEncounterModalSave={handleCloseEncounterModalSave}
 					onShowCancelAppointmentModalChange={setShowCancelAppointmentModal}
 					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
@@ -202,6 +238,7 @@ interface EncounterShelfContentProps {
 	showCloseEncounterModal: boolean;
 	showEditContactModal: boolean;
 	onActiveTabChange(activeTab: EncounterShelfTab): void;
+	onAttendanceStatusChange(attendanceStatusId: ATTENDANCE_STATUS_ID): Promise<void>;
 	onCancelAppointmentModalSave(data: CancelCareEncounterAppointmentRequestBody): Promise<void>;
 	onCloseEncounterModalSave(data: CancelCareEncounterRequestBody): Promise<void>;
 	onShowCancelAppointmentModalChange(show: boolean): void;
@@ -218,6 +255,7 @@ const EncounterShelfContent = ({
 	showCloseEncounterModal,
 	showEditContactModal,
 	onActiveTabChange,
+	onAttendanceStatusChange,
 	onCancelAppointmentModalSave,
 	onCloseEncounterModalSave,
 	onShowCancelAppointmentModalChange,
@@ -378,6 +416,7 @@ const EncounterShelfContent = ({
 						<div className="mb-6">
 							<EncounterAppointmentCard
 								appointment={careEncounter.appointment}
+								onAttendanceStatusChange={onAttendanceStatusChange}
 								onCancel={() => {
 									onShowCancelAppointmentModalChange(true);
 								}}
