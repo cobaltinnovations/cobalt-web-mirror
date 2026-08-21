@@ -79,6 +79,7 @@ export interface AppointmentModel {
 	appointmentDescription: string;
 	appointmentType?: AppointmentType;
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
+	inSession: boolean;
 	canceledForReschedule: boolean;
 	rescheduledAppointmentId?: string;
 	patientOrderId?: string;

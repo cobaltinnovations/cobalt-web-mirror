@@ -36,6 +36,11 @@ export interface CareEncounterCancellationReasonModel {
 	freeformTextRequired: boolean;
 }
 
+export interface CareEncounterAttendanceStatusModel {
+	attendanceStatusId: ATTENDANCE_STATUS_ID;
+	description: string;
+}
+
 interface CareEncounterBaseModel {
 	careEncounterId: string;
 	appointmentId: string;
@@ -69,6 +74,7 @@ export interface CareEncounterAppointmentModel {
 	providerId: string;
 	appointmentTypeId?: string;
 	attendanceStatusId: ATTENDANCE_STATUS_ID;
+	inSession: boolean;
 	title: string;
 	startTime: string;
 	startTimeDescription: string;

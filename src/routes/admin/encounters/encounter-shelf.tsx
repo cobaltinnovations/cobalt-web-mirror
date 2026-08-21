@@ -119,12 +119,16 @@ export const Component = () => {
 					title: 'Encounter Closed',
 					actions: [],
 				});
+				navigate({
+					pathname: '..',
+					search: location.search,
+				});
 				await refreshCareEncounters();
 			} catch (error) {
 				handleError(error);
 			}
 		},
-		[addFlag, encounterId, handleError, refreshCareEncounters]
+		[addFlag, encounterId, handleError, location.search, navigate, refreshCareEncounters]
 	);
 
 	const handleCancelAppointmentModalSave = useCallback(
@@ -224,6 +228,10 @@ const EncounterShelfContent = ({
 	const classes = useStyles();
 	const emailAddress = careEncounter.appointment.account?.emailAddress;
 	const notes = careEncounter.notes?.trim();
+	const encounterHistory =
+		careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN
+			? [careEncounter, ...otherCareEncounters]
+			: otherCareEncounters;
 	const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel>();
 
 	return (
@@ -381,10 +389,10 @@ const EncounterShelfContent = ({
 						/>
 					</section>
 
-					{otherCareEncounters.length > 0 && (
+					{encounterHistory.length > 0 && (
 						<section className={classes.section}>
 							<h4 className="mb-6">Encounters</h4>
-							<EncounterRelatedEncountersCard careEncounters={otherCareEncounters} />
+							<EncounterRelatedEncountersCard careEncounters={encounterHistory} />
 						</section>
 					)}
 				</Tab.Pane>

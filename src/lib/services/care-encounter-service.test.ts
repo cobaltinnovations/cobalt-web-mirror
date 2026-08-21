@@ -1,4 +1,5 @@
 import {
+	ATTENDANCE_STATUS_ID,
 	CareEncounterAssignmentScopeId,
 	CareEncounterCancellationReasonId,
 	CareEncounterSortColumnId,
@@ -131,6 +132,36 @@ it('requests care encounter cancellation reasons', () => {
 	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
 		method: 'get',
 		url: '/admin/care-encounter-cancellation-reasons',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('requests selectable care encounter attendance statuses', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.getCareEncounterAttendanceStatuses();
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'get',
+		url: '/admin/care-encounter-attendance-statuses',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('changes a care encounter appointment attendance status', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		attendanceStatusId: ATTENDANCE_STATUS_ID.ATTENDED,
+	};
+
+	careEncounterService.changeCareEncounterAppointmentAttendanceStatus('care-encounter-1', 'appointment-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/appointments/appointment-1/attendance-status',
+		data,
 	});
 
 	orchestrateRequestSpy.mockRestore();

@@ -63,6 +63,7 @@ const historicalAppointment = {
 	canceledAtDescription: 'Aug 11, 2026 at 9:15 AM',
 	cancellationReason: 'Patient unavailable',
 	attendanceStatusId: ATTENDANCE_STATUS_ID.CANCELED,
+	inSession: false,
 } as CareEncounterModel['appointment'];
 
 const careEncounter: CareEncounterModel = {
@@ -88,6 +89,7 @@ const careEncounter: CareEncounterModel = {
 		accountId: 'account-1',
 		firstName: 'Avery',
 		lastName: 'Morgan',
+		inSession: false,
 		startTimeDescription: 'Backend Appointment Start Time',
 		localStartDate: '2026-08-18',
 		localStartTime: '10:25:00',
@@ -109,6 +111,7 @@ const careEncounterList: CareEncounterListModel = {
 		providerId: 'provider-1',
 		appointmentTypeId: 'appointment-type-1',
 		attendanceStatusId: ATTENDANCE_STATUS_ID.UNKNOWN,
+		inSession: false,
 		title: 'Care Navigator Appointment',
 		startTime: '2026-08-18T14:25:00Z',
 		startTimeDescription: 'Backend Appointment Start Time',
@@ -118,14 +121,6 @@ const careEncounterList: CareEncounterListModel = {
 		canceledForReschedule: false,
 		canceled: false,
 	},
-};
-
-const openRelatedCareEncounter: CareEncounterListModel = {
-	...careEncounterList,
-	careEncounterId: 'care-encounter-2',
-	createdDateDescription: 'Jul 12, 2026',
-	careEncounterStatusId: CareEncounterStatusId.OPEN,
-	careEncounterStatusDisplayLabel: 'Open',
 };
 
 const closedRelatedCareEncounter: CareEncounterListModel = {
@@ -549,7 +544,7 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 
 	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
 	expect(screen.getByText('Navigator Name')).toBeInTheDocument();
-	expect(screen.getAllByText('Backend Created Date')).toHaveLength(2);
+	expect(screen.getAllByText('Backend Created Date')).toHaveLength(3);
 	expect(screen.getByText('Unknown')).toBeInTheDocument();
 	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
 	expect(screen.getByText('Navigator Appointment')).toBeInTheDocument();
@@ -847,16 +842,16 @@ it('does not render appointment history when the response history is empty', asy
 	expect(screen.queryByText('Appointment History')).not.toBeInTheDocument();
 });
 
-it('renders related encounters as a noninteractive list in API order', async () => {
+it('renders the active encounter and related encounters as a noninteractive list', async () => {
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>
 			({
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue({
 					...defaultDetailResponse,
-					otherCareEncounters: [openRelatedCareEncounter, closedRelatedCareEncounter],
-					otherCareEncountersTotalCount: 2,
-					otherCareEncountersTotalCountDescription: '2',
+					otherCareEncounters: [closedRelatedCareEncounter],
+					otherCareEncountersTotalCount: 1,
+					otherCareEncountersTotalCountDescription: '1',
 				}),
 			} as ReturnType<typeof careEncounterService.getCareEncounter>)
 	);
@@ -871,19 +866,30 @@ it('renders related encounters as a noninteractive list in API order', async () 
 	const items = encountersSection.querySelectorAll('li');
 
 	expect(items).toHaveLength(2);
-	expect(items[0]).toHaveTextContent('Jul 12, 2026');
+	expect(items[0]).toHaveTextContent('Backend Created Date');
+	expect(items[0]).toHaveTextContent('Open');
 	expect(items[1]).toHaveTextContent('Jun 1, 2026 - Jun 8, 2026 at 9:30 AM');
-	expect(encounters.getByText('Open')).toHaveClass('text-info');
+	expect(encounters.getByText('Open')).toHaveClass('text-success');
 	expect(encounters.getByText('Closed')).toHaveClass('text-gray');
 	expect(encounters.queryByRole('button')).not.toBeInTheDocument();
 	expect(encounters.queryByRole('link')).not.toBeInTheDocument();
 
-	fireEvent.click(encounters.getByText('Jul 12, 2026'));
+	fireEvent.click(encounters.getByText('Backend Created Date'));
 	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
 	expect(router.state.location.search).toBe('?status=OPEN');
 });
 
 it('does not render the related encounters section when the response list is empty', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: canceledCareEncounter,
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
 	renderEncounters('/admin/encounters/care-encounter-1');
 
 	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
@@ -1155,7 +1161,7 @@ it('loads close encounter reasons on entry and resets its selection when reopene
 	expect(getCareEncounterCancellationReasonsSpy).toHaveBeenCalledTimes(2);
 });
 
-it('cancels an encounter, updates the shelf, and refreshes the table without changing the route', async () => {
+it('cancels an encounter, dismisses the shelf, and refreshes the table', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 
 	const openModalButton = await screen.findByRole('button', { name: 'Close Encounter' });
@@ -1177,12 +1183,13 @@ it('cancels an encounter, updates the shelf, and refreshes the table without cha
 	});
 	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
 	expect(screen.queryByRole('button', { name: 'Close Encounter' })).not.toBeInTheDocument();
+	expect(screen.queryByRole('heading', { name: 'Avery Morgan' })).not.toBeInTheDocument();
 	expect(mockAddFlag).toHaveBeenCalledWith({
 		variant: 'success',
 		title: 'Encounter Closed',
 		actions: [],
 	});
-	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.pathname).toBe('/admin/encounters');
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
 });
 

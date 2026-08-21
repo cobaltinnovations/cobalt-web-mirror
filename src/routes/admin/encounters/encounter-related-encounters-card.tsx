@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from 'react-bootstrap';
 
 import { createUseThemedStyles } from '@/jss/theme';
-import { CareEncounterListModel, CareEncounterStatusId } from '@/lib/models';
+import { CareEncounterStatusId } from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	item: {
@@ -18,8 +18,16 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 }));
 
+interface CareEncounterHistoryItem {
+	careEncounterId: string;
+	careEncounterStatusId: CareEncounterStatusId;
+	careEncounterStatusDisplayLabel: string;
+	createdDateDescription: string;
+	closedAtDescription?: string;
+}
+
 interface Props {
-	careEncounters: CareEncounterListModel[];
+	careEncounters: CareEncounterHistoryItem[];
 }
 
 export const EncounterRelatedEncountersCard = ({ careEncounters }: Props) => {
@@ -43,7 +51,7 @@ export const EncounterRelatedEncountersCard = ({ careEncounters }: Props) => {
 							<span
 								className={`ms-4 ${
 									careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN
-										? 'text-info'
+										? 'text-success'
 										: 'text-gray'
 								}`}
 							>

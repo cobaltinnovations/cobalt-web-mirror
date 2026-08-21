@@ -1,4 +1,6 @@
 import {
+	ATTENDANCE_STATUS_ID,
+	CareEncounterAttendanceStatusModel,
 	CareEncounterCancellationReasonId,
 	CareEncounterCancellationReasonModel,
 	CareEncounterAssignmentScopeId,
@@ -58,6 +60,10 @@ export interface GetCareEncounterCancellationReasonsResponseBody {
 	careEncounterCancellationReasons: CareEncounterCancellationReasonModel[];
 }
 
+export interface GetCareEncounterAttendanceStatusesResponseBody {
+	attendanceStatuses: CareEncounterAttendanceStatusModel[];
+}
+
 export interface CancelCareEncounterRequestBody {
 	careEncounterCancellationReasonId: CareEncounterCancellationReasonId;
 	careEncounterCancellationReasonOtherText?: string;
@@ -65,6 +71,10 @@ export interface CancelCareEncounterRequestBody {
 
 export interface CancelCareEncounterAppointmentRequestBody {
 	cancellationReason: string;
+}
+
+export interface ChangeCareEncounterAppointmentAttendanceStatusRequestBody {
+	attendanceStatusId: ATTENDANCE_STATUS_ID;
 }
 
 export const careEncounterService = {
@@ -111,6 +121,23 @@ export const careEncounterService = {
 		return httpSingleton.orchestrateRequest<GetCareEncounterCancellationReasonsResponseBody>({
 			method: 'get',
 			url: '/admin/care-encounter-cancellation-reasons',
+		});
+	},
+	getCareEncounterAttendanceStatuses() {
+		return httpSingleton.orchestrateRequest<GetCareEncounterAttendanceStatusesResponseBody>({
+			method: 'get',
+			url: '/admin/care-encounter-attendance-statuses',
+		});
+	},
+	changeCareEncounterAppointmentAttendanceStatus(
+		careEncounterId: string,
+		appointmentId: string,
+		data: ChangeCareEncounterAppointmentAttendanceStatusRequestBody
+	) {
+		return httpSingleton.orchestrateRequest<CareEncounterResponseBody>({
+			method: 'put',
+			url: `/admin/care-encounters/${careEncounterId}/appointments/${appointmentId}/attendance-status`,
+			data,
 		});
 	},
 	cancelCareEncounter(careEncounterId: string, data: CancelCareEncounterRequestBody) {
