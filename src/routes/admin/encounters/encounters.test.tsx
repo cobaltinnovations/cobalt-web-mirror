@@ -100,6 +100,24 @@ const careEncounterList: CareEncounterListModel = {
 	},
 };
 
+const openRelatedCareEncounter: CareEncounterListModel = {
+	...careEncounterList,
+	careEncounterId: 'care-encounter-2',
+	createdDateDescription: 'Jul 12, 2026',
+	careEncounterStatusId: CareEncounterStatusId.OPEN,
+	careEncounterStatusDisplayLabel: 'Open',
+};
+
+const closedRelatedCareEncounter: CareEncounterListModel = {
+	...careEncounterList,
+	careEncounterId: 'care-encounter-3',
+	createdDateDescription: 'Jun 1, 2026',
+	closedAt: '2026-06-08T13:30:00Z',
+	closedAtDescription: 'Jun 8, 2026 at 9:30 AM',
+	careEncounterStatusId: CareEncounterStatusId.CLOSED,
+	careEncounterStatusDisplayLabel: 'Closed',
+};
+
 const defaultResponse: GetCareEncountersResponseBody = {
 	totalCount: 1,
 	totalCountDescription: '1',
@@ -766,6 +784,49 @@ it('does not render appointment history when the response history is empty', asy
 
 	expect(await screen.findByText('Appointment')).toBeInTheDocument();
 	expect(screen.queryByText('Appointment History')).not.toBeInTheDocument();
+});
+
+it('renders related encounters as a noninteractive list in API order', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					otherCareEncounters: [openRelatedCareEncounter, closedRelatedCareEncounter],
+					otherCareEncountersTotalCount: 2,
+					otherCareEncountersTotalCountDescription: '2',
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	const router = renderEncounters('/admin/encounters/care-encounter-1?status=OPEN');
+
+	const encountersHeading = await screen.findByRole('heading', { name: 'Encounters', level: 4 });
+	const encountersSection = encountersHeading.closest('section');
+	if (!encountersSection) {
+		throw new Error('Encounters section not found.');
+	}
+	const encounters = within(encountersSection as HTMLElement);
+	const items = encountersSection.querySelectorAll('li');
+
+	expect(items).toHaveLength(2);
+	expect(items[0]).toHaveTextContent('Jul 12, 2026');
+	expect(items[1]).toHaveTextContent('Jun 1, 2026 - Jun 8, 2026 at 9:30 AM');
+	expect(encounters.getByText('Open')).toHaveClass('text-info');
+	expect(encounters.getByText('Closed')).toHaveClass('text-gray');
+	expect(encounters.queryByRole('button')).not.toBeInTheDocument();
+	expect(encounters.queryByRole('link')).not.toBeInTheDocument();
+
+	fireEvent.click(encounters.getByText('Jul 12, 2026'));
+	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	expect(router.state.location.search).toBe('?status=OPEN');
+});
+
+it('does not render the related encounters section when the response list is empty', async () => {
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
+	expect(screen.queryByRole('heading', { name: 'Encounters', level: 4 })).not.toBeInTheDocument();
 });
 
 it('dismisses the cancellation modal without closing the encounter shelf', async () => {

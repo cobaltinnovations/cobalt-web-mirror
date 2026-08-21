@@ -58,7 +58,7 @@ export const EncounterAppointmentHistoryCard = ({ appointments, onSelect }: Prop
 			<Card.Header>
 				<Card.Title>Appointment History</Card.Title>
 			</Card.Header>
-			<Card.Body className="p-0">
+			<Card.Body className="p-0 overflow-hidden">
 				{appointments.map((appointment) => (
 					<Button
 						key={appointment.appointmentId}
@@ -70,7 +70,7 @@ export const EncounterAppointmentHistoryCard = ({ appointments, onSelect }: Prop
 						}}
 					>
 						<span className="fw-bold">{appointment.startTimeDescription}</span>
-						<span className="ms-4 text-gray">{getAppointmentStatus(appointment)}</span>
+						<span className="ms-4 text-gray fw-normal">{getAppointmentStatus(appointment)}</span>
 					</Button>
 				))}
 			</Card.Body>

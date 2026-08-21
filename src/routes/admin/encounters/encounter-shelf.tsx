@@ -9,7 +9,7 @@ import TabBar from '@/components/tab-bar';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { AppointmentModel, CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
+import { AppointmentModel, CareEncounterListModel, CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
 import {
 	CancelCareEncounterAppointmentRequestBody,
 	CancelCareEncounterRequestBody,
@@ -22,6 +22,7 @@ import { EditContactModal } from './edit-contact-modal';
 import { EncounterAppointmentCard } from './encounter-appointment-card';
 import { EncounterAppointmentHistoryCard } from './encounter-appointment-history-card';
 import { EncounterNotes } from './encounter-notes';
+import { EncounterRelatedEncountersCard } from './encounter-related-encounters-card';
 import { EncounterScreeningAnswersCard } from './encounter-screening-answers-card';
 import type { EncountersOutletContext } from './encounters';
 
@@ -70,6 +71,7 @@ export const Component = () => {
 	const [showCloseEncounterModal, setShowCloseEncounterModal] = useState(false);
 	const [showEditContactModal, setShowEditContactModal] = useState(false);
 	const [careEncounter, setCareEncounter] = useState<CareEncounterModel | null>(null);
+	const [otherCareEncounters, setOtherCareEncounters] = useState<CareEncounterListModel[]>([]);
 	const careEncounterRequestRef = useRef<ReturnType<typeof careEncounterService.getCareEncounter>>();
 
 	const fetchCareEncounter = useCallback(async () => {
@@ -87,6 +89,7 @@ export const Component = () => {
 
 			if (request === careEncounterRequestRef.current) {
 				setCareEncounter(response.careEncounter);
+				setOtherCareEncounters(response.otherCareEncounters);
 			}
 		} finally {
 			if (request === careEncounterRequestRef.current) {
@@ -164,6 +167,7 @@ export const Component = () => {
 			{careEncounter && (
 				<EncounterShelfContent
 					careEncounter={careEncounter}
+					otherCareEncounters={otherCareEncounters}
 					activeTab={activeTab}
 					showCancelAppointmentModal={showCancelAppointmentModal}
 					showCloseEncounterModal={showCloseEncounterModal}
@@ -188,6 +192,7 @@ export const Component = () => {
 
 interface EncounterShelfContentProps {
 	careEncounter: CareEncounterModel;
+	otherCareEncounters: CareEncounterListModel[];
 	activeTab: EncounterShelfTab;
 	showCancelAppointmentModal: boolean;
 	showCloseEncounterModal: boolean;
@@ -203,6 +208,7 @@ interface EncounterShelfContentProps {
 
 const EncounterShelfContent = ({
 	careEncounter,
+	otherCareEncounters,
 	activeTab,
 	showCancelAppointmentModal,
 	showCloseEncounterModal,
@@ -374,6 +380,13 @@ const EncounterShelfContent = ({
 							onSelect={setSelectedAppointment}
 						/>
 					</section>
+
+					{otherCareEncounters.length > 0 && (
+						<section className={classes.section}>
+							<h4 className="mb-6">Encounters</h4>
+							<EncounterRelatedEncountersCard careEncounters={otherCareEncounters} />
+						</section>
+					)}
 				</Tab.Pane>
 
 				<Tab.Pane eventKey="contact-history" className={classes.tabPane}>
