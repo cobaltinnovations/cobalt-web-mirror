@@ -93,6 +93,7 @@ const careEncounter: CareEncounterModel = {
 	appointmentDate: '2026-08-18',
 	appointmentDateDescription: 'Backend Appointment Date',
 	careEncounterNotes: [],
+	careEncounterScheduledMessages: [],
 	createdByAccountId: 'account-2',
 	lastUpdatedByAccountId: 'account-2',
 	created: '2026-07-28T14:00:00Z',
@@ -159,9 +160,9 @@ const defaultResponse: GetCareEncountersResponseBody = {
 
 const defaultDetailResponse: GetCareEncounterResponseBody = {
 	careEncounter,
-	otherCareEncounters: [],
-	otherCareEncountersTotalCount: 0,
-	otherCareEncountersTotalCountDescription: '0',
+	careEncounterHistory: [],
+	careEncounterHistoryTotalCount: 0,
+	careEncounterHistoryTotalCountDescription: '0',
 };
 
 const careEncounterCancellationReasons = [
@@ -664,6 +665,29 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	expect(router.state.location.search).toBe('?status=CLOSED');
 });
 
+it('counts only non-deleted scheduled messages in contact history', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						careEncounterScheduledMessages: [
+							{ careEncounterScheduledMessageId: 'visible-message', deleted: false },
+							{ careEncounterScheduledMessageId: 'deleted-message', deleted: true },
+						] as unknown as CareEncounterModel['careEncounterScheduledMessages'],
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByRole('button', { name: 'Contact History (1)' })).toBeInTheDocument();
+});
+
 it('renders the current appointment screening answers from the encounter response', async () => {
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>
@@ -1143,9 +1167,9 @@ it('renders the active encounter and related encounters as a noninteractive list
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue({
 					...defaultDetailResponse,
-					otherCareEncounters: [closedRelatedCareEncounter],
-					otherCareEncountersTotalCount: 1,
-					otherCareEncountersTotalCountDescription: '1',
+					careEncounterHistory: [closedRelatedCareEncounter],
+					careEncounterHistoryTotalCount: 1,
+					careEncounterHistoryTotalCountDescription: '1',
 				}),
 			} as ReturnType<typeof careEncounterService.getCareEncounter>)
 	);

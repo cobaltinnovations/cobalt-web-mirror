@@ -1,4 +1,5 @@
 import { AppointmentModel, AppointmentTimeStatusId, ATTENDANCE_STATUS_ID } from './appointments';
+import { MessageStatusId, MessageTypeId, ScheduledMessageStatusId } from './integrated-care-models';
 
 export enum CareEncounterStatusId {
 	OPEN = 'OPEN',
@@ -45,6 +46,73 @@ export interface CareEncounterNoteModel {
 	careEncounterNoteId: string;
 	careEncounterId: string;
 	note: string;
+	createdByAccountId: string;
+	createdByAccountDisplayName?: string;
+	lastUpdatedByAccountId: string;
+	lastUpdatedByAccountDisplayName?: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+}
+
+export enum CareEncounterScheduledMessageTypeId {
+	FOLLOW_UP = 'FOLLOW_UP',
+}
+
+export interface CareEncounterScheduledMessageTypeModel {
+	careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId;
+	description: string;
+	displayOrder: number;
+	supportedMessageTypeIds: MessageTypeId[];
+}
+
+export interface CareEncounterScheduledMessageModel {
+	careEncounterScheduledMessageId: string;
+	careEncounterId: string;
+	careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId;
+	careEncounterScheduledMessageTypeDescription: string;
+	scheduledMessageId: string;
+	scheduledMessageStatusId: ScheduledMessageStatusId;
+	scheduledMessageStatusDescription: string;
+	scheduledMessageSourceId: string;
+	scheduledByAccountId?: string;
+	scheduledByAccountDisplayName?: string;
+	messageId: string;
+	scheduledAtDate: string;
+	scheduledAtTime: string;
+	timeZone: string;
+	scheduledAt: string;
+	scheduledAtDescription: string;
+	processedAt?: string;
+	processedAtDescription?: string;
+	canceledAt?: string;
+	canceledAtDescription?: string;
+	erroredAt?: string;
+	erroredAtDescription?: string;
+	messageStatusId?: MessageStatusId;
+	messageStatusDescription?: string;
+	sentAt?: string;
+	sentAtDescription?: string;
+	deliveredAt?: string;
+	deliveredAtDescription?: string;
+	deliveryFailedAt?: string;
+	deliveryFailedAtDescription?: string;
+	deliveryFailedReason?: string;
+	complaintRegisteredAt?: string;
+	complaintRegisteredAtDescription?: string;
+	recipientEmailAddress: string;
+	customEmailText: string;
+	emailSubject: string;
+	emailContentHtml: string;
+	emailBody: string;
+	editable: boolean;
+	cancelable: boolean;
+	deleted: boolean;
+	deletedAt?: string;
+	deletedAtDescription?: string;
+	deletedByAccountId?: string;
+	deletedByAccountDisplayName?: string;
 	createdByAccountId: string;
 	createdByAccountDisplayName?: string;
 	lastUpdatedByAccountId: string;
@@ -105,6 +173,7 @@ export interface CareEncounterListModel extends CareEncounterBaseModel {
 export interface CareEncounterModel extends CareEncounterBaseModel {
 	emailAddress?: string;
 	careEncounterNotes: CareEncounterNoteModel[];
+	careEncounterScheduledMessages: CareEncounterScheduledMessageModel[];
 	appointment: AppointmentModel;
 	appointmentHistory: AppointmentModel[];
 }

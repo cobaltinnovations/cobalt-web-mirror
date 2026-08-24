@@ -7,6 +7,9 @@ import {
 	CareEncounterListModel,
 	CareEncounterModel,
 	CareEncounterNoteModel,
+	CareEncounterScheduledMessageModel,
+	CareEncounterScheduledMessageTypeId,
+	CareEncounterScheduledMessageTypeModel,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
 	SortDirectionId,
@@ -34,9 +37,9 @@ export interface GetCareEncountersResponseBody {
 
 export interface GetCareEncounterResponseBody {
 	careEncounter: CareEncounterModel;
-	otherCareEncounters: CareEncounterListModel[];
-	otherCareEncountersTotalCount: number;
-	otherCareEncountersTotalCountDescription: string;
+	careEncounterHistory: CareEncounterListModel[];
+	careEncounterHistoryTotalCount: number;
+	careEncounterHistoryTotalCountDescription: string;
 }
 
 export interface CareEncounterResponseBody {
@@ -61,6 +64,36 @@ export interface CareEncounterNoteRequestBody {
 
 export interface CareEncounterNoteResponseBody {
 	careEncounterNote: CareEncounterNoteModel;
+}
+
+export interface GetCareEncounterScheduledMessageTypesResponseBody {
+	careEncounterScheduledMessageTypes: CareEncounterScheduledMessageTypeModel[];
+}
+
+export interface CareEncounterScheduledMessageRequestBody {
+	careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId;
+	scheduledAtDate: string;
+	scheduledAtTime: string;
+	customEmailText: string;
+}
+
+export type PreviewCareEncounterScheduledMessageRequestBody = Pick<
+	CareEncounterScheduledMessageRequestBody,
+	'careEncounterScheduledMessageTypeId' | 'customEmailText'
+>;
+
+export interface CareEncounterScheduledMessagePreviewModel {
+	emailSubject: string;
+	emailContentHtml: string;
+	emailBody: string;
+}
+
+export interface PreviewCareEncounterScheduledMessageResponseBody {
+	careEncounterScheduledMessagePreview: CareEncounterScheduledMessagePreviewModel;
+}
+
+export interface CareEncounterScheduledMessageResponseBody {
+	careEncounterScheduledMessage: CareEncounterScheduledMessageModel;
 }
 
 export interface AssignCareEncounterRequestBody {
@@ -99,6 +132,46 @@ export const careEncounterService = {
 		return httpSingleton.orchestrateRequest<GetCareEncounterResponseBody>({
 			method: 'get',
 			url: `/admin/care-encounters/${careEncounterId}`,
+		});
+	},
+	getCareEncounterScheduledMessageTypes() {
+		return httpSingleton.orchestrateRequest<GetCareEncounterScheduledMessageTypesResponseBody>({
+			method: 'get',
+			url: '/admin/care-encounter-scheduled-message-types',
+		});
+	},
+	previewCareEncounterScheduledMessage(
+		careEncounterId: string,
+		data: PreviewCareEncounterScheduledMessageRequestBody
+	) {
+		return httpSingleton.orchestrateRequest<PreviewCareEncounterScheduledMessageResponseBody>({
+			method: 'post',
+			url: `/admin/care-encounters/${careEncounterId}/scheduled-messages/preview`,
+			data,
+		});
+	},
+	createCareEncounterScheduledMessage(careEncounterId: string, data: CareEncounterScheduledMessageRequestBody) {
+		return httpSingleton.orchestrateRequest<CareEncounterScheduledMessageResponseBody>({
+			method: 'post',
+			url: `/admin/care-encounters/${careEncounterId}/scheduled-messages`,
+			data,
+		});
+	},
+	updateCareEncounterScheduledMessage(
+		careEncounterId: string,
+		careEncounterScheduledMessageId: string,
+		data: CareEncounterScheduledMessageRequestBody
+	) {
+		return httpSingleton.orchestrateRequest<CareEncounterScheduledMessageResponseBody>({
+			method: 'put',
+			url: `/admin/care-encounters/${careEncounterId}/scheduled-messages/${careEncounterScheduledMessageId}`,
+			data,
+		});
+	},
+	deleteCareEncounterScheduledMessage(careEncounterId: string, careEncounterScheduledMessageId: string) {
+		return httpSingleton.orchestrateRequest<CareEncounterScheduledMessageResponseBody>({
+			method: 'delete',
+			url: `/admin/care-encounters/${careEncounterId}/scheduled-messages/${careEncounterScheduledMessageId}`,
 		});
 	},
 	getCareEncounterNotes(careEncounterId: string) {

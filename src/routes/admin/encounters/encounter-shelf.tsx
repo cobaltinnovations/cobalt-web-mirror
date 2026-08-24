@@ -3,7 +3,6 @@ import { Button, Card, Col, Container, Row, Tab } from 'react-bootstrap';
 import { useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
 import AsyncWrapper from '@/components/async-page';
-import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
 import TabBar from '@/components/tab-bar';
 import useFlags from '@/hooks/use-flags';
@@ -28,6 +27,7 @@ import { CloseEncounterModal } from './close-encounter-modal';
 import { EditContactModal } from './edit-contact-modal';
 import { EncounterAppointmentCard } from './encounter-appointment-card';
 import { EncounterAppointmentHistoryCard } from './encounter-appointment-history-card';
+import { EncounterContactHistory } from './encounter-contact-history';
 import { EncounterNotes } from './encounter-notes';
 import { EncounterRelatedEncountersCard } from './encounter-related-encounters-card';
 import { EncounterScreeningAnswersCard } from './encounter-screening-answers-card';
@@ -96,7 +96,7 @@ export const Component = () => {
 
 			if (request === careEncounterRequestRef.current) {
 				setCareEncounter(response.careEncounter);
-				setOtherCareEncounters(response.otherCareEncounters);
+				setOtherCareEncounters(response.careEncounterHistory);
 			}
 		} finally {
 			if (request === careEncounterRequestRef.current) {
@@ -203,6 +203,11 @@ export const Component = () => {
 		[refreshCareEncounters]
 	);
 
+	const handleCareEncounterScheduledMessagesChange = useCallback(async () => {
+		await fetchCareEncounter();
+		await refreshCareEncounters();
+	}, [fetchCareEncounter, refreshCareEncounters]);
+
 	const handleEditContactModalSave = useCallback(
 		async (emailAddress: string) => {
 			if (!encounterId) {
@@ -252,6 +257,7 @@ export const Component = () => {
 					onCloseEncounterModalSave={handleCloseEncounterModalSave}
 					onEditContactModalSave={handleEditContactModalSave}
 					onCareEncounterNotesChange={handleCareEncounterNotesChange}
+					onCareEncounterScheduledMessagesChange={handleCareEncounterScheduledMessagesChange}
 					onShowCancelAppointmentModalChange={setShowCancelAppointmentModal}
 					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
 					onShowEditContactModalChange={setShowEditContactModal}
@@ -280,6 +286,7 @@ interface EncounterShelfContentProps {
 	onCloseEncounterModalSave(data: CancelCareEncounterRequestBody): Promise<void>;
 	onEditContactModalSave(emailAddress: string): Promise<void>;
 	onCareEncounterNotesChange(careEncounterNotes: CareEncounterNoteModel[]): Promise<void>;
+	onCareEncounterScheduledMessagesChange(): Promise<void>;
 	onShowCancelAppointmentModalChange(show: boolean): void;
 	onShowCloseEncounterModalChange(show: boolean): void;
 	onShowEditContactModalChange(show: boolean): void;
@@ -299,6 +306,7 @@ const EncounterShelfContent = ({
 	onCloseEncounterModalSave,
 	onEditContactModalSave,
 	onCareEncounterNotesChange,
+	onCareEncounterScheduledMessagesChange,
 	onShowCancelAppointmentModalChange,
 	onShowCloseEncounterModalChange,
 	onShowEditContactModalChange,
@@ -311,6 +319,9 @@ const EncounterShelfContent = ({
 			? [careEncounter, ...otherCareEncounters]
 			: otherCareEncounters;
 	const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel>();
+	const scheduledMessages = (careEncounter.careEncounterScheduledMessages ?? []).filter(
+		(message) => !message.deleted
+	);
 
 	return (
 		<Tab.Container id="encounter-shelf-tabs" activeKey={activeTab} mountOnEnter unmountOnExit>
@@ -365,7 +376,7 @@ const EncounterShelfContent = ({
 					value={activeTab}
 					tabs={[
 						{ value: 'encounter-details', title: 'Encounter Details' },
-						{ value: 'contact-history', title: 'Contact History (0)' },
+						{ value: 'contact-history', title: `Contact History (${scheduledMessages.length})` },
 						{ value: 'notes', title: `Notes (${careEncounter.careEncounterNotes.length})` },
 					]}
 					onTabClick={(value) => {
@@ -480,7 +491,10 @@ const EncounterShelfContent = ({
 
 				<Tab.Pane eventKey="contact-history" className={classes.tabPane}>
 					<section className={classes.section}>
-						<NoData title="No Contact Attempts Logged" actions={[]} />
+						<EncounterContactHistory
+							careEncounter={careEncounter}
+							onChanged={onCareEncounterScheduledMessagesChange}
+						/>
 					</section>
 				</Tab.Pane>
 

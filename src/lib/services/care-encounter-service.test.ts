@@ -2,6 +2,7 @@ import {
 	ATTENDANCE_STATUS_ID,
 	CareEncounterAssignmentScopeId,
 	CareEncounterCancellationReasonId,
+	CareEncounterScheduledMessageTypeId,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
 	SortDirectionId,
@@ -53,6 +54,94 @@ it('requests an admin care encounter by ID', () => {
 	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
 		method: 'get',
 		url: '/admin/care-encounters/care-encounter-1',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('requests care encounter scheduled message types', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.getCareEncounterScheduledMessageTypes();
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'get',
+		url: '/admin/care-encounter-scheduled-message-types',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('previews a care encounter scheduled message', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId.FOLLOW_UP,
+		customEmailText: '<p>Resources</p>',
+	};
+
+	careEncounterService.previewCareEncounterScheduledMessage('care-encounter-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'post',
+		url: '/admin/care-encounters/care-encounter-1/scheduled-messages/preview',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('creates a care encounter scheduled message', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId.FOLLOW_UP,
+		scheduledAtDate: '2026-08-26',
+		scheduledAtTime: '10:30:00',
+		customEmailText: '<p>Resources</p>',
+	};
+
+	careEncounterService.createCareEncounterScheduledMessage('care-encounter-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'post',
+		url: '/admin/care-encounters/care-encounter-1/scheduled-messages',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('updates a care encounter scheduled message', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = {
+		careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId.FOLLOW_UP,
+		scheduledAtDate: '2026-08-27',
+		scheduledAtTime: '11:45:00',
+		customEmailText: '<p>Updated resources</p>',
+	};
+
+	careEncounterService.updateCareEncounterScheduledMessage(
+		'care-encounter-1',
+		'care-encounter-scheduled-message-1',
+		data
+	);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/scheduled-messages/care-encounter-scheduled-message-1',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('deletes a care encounter scheduled message', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.deleteCareEncounterScheduledMessage('care-encounter-1', 'care-encounter-scheduled-message-1');
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'delete',
+		url: '/admin/care-encounters/care-encounter-1/scheduled-messages/care-encounter-scheduled-message-1',
 	});
 
 	orchestrateRequestSpy.mockRestore();
