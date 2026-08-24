@@ -89,6 +89,7 @@ const careEncounter: CareEncounterModel = {
 	careEncounterStatusId: CareEncounterStatusId.OPEN,
 	careEncounterStatusDisplayLabel: 'Open',
 	patientFullName: 'Avery Morgan',
+	emailAddress: 'patient@example.com',
 	appointmentDate: '2026-08-18',
 	appointmentDateDescription: 'Backend Appointment Date',
 	careEncounterNotes: [],
@@ -240,6 +241,7 @@ const changeCareEncounterAppointmentAttendanceStatusSpy = jest.spyOn(
 	careEncounterService,
 	'changeCareEncounterAppointmentAttendanceStatus'
 );
+const updateCareEncounterSpy = jest.spyOn(careEncounterService, 'updateCareEncounter');
 const createCareEncounterNoteSpy = jest.spyOn(careEncounterService, 'createCareEncounterNote');
 const updateCareEncounterNoteSpy = jest.spyOn(careEncounterService, 'updateCareEncounterNote');
 
@@ -317,6 +319,13 @@ beforeEach(() => {
 					},
 				}),
 			} as ReturnType<typeof careEncounterService.changeCareEncounterAppointmentAttendanceStatus>)
+	);
+	updateCareEncounterSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounter }),
+			} as ReturnType<typeof careEncounterService.updateCareEncounter>)
 	);
 	createCareEncounterNoteSpy.mockImplementation(
 		() =>
@@ -1239,7 +1248,7 @@ it('renders an empty state and hides screening answers when there is no active a
 	expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
 });
 
-it('opens the edit contact modal with the shelf email and resets unsaved changes on entry', async () => {
+it('updates the primary contact email and resets unsaved changes on entry', async () => {
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 	const editContactButton = await screen.findByRole('button', { name: 'Edit Contact' });
 
@@ -1263,15 +1272,125 @@ it('opens the edit contact modal with the shelf email and resets unsaved changes
 	emailInput = modal.getByRole('textbox', { name: 'Email Address' });
 	expect(emailInput).toHaveValue('patient@example.com');
 
-	fireEvent.change(emailInput, { target: { value: 'saved-nowhere@example.com' } });
-	await clickAndFlush(modal.getByRole('button', { name: 'Save' }));
+	const updatedCareEncounter = { ...careEncounter, emailAddress: 'updated@example.com' };
+	let resolveUpdateRequest!: (response: { careEncounter: CareEncounterModel }) => void;
+	const updateRequest = new Promise<{ careEncounter: CareEncounterModel }>((resolve) => {
+		resolveUpdateRequest = resolve;
+	});
+	updateCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockReturnValue(updateRequest),
+			} as ReturnType<typeof careEncounterService.updateCareEncounter>)
+	);
+
+	fireEvent.change(emailInput, { target: { value: '  updated@example.com  ' } });
+	const form = dialog.querySelector('form');
+	if (!form) {
+		throw new Error('Edit Primary Contact form not found.');
+	}
+	fireEvent.submit(form);
+
+	await waitFor(() => expect(emailInput).toBeDisabled());
+	expect(modal.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+	expect(modal.getByRole('button', { name: 'Save' })).toBeDisabled();
+	expect(modal.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+	fireEvent.submit(form);
+	expect(updateCareEncounterSpy).toHaveBeenCalledTimes(1);
+	expect(updateCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1', {
+		emailAddress: 'updated@example.com',
+	});
+
+	await act(async () => {
+		resolveUpdateRequest({ careEncounter: updatedCareEncounter });
+	});
 
 	await waitFor(() => expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument());
-	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
-	expect(cancelCareEncounterSpy).not.toHaveBeenCalled();
-	expect(mockAddFlag).not.toHaveBeenCalled();
+	expect(screen.getByText('updated@example.com')).toBeInTheDocument();
+	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
+	expect(mockAddFlag).toHaveBeenCalledWith({
+		variant: 'success',
+		title: 'Primary Contact Updated',
+		actions: [],
+	});
 	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('allows clearing the primary contact email', async () => {
+	updateCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					careEncounter: { ...careEncounter, emailAddress: undefined },
+				}),
+			} as ReturnType<typeof careEncounterService.updateCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Edit Contact' }));
+	const dialog = await findEditContactDialog();
+	const modal = within(dialog);
+	fireEvent.change(modal.getByRole('textbox', { name: 'Email Address' }), { target: { value: '' } });
+	await clickAndFlush(modal.getByRole('button', { name: 'Save' }));
+
+	await waitFor(() => expect(updateCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1', { emailAddress: '' }));
+	const contactCard = screen.getByText('Contact').closest('.ic-card');
+	if (!contactCard) {
+		throw new Error('Contact card not found.');
+	}
+	expect(within(contactCard as HTMLElement).getByText('Unknown')).toBeInTheDocument();
+});
+
+it('keeps the contact modal open and reports errors when the email update fails', async () => {
+	const error = new Error('Unable to update contact');
+	updateCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(error),
+			} as ReturnType<typeof careEncounterService.updateCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	await clickAndFlush(await screen.findByRole('button', { name: 'Edit Contact' }));
+	const dialog = await findEditContactDialog();
+	const modal = within(dialog);
+	const emailInput = modal.getByRole('textbox', { name: 'Email Address' });
+	fireEvent.change(emailInput, { target: { value: 'failed@example.com' } });
+	await clickAndFlush(modal.getByRole('button', { name: 'Save' }));
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(emailInput).toHaveValue('failed@example.com');
+	expect(emailInput).toBeEnabled();
+	expect(modal.getByRole('button', { name: 'Save' })).toBeEnabled();
+	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
+});
+
+it('disables contact editing when the encounter is not open', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						careEncounterStatusId: CareEncounterStatusId.CLOSED,
+						careEncounterStatusDisplayLabel: 'Closed',
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	const editContactButton = await screen.findByRole('button', { name: 'Edit Contact' });
+	expect(editContactButton).toBeDisabled();
+	fireEvent.click(editContactButton);
+	expect(screen.queryByText('Edit Primary Contact')).not.toBeInTheDocument();
+	expect(updateCareEncounterSpy).not.toHaveBeenCalled();
 });
 
 it('dismisses the edit contact modal through X, backdrop, and Escape without closing the shelf', async () => {
@@ -1307,6 +1426,7 @@ it('renders neutral fallbacks for unavailable encounter details', async () => {
 					...defaultDetailResponse,
 					careEncounter: {
 						...careEncounter,
+						emailAddress: undefined,
 						appointment: {
 							...careEncounter.appointment,
 							provider: undefined,

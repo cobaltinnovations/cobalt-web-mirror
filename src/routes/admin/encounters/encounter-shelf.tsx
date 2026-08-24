@@ -203,6 +203,30 @@ export const Component = () => {
 		[refreshCareEncounters]
 	);
 
+	const handleEditContactModalSave = useCallback(
+		async (emailAddress: string) => {
+			if (!encounterId) {
+				return;
+			}
+
+			try {
+				const response = await careEncounterService.updateCareEncounter(encounterId, { emailAddress }).fetch();
+
+				setCareEncounter(response.careEncounter);
+				setShowEditContactModal(false);
+				addFlag({
+					variant: 'success',
+					title: 'Primary Contact Updated',
+					actions: [],
+				});
+				await refreshCareEncounters();
+			} catch (error) {
+				handleError(error);
+			}
+		},
+		[addFlag, encounterId, handleError, refreshCareEncounters]
+	);
+
 	if (!encounterId) {
 		throw new Error('Unknown encounter');
 	}
@@ -226,6 +250,7 @@ export const Component = () => {
 					onCancelAppointmentModalSave={handleCancelAppointmentModalSave}
 					onAttendanceStatusChange={handleAttendanceStatusChange}
 					onCloseEncounterModalSave={handleCloseEncounterModalSave}
+					onEditContactModalSave={handleEditContactModalSave}
 					onCareEncounterNotesChange={handleCareEncounterNotesChange}
 					onShowCancelAppointmentModalChange={setShowCancelAppointmentModal}
 					onShowCloseEncounterModalChange={setShowCloseEncounterModal}
@@ -253,6 +278,7 @@ interface EncounterShelfContentProps {
 	onAttendanceStatusChange(attendanceStatusId: ATTENDANCE_STATUS_ID): Promise<void>;
 	onCancelAppointmentModalSave(data: CancelCareEncounterAppointmentRequestBody): Promise<void>;
 	onCloseEncounterModalSave(data: CancelCareEncounterRequestBody): Promise<void>;
+	onEditContactModalSave(emailAddress: string): Promise<void>;
 	onCareEncounterNotesChange(careEncounterNotes: CareEncounterNoteModel[]): Promise<void>;
 	onShowCancelAppointmentModalChange(show: boolean): void;
 	onShowCloseEncounterModalChange(show: boolean): void;
@@ -271,6 +297,7 @@ const EncounterShelfContent = ({
 	onAttendanceStatusChange,
 	onCancelAppointmentModalSave,
 	onCloseEncounterModalSave,
+	onEditContactModalSave,
 	onCareEncounterNotesChange,
 	onShowCancelAppointmentModalChange,
 	onShowCloseEncounterModalChange,
@@ -278,7 +305,7 @@ const EncounterShelfContent = ({
 	onClose,
 }: EncounterShelfContentProps) => {
 	const classes = useStyles();
-	const emailAddress = careEncounter.appointment.account?.emailAddress;
+	const emailAddress = careEncounter.emailAddress;
 	const encounterHistory =
 		careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN
 			? [careEncounter, ...otherCareEncounters]
@@ -311,6 +338,7 @@ const EncounterShelfContent = ({
 			<EditContactModal
 				emailAddress={emailAddress ?? ''}
 				show={showEditContactModal}
+				onSave={onEditContactModalSave}
 				onHide={() => {
 					onShowEditContactModalChange(false);
 				}}
@@ -396,6 +424,7 @@ const EncounterShelfContent = ({
 										variant="transparent-secondary"
 										className="p-2"
 										aria-label="Edit Contact"
+										disabled={careEncounter.careEncounterStatusId !== CareEncounterStatusId.OPEN}
 										onClick={() => {
 											onShowEditContactModalChange(true);
 										}}
