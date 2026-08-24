@@ -45,7 +45,8 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 		minHeight: 'auto',
 		alignItems: 'center',
 		display: 'inline-flex',
-		justifyContent: 'center',
+		justifyContent: 'flex-start',
+		textAlign: 'left',
 		textDecoration: 'none',
 		'&:focus': {
 			boxShadow: 'none !important',

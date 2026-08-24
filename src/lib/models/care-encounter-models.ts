@@ -41,6 +41,20 @@ export interface CareEncounterAttendanceStatusModel {
 	description: string;
 }
 
+export interface CareEncounterNoteModel {
+	careEncounterNoteId: string;
+	careEncounterId: string;
+	note: string;
+	createdByAccountId: string;
+	createdByAccountDisplayName?: string;
+	lastUpdatedByAccountId: string;
+	lastUpdatedByAccountDisplayName?: string;
+	created: string;
+	createdDescription: string;
+	lastUpdated: string;
+	lastUpdatedDescription: string;
+}
+
 interface CareEncounterBaseModel {
 	careEncounterId: string;
 	appointmentId: string;
@@ -52,7 +66,6 @@ interface CareEncounterBaseModel {
 	patientFullName: string;
 	appointmentDate: string;
 	appointmentDateDescription: string;
-	notes?: string;
 	closedAt?: string;
 	closedAtDescription?: string;
 	closedByAccountId?: string;
@@ -91,6 +104,7 @@ export interface CareEncounterListModel extends CareEncounterBaseModel {
 
 export interface CareEncounterModel extends CareEncounterBaseModel {
 	emailAddress?: string;
+	careEncounterNotes: CareEncounterNoteModel[];
 	appointment: AppointmentModel;
 	appointmentHistory: AppointmentModel[];
 }

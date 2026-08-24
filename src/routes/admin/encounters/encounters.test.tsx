@@ -9,6 +9,7 @@ import {
 	CareEncounterCancellationReasonId,
 	CareEncounterListModel,
 	CareEncounterModel,
+	CareEncounterNoteModel,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
 	SortDirectionId,
@@ -67,6 +68,20 @@ const historicalAppointment = {
 	appointmentTimeStatusId: AppointmentTimeStatusId.PASSED,
 } as CareEncounterModel['appointment'];
 
+const careEncounterNote: CareEncounterNoteModel = {
+	careEncounterNoteId: 'care-encounter-note-1',
+	careEncounterId: 'care-encounter-1',
+	note: 'First encounter note',
+	createdByAccountId: 'care-navigator-1',
+	createdByAccountDisplayName: 'First Navigator',
+	lastUpdatedByAccountId: 'care-navigator-1',
+	lastUpdatedByAccountDisplayName: 'First Navigator',
+	created: '2026-08-20T15:04:00Z',
+	createdDescription: 'Aug 20, 2026 at 11:04 AM',
+	lastUpdated: '2026-08-20T15:04:00Z',
+	lastUpdatedDescription: 'Aug 20, 2026 at 11:04 AM',
+};
+
 const careEncounter: CareEncounterModel = {
 	careEncounterId: 'care-encounter-1',
 	appointmentId: 'appointment-1',
@@ -76,6 +91,7 @@ const careEncounter: CareEncounterModel = {
 	patientFullName: 'Avery Morgan',
 	appointmentDate: '2026-08-18',
 	appointmentDateDescription: 'Backend Appointment Date',
+	careEncounterNotes: [],
 	createdByAccountId: 'account-2',
 	lastUpdatedByAccountId: 'account-2',
 	created: '2026-07-28T14:00:00Z',
@@ -224,7 +240,8 @@ const changeCareEncounterAppointmentAttendanceStatusSpy = jest.spyOn(
 	careEncounterService,
 	'changeCareEncounterAppointmentAttendanceStatus'
 );
-const updateCareEncounterSpy = jest.spyOn(careEncounterService, 'updateCareEncounter');
+const createCareEncounterNoteSpy = jest.spyOn(careEncounterService, 'createCareEncounterNote');
+const updateCareEncounterNoteSpy = jest.spyOn(careEncounterService, 'updateCareEncounterNote');
 
 beforeAll(() => {
 	Object.defineProperty(window, 'matchMedia', {
@@ -301,6 +318,20 @@ beforeEach(() => {
 				}),
 			} as ReturnType<typeof careEncounterService.changeCareEncounterAppointmentAttendanceStatus>)
 	);
+	createCareEncounterNoteSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounterNote }),
+			} as ReturnType<typeof careEncounterService.createCareEncounterNote>)
+	);
+	updateCareEncounterNoteSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounterNote }),
+			} as ReturnType<typeof careEncounterService.updateCareEncounterNote>)
+	);
 });
 
 afterEach(() => {
@@ -355,6 +386,17 @@ const findEditContactDialog = async () => {
 
 	if (!dialog) {
 		throw new Error('Edit Primary Contact dialog not found.');
+	}
+
+	return dialog as HTMLElement;
+};
+
+const findEditNoteDialog = async () => {
+	const title = await screen.findByText('Edit Note');
+	const dialog = title.closest('[role="dialog"]');
+
+	if (!dialog) {
+		throw new Error('Edit Note dialog not found.');
 	}
 
 	return dialog as HTMLElement;
@@ -585,7 +627,7 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
 	expect(screen.getByText('Navigator Name')).toBeInTheDocument();
 	expect(screen.getAllByText('Backend Created Date')).toHaveLength(3);
-	expect(screen.getByText('Unknown')).toBeInTheDocument();
+	expect(screen.getAllByText('Unknown').length).toBeGreaterThan(0);
 	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
 	expect(screen.getByText('Navigator Appointment')).toBeInTheDocument();
 	expect(screen.getByRole('heading', { name: 'No Screening Answers' })).toBeInTheDocument();
@@ -1285,7 +1327,16 @@ it('renders neutral fallbacks for unavailable encounter details', async () => {
 	expect(within(dialog).getByRole('textbox', { name: 'Email Address' })).toHaveValue('');
 });
 
-it('renders an encounter note and updates the notes tab count', async () => {
+it('renders encounter notes in backend order and updates the notes tab count', async () => {
+	const secondCareEncounterNote: CareEncounterNoteModel = {
+		...careEncounterNote,
+		careEncounterNoteId: 'care-encounter-note-2',
+		note: 'Second encounter note',
+		createdByAccountId: 'care-navigator-2',
+		createdByAccountDisplayName: undefined,
+		created: '2026-08-19T14:00:00Z',
+		createdDescription: 'Aug 19, 2026 at 10:00 AM',
+	};
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>
 			({
@@ -1294,7 +1345,7 @@ it('renders an encounter note and updates the notes tab count', async () => {
 					...defaultDetailResponse,
 					careEncounter: {
 						...careEncounter,
-						notes: 'Read-only encounter note',
+						careEncounterNotes: [careEncounterNote, secondCareEncounterNote],
 					},
 				}),
 			} as ReturnType<typeof careEncounterService.getCareEncounter>)
@@ -1302,18 +1353,32 @@ it('renders an encounter note and updates the notes tab count', async () => {
 
 	renderEncounters('/admin/encounters/care-encounter-1');
 
-	const notesTab = await screen.findByRole('button', { name: 'Notes (1)' });
+	const notesTab = await screen.findByRole('button', { name: 'Notes (2)' });
 	fireEvent.click(notesTab);
 
-	expect(await screen.findByText('Read-only encounter note')).toBeInTheDocument();
-	expect(screen.getAllByText('Navigator Name')).toHaveLength(2);
-	expect(screen.getByText('Jul 28, 2026 at 10:00 AM')).toBeInTheDocument();
-	expect(screen.getByRole('button', { name: 'Edit Note' })).toBeInTheDocument();
+	expect(await screen.findByText('First encounter note')).toBeInTheDocument();
+	expect(screen.getByText('Second encounter note')).toBeInTheDocument();
+	expect(screen.getByText('First Navigator')).toBeInTheDocument();
+	expect(screen.getAllByText('Unknown').length).toBeGreaterThan(0);
+	expect(screen.getByText('Aug 20, 2026 at 11:04 AM')).toBeInTheDocument();
+	expect(screen.getByText('Aug 19, 2026 at 10:00 AM')).toBeInTheDocument();
+	expect(screen.getAllByRole('button', { name: 'Edit Note' })).toHaveLength(2);
 	expect(screen.getByRole('textbox', { name: 'Your Note:' })).toBeInTheDocument();
-	expectTabToBeActive('Notes (1)');
+	expectTabToBeActive('Notes (2)');
 });
 
-it('keeps the add-note form local without updating the encounter', async () => {
+it('adds a trimmed encounter note, refreshes the table, and preserves the shelf route', async () => {
+	const addedCareEncounterNote = {
+		...careEncounterNote,
+		note: 'A persisted note',
+	};
+	createCareEncounterNoteSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounterNote: addedCareEncounterNote }),
+			} as ReturnType<typeof careEncounterService.createCareEncounterNote>)
+	);
 	const router = renderEncounters('/admin/encounters/care-encounter-1?source=admin&status=OPEN');
 	const notesTab = await screen.findByRole('button', { name: 'Notes (0)' });
 	fireEvent.click(notesTab);
@@ -1322,15 +1387,156 @@ it('keeps the add-note form local without updating the encounter', async () => {
 	const addNoteButton = screen.getByRole('button', { name: 'Add Note' });
 
 	expect(addNoteButton).toBeDisabled();
-	fireEvent.change(noteInput, { target: { value: 'A local-only note' } });
+	expect(noteInput).not.toHaveAttribute('minlength');
+	expect(noteInput).not.toHaveAttribute('maxlength');
+	fireEvent.change(noteInput, { target: { value: '  A persisted note  ' } });
 	expect(addNoteButton).toBeEnabled();
+	const tableRequestCount = getCareEncountersSpy.mock.calls.length;
 	await clickAndFlush(addNoteButton);
 
-	expect(noteInput).toHaveValue('A local-only note');
-	expect(updateCareEncounterSpy).not.toHaveBeenCalled();
-	expect(screen.getByRole('heading', { name: 'No Notes' })).toBeInTheDocument();
+	expect(createCareEncounterNoteSpy).toHaveBeenCalledWith('care-encounter-1', { note: 'A persisted note' });
+	await waitFor(() => expect(noteInput).toHaveValue(''));
+	expect(await screen.findByText('A persisted note')).toBeInTheDocument();
+	expect(screen.queryByRole('heading', { name: 'No Notes' })).not.toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Notes (1)' })).toBeInTheDocument();
+	expect(getCareEncountersSpy).toHaveBeenCalledTimes(tableRequestCount + 1);
+	expect(mockAddFlag).toHaveBeenCalledWith({ variant: 'success', title: 'Note Added', actions: [] });
 	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
+});
+
+it('retains add-note input and reports the error when creation fails', async () => {
+	const error = new Error('Unable to add note');
+	createCareEncounterNoteSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(error),
+			} as ReturnType<typeof careEncounterService.createCareEncounterNote>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+	fireEvent.click(await screen.findByRole('button', { name: 'Notes (0)' }));
+
+	const noteInput = screen.getByRole('textbox', { name: 'Your Note:' });
+	fireEvent.change(noteInput, { target: { value: 'Keep this note' } });
+	await clickAndFlush(screen.getByRole('button', { name: 'Add Note' }));
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(noteInput).toHaveValue('Keep this note');
+	expect(screen.getByRole('button', { name: 'Add Note' })).toBeEnabled();
+});
+
+it('edits an encounter note without reordering notes', async () => {
+	const secondCareEncounterNote: CareEncounterNoteModel = {
+		...careEncounterNote,
+		careEncounterNoteId: 'care-encounter-note-2',
+		note: 'Older note',
+	};
+	const updatedCareEncounterNote = {
+		...careEncounterNote,
+		note: 'Updated first note',
+		lastUpdatedDescription: 'Aug 21, 2026 at 9:00 AM',
+	};
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						careEncounterNotes: [careEncounterNote, secondCareEncounterNote],
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	updateCareEncounterNoteSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({ careEncounterNote: updatedCareEncounterNote }),
+			} as ReturnType<typeof careEncounterService.updateCareEncounterNote>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+	fireEvent.click(await screen.findByRole('button', { name: 'Notes (2)' }));
+	await clickAndFlush(screen.getAllByRole('button', { name: 'Edit Note' })[0]);
+
+	const dialog = await findEditNoteDialog();
+	const noteInput = within(dialog).getByRole('textbox', { name: 'Note' });
+	expect(noteInput).toHaveValue('First encounter note');
+	expect(noteInput).not.toHaveAttribute('minlength');
+	expect(noteInput).not.toHaveAttribute('maxlength');
+	fireEvent.change(noteInput, { target: { value: '  Updated first note  ' } });
+	const tableRequestCount = getCareEncountersSpy.mock.calls.length;
+	await clickAndFlush(within(dialog).getByRole('button', { name: 'Save' }));
+
+	expect(updateCareEncounterNoteSpy).toHaveBeenCalledWith('care-encounter-1', 'care-encounter-note-1', {
+		note: 'Updated first note',
+	});
+	await waitFor(() => expect(screen.queryByText('Edit Note')).not.toBeInTheDocument());
+	const renderedNotes = screen.getAllByText(/Updated first note|Older note/);
+	expect(renderedNotes[0]).toHaveTextContent('Updated first note');
+	expect(renderedNotes[1]).toHaveTextContent('Older note');
+	expect(screen.getByRole('button', { name: 'Notes (2)' })).toBeInTheDocument();
+	expect(getCareEncountersSpy).toHaveBeenCalledTimes(tableRequestCount + 1);
+	expect(mockAddFlag).toHaveBeenCalledWith({ variant: 'success', title: 'Note Updated', actions: [] });
+});
+
+it('keeps the Edit Note modal open when updating fails', async () => {
+	const error = new Error('Unable to update note');
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: { ...careEncounter, careEncounterNotes: [careEncounterNote] },
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	updateCareEncounterNoteSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockRejectedValue(error),
+			} as ReturnType<typeof careEncounterService.updateCareEncounterNote>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+	fireEvent.click(await screen.findByRole('button', { name: 'Notes (1)' }));
+	await clickAndFlush(screen.getByRole('button', { name: 'Edit Note' }));
+
+	const dialog = await findEditNoteDialog();
+	const noteInput = within(dialog).getByRole('textbox', { name: 'Note' });
+	fireEvent.change(noteInput, { target: { value: 'Unsuccessful update' } });
+	await clickAndFlush(within(dialog).getByRole('button', { name: 'Save' }));
+
+	await waitFor(() => expect(mockHandleError).toHaveBeenCalledWith(error));
+	expect(noteInput).toHaveValue('Unsuccessful update');
+	expect(within(dialog).getByRole('button', { name: 'Save' })).toBeEnabled();
+});
+
+it('renders notes as read-only when the encounter is closed', async () => {
+	getCareEncounterSpy.mockImplementationOnce(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						careEncounterStatusId: CareEncounterStatusId.CLOSED,
+						careEncounterStatusDisplayLabel: 'Closed',
+						careEncounterNotes: [careEncounterNote],
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+	renderEncounters('/admin/encounters/care-encounter-1');
+	fireEvent.click(await screen.findByRole('button', { name: 'Notes (1)' }));
+
+	expect(screen.getByRole('button', { name: 'Edit Note' })).toBeDisabled();
+	expect(screen.getByRole('textbox', { name: 'Your Note:' })).toBeDisabled();
+	expect(screen.getByRole('button', { name: 'Add Note' })).toBeDisabled();
 });
 
 it('aborts the encounter detail request when the route ID changes', async () => {

@@ -62,7 +62,6 @@ it('creates an admin care encounter', () => {
 	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
 	const data = {
 		appointmentId: 'appointment-1',
-		notes: 'Initial notes',
 	};
 
 	careEncounterService.createCareEncounter(data);
@@ -80,7 +79,6 @@ it('updates an admin care encounter', () => {
 	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
 	const data = {
 		emailAddress: 'patient@example.com',
-		notes: 'Updated notes',
 	};
 
 	careEncounterService.updateCareEncounter('care-encounter-1', data);
@@ -88,6 +86,49 @@ it('updates an admin care encounter', () => {
 	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
 		method: 'put',
 		url: '/admin/care-encounters/care-encounter-1',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('requests notes for an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.getCareEncounterNotes('care-encounter-1');
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'get',
+		url: '/admin/care-encounters/care-encounter-1/notes',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('creates a note for an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = { note: 'New encounter note' };
+
+	careEncounterService.createCareEncounterNote('care-encounter-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'post',
+		url: '/admin/care-encounters/care-encounter-1/notes',
+		data,
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
+it('updates a note for an admin care encounter', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+	const data = { note: 'Updated encounter note' };
+
+	careEncounterService.updateCareEncounterNote('care-encounter-1', 'care-encounter-note-1', data);
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'put',
+		url: '/admin/care-encounters/care-encounter-1/notes/care-encounter-note-1',
 		data,
 	});
 

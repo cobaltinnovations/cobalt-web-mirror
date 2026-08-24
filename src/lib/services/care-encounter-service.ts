@@ -6,6 +6,7 @@ import {
 	CareEncounterAssignmentScopeId,
 	CareEncounterListModel,
 	CareEncounterModel,
+	CareEncounterNoteModel,
 	CareEncounterSortColumnId,
 	CareEncounterStatusId,
 	SortDirectionId,
@@ -44,12 +45,22 @@ export interface CareEncounterResponseBody {
 
 export interface CreateCareEncounterRequestBody {
 	appointmentId: string;
-	notes?: string;
 }
 
 export interface UpdateCareEncounterRequestBody {
 	emailAddress?: string;
-	notes?: string;
+}
+
+export interface GetCareEncounterNotesResponseBody {
+	careEncounterNotes: CareEncounterNoteModel[];
+}
+
+export interface CareEncounterNoteRequestBody {
+	note: string;
+}
+
+export interface CareEncounterNoteResponseBody {
+	careEncounterNote: CareEncounterNoteModel;
 }
 
 export interface AssignCareEncounterRequestBody {
@@ -88,6 +99,26 @@ export const careEncounterService = {
 		return httpSingleton.orchestrateRequest<GetCareEncounterResponseBody>({
 			method: 'get',
 			url: `/admin/care-encounters/${careEncounterId}`,
+		});
+	},
+	getCareEncounterNotes(careEncounterId: string) {
+		return httpSingleton.orchestrateRequest<GetCareEncounterNotesResponseBody>({
+			method: 'get',
+			url: `/admin/care-encounters/${careEncounterId}/notes`,
+		});
+	},
+	createCareEncounterNote(careEncounterId: string, data: CareEncounterNoteRequestBody) {
+		return httpSingleton.orchestrateRequest<CareEncounterNoteResponseBody>({
+			method: 'post',
+			url: `/admin/care-encounters/${careEncounterId}/notes`,
+			data,
+		});
+	},
+	updateCareEncounterNote(careEncounterId: string, careEncounterNoteId: string, data: CareEncounterNoteRequestBody) {
+		return httpSingleton.orchestrateRequest<CareEncounterNoteResponseBody>({
+			method: 'put',
+			url: `/admin/care-encounters/${careEncounterId}/notes/${careEncounterNoteId}`,
+			data,
 		});
 	},
 	createCareEncounter(data: CreateCareEncounterRequestBody) {

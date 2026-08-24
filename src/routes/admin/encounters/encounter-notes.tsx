@@ -1,11 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import classNames from 'classnames';
 
 import InputHelper from '@/components/input-helper';
+import LoadingButton from '@/components/loading-button';
 import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
+import useFlags from '@/hooks/use-flags';
+import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { CareEncounterModel, CareEncounterStatusId } from '@/lib/models';
+import { CareEncounterModel, CareEncounterNoteModel, CareEncounterStatusId } from '@/lib/models';
+import { careEncounterService } from '@/lib/services';
+import { EditNoteModal } from './edit-note-modal';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	notes: {
@@ -27,70 +33,157 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface Props {
 	careEncounter: CareEncounterModel;
+	onNotesChange(careEncounterNotes: CareEncounterNoteModel[]): Promise<void>;
 }
 
-export const EncounterNotes = ({ careEncounter }: Props) => {
+export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 	const classes = useStyles();
+	const handleError = useHandleError();
+	const { addFlag } = useFlags();
 	const noteInputRef = useRef<HTMLInputElement>(null);
 	const [noteInputValue, setNoteInputValue] = useState('');
-	const notes = careEncounter.notes?.trim();
+	const [noteToEdit, setNoteToEdit] = useState<CareEncounterNoteModel>();
+	const [isAddingNote, setIsAddingNote] = useState(false);
+	const normalizedNoteInputValue = noteInputValue.trim();
 	const isEncounterOpen = careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN;
 
 	useEffect(() => {
 		noteInputRef.current?.focus();
 	}, []);
 
-	return (
-		<div className={classes.notes}>
-			<div className={classes.noteList}>
-				{notes ? (
-					<div>
-						<div className="mb-2 d-flex align-items-center justify-content-between gap-4">
-							<p className="mb-0 fw-bold">{careEncounter.appointment.provider?.name ?? 'Unknown'}</p>
-							<div className="d-flex align-items-center">
-								<p className="mb-0 me-2 text-gray">{careEncounter.lastUpdatedDescription}</p>
-								<Button
-									variant="transparent-secondary"
-									className="p-2"
-									aria-label="Edit Note"
-									disabled={!isEncounterOpen}
-								>
-									<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
-								</Button>
-							</div>
-						</div>
-						<p className="mb-0">{notes}</p>
-					</div>
-				) : (
-					<NoData title="No Notes" actions={[]} />
-				)}
-			</div>
+	const handleFormSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
 
-			<div className={classes.inputOuter}>
-				<Form
-					onSubmit={(event) => {
-						event.preventDefault();
-					}}
-				>
-					<InputHelper
-						ref={noteInputRef}
-						className="mb-4"
-						as="textarea"
-						label="Your Note:"
-						aria-label="Your Note:"
-						value={noteInputValue}
-						disabled={!isEncounterOpen}
-						onChange={({ currentTarget }) => {
-							setNoteInputValue(currentTarget.value);
-						}}
-					/>
-					<div className="text-right">
-						<Button type="submit" variant="primary" disabled={!noteInputValue.trim() || !isEncounterOpen}>
-							Add Note
-						</Button>
-					</div>
-				</Form>
+			if (!normalizedNoteInputValue || !isEncounterOpen) {
+				return;
+			}
+
+			setIsAddingNote(true);
+
+			try {
+				const response = await careEncounterService
+					.createCareEncounterNote(careEncounter.careEncounterId, { note: normalizedNoteInputValue })
+					.fetch();
+
+				await onNotesChange([response.careEncounterNote, ...careEncounter.careEncounterNotes]);
+				setNoteInputValue('');
+				addFlag({
+					variant: 'success',
+					title: 'Note Added',
+					actions: [],
+				});
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsAddingNote(false);
+			}
+		},
+		[
+			addFlag,
+			careEncounter.careEncounterId,
+			careEncounter.careEncounterNotes,
+			handleError,
+			isEncounterOpen,
+			normalizedNoteInputValue,
+			onNotesChange,
+		]
+	);
+
+	const handleEditNoteSave = useCallback(
+		async (careEncounterNote: CareEncounterNoteModel) => {
+			await onNotesChange(
+				careEncounter.careEncounterNotes.map((currentCareEncounterNote) =>
+					currentCareEncounterNote.careEncounterNoteId === careEncounterNote.careEncounterNoteId
+						? careEncounterNote
+						: currentCareEncounterNote
+				)
+			);
+			setNoteToEdit(undefined);
+			addFlag({
+				variant: 'success',
+				title: 'Note Updated',
+				actions: [],
+			});
+		},
+		[addFlag, careEncounter.careEncounterNotes, onNotesChange]
+	);
+
+	return (
+		<>
+			<EditNoteModal
+				careEncounterNote={noteToEdit}
+				show={Boolean(noteToEdit)}
+				onSave={handleEditNoteSave}
+				onHide={() => {
+					setNoteToEdit(undefined);
+				}}
+			/>
+
+			<div className={classes.notes}>
+				<div className={classes.noteList}>
+					{careEncounter.careEncounterNotes.length > 0 ? (
+						careEncounter.careEncounterNotes.map((careEncounterNote, noteIndex) => (
+							<div
+								key={careEncounterNote.careEncounterNoteId}
+								className={classNames({
+									'mb-6': noteIndex < careEncounter.careEncounterNotes.length - 1,
+								})}
+							>
+								<div className="mb-2 d-flex align-items-center justify-content-between gap-4">
+									<p className="mb-0 fw-bold">
+										{careEncounterNote.createdByAccountDisplayName ?? 'Unknown'}
+									</p>
+									<div className="d-flex align-items-center">
+										<p className="mb-0 me-2 text-gray">{careEncounterNote.createdDescription}</p>
+										<Button
+											variant="transparent-secondary"
+											className="p-2"
+											aria-label="Edit Note"
+											disabled={!isEncounterOpen}
+											onClick={() => {
+												setNoteToEdit(careEncounterNote);
+											}}
+										>
+											<SvgIcon kit="far" icon="pen" size={16} className="d-flex" />
+										</Button>
+									</div>
+								</div>
+								<p className="mb-0">{careEncounterNote.note}</p>
+							</div>
+						))
+					) : (
+						<NoData title="No Notes" actions={[]} />
+					)}
+				</div>
+
+				<div className={classes.inputOuter}>
+					<Form onSubmit={handleFormSubmit}>
+						<InputHelper
+							ref={noteInputRef}
+							className="mb-4"
+							as="textarea"
+							label="Your Note:"
+							aria-label="Your Note:"
+							value={noteInputValue}
+							disabled={!isEncounterOpen || isAddingNote}
+							onChange={({ currentTarget }) => {
+								setNoteInputValue(currentTarget.value);
+							}}
+						/>
+						<div className="text-right">
+							<LoadingButton
+								type="submit"
+								variant="primary"
+								isLoading={isAddingNote}
+								disabled={!normalizedNoteInputValue || !isEncounterOpen || isAddingNote}
+							>
+								Add Note
+							</LoadingButton>
+						</div>
+					</Form>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 };
