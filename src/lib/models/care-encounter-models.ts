@@ -60,6 +60,11 @@ export enum CareEncounterScheduledMessageTypeId {
 	FOLLOW_UP = 'FOLLOW_UP',
 }
 
+export enum ScheduledMessageSourceId {
+	SYSTEM = 'SYSTEM',
+	MANUAL = 'MANUAL',
+}
+
 export interface CareEncounterScheduledMessageTypeModel {
 	careEncounterScheduledMessageTypeId: CareEncounterScheduledMessageTypeId;
 	description: string;
@@ -75,7 +80,7 @@ export interface CareEncounterScheduledMessageModel {
 	scheduledMessageId: string;
 	scheduledMessageStatusId: ScheduledMessageStatusId;
 	scheduledMessageStatusDescription: string;
-	scheduledMessageSourceId: string;
+	scheduledMessageSourceId: ScheduledMessageSourceId;
 	scheduledByAccountId?: string;
 	scheduledByAccountDisplayName?: string;
 	messageId: string;
@@ -164,6 +169,11 @@ export interface CareEncounterAppointmentModel {
 	timeZone: string;
 	canceledForReschedule: boolean;
 	canceled?: boolean;
+	canceledAt?: string;
+	canceledAtDescription?: string;
+	canceledByAccountId?: string;
+	canceledByAccountDisplayName?: string;
+	cancellationReason?: string;
 }
 
 export interface CareEncounterListModel extends CareEncounterBaseModel {
@@ -173,6 +183,7 @@ export interface CareEncounterListModel extends CareEncounterBaseModel {
 export interface CareEncounterModel extends CareEncounterBaseModel {
 	emailAddress?: string;
 	careEncounterNotes: CareEncounterNoteModel[];
+	notesEditable: boolean;
 	careEncounterScheduledMessages: CareEncounterScheduledMessageModel[];
 	appointment: AppointmentModel;
 	appointmentHistory: AppointmentModel[];

@@ -20,6 +20,14 @@ export enum BookingExperienceId {
 	V2 = 'V2',
 }
 
+export enum SchedulingSystemId {
+	NONE = 'NONE',
+	ACUITY = 'ACUITY',
+	EPIC = 'EPIC',
+	EPIC_FHIR = 'EPIC_FHIR',
+	COBALT = 'COBALT',
+}
+
 export interface AppointmentType {
 	appointmentTypeId: string;
 	schedulingSystemId: string;
@@ -53,29 +61,44 @@ export interface AppointmentModel {
 	careEncounterId?: string;
 	screeningSessionId?: string;
 	screeningSessionResult?: ScreeningSessionResult;
+	appointmentReasonId?: string;
+	createdByAccountId?: string;
 	firstName?: string;
 	lastName?: string;
+	emailAddress?: string;
+	contactPhoneNumber?: string;
+	contactPhoneNumberDescription?: string;
 	appointmentTypeId: string;
+	intakeAssessmentId?: string;
 	acuityAppointmentId?: number;
 	bluejeansMeetingId?: number;
+	groupEventId?: string;
+	groupEventTypeId?: string;
 	name?: string;
+	title?: string;
+	subtitle?: string;
 	startTime: string;
 	startTimeDescription: string;
 	localStartDate: string;
 	localStartTime: string;
 	endTime: string;
 	endTimeDescription: string;
+	localEndDate?: string;
+	localEndTime?: string;
 	durationInMinutes: number;
 	durationInMinutesDescription: string;
 	timeDescription: string;
 	timeZone: string;
 	videoconferenceUrl: string;
 	videoconferencePlatformId: VideoconferencePlatformId;
+	schedulingSystemId?: SchedulingSystemId;
+	phoneNumber?: string;
 	phoneNumberDescription?: string;
 	canceled: boolean;
 	canceledAt?: string;
 	canceledAtDescription?: string;
 	canceledByAccountId?: string;
+	canceledByAccountDisplayName?: string;
 	cancellationReason?: string;
 	created: string;
 	createdDescription: string;

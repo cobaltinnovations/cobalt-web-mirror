@@ -224,6 +224,19 @@ it('updates a note for an admin care encounter', () => {
 	orchestrateRequestSpy.mockRestore();
 });
 
+it('deletes a note for an admin care encounter without expecting a response body', () => {
+	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
+
+	careEncounterService.deleteCareEncounterNote('care-encounter-1', 'care-encounter-note-1');
+
+	expect(orchestrateRequestSpy).toHaveBeenCalledWith({
+		method: 'delete',
+		url: '/admin/care-encounters/care-encounter-1/notes/care-encounter-note-1',
+	});
+
+	orchestrateRequestSpy.mockRestore();
+});
+
 it('closes an admin care encounter', () => {
 	const orchestrateRequestSpy = jest.spyOn(httpSingleton, 'orchestrateRequest').mockReturnValue({} as never);
 

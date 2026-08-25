@@ -93,6 +93,7 @@ const careEncounter: CareEncounterModel = {
 	appointmentDate: '2026-08-18',
 	appointmentDateDescription: 'Backend Appointment Date',
 	careEncounterNotes: [],
+	notesEditable: true,
 	careEncounterScheduledMessages: [],
 	createdByAccountId: 'account-2',
 	lastUpdatedByAccountId: 'account-2',
@@ -1668,7 +1669,7 @@ it('keeps the Edit Note modal open when updating fails', async () => {
 	expect(within(dialog).getByRole('button', { name: 'Save' })).toBeEnabled();
 });
 
-it('renders notes as read-only when the encounter is closed', async () => {
+it('renders notes as read-only when the backend marks them noneditable', async () => {
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>
 			({
@@ -1677,8 +1678,7 @@ it('renders notes as read-only when the encounter is closed', async () => {
 					...defaultDetailResponse,
 					careEncounter: {
 						...careEncounter,
-						careEncounterStatusId: CareEncounterStatusId.CLOSED,
-						careEncounterStatusDisplayLabel: 'Closed',
+						notesEditable: false,
 						careEncounterNotes: [careEncounterNote],
 					},
 				}),

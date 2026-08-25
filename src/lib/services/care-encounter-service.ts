@@ -56,6 +56,7 @@ export interface UpdateCareEncounterRequestBody {
 
 export interface GetCareEncounterNotesResponseBody {
 	careEncounterNotes: CareEncounterNoteModel[];
+	notesEditable: boolean;
 }
 
 export interface CareEncounterNoteRequestBody {
@@ -192,6 +193,12 @@ export const careEncounterService = {
 			method: 'put',
 			url: `/admin/care-encounters/${careEncounterId}/notes/${careEncounterNoteId}`,
 			data,
+		});
+	},
+	deleteCareEncounterNote(careEncounterId: string, careEncounterNoteId: string) {
+		return httpSingleton.orchestrateRequest<void>({
+			method: 'delete',
+			url: `/admin/care-encounters/${careEncounterId}/notes/${careEncounterNoteId}`,
 		});
 	},
 	createCareEncounter(data: CreateCareEncounterRequestBody) {

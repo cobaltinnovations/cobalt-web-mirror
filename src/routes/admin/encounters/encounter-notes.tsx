@@ -9,7 +9,7 @@ import SvgIcon from '@/components/svg-icon';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
-import { CareEncounterModel, CareEncounterNoteModel, CareEncounterStatusId } from '@/lib/models';
+import { CareEncounterModel, CareEncounterNoteModel } from '@/lib/models';
 import { careEncounterService } from '@/lib/services';
 import { EditNoteModal } from './edit-note-modal';
 
@@ -45,7 +45,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 	const [noteToEdit, setNoteToEdit] = useState<CareEncounterNoteModel>();
 	const [isAddingNote, setIsAddingNote] = useState(false);
 	const normalizedNoteInputValue = noteInputValue.trim();
-	const isEncounterOpen = careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN;
+	const notesEditable = careEncounter.notesEditable;
 
 	useEffect(() => {
 		noteInputRef.current?.focus();
@@ -55,7 +55,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			if (!normalizedNoteInputValue || !isEncounterOpen) {
+			if (!normalizedNoteInputValue || !notesEditable) {
 				return;
 			}
 
@@ -84,7 +84,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 			careEncounter.careEncounterId,
 			careEncounter.careEncounterNotes,
 			handleError,
-			isEncounterOpen,
+			notesEditable,
 			normalizedNoteInputValue,
 			onNotesChange,
 		]
@@ -140,7 +140,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 											variant="transparent-secondary"
 											className="p-2"
 											aria-label="Edit Note"
-											disabled={!isEncounterOpen}
+											disabled={!notesEditable}
 											onClick={() => {
 												setNoteToEdit(careEncounterNote);
 											}}
@@ -166,7 +166,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 							label="Your Note:"
 							aria-label="Your Note:"
 							value={noteInputValue}
-							disabled={!isEncounterOpen || isAddingNote}
+							disabled={!notesEditable || isAddingNote}
 							onChange={({ currentTarget }) => {
 								setNoteInputValue(currentTarget.value);
 							}}
@@ -176,7 +176,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 								type="submit"
 								variant="primary"
 								isLoading={isAddingNote}
-								disabled={!normalizedNoteInputValue || !isEncounterOpen || isAddingNote}
+								disabled={!normalizedNoteInputValue || !notesEditable || isAddingNote}
 							>
 								Add Note
 							</LoadingButton>

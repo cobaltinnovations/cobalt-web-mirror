@@ -9,6 +9,7 @@ import {
 	CareEncounterStatusId,
 	MessageStatusId,
 	MessageTypeId,
+	ScheduledMessageSourceId,
 	ScheduledMessageStatusId,
 } from '@/lib/models';
 import { careEncounterService } from '@/lib/services';
@@ -80,7 +81,7 @@ const pendingMessage = {
 	scheduledMessageId: 'scheduler-1',
 	scheduledMessageStatusId: ScheduledMessageStatusId.PENDING,
 	scheduledMessageStatusDescription: 'Pending',
-	scheduledMessageSourceId: 'MANUAL',
+	scheduledMessageSourceId: ScheduledMessageSourceId.MANUAL,
 	scheduledByAccountId: 'navigator-1',
 	scheduledByAccountDisplayName: 'Navigator Name',
 	messageId: 'message-1',
