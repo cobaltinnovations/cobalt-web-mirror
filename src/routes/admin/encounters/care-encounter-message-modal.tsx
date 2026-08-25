@@ -26,7 +26,7 @@ import {
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
-		maxWidth: 760,
+		maxWidth: 620,
 	},
 	field: {
 		flex: 1,
@@ -354,8 +354,10 @@ export const CareEncounterMessageModal = ({ careEncounterId, messageToEdit, onCh
 								</Form.Group>
 							)}
 
-							<div className={classNames(classes.divider, 'pt-6')}>
-								<Form.Label className="mb-3 fs-large">Custom email text</Form.Label>
+							<hr className="mb-6" />
+
+							<div>
+								<Form.Label className="mb-4">Custom email text</Form.Label>
 								<WysiwygBasic
 									ref={editorRef}
 									value={formValues.customEmailText}

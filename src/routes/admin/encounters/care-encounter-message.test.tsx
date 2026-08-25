@@ -294,6 +294,7 @@ it('renders pending and sent designs, hides deleted records, and prevents duplic
 		/>
 	);
 
+	expect(screen.getByRole('heading', { name: 'Contact History (2)' })).toBeInTheDocument();
 	expect(screen.getByText('Message scheduled for Aug 26, 2026 at 10:30 AM')).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Edit scheduled message' })).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Schedule Message' })).toBeDisabled();

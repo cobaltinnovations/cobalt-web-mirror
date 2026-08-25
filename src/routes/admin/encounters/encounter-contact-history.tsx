@@ -16,17 +16,17 @@ import { CareEncounterMessageModal } from './care-encounter-message-modal';
 const useStyles = createUseThemedStyles((theme) => ({
 	readOnlyHeader: {
 		gap: 16,
+		marginBottom: 8,
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 	},
 	readOnlyBody: {
-		marginTop: 12,
 		padding: 24,
 		borderRadius: 4,
 		backgroundColor: theme.colors.n0,
 		border: `1px solid ${theme.colors.border}`,
-		'& p, & div': {
+		'& p:not(:last-child), & div:not(:last-child)': {
 			marginBottom: 20,
 		},
 	},
@@ -99,12 +99,12 @@ const ReadOnlyMessage = ({ message }: { message: CareEncounterScheduledMessageMo
 	return (
 		<article className="mb-6">
 			<div className={classes.readOnlyHeader}>
-				<p className="mb-0 fs-large">
+				<p className="mb-0">
 					<strong>{navigatorName}</strong> {sent ? 'sent' : 'scheduled'} a follow-up email
 				</p>
 				<p className="mb-0 text-n500">{sent ? message.sentAtDescription : message.scheduledAtDescription}</p>
 			</div>
-			{!sent && <p className="mb-0 mt-2 text-n500">Status: {statusDescription}</p>}
+			{!sent && <p className="mb-0 text-n500">Status: {statusDescription}</p>}
 			<WysiwygDisplay html={message.emailContentHtml} className={classes.readOnlyBody} />
 		</article>
 	);
@@ -139,8 +139,12 @@ export const EncounterContactHistory = ({ careEncounter, onChanged }: Props) => 
 				onChanged={onChanged}
 			/>
 
-			<div className="mb-6 d-flex justify-content-end">
+			<div className="mb-6 d-flex justify-content-between align-items-center">
+				<h4 className="fw-semibold">
+					Contact History <span className="text-muted">({messages.length})</span>
+				</h4>
 				<Button
+					variant="outline-primary"
 					disabled={careEncounter.careEncounterStatusId !== CareEncounterStatusId.OPEN || hasPendingMessage}
 					onClick={() => {
 						setMessageToEdit(undefined);
