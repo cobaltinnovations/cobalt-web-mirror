@@ -753,12 +753,13 @@ it('renders the current appointment screening answers from the encounter respons
 
 	renderEncounters('/admin/encounters/care-encounter-1');
 
-	const screeningAnswersCard = (await screen.findByText('Screening Answers')).closest('.ic-card');
+	const screeningAnswersCard = (await screen.findByText('Appointment Screening Answers')).closest('.ic-card');
 	if (!screeningAnswersCard) {
-		throw new Error('Screening Answers card not found.');
+		throw new Error('Appointment card not found.');
 	}
 	const screeningAnswers = within(screeningAnswersCard as HTMLElement);
 
+	expect(screeningAnswers.getByText('Appointment')).toBeInTheDocument();
 	expect(screeningAnswers.getByText('1)')).toBeInTheDocument();
 	expect(screeningAnswers.getByText('Who are you seeking support for?')).toBeInTheDocument();
 	expect(screeningAnswers.getByText('Myself')).toBeInTheDocument();
@@ -1030,7 +1031,7 @@ it('cancels the current appointment and refreshes the shelf without changing the
 	});
 	await waitFor(() => expect(getCareEncountersSpy).toHaveBeenCalledTimes(2));
 	expect(screen.getByRole('heading', { name: 'No Active Appointment' })).toBeInTheDocument();
-	expect(screen.queryByText('Screening Answers')).not.toBeInTheDocument();
+	expect(screen.queryByText('Appointment Screening Answers')).not.toBeInTheDocument();
 	expect(mockAddFlag).toHaveBeenCalledWith({
 		variant: 'success',
 		title: 'Appointment Canceled',
@@ -1266,7 +1267,7 @@ it('renders an empty state and hides screening answers when there is no active a
 	renderEncounters('/admin/encounters/care-encounter-1');
 
 	expect(await screen.findByRole('heading', { name: 'No Active Appointment' })).toBeInTheDocument();
-	expect(screen.queryByText('Screening Answers')).not.toBeInTheDocument();
+	expect(screen.queryByText('Appointment Screening Answers')).not.toBeInTheDocument();
 	expect(screen.queryByText('Appointment')).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Join Video Call' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();

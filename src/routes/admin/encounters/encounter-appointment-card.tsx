@@ -15,6 +15,7 @@ import {
 	CareEncounterAttendanceStatusModel,
 } from '@/lib/models';
 import { careEncounterService } from '@/lib/services';
+import { EncounterScreeningAnswers } from './encounter-screening-answers-card';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	appointmentRow: {
@@ -146,7 +147,7 @@ export const EncounterAppointmentCard = ({ appointment, onCancel, onAttendanceSt
 						<div className={classes.calendarIcon}>
 							<SvgIcon kit="far" icon="calendar" size={16} className="d-flex" />
 						</div>
-						<h5 className="mb-0 text-uppercase">{appointment.startTimeDescription}</h5>
+						<h5 className="mb-0 text-uppercase fw-semibold">{appointment.startTimeDescription}</h5>
 					</div>
 
 					<div className={classes.actions}>
@@ -209,6 +210,10 @@ export const EncounterAppointmentCard = ({ appointment, onCancel, onAttendanceSt
 						))}
 					</InputHelper>
 				)}
+			</Card.Body>
+			<Card.Body className="border-top">
+				<h5 className="mb-6 fw-semibold">Appointment Screening Answers</h5>
+				<EncounterScreeningAnswers screeningSessionResult={appointment.screeningSessionResult} />
 			</Card.Body>
 		</Card>
 	);

@@ -30,7 +30,6 @@ import { EncounterAppointmentHistoryCard } from './encounter-appointment-history
 import { EncounterContactHistory } from './encounter-contact-history';
 import { EncounterNotes } from './encounter-notes';
 import { EncounterRelatedEncountersCard } from './encounter-related-encounters-card';
-import { EncounterScreeningAnswersCard } from './encounter-screening-answers-card';
 import type { EncountersOutletContext } from './encounters';
 
 type EncounterShelfTab = 'encounter-details' | 'contact-history' | 'notes';
@@ -461,11 +460,6 @@ const EncounterShelfContent = ({
 
 					<section className={classes.section}>
 						<h4 className="mb-6">Navigator Appointment</h4>
-						{!careEncounter.appointment.canceled && (
-							<EncounterScreeningAnswersCard
-								screeningSessionResult={careEncounter.appointment.screeningSessionResult}
-							/>
-						)}
 						<div className="mb-6">
 							<EncounterAppointmentCard
 								appointment={careEncounter.appointment}

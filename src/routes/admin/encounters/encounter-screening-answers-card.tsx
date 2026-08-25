@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import NoData from '@/components/no-data';
@@ -45,7 +44,9 @@ export const EncounterScreeningAnswers = ({ screeningSessionResult }: Props) => 
 										'mb-1': (question.screeningAnswerResults ?? []).length - 1 !== answerIndex,
 									})}
 								>
-									{answer.answerOptionText && <h5 className="mb-0">{answer.answerOptionText}</h5>}
+									{answer.answerOptionText && (
+										<p className="mb-0 fw-bold">{answer.answerOptionText}</p>
+									)}
 									{answer.text && <p className="mb-0 fw-semibold">{answer.text}</p>}
 								</div>
 							))}
@@ -54,18 +55,5 @@ export const EncounterScreeningAnswers = ({ screeningSessionResult }: Props) => 
 				);
 			})}
 		</ol>
-	);
-};
-
-export const EncounterScreeningAnswersCard = ({ screeningSessionResult }: Props) => {
-	return (
-		<Card bsPrefix="ic-card" className="mb-6">
-			<Card.Header>
-				<Card.Title>Screening Answers</Card.Title>
-			</Card.Header>
-			<Card.Body>
-				<EncounterScreeningAnswers screeningSessionResult={screeningSessionResult} />
-			</Card.Body>
-		</Card>
 	);
 };
