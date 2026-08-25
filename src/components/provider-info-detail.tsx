@@ -46,9 +46,10 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface ProviderInfoDetailProps {
 	providerId?: string;
 	clinicId?: string;
+	className?: string;
 }
 
-const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) => {
+const ProviderInfoDetail = ({ providerId, clinicId, className }: ProviderInfoDetailProps) => {
 	const classes = useStyles();
 	const [searchParams] = useSearchParams();
 	const featureId = useMemo(() => searchParams.get('featureId') ?? undefined, [searchParams]);
@@ -133,7 +134,7 @@ const ProviderInfoDetail = ({ providerId, clinicId }: ProviderInfoDetailProps) =
 			/>
 
 			<AsyncWrapper fetchData={fetchData}>
-				<Container>
+				<Container className={className}>
 					<Row className="mb-8">
 						<Col>
 							<div className="d-flex align-items-center">
