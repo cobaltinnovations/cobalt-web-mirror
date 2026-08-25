@@ -69,7 +69,7 @@ export const EncounterAppointmentHistoryCard = ({ appointments, onSelect }: Prop
 							onSelect(appointment);
 						}}
 					>
-						<span className="fw-bold">{appointment.startTimeDescription}</span>
+						<span className="fw-semibold">{appointment.startTimeDescription}</span>
 						<span className="ms-4 text-gray fw-normal">{getAppointmentStatus(appointment)}</span>
 					</Button>
 				))}

@@ -160,9 +160,9 @@ const defaultResponse: GetCareEncountersResponseBody = {
 
 const defaultDetailResponse: GetCareEncounterResponseBody = {
 	careEncounter,
-	careEncounterHistory: [],
-	careEncounterHistoryTotalCount: 0,
-	careEncounterHistoryTotalCountDescription: '0',
+	careEncounterHistory: [careEncounterList],
+	careEncounterHistoryTotalCount: 1,
+	careEncounterHistoryTotalCountDescription: '1',
 };
 
 const careEncounterCancellationReasons = [
@@ -1161,22 +1161,22 @@ it('does not render appointment history when the response history is empty', asy
 	expect(screen.queryByText('Appointment History')).not.toBeInTheDocument();
 });
 
-it('renders the active encounter and related encounters as a noninteractive list', async () => {
+it('renders the active and related encounters as route links', async () => {
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>
 			({
 				abort: jest.fn(),
 				fetch: jest.fn().mockResolvedValue({
 					...defaultDetailResponse,
-					careEncounterHistory: [closedRelatedCareEncounter],
-					careEncounterHistoryTotalCount: 1,
-					careEncounterHistoryTotalCountDescription: '1',
+					careEncounterHistory: [careEncounterList, closedRelatedCareEncounter],
+					careEncounterHistoryTotalCount: 2,
+					careEncounterHistoryTotalCountDescription: '2',
 				}),
 			} as ReturnType<typeof careEncounterService.getCareEncounter>)
 	);
 	const router = renderEncounters('/admin/encounters/care-encounter-1?status=OPEN');
 
-	const encountersHeading = await screen.findByRole('heading', { name: 'Encounters', level: 4 });
+	const encountersHeading = await screen.findByRole('heading', { name: 'Encounters (2)', level: 4 });
 	const encountersSection = encountersHeading.closest('section');
 	if (!encountersSection) {
 		throw new Error('Encounters section not found.');
@@ -1191,11 +1191,16 @@ it('renders the active encounter and related encounters as a noninteractive list
 	expect(encounters.getByText('Open')).toHaveClass('text-success');
 	expect(encounters.getByText('Closed')).toHaveClass('text-gray');
 	expect(encounters.queryByRole('button')).not.toBeInTheDocument();
-	expect(encounters.queryByRole('link')).not.toBeInTheDocument();
+	expect(encounters.getAllByRole('link')).toHaveLength(2);
+	expect(encounters.getByRole('link', { name: 'View encounter from Backend Created Date' })).toHaveAttribute(
+		'aria-current',
+		'page'
+	);
 
-	fireEvent.click(encounters.getByText('Backend Created Date'));
-	expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-1');
+	fireEvent.click(encounters.getByRole('link', { name: /View encounter from Jun 1, 2026/ }));
+	await waitFor(() => expect(router.state.location.pathname).toBe('/admin/encounters/care-encounter-3'));
 	expect(router.state.location.search).toBe('?status=OPEN');
+	expect(getCareEncounterSpy).toHaveBeenCalledWith('care-encounter-3');
 });
 
 it('does not render the related encounters section when the response list is empty', async () => {
@@ -1206,13 +1211,16 @@ it('does not render the related encounters section when the response list is emp
 				fetch: jest.fn().mockResolvedValue({
 					...defaultDetailResponse,
 					careEncounter: canceledCareEncounter,
+					careEncounterHistory: [],
+					careEncounterHistoryTotalCount: 0,
+					careEncounterHistoryTotalCountDescription: '0',
 				}),
 			} as ReturnType<typeof careEncounterService.getCareEncounter>)
 	);
 	renderEncounters('/admin/encounters/care-encounter-1');
 
 	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
-	expect(screen.queryByRole('heading', { name: 'Encounters', level: 4 })).not.toBeInTheDocument();
+	expect(screen.queryByRole('heading', { name: /^Encounters/, level: 4 })).not.toBeInTheDocument();
 });
 
 it('dismisses the cancellation modal without closing the encounter shelf', async () => {

@@ -77,7 +77,7 @@ export const Component = () => {
 	const [showCloseEncounterModal, setShowCloseEncounterModal] = useState(false);
 	const [showEditContactModal, setShowEditContactModal] = useState(false);
 	const [careEncounter, setCareEncounter] = useState<CareEncounterModel | null>(null);
-	const [otherCareEncounters, setOtherCareEncounters] = useState<CareEncounterListModel[]>([]);
+	const [careEncounterHistory, setCareEncounterHistory] = useState<CareEncounterListModel[]>([]);
 	const careEncounterRequestRef = useRef<ReturnType<typeof careEncounterService.getCareEncounter>>();
 
 	const fetchCareEncounter = useCallback(async () => {
@@ -95,7 +95,7 @@ export const Component = () => {
 
 			if (request === careEncounterRequestRef.current) {
 				setCareEncounter(response.careEncounter);
-				setOtherCareEncounters(response.careEncounterHistory);
+				setCareEncounterHistory(response.careEncounterHistory);
 			}
 		} finally {
 			if (request === careEncounterRequestRef.current) {
@@ -245,7 +245,7 @@ export const Component = () => {
 			{careEncounter && (
 				<EncounterShelfContent
 					careEncounter={careEncounter}
-					otherCareEncounters={otherCareEncounters}
+					careEncounterHistory={careEncounterHistory}
 					activeTab={activeTab}
 					showCancelAppointmentModal={showCancelAppointmentModal}
 					showCloseEncounterModal={showCloseEncounterModal}
@@ -274,7 +274,7 @@ export const Component = () => {
 
 interface EncounterShelfContentProps {
 	careEncounter: CareEncounterModel;
-	otherCareEncounters: CareEncounterListModel[];
+	careEncounterHistory: CareEncounterListModel[];
 	activeTab: EncounterShelfTab;
 	showCancelAppointmentModal: boolean;
 	showCloseEncounterModal: boolean;
@@ -294,7 +294,7 @@ interface EncounterShelfContentProps {
 
 const EncounterShelfContent = ({
 	careEncounter,
-	otherCareEncounters,
+	careEncounterHistory,
 	activeTab,
 	showCancelAppointmentModal,
 	showCloseEncounterModal,
@@ -313,10 +313,6 @@ const EncounterShelfContent = ({
 }: EncounterShelfContentProps) => {
 	const classes = useStyles();
 	const emailAddress = careEncounter.emailAddress;
-	const encounterHistory =
-		careEncounter.careEncounterStatusId === CareEncounterStatusId.OPEN
-			? [careEncounter, ...otherCareEncounters]
-			: otherCareEncounters;
 	const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel>();
 	const scheduledMessages = (careEncounter.careEncounterScheduledMessages ?? []).filter(
 		(message) => !message.deleted
@@ -459,7 +455,7 @@ const EncounterShelfContent = ({
 					</section>
 
 					<section className={classes.section}>
-						<h4 className="mb-6">Navigator Appointment</h4>
+						<h4 className="mb-6 fw-semibold">Navigator Appointment</h4>
 						<div className="mb-6">
 							<EncounterAppointmentCard
 								appointment={careEncounter.appointment}
@@ -475,10 +471,12 @@ const EncounterShelfContent = ({
 						/>
 					</section>
 
-					{encounterHistory.length > 0 && (
+					{careEncounterHistory.length > 0 && (
 						<section className={classes.section}>
-							<h4 className="mb-6">Encounters</h4>
-							<EncounterRelatedEncountersCard careEncounters={encounterHistory} />
+							<h4 className="mb-6 fw-semibold">
+								Encounters <span className="text-muted">({careEncounterHistory.length})</span>
+							</h4>
+							<EncounterRelatedEncountersCard careEncounters={careEncounterHistory} />
 						</section>
 					)}
 				</Tab.Pane>
