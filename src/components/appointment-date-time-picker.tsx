@@ -529,7 +529,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 	return (
 		<>
-			{appointmentModalityTabs.length > 0 && (
+			{appointmentModalityTabs.length > 1 && (
 				<TabBar
 					value={selectedAppointmentModalityId}
 					tabs={appointmentModalityTabs}
