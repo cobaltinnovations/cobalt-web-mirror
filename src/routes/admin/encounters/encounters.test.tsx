@@ -60,9 +60,13 @@ const historicalAppointment = {
 			},
 		],
 	},
+	localStartDate: '2026-08-10',
+	localStartTime: '14:30:00',
 	startTimeDescription: 'Aug 10, 2026 at 2:30 PM',
+	durationInMinutesDescription: '30 min',
 	canceled: true,
 	canceledAtDescription: 'Aug 11, 2026 at 9:15 AM',
+	canceledByAccountDisplayName: 'Navigator Name',
 	cancellationReason: 'Patient unavailable',
 	attendanceStatusId: ATTENDANCE_STATUS_ID.CANCELED,
 	appointmentTimeStatusId: AppointmentTimeStatusId.PASSED,
@@ -1089,13 +1093,15 @@ it('renders appointment history and opens read-only appointment details', async 
 	}
 	const details = within(dialog as HTMLElement);
 
-	expect(details.getByText('Appointment Date')).toBeInTheDocument();
-	expect(details.getByText('Aug 10, 2026 at 2:30 PM')).toBeInTheDocument();
-	expect(details.getByText('Canceled Date')).toBeInTheDocument();
-	expect(details.getByText('Aug 11, 2026 at 9:15 AM')).toBeInTheDocument();
-	expect(details.getByText('Cancellation Reason')).toBeInTheDocument();
+	expect(details.getByText('Original Appointment')).toBeInTheDocument();
+	expect(details.getByText('Aug 10, 2026 • 2:30PM')).toBeInTheDocument();
+	expect(details.getByText('Monday • 30 min')).toBeInTheDocument();
+	expect(details.getByText('Canceled')).toBeInTheDocument();
+	expect(details.getByText('Aug 11, 2026 • 9:15AM')).toBeInTheDocument();
+	expect(details.getByText('By Navigator Name')).toBeInTheDocument();
+	expect(details.getByText('Reason')).toBeInTheDocument();
 	expect(details.getByText('Patient unavailable')).toBeInTheDocument();
-	expect(details.getByRole('heading', { name: 'Screening Answers' })).toBeInTheDocument();
+	expect(details.getByRole('heading', { name: 'Appointment Screening Answers' })).toBeInTheDocument();
 	expect(details.getByText('1)')).toBeInTheDocument();
 	expect(details.getByText('Historical screening question?')).toBeInTheDocument();
 	expect(details.getByText('Historical screening answer')).toBeInTheDocument();
