@@ -33,6 +33,7 @@ const Reports = () => {
 			ACCOUNT_ONBOARDING_COMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_COMPLETE_V2: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_GEOLOCATION: account?.accountCapabilityFlags.canViewAnalytics,
+			COURSE_FEEDBACK: account?.accountCapabilityFlags.canViewAnalytics,
 			COURSE_MCB_DOWNLOAD: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_TIMELINE: account?.accountCapabilityFlags.canViewAnalytics,
 		} as Record<string, boolean>;
@@ -65,7 +66,7 @@ const Reports = () => {
 				reportTypeId: formValues.reportTypeId,
 				reportFormatId: 'CSV',
 				...(formValues.startDate ? { startDateTime: `${formValues.startDate}T00:00:00` } : {}),
-				...(formValues.endDate ? { endDateTime: `${formValues.endDate}T23:59:59` } : {}),
+				...(formValues.endDate ? { endDateTime: `${formValues.endDate}T23:59:59.999999` } : {}),
 				...(formValues.reportTypeId === ReportTypeId.ACCOUNT_TIMELINE && formValues.accountId
 					? { accountId: formValues.accountId }
 					: {}),
