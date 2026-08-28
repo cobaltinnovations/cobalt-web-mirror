@@ -1,5 +1,6 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import moment from 'moment';
 
 import { CobaltThemeProvider } from '@/jss/theme';
 import {
@@ -73,6 +74,8 @@ const messageTypesResponse = {
 	],
 };
 
+const pendingScheduledAt = moment().add(3, 'days').hour(10).minute(30).second(0).millisecond(0);
+
 const pendingMessage = {
 	careEncounterScheduledMessageId: 'scheduled-message-1',
 	careEncounterId: 'care-encounter-1',
@@ -85,11 +88,13 @@ const pendingMessage = {
 	scheduledByAccountId: 'navigator-1',
 	scheduledByAccountDisplayName: 'Navigator Name',
 	messageId: 'message-1',
-	scheduledAtDate: '2026-08-26',
-	scheduledAtTime: '10:30:00',
+	// Keep the pending message in the future relative to the run: the modal refuses to save
+	// an edit whose scheduled time has passed, so a fixed date turns this into a time bomb.
+	scheduledAtDate: pendingScheduledAt.format('YYYY-MM-DD'),
+	scheduledAtTime: pendingScheduledAt.format('HH:mm:ss'),
 	timeZone: 'America/New_York',
-	scheduledAt: '2026-08-26T14:30:00Z',
-	scheduledAtDescription: 'Aug 26, 2026 at 10:30 AM',
+	scheduledAt: pendingScheduledAt.toISOString(),
+	scheduledAtDescription: pendingScheduledAt.format('MMM D, YYYY [at] h:mm A'),
 	recipientEmailAddress: 'patient@example.com',
 	customEmailText: '<p>Original resources.</p>',
 	emailSubject: 'Follow-up from Cobalt',
@@ -210,7 +215,7 @@ it('uses one form state across the create and preview pages and schedules the me
 	expect(mockAddFlag).toHaveBeenCalledWith({
 		variant: 'success',
 		title: 'Message Scheduled',
-		description: 'Message is scheduled for Aug 26, 2026 at 10:30 AM.',
+		description: `Message is scheduled for ${pendingMessage.scheduledAtDescription}.`,
 		actions: [],
 	});
 });
@@ -296,7 +301,7 @@ it('renders pending and sent designs, hides deleted records, and prevents duplic
 	);
 
 	expect(screen.getByRole('heading', { name: 'Contact History (2)' })).toBeInTheDocument();
-	expect(screen.getByText('Message scheduled for Aug 26, 2026 at 10:30 AM')).toBeInTheDocument();
+	expect(screen.getByText(`Message scheduled for ${pendingMessage.scheduledAtDescription}`)).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Edit scheduled message' })).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Schedule Message' })).toBeDisabled();
 	expect(screen.getByText('Navigator Name', { selector: 'strong' })).toBeInTheDocument();

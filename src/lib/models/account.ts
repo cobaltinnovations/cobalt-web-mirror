@@ -80,6 +80,8 @@ export interface AccountModel {
 		canViewProviderReportUnusedAvailability: boolean; // `PROVIDER_UNUSED_AVAILABILITY` report option in dropdown
 		canManageCareResources: boolean;
 		canCreatePages: boolean;
+		isCareNavigator: boolean; // account holds the NAVIGATOR capability
+		canManageCareEncounters: boolean; // Encounters admin tab (navigator + institution has a Care Navigator booking provider)
 	};
 }
 

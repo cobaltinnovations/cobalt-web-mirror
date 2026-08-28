@@ -50,6 +50,7 @@ import AsyncWrapper from './components/async-page';
 import {
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
 	buildQueryParamUrl,
+	canAccessProviderScheduling,
 	getBookingV2DisabledFallbackUrl,
 	getFeatureIdForLegacyCareUrlName,
 } from './lib/utils';
@@ -195,6 +196,12 @@ const RedirectToAdminPathOrRender = ({ pathname, element }: { pathname: string; 
 const RedirectToAdminHome = () => {
 	const { account } = useAccount();
 
+	// Care Navigators who are not administrators can only reach the Encounters surface,
+	// so never route them at an administrator-only destination.
+	if (account?.roleId !== ROLE_ID.ADMINISTRATOR) {
+		return account?.accountCapabilityFlags.canManageCareEncounters ? <Navigate to="encounters" /> : <NoMatch />;
+	}
+
 	if (account?.accountCapabilityFlags.canAdministerContent) {
 		return <Navigate to="my-content" />;
 	} else if (account?.accountCapabilityFlags.canAdministerGroupSessions) {
@@ -203,6 +210,8 @@ const RedirectToAdminHome = () => {
 		return <Navigate to="reports" />;
 	} else if (account?.accountCapabilityFlags.canViewAnalytics) {
 		return <Navigate to="analytics" />;
+	} else if (account?.accountCapabilityFlags.canManageCareEncounters) {
+		return <Navigate to="encounters" />;
 	} else {
 		return <NoMatch />;
 	}
@@ -684,7 +693,7 @@ export const routes: RouteObject[] = [
 						element: (
 							<ToggledOutlet
 								isEnabled={({ account }) => {
-									return account?.roleId === ROLE_ID.PROVIDER;
+									return canAccessProviderScheduling(account);
 								}}
 							/>
 						),
@@ -1090,7 +1099,10 @@ export const routes: RouteObject[] = [
 				element: (
 					<ToggledOutlet
 						isEnabled={({ account }) => {
-							return account?.roleId === ROLE_ID.ADMINISTRATOR;
+							return (
+								account?.roleId === ROLE_ID.ADMINISTRATOR ||
+								!!account?.accountCapabilityFlags.canManageCareEncounters
+							);
 						}}
 					/>
 				),
@@ -1107,125 +1119,154 @@ export const routes: RouteObject[] = [
 								element: <RedirectToAdminHome />,
 							},
 							{
-								path: 'my-content',
-								element: <RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />,
-							},
-							{
-								path: 'my-content/create',
-								element: <RedirectToAdminPathOrRender pathname="resources/add" element={<NoMatch />} />,
-							},
-							{
-								path: 'available-content',
-								element: <RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />,
-							},
-							{
-								path: 'resources',
+								element: (
+									<ToggledOutlet
+										isEnabled={({ account }) =>
+											!!account?.accountCapabilityFlags.canManageCareEncounters
+										}
+									/>
+								),
 								children: [
 									{
-										id: 'admin-resources',
-										index: true,
-										lazy: () => import('@/routes/admin/resources/resources'),
-									},
-									{
-										id: 'admin-resource-form',
-										path: ':action?/:contentId?',
-										lazy: () => import('@/routes/admin/resources/resource-form'),
+										id: 'admin-encounters',
+										path: 'encounters',
+										lazy: () => import('@/routes/admin/encounters/encounters'),
+										children: [
+											{
+												id: 'admin-encounter-shelf',
+												path: ':encounterId',
+												lazy: () => import('@/routes/admin/encounters/encounter-shelf'),
+											},
+										],
 									},
 								],
 							},
 							{
-								path: 'pages',
+								element: (
+									<ToggledOutlet
+										isEnabled={({ account }) => account?.roleId === ROLE_ID.ADMINISTRATOR}
+									/>
+								),
 								children: [
 									{
-										id: 'admin-pages',
-										index: true,
-										lazy: () => import('@/routes/admin/pages/pages'),
+										path: 'my-content',
+										element: (
+											<RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />
+										),
 									},
 									{
-										id: 'admin-page-builder',
-										path: ':pageId?',
-										lazy: () => import('@/routes/admin/pages/page-builder'),
+										path: 'my-content/create',
+										element: (
+											<RedirectToAdminPathOrRender
+												pathname="resources/add"
+												element={<NoMatch />}
+											/>
+										),
+									},
+									{
+										path: 'available-content',
+										element: (
+											<RedirectToAdminPathOrRender pathname="resources" element={<NoMatch />} />
+										),
+									},
+									{
+										path: 'resources',
+										children: [
+											{
+												id: 'admin-resources',
+												index: true,
+												lazy: () => import('@/routes/admin/resources/resources'),
+											},
+											{
+												id: 'admin-resource-form',
+												path: ':action?/:contentId?',
+												lazy: () => import('@/routes/admin/resources/resource-form'),
+											},
+										],
+									},
+									{
+										path: 'pages',
+										children: [
+											{
+												id: 'admin-pages',
+												index: true,
+												lazy: () => import('@/routes/admin/pages/pages'),
+											},
+											{
+												id: 'admin-page-builder',
+												path: ':pageId?',
+												lazy: () => import('@/routes/admin/pages/page-builder'),
+											},
+										],
+									},
+									{
+										path: 'group-sessions',
+										children: [
+											{
+												id: 'admin-group-sessions',
+												index: true,
+												lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
+											},
+											{
+												id: 'admin-group-session-form',
+												path: ':action?/:groupSessionId?',
+												lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
+											},
+										],
+									},
+									{
+										id: 'admin-reports',
+										path: 'reports',
+										element: <Reports />,
+									},
+									{
+										id: 'admin-scheduling',
+										path: 'scheduling',
+										element: <>TODO: Scheduling</>,
+									},
+									{
+										id: 'admin-analytics-layout',
+										path: 'analytics',
+										lazy: () => import('@/routes/admin/analytics/layout'),
+										children: [
+											{
+												index: true,
+												element: <Navigate to="overview" />,
+											},
+											{
+												id: 'admin-analytics-dashboard-tab',
+												path: ':dashboardTab',
+												lazy: () => import('@/routes/admin/analytics/dashboard-tab'),
+											},
+										],
+									},
+									{
+										id: 'admin-analytics-xray',
+										path: 'x-ray',
+										lazy: () => import('@/routes/admin/analytics/x-ray'),
+									},
+									{
+										id: 'admin-debug',
+										path: 'debug',
+										element: <ToggledOutlet isEnabled={() => config.showDebug} />,
+										children: [
+											{
+												index: true,
+												element: <Navigate to="ui" />,
+											},
+											{
+												id: 'admin-debug-ui',
+												path: 'ui',
+												lazy: () => import('@/routes/admin/debug/ui'),
+											},
+										],
+									},
+									{
+										id: 'admin-study-insights',
+										path: 'study-insights',
+										lazy: () => import('@/routes/admin/study-insights'),
 									},
 								],
-							},
-							{
-								path: 'group-sessions',
-								children: [
-									{
-										id: 'admin-group-sessions',
-										index: true,
-										lazy: () => import('@/routes/admin/group-sessions/group-sessions'),
-									},
-									{
-										id: 'admin-group-session-form',
-										path: ':action?/:groupSessionId?',
-										lazy: () => import('@/routes/admin/group-sessions/group-session-form'),
-									},
-								],
-							},
-							{
-								id: 'admin-reports',
-								path: 'reports',
-								element: <Reports />,
-							},
-							{
-								id: 'admin-encounters',
-								path: 'encounters',
-								lazy: () => import('@/routes/admin/encounters/encounters'),
-								children: [
-									{
-										id: 'admin-encounter-shelf',
-										path: ':encounterId',
-										lazy: () => import('@/routes/admin/encounters/encounter-shelf'),
-									},
-								],
-							},
-							{
-								id: 'admin-scheduling',
-								path: 'scheduling',
-								element: <>TODO: Scheduling</>,
-							},
-							{
-								id: 'admin-analytics-layout',
-								path: 'analytics',
-								lazy: () => import('@/routes/admin/analytics/layout'),
-								children: [
-									{
-										index: true,
-										element: <Navigate to="overview" />,
-									},
-									{
-										id: 'admin-analytics-dashboard-tab',
-										path: ':dashboardTab',
-										lazy: () => import('@/routes/admin/analytics/dashboard-tab'),
-									},
-								],
-							},
-							{
-								id: 'admin-analytics-xray',
-								path: 'x-ray',
-								lazy: () => import('@/routes/admin/analytics/x-ray'),
-							},
-							{
-								id: 'admin-debug',
-								path: 'debug',
-								element: <ToggledOutlet isEnabled={() => config.showDebug} />,
-								children: [
-									{
-										index: true,
-										element: <Navigate to="ui" />,
-									},
-									{
-										id: 'admin-debug-ui',
-										path: 'ui',
-										lazy: () => import('@/routes/admin/debug/ui'),
-									},
-								],
-							},
-							{
-								id: 'admin-study-insights',
-								path: 'study-insights',
-								lazy: () => import('@/routes/admin/study-insights'),
 							},
 						],
 					},

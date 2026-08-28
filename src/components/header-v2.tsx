@@ -34,7 +34,7 @@ import { useAppRootLoaderData } from '@/routes/root';
 
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
-import { buildQueryParamUrl, getGeneralNavigationFeatures } from '@/lib/utils';
+import { buildQueryParamUrl, canAccessProviderScheduling, getGeneralNavigationFeatures } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 export const HEADER_HEIGHT = 60;
@@ -325,7 +325,7 @@ const HeaderV2 = () => {
 	const classes = useHeaderV2Styles();
 	const revalidator = useRevalidator();
 
-	const { account, institution, isAdmin, isProvider, signOutAndClearContext } = useAccount();
+	const { account, institution, isAdmin, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
@@ -603,9 +603,10 @@ const HeaderV2 = () => {
 	/* ----------------------------------------------------------- */
 	/* Admin navigation Config */
 	/* ----------------------------------------------------------- */
+	const canAccessScheduling = canAccessProviderScheduling(account);
 	const adminNavigationConfig = useMemo(() => {
 		return [
-			...(isProvider
+			...(canAccessScheduling
 				? [
 						{
 							testId: 'menuLinkScheduling',
@@ -617,20 +618,20 @@ const HeaderV2 = () => {
 						},
 				  ]
 				: []),
-			...(isAdmin
+			...(isAdmin || account?.accountCapabilityFlags.canManageCareEncounters
 				? [
 						{
 							testId: '',
 							icon: (
 								<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="text-gray" />
 							),
-							title: 'Admin',
-							to: '/admin',
+							title: isAdmin ? 'Admin' : 'Encounters',
+							to: isAdmin ? '/admin' : '/admin/encounters',
 						},
 				  ]
 				: []),
 		];
-	}, [isAdmin, isProvider]);
+	}, [account?.accountCapabilityFlags.canManageCareEncounters, canAccessScheduling, isAdmin]);
 
 	const handleAlertDismiss = useCallback(
 		async (alertId: string) => {

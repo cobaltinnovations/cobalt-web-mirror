@@ -10,7 +10,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
 import { config } from '@/config';
 
-import { AnalyticsNativeEventAccountSignedOutSource, AnalyticsProfileId } from '@/lib/models';
+import { AnalyticsNativeEventAccountSignedOutSource, AnalyticsProfileId, ROLE_ID } from '@/lib/models';
 import SvgIcon from '../svg-icon';
 
 export const ADMIN_HEADER_HEIGHT = 60;
@@ -110,6 +110,7 @@ export const AdminHeader = () => {
 	const classes = useStyles();
 	const location = useLocation();
 	const { account, institution, signOutAndClearContext } = useAccount();
+	const isAdministrator = account?.roleId === ROLE_ID.ADMINISTRATOR;
 
 	const isResourcePreview = useMatch({
 		path: '/admin/resources/preview/*',
@@ -147,7 +148,7 @@ export const AdminHeader = () => {
 
 	const navigationLinks = useMemo(
 		() => [
-			...(account?.accountCapabilityFlags.canAdministerContent
+			...(isAdministrator && account?.accountCapabilityFlags.canAdministerContent
 				? [
 						{
 							testId: '',
@@ -158,7 +159,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(account?.accountCapabilityFlags.canAdministerGroupSessions
+			...(isAdministrator && account?.accountCapabilityFlags.canAdministerGroupSessions
 				? [
 						{
 							testId: '',
@@ -169,7 +170,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(account?.accountCapabilityFlags.canCreatePages
+			...(isAdministrator && account?.accountCapabilityFlags.canCreatePages
 				? [
 						{
 							testId: '',
@@ -180,7 +181,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(account?.accountCapabilityFlags.canViewProviderReports
+			...(isAdministrator && account?.accountCapabilityFlags.canViewProviderReports
 				? [
 						{
 							testId: '',
@@ -191,13 +192,17 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			{
-				testId: '',
-				navigationItemId: 'ENCOUNTERS',
-				to: '/admin/encounters',
-				title: 'Encounters',
-				active: !!encountersMatch,
-			},
+			...(account?.accountCapabilityFlags.canManageCareEncounters
+				? [
+						{
+							testId: '',
+							navigationItemId: 'ENCOUNTERS',
+							to: '/admin/encounters',
+							title: 'Encounters',
+							active: !!encountersMatch,
+						},
+				  ]
+				: []),
 			// {
 			// 	testId: '',
 			// 	navigationItemId: 'SCHEDULING',
@@ -205,7 +210,8 @@ export const AdminHeader = () => {
 			// 	title: 'Scheduling',
 			// 	active: !!schedulingMatch,
 			// },
-			...(account?.accountCapabilityFlags.canViewAnalytics &&
+			...(isAdministrator &&
+			account?.accountCapabilityFlags.canViewAnalytics &&
 			institution.analyticsProfileId === AnalyticsProfileId.LEGACY
 				? [
 						{
@@ -217,7 +223,8 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(account?.accountCapabilityFlags.canViewAnalytics &&
+			...(isAdministrator &&
+			account?.accountCapabilityFlags.canViewAnalytics &&
 			institution.analyticsProfileId === AnalyticsProfileId.XRAY
 				? [
 						{
@@ -229,7 +236,7 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(account?.accountCapabilityFlags.canViewStudyInsights
+			...(isAdministrator && account?.accountCapabilityFlags.canViewStudyInsights
 				? [
 						{
 							testId: '',
@@ -259,6 +266,8 @@ export const AdminHeader = () => {
 			account?.accountCapabilityFlags.canViewAnalytics,
 			account?.accountCapabilityFlags.canViewProviderReports,
 			account?.accountCapabilityFlags.canViewStudyInsights,
+			account?.accountCapabilityFlags.canManageCareEncounters,
+			isAdministrator,
 			analyticsMatch,
 			debugMatch,
 			encountersMatch,
