@@ -48,6 +48,7 @@ export interface AccountModel {
 	genderIdentityId?: string;
 	institutionId: string;
 	institutionLocationId: string;
+	promptedForInstitutionLocation: boolean;
 	insuranceId?: string;
 	jobTitle?: string;
 	languageCode?: string;
