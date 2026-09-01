@@ -146,6 +146,18 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	accountDropdown: {
 		width: 280,
 	},
+	accountMenuButton: {
+		width: 44,
+		height: 44,
+		minHeight: 44,
+		borderRadius: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		'&:focus:not(:focus-visible)': {
+			boxShadow: 'none',
+		},
+	},
 	menuButton: {
 		width: 44,
 		height: 44,
@@ -964,7 +976,8 @@ const HeaderV2 = () => {
 							<Dropdown.Toggle
 								as={DropdownToggle}
 								id="mhic-header__dropdown-menu"
-								className="p-0 border-0"
+								aria-label="Open account menu"
+								className={classNames(classes.accountMenuButton, 'p-0 border-0')}
 							>
 								<SvgIcon kit="fas" icon="circle-user" size={32} className="d-flex" />
 							</Dropdown.Toggle>

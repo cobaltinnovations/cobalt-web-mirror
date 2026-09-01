@@ -11,7 +11,7 @@ jest.mock('@/components/provider-info-detail', () => ({
 	),
 }));
 
-it('adds the standard top padding to the standalone provider info route', async () => {
+it('renders the standalone provider information route', async () => {
 	const router = createMemoryRouter(
 		[
 			{
@@ -26,6 +26,5 @@ it('adds the standard top padding to the standalone provider info route', async 
 	render(<RouterProvider router={router} />);
 
 	const providerInfoDetail = await screen.findByTestId('provider-info-detail');
-	expect(providerInfoDetail).toHaveClass('pt-10');
 	expect(providerInfoDetail).toHaveAttribute('data-provider-id', 'provider-id');
 });

@@ -11,5 +11,5 @@ export const loader = ({ params }: LoaderFunctionArgs) => {
 
 export const Component = () => {
 	const { providerId, clinicId } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-	return <ProviderInfoDetail className="pt-10" providerId={providerId} clinicId={clinicId} />;
+	return <ProviderInfoDetail providerId={providerId} clinicId={clinicId} />;
 };

@@ -22,6 +22,7 @@ import NoData from '@/components/no-data';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import useHandleError from '@/hooks/use-handle-error';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
+import EmployerSelectionModal from '@/components/employer-selection-modal';
 import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
@@ -359,6 +360,62 @@ export const Component = () => {
 	);
 	const selectedInstitutionFeatureName = selectedInstitutionFeature?.name.toLocaleLowerCase() ?? 'matching';
 	const selectedInstitutionLocationName = selectedInstitutionLocation?.name ?? 'the selected employer';
+	const [showEmployerModal, setShowEmployerModal] = useState(false);
+	const [selectedEmployerId, setSelectedEmployerId] = useState('');
+	const openEmployerModal = useCallback(() => {
+		setSelectedEmployerId(institutionLocationId);
+		setShowEmployerModal(true);
+	}, [institutionLocationId]);
+
+	const persistEmployerSelection = useCallback(
+		async (selectedInstitutionLocationId: string) => {
+			const selectionSequence = ++employerSelectionSequenceRef.current;
+
+			if (!selectedInstitutionLocationId) {
+				setSearchParams(
+					(currentSearchParams) => {
+						const nextSearchParams = new URLSearchParams(currentSearchParams);
+						nextSearchParams.delete('institutionLocationId');
+						return nextSearchParams;
+					},
+					{ replace: true }
+				);
+				return;
+			}
+
+			let persistedInstitutionLocationId = selectedInstitutionLocationId;
+			try {
+				if (account) {
+					const response = await accountService
+						.setAccountLocation(account.accountId, {
+							accountId: account.accountId,
+							institutionLocationId: getPersistedInstitutionLocationId(selectedInstitutionLocationId),
+						})
+						.fetch();
+
+					if (response.account.institutionLocationId) {
+						persistedInstitutionLocationId = response.account.institutionLocationId;
+					}
+				}
+			} catch (error) {
+				handleError(error);
+			} finally {
+				if (selectionSequence !== employerSelectionSequenceRef.current) {
+					return;
+				}
+
+				setSearchParams(
+					(currentSearchParams) => {
+						const nextSearchParams = new URLSearchParams(currentSearchParams);
+						nextSearchParams.set('institutionLocationId', persistedInstitutionLocationId);
+						return nextSearchParams;
+					},
+					{ replace: true }
+				);
+			}
+		},
+		[account, handleError, setSearchParams]
+	);
 
 	const shouldPersistForcedLocation = Boolean(account && forceLocation && institutionLocationId);
 	const persistForcedLocation = useCallback(async () => {
@@ -443,9 +500,7 @@ export const Component = () => {
 					{
 						variant: 'primary',
 						title: 'Select Employer',
-						onClick: () => {
-							employerRef.current?.focus();
-						},
+						onClick: openEmployerModal,
 					},
 				],
 			};
@@ -475,9 +530,7 @@ export const Component = () => {
 					{
 						variant: 'primary',
 						title: 'Select Employer',
-						onClick: () => {
-							employerRef.current?.focus();
-						},
+						onClick: openEmployerModal,
 					},
 				],
 			};
@@ -492,6 +545,7 @@ export const Component = () => {
 		featureId,
 		institutionLocationId,
 		providers.length,
+		openEmployerModal,
 		selectedInstitutionFeatureName,
 		selectedInstitutionLocationName,
 	]);
@@ -587,57 +641,28 @@ export const Component = () => {
 
 	const handleEmployerSelectChange = useCallback(
 		async ({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
-			const selectionSequence = ++employerSelectionSequenceRef.current;
-			const selectedInstitutionLocationId = currentTarget.value;
-
-			if (selectedInstitutionLocationId) {
-				let persistedInstitutionLocationId = selectedInstitutionLocationId;
-				try {
-					if (account) {
-						const response = await accountService
-							.setAccountLocation(account.accountId, {
-								accountId: account.accountId,
-								institutionLocationId: getPersistedInstitutionLocationId(selectedInstitutionLocationId),
-							})
-							.fetch();
-
-						if (response.account.institutionLocationId) {
-							persistedInstitutionLocationId = response.account.institutionLocationId;
-						}
-					}
-				} catch (error) {
-					handleError(error);
-				} finally {
-					if (selectionSequence !== employerSelectionSequenceRef.current) {
-						return;
-					}
-
-					setSearchParams(
-						(currentSearchParams) => {
-							const nextSearchParams = new URLSearchParams(currentSearchParams);
-							nextSearchParams.set('institutionLocationId', persistedInstitutionLocationId);
-							return nextSearchParams;
-						},
-						{ replace: true }
-					);
-				}
-			} else {
-				setSearchParams(
-					(currentSearchParams) => {
-						const nextSearchParams = new URLSearchParams(currentSearchParams);
-						nextSearchParams.delete('institutionLocationId');
-						return nextSearchParams;
-					},
-					{ replace: true }
-				);
-			}
+			await persistEmployerSelection(currentTarget.value);
 		},
-		[account, handleError, setSearchParams]
+		[persistEmployerSelection]
 	);
 
 	return (
 		<>
 			<IneligibleBookingModal />
+			<EmployerSelectionModal
+				show={showEmployerModal}
+				institutionLocations={institutionLocations}
+				selectedInstitutionLocationId={selectedEmployerId}
+				onInstitutionLocationSelect={setSelectedEmployerId}
+				onContinue={() => {
+					persistEmployerSelection(selectedEmployerId).then(() => {
+						setShowEmployerModal(false);
+					});
+				}}
+				onHide={() => {
+					setShowEmployerModal(false);
+				}}
+			/>
 			<Helmet>
 				<title>{institution.platformName ?? 'Cobalt'} | Providers</title>
 			</Helmet>

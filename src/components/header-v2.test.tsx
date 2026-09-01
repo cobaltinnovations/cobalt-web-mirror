@@ -14,8 +14,17 @@ jest.mock('react-bootstrap', () => {
 		({ children, className }: { children: React.ReactNode; className?: string }) =>
 			createElement('div', { className }, children),
 		{
-			Toggle: ({ children, id, className }: { children: React.ReactNode; id?: string; className?: string }) =>
-				createElement('button', { id, className }, children),
+			Toggle: ({
+				children,
+				id,
+				className,
+				'aria-label': ariaLabel,
+			}: {
+				children: React.ReactNode;
+				id?: string;
+				className?: string;
+				'aria-label'?: string;
+			}) => createElement('button', { id, className, 'aria-label': ariaLabel }, children),
 			Menu: ({ children, className }: { children: React.ReactNode; className?: string }) =>
 				createElement('div', { className }, children),
 			Item: ({
@@ -139,6 +148,7 @@ it('shows Patient Scheduling for an administrator linked to a provider', () => {
 
 	const schedulingLink = screen.getByText('Patient Scheduling').closest('a');
 	expect(schedulingLink).toHaveAttribute('href', '/scheduling');
+	expect(screen.getByRole('button', { name: 'Open account menu' })).toBeInTheDocument();
 });
 
 it('hides Patient Scheduling for a provider-role account without a linked provider', () => {

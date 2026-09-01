@@ -28,29 +28,7 @@ export const getEffectiveBookingV2Enabled = ({
 
 export const getGeneralNavigationFeatures = ({
 	features,
-	bookingV2Enabled,
-}: Pick<Institution, 'features' | 'bookingV2Enabled'>): InstitutionFeature[] => {
-	if (!bookingV2Enabled) {
-		return features;
-	}
-
-	return features.flatMap((feature) => {
-		if (feature.supportRoleIds.length === 0) {
-			return [feature];
-		}
-
-		if (feature.featureId !== FeatureId.MENTAL_HEALTH_PROVIDERS) {
-			return [];
-		}
-
-		return [
-			{
-				...feature,
-				urlName: '/providers',
-			},
-		];
-	});
-};
+}: Pick<Institution, 'features' | 'bookingV2Enabled'>): InstitutionFeature[] => features;
 
 export const getEffectiveProviderSearchFeatureId = (featureId?: string | null) =>
 	featureId || FeatureId.MENTAL_HEALTH_PROVIDERS;
