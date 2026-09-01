@@ -1,10 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import useAccount from '@/hooks/use-account';
-import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import PathwaysIcon from '@/components/pathways-icons';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
@@ -13,7 +12,6 @@ import useAnalytics from '@/hooks/use-analytics';
 import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId, FeatureId } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
 import { buildQueryParamUrl, getGeneralNavigationFeatures } from '@/lib/utils';
-import SvgIcon from './svg-icon';
 
 interface UseStylesProps {
 	featuresLength: number;
@@ -167,18 +165,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface PathwaysSectionProps {
 	className?: string;
-	featuresScreeningFlow: ReturnType<typeof useScreeningFlow>;
 }
 
-const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionProps) => {
+const PathwaysSection = ({ className }: PathwaysSectionProps) => {
 	const { account, institution } = useAccount();
 	const { trackEvent } = useAnalytics();
 	const generalNavigationFeatures = getGeneralNavigationFeatures(institution);
 	const classes = useStyles({
 		featuresLength: generalNavigationFeatures.filter((feature) => feature.landingPageVisible).length,
 	});
-
-	const { startScreeningFlow } = featuresScreeningFlow;
 
 	return (
 		<>
@@ -228,37 +223,6 @@ const PathwaysSection = ({ className, featuresScreeningFlow }: PathwaysSectionPr
 						</div>
 					</Col>
 				</Row>
-
-				{institution?.hasTakenFeatureScreening && (
-					<Row className="pt-12">
-						<Col>
-							<div className="d-flex align-items-center justify-content-center">
-								<SvgIcon
-									kit="fas"
-									icon="circle-info"
-									size={20}
-									className="me-2 text-p300 flex-shrink-0"
-								/>
-								<p className="mb-0">
-									{(institution?.features ?? []).some((feature) => feature.recommended)
-										? 'Recommendations are based on your recent assessment scores.'
-										: 'There are no recommendations based on your recent assessment scores.'}
-									{institution?.takeFeatureScreening && institution?.hasTakenFeatureScreening && (
-										<Button
-											variant="link"
-											className="ms-1 p-0 fw-normal"
-											onClick={() => {
-												startScreeningFlow();
-											}}
-										>
-											Retake the assessment
-										</Button>
-									)}
-								</p>
-							</div>
-						</Col>
-					</Row>
-				)}
 			</Container>
 		</>
 	);

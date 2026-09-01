@@ -99,6 +99,11 @@ describe('provider booking experience', () => {
 			urlName: '/group-sessions',
 			supportRoleIds: [],
 		});
+		const careNavigator = providerFeature({
+			featureId: FeatureId.RESOURCE_NAVIGATOR,
+			urlName: '/provider-info/care-navigator-provider-id',
+			supportRoleIds: [],
+		});
 		const features = [
 			therapy,
 			medicationPrescriber,
@@ -107,6 +112,7 @@ describe('provider booking experience', () => {
 			mentalHealthProviders,
 			coaching,
 			spiritualSupport,
+			careNavigator,
 		];
 
 		expect(getGeneralNavigationFeatures({ features, bookingV2Enabled: false })).toBe(features);
