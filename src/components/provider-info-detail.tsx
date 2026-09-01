@@ -29,6 +29,13 @@ import {
 } from '@/lib/utils';
 
 const useStyles = createUseThemedStyles((theme) => ({
+	header: {
+		padding: '40px 0',
+		backgroundColor: theme.colors.n75,
+	},
+	body: {
+		padding: '32px 0 64px',
+	},
 	imageOuter: {
 		width: 120,
 		height: 120,
@@ -134,61 +141,71 @@ const ProviderInfoDetail = ({ providerId, clinicId, className }: ProviderInfoDet
 			/>
 
 			<AsyncWrapper fetchData={fetchData}>
-				<Container className={className}>
-					<Row className="mb-8">
-						<Col>
-							<div className="d-flex align-items-center">
-								<div
-									className={classNames(classes.imageOuter, 'me-6')}
-									style={{ backgroundImage: `url(${provider?.imageUrl ?? ''})` }}
-								/>
-								<div>
-									<h3 className="mb-2">{provider?.name ?? clinic?.description}</h3>
+				<div className={className}>
+					<div className={classes.header}>
+						<Container>
+							<Row>
+								<Col>
 									<div className="d-flex align-items-center">
-										{(provider?.supportedAppointmentModalities ?? []).map(
-											(supportedAppointmentModality) => (
-												<div
-													key={supportedAppointmentModality.appointmentModalityId}
-													className="me-4 d-inline-flex align-items-center"
-												>
-													{getSupportedAppointmentModalityIconById(
-														supportedAppointmentModality.appointmentModalityId
-													)}
-													<p className="mb-0">{supportedAppointmentModality.description}</p>
-												</div>
-											)
-										)}
+										<div
+											className={classNames(classes.imageOuter, 'me-6')}
+											style={{ backgroundImage: `url(${provider?.imageUrl ?? ''})` }}
+										/>
+										<div>
+											<h3 className="mb-2">{provider?.name ?? clinic?.description}</h3>
+											<div className="d-flex align-items-center">
+												{(provider?.supportedAppointmentModalities ?? []).map(
+													(supportedAppointmentModality) => (
+														<div
+															key={supportedAppointmentModality.appointmentModalityId}
+															className="me-4 d-inline-flex align-items-center"
+														>
+															{getSupportedAppointmentModalityIconById(
+																supportedAppointmentModality.appointmentModalityId
+															)}
+															<p className="mb-0">
+																{supportedAppointmentModality.description}
+															</p>
+														</div>
+													)
+												)}
+											</div>
+										</div>
 									</div>
-								</div>
-							</div>
-						</Col>
-					</Row>
-					<Row>
-						<Col xs={12} xl={7}>
-							<div
-								dangerouslySetInnerHTML={{ __html: provider?.detailsHtml ?? clinic?.detailsHtml ?? '' }}
-							/>
-						</Col>
-						<Col xs={12} xl={5}>
-							{availability && (
-								<ProviderInfoDetailSchedule
-									featureId={featureId}
-									institutionLocationId={institutionLocationId}
-									bookingV1FallbackUrl={bookingV1FallbackUrl}
-									provider={provider}
-									clinic={clinic}
-									availability={availability}
-									providerId={providerId}
-									clinicId={clinicId}
-									onViewAppointmentsButtonClick={() => {
-										setShowProviderScheduleModal(true);
+								</Col>
+							</Row>
+						</Container>
+					</div>
+					<Container className={classes.body}>
+						<Row>
+							<Col xs={12} xl={7}>
+								<div
+									dangerouslySetInnerHTML={{
+										__html: provider?.detailsHtml ?? clinic?.detailsHtml ?? '',
 									}}
 								/>
-							)}
-							<ProviderInfoDetailContact className="mt-6" provider={provider} clinic={clinic} />
-						</Col>
-					</Row>
-				</Container>
+							</Col>
+							<Col xs={12} xl={5}>
+								{availability && (
+									<ProviderInfoDetailSchedule
+										featureId={featureId}
+										institutionLocationId={institutionLocationId}
+										bookingV1FallbackUrl={bookingV1FallbackUrl}
+										provider={provider}
+										clinic={clinic}
+										availability={availability}
+										providerId={providerId}
+										clinicId={clinicId}
+										onViewAppointmentsButtonClick={() => {
+											setShowProviderScheduleModal(true);
+										}}
+									/>
+								)}
+								<ProviderInfoDetailContact className="mt-6" provider={provider} clinic={clinic} />
+							</Col>
+						</Row>
+					</Container>
+				</div>
 			</AsyncWrapper>
 		</>
 	);
