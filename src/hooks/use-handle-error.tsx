@@ -7,6 +7,7 @@ import { ReauthModalContext } from '@/contexts/reauth-modal-context';
 import useAccount from './use-account';
 import axios from 'axios';
 import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
+import { didBookingExperienceChange } from '@/lib/utils';
 
 function useHandleError(handler?: (error: CobaltError) => boolean | Promise<boolean>): (error: unknown) => void {
 	const { signOutAndClearContext } = useAccount();
@@ -41,6 +42,11 @@ function useHandleError(handler?: (error: CobaltError) => boolean | Promise<bool
 					});
 				}
 
+				return;
+			}
+
+			if (didBookingExperienceChange(handled.apiError?.metadata)) {
+				window.location.reload();
 				return;
 			}
 

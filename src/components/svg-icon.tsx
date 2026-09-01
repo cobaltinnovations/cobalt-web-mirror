@@ -1,7 +1,7 @@
 import React from 'react';
 import { byPrefixAndName, IconName, IconPrefix } from '@awesome.me/kit-c75e843088/icons';
 
-type SvgIconProps = {
+export type SvgIconProps = {
 	kit: IconPrefix;
 	icon: IconName;
 	title?: string;

@@ -105,7 +105,7 @@ export const AppointmentTypeFormModal = ({
 }: AppointmentTypeFormModalProps) => {
 	useTrackModalView('AppointmentTypeFormModal', modalProps.show);
 	const theme = useCobaltTheme();
-	const { account } = useAccount();
+	const { account, institution } = useAccount();
 	const classes = useModalStyles();
 	const handleError = useHandleError();
 
@@ -140,8 +140,8 @@ export const AppointmentTypeFormModal = ({
 				setDurationInMinutes(appointmentType.durationInMinutes);
 			}
 
-			setPatientIntakeQuestions(appointmentType.patientIntakeQuestions);
-			setScreeningQuestions(appointmentType.screeningQuestions);
+			setPatientIntakeQuestions(appointmentType.patientIntakeQuestions ?? []);
+			setScreeningQuestions(appointmentType.screeningQuestions ?? []);
 		} catch (error) {
 			handleError(error);
 		}
@@ -170,7 +170,8 @@ export const AppointmentTypeFormModal = ({
 				visitTypeId,
 				durationInMinutes: duration === 'other' ? durationInMinutes || 0 : parseInt(duration, 10),
 				hexColor: color,
-				patientIntakeQuestions,
+				screeningFlowId: institution.bookingV2Enabled && screeningQuestions.length === 0 ? null : undefined,
+				patientIntakeQuestions: institution.bookingV2Enabled ? [] : patientIntakeQuestions,
 				screeningQuestions,
 			};
 			let response;
@@ -192,6 +193,7 @@ export const AppointmentTypeFormModal = ({
 		duration,
 		durationInMinutes,
 		handleError,
+		institution.bookingV2Enabled,
 		onSave,
 		patientIntakeQuestions,
 		screeningQuestions,
@@ -338,55 +340,61 @@ export const AppointmentTypeFormModal = ({
 					</div>
 				</Form.Group>
 
-				<h3 className="mb-4">Client Information</h3>
+				{institution.bookingV2Enabled ? null : (
+					<>
+						<h3 className="mb-4">Client Information</h3>
 
-				<Form.Group className="mb-5">
-					<Form.Label style={{ ...theme.fonts.default }}>Collect:</Form.Label>
-					<div className="d-flex align-items-center">
-						{Object.values(PatientIntakeCheckboxes).map(
-							({ label, question, fontSizeId, questionContentHintId, disabled, testId }) => {
-								const isChecked = !!(patientIntakeQuestions || []).find(
-									(patientIntakeQuestion) =>
-										patientIntakeQuestion.questionContentHintId === questionContentHintId
-								);
+						<Form.Group className="mb-5">
+							<Form.Label style={{ ...theme.fonts.default }}>Collect:</Form.Label>
+							<div className="d-flex align-items-center">
+								{Object.values(PatientIntakeCheckboxes).map(
+									({ label, question, fontSizeId, questionContentHintId, disabled, testId }) => {
+										const isChecked = !!(patientIntakeQuestions || []).find(
+											(patientIntakeQuestion) =>
+												patientIntakeQuestion.questionContentHintId === questionContentHintId
+										);
 
-								return (
-									<Form.Check
-										data-testid={testId}
-										id={`collect-${questionContentHintId}`}
-										key={questionContentHintId}
-										type="checkbox"
-										name={`collect-${questionContentHintId}`}
-										className="me-6"
-										label={label}
-										checked={isChecked}
-										disabled={disabled}
-										onChange={({ currentTarget }) => {
-											const patientIntakeQuestionsClone = cloneDeep(patientIntakeQuestions || []);
+										return (
+											<Form.Check
+												data-testid={testId}
+												id={`collect-${questionContentHintId}`}
+												key={questionContentHintId}
+												type="checkbox"
+												name={`collect-${questionContentHintId}`}
+												className="me-6"
+												label={label}
+												checked={isChecked}
+												disabled={disabled}
+												onChange={({ currentTarget }) => {
+													const patientIntakeQuestionsClone = cloneDeep(
+														patientIntakeQuestions || []
+													);
 
-											if (currentTarget.checked) {
-												patientIntakeQuestionsClone.push({
-													question,
-													fontSizeId,
-													questionContentHintId,
-												});
-											} else {
-												const indexToRemove = patientIntakeQuestionsClone.findIndex(
-													(patientIntakeQuestion) =>
-														patientIntakeQuestion.questionContentHintId ===
-														questionContentHintId
-												);
-												patientIntakeQuestionsClone.splice(indexToRemove, 1);
-											}
+													if (currentTarget.checked) {
+														patientIntakeQuestionsClone.push({
+															question,
+															fontSizeId,
+															questionContentHintId,
+														});
+													} else {
+														const indexToRemove = patientIntakeQuestionsClone.findIndex(
+															(patientIntakeQuestion) =>
+																patientIntakeQuestion.questionContentHintId ===
+																questionContentHintId
+														);
+														patientIntakeQuestionsClone.splice(indexToRemove, 1);
+													}
 
-											setPatientIntakeQuestions(patientIntakeQuestionsClone);
-										}}
-									/>
-								);
-							}
-						)}
-					</div>
-				</Form.Group>
+													setPatientIntakeQuestions(patientIntakeQuestionsClone);
+												}}
+											/>
+										);
+									}
+								)}
+							</div>
+						</Form.Group>
+					</>
+				)}
 
 				<h3 className="mb-4">Screening Questions</h3>
 
@@ -422,7 +430,7 @@ export const AppointmentTypeFormModal = ({
 								}}
 								helperText="An attendee must first answer “Yes” to this question before being allowed to reserve a seat."
 							/>
-							<div className="mb-5">
+							{/* <div className="mb-5">
 								<Form.Check
 									data-testid="appointmentTypeFormScreeningQuestionSizeCheckbox"
 									id={`screening-question-toggle--${index}`}
@@ -441,7 +449,7 @@ export const AppointmentTypeFormModal = ({
 										setScreeningQuestions(screeningQuestionsClone);
 									}}
 								/>
-							</div>
+							</div> */}
 						</div>
 					);
 				})}

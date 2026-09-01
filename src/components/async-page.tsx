@@ -11,7 +11,7 @@ enum DISPLAY_STATES {
 }
 
 interface AsyncWrapperProps extends PropsWithChildren {
-	fetchData(): void | Promise<void>;
+	fetchData(): void | Promise<unknown>;
 	abortFetch?(): void;
 	showBackButton?: boolean;
 	showRetryButton?: boolean;

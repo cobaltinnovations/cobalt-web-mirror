@@ -1,7 +1,17 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { AppointmentModel, FollowupModel, AccountModel, ATTENDANCE_STATUS_ID } from '@/lib/models';
+import {
+	AccountModel,
+	AppointmentBookingRequirementsDestinationId,
+	BookingExperienceId,
+	AppointmentModel,
+	ATTENDANCE_STATUS_ID,
+	FollowupModel,
+	ProviderAppointmentSelectionTypeId,
+	ScreeningSession,
+} from '@/lib/models';
 
 export interface CreateAppointmentData {
+	bookingExperienceId: BookingExperienceId;
 	accountId?: string;
 	providerId?: string;
 	date: string;
@@ -13,6 +23,42 @@ export interface CreateAppointmentData {
 	intakeAssessmentId?: string;
 	comment?: string;
 	patientOrderId?: string;
+	firstName?: string;
+	lastName?: string;
+	appointmentModalityId?: string;
+	epicAppointmentFhirId?: string;
+}
+
+export type RescheduleAppointmentData = Partial<CreateAppointmentData> &
+	Pick<CreateAppointmentData, 'bookingExperienceId'>;
+
+export interface CancelAppointmentData {
+	cancellationReason?: string;
+}
+
+export interface AppointmentBookingRequirementsData {
+	accountId?: string;
+	providerId: string;
+	appointmentTypeId: string;
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
+	appointmentModalityId?: string;
+	date: string;
+	time: string;
+	epicDepartmentId?: string;
+	epicAppointmentFhirId?: string;
+}
+
+export interface AppointmentBookingRequirements {
+	appointmentBookingRequirementsDestinationId: AppointmentBookingRequirementsDestinationId;
+	accountId: string;
+	providerId: string;
+	appointmentTypeId: string;
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
+	screeningFlowId?: string;
+	screeningRequired: boolean;
+	screeningSatisfied: boolean;
+	screeningSession?: ScreeningSession;
+	context: Record<string, unknown>;
 }
 
 export interface CreateFollowupDate {
@@ -51,6 +97,15 @@ interface FollowupQueryFilters {
 }
 
 export const appointmentService = {
+	getAppointmentBookingRequirements(data: AppointmentBookingRequirementsData) {
+		return httpSingleton.orchestrateRequest<{
+			appointmentBookingRequirements: AppointmentBookingRequirements;
+		}>({
+			method: 'post',
+			url: '/appointments/booking-requirements',
+			data,
+		});
+	},
 	createAppointment(data: CreateAppointmentData) {
 		return httpSingleton.orchestrateRequest<AppointmentResponse>({
 			method: 'post',
@@ -72,11 +127,11 @@ export const appointmentService = {
 			url: `/appointments?${params.toString()}`,
 		});
 	},
-	cancelAppointment(appointmentId: string) {
+	cancelAppointment(appointmentId: string, data: CancelAppointmentData = {}) {
 		return httpSingleton.orchestrateRequest<void>({
 			method: 'put',
 			url: `/appointments/${appointmentId}/cancel`,
-			data: {},
+			data,
 		});
 	},
 	getAppointment(appointmentId?: string) {
@@ -88,7 +143,7 @@ export const appointmentService = {
 		});
 	},
 
-	rescheduleAppointment(appointmentId: string, data: Partial<CreateAppointmentData>) {
+	rescheduleAppointment(appointmentId: string, data: RescheduleAppointmentData) {
 		return httpSingleton.orchestrateRequest<AppointmentResponse>({
 			method: 'put',
 			url: `/appointments/${appointmentId}/reschedule`,

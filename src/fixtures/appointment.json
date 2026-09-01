@@ -3,6 +3,7 @@
 	"accountId": "account-fixture-id-1",
 	"appointmentReasonId": "appointment-reason-id-1",
 	"attendanceStatusId": "UNKNOWN",
+	"appointmentTimeStatusId": "SCHEDULED",
 	"createdByAccountId": "account-fixture-id-1",
 	"appointmentTypeId": "appointment-type-fixture-id-1",
 	"bluejeansMeetingId": 123,

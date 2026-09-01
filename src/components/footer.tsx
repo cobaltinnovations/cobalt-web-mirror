@@ -14,6 +14,7 @@ import FooterNav from './footer-nav';
 
 import { FeatureId } from '@/lib/models';
 import { RouteHandle } from '@/routes';
+import { buildQueryParamUrl, getGeneralNavigationFeatures } from '@/lib/utils';
 import SvgIcon from './svg-icon';
 
 const useFooterStyles = createUseThemedStyles((theme) => ({
@@ -43,6 +44,7 @@ const Footer: FC = () => {
 	const footerRef = useRef<HTMLElement | null>(null);
 	const { account, institution, isIntegratedCarePatient } = useAccount();
 	const routeMatches = useMatches();
+	const generalNavigationFeatures = getGeneralNavigationFeatures(institution);
 
 	const hideFooter = useMemo(() => {
 		// check config for any route in the rendered hierarchy
@@ -138,7 +140,7 @@ const Footer: FC = () => {
 								<Col xs={6} lg={2} className="mb-8">
 									<p className="mb-3 fs-large fw-semibold text-n500">Support</p>
 									<ul className="list-unstyled">
-										{(institution?.features ?? [])
+										{generalNavigationFeatures
 											.filter(
 												(feature) =>
 													feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT' &&
@@ -151,7 +153,10 @@ const Footer: FC = () => {
 														to={
 															featureId === FeatureId.THERAPY &&
 															account?.institutionLocationId
-																? `${urlName}?institutionLocationId=${account.institutionLocationId}`
+																? buildQueryParamUrl(urlName, {
+																		institutionLocationId:
+																			account.institutionLocationId,
+																  })
 																: urlName
 														}
 													>
@@ -164,7 +169,7 @@ const Footer: FC = () => {
 								<Col xs={6} lg={2} className="mb-8">
 									<p className="mb-3 fs-large fw-semibold text-n500">Resources</p>
 									<ul className="list-unstyled">
-										{(institution?.features ?? [])
+										{generalNavigationFeatures
 											.filter(
 												(feature) =>
 													feature.navigationHeaderId === 'BROWSE_RESOURCES' &&

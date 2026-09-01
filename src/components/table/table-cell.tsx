@@ -42,9 +42,11 @@ const useTableCellStyles = createUseThemedStyles((theme) => ({
 	},
 	sortableButton: {
 		padding: 0,
+		minHeight: 'auto',
 		alignItems: 'center',
 		display: 'inline-flex',
-		justifyContent: 'center',
+		justifyContent: 'flex-start',
+		textAlign: 'left',
 		textDecoration: 'none',
 		'&:focus': {
 			boxShadow: 'none !important',

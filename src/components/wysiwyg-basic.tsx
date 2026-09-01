@@ -34,7 +34,7 @@ const customTitleStyles = [
 	{ title: 'Title 3', value: '3' },
 ];
 
-type WysiwygToolbarPreset = 'default' | 'page-builder';
+type WysiwygToolbarPreset = 'default' | 'page-builder' | 'care-encounter-message';
 type PageBuilderTextStyleId = 'TITLE_1' | 'TITLE_2' | 'TITLE_3' | 'BODY_SMALL' | 'BODY_NORMAL' | 'BODY_LARGE';
 
 const pageBuilderTextStyles: Array<
@@ -242,7 +242,11 @@ const defaultQuillModules = {
 		['link', 'clean'],
 	],
 };
+const careEncounterMessageQuillModules = {
+	toolbar: [['bold', 'italic', 'underline'], [{ list: 'bullet' }, { list: 'ordered' }], ['link']],
+};
 const defaultQuillFormats = ['size', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link'];
+const careEncounterMessageQuillFormats = ['bold', 'italic', 'underline', 'list', 'bullet', 'link'];
 const pageBuilderQuillFormats = [
 	'header',
 	'size',
@@ -290,18 +294,23 @@ const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
 		const [isPageBuilderStyleMenuOpen, setIsPageBuilderStyleMenuOpen] = useState(false);
 		const [activePageBuilderTextStyleId, setActivePageBuilderTextStyleId] =
 			useState<PageBuilderTextStyleId>('BODY_NORMAL');
-		const modules = useMemo(
-			() =>
-				toolbarPreset === 'page-builder'
-					? {
-							toolbar: {
-								container: `#${pageBuilderToolbarId}`,
-							},
-					  }
-					: defaultQuillModules,
-			[pageBuilderToolbarId, toolbarPreset]
-		);
-		const formats = toolbarPreset === 'page-builder' ? pageBuilderQuillFormats : defaultQuillFormats;
+		const modules = useMemo(() => {
+			if (toolbarPreset === 'page-builder') {
+				return {
+					toolbar: {
+						container: `#${pageBuilderToolbarId}`,
+					},
+				};
+			}
+
+			return toolbarPreset === 'care-encounter-message' ? careEncounterMessageQuillModules : defaultQuillModules;
+		}, [pageBuilderToolbarId, toolbarPreset]);
+		const formats =
+			toolbarPreset === 'page-builder'
+				? pageBuilderQuillFormats
+				: toolbarPreset === 'care-encounter-message'
+				? careEncounterMessageQuillFormats
+				: defaultQuillFormats;
 		const activePageBuilderTextStyle = pageBuilderTextStyleOptions.find(
 			(pageBuilderTextStyleOption) => pageBuilderTextStyleOption.id === activePageBuilderTextStyleId
 		);

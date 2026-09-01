@@ -131,6 +131,8 @@ export interface Institution {
 	platformName: string;
 
 	analyticsProfileId: AnalyticsProfileId;
+
+	bookingV2Enabled: boolean;
 }
 
 export interface InstitutionFeature {
@@ -141,6 +143,7 @@ export interface InstitutionFeature {
 	navVisible: boolean;
 	landingPageVisible: boolean;
 	navigationHeaderId: string;
+	providerId?: string;
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];
 	urlName: string;

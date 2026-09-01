@@ -17,6 +17,12 @@ import {
 	Specialty,
 	ProviderVisitType,
 	FeatureId,
+	ProviderSearchResultModel,
+	ProviderAppointmentSelectionTypeId,
+	AppointmentModality,
+	FirstAvailableAppointmentModel,
+	ScreeningRequirement,
+	AppointmentTypeSummary,
 } from '@/lib/models';
 import { OrchestratedRequest } from '@/lib/http-client';
 
@@ -158,6 +164,20 @@ interface GetProviderByIdResponse {
 	provider: Provider;
 }
 
+export interface AvailabilityModel {
+	appointmentTypes: AppointmentTypeSummary[];
+	appointmentModalities: AppointmentModality[];
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
+	providerId?: string;
+	providerName?: string;
+	clinicId?: string;
+	clinicDescription?: string;
+	startDate: string;
+	endDate: string;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
+	screeningRequirement?: ScreeningRequirement;
+}
+
 export const providerService = {
 	fetchFindOptions({
 		supportRoleIds,
@@ -222,6 +242,15 @@ export const providerService = {
 			method: 'post',
 			url: '/providers/find',
 			data: filters,
+		});
+	},
+
+	searchProviders(queryParams: { featureId?: string; institutionLocationId?: string }) {
+		const params = new URLSearchParams({ ...queryParams });
+
+		return httpSingleton.orchestrateRequest<{ providers: ProviderSearchResultModel[] }>({
+			method: 'get',
+			url: `/providers/search?${params.toString()}`,
 		});
 	},
 
@@ -300,6 +329,45 @@ export const providerService = {
 		return httpSingleton.orchestrateRequest<GetProviderByIdResponse>({
 			method: 'get',
 			url: `/providers/${providerId}`,
+		});
+	},
+
+	getProviderAvailability(
+		providerId: string,
+		queryParams?: {
+			featureId?: string;
+			institutionLocationId?: string;
+			startDate?: string;
+			endDate?: string;
+			appointmentTypeId?: string;
+		}
+	) {
+		const params = new URLSearchParams({ ...queryParams });
+
+		return httpSingleton.orchestrateRequest<{
+			providerAvailability: AvailabilityModel;
+		}>({
+			method: 'get',
+			url: `/providers/${providerId}/availability?${params}`,
+		});
+	},
+	getClinicAvailability(
+		clinicId: string,
+		queryParams?: {
+			featureId?: string;
+			institutionLocationId?: string;
+			startDate?: string;
+			endDate?: string;
+			appointmentTypeId?: string;
+		}
+	) {
+		const params = new URLSearchParams({ ...queryParams });
+
+		return httpSingleton.orchestrateRequest<{
+			clinicAvailability: AvailabilityModel;
+		}>({
+			method: 'get',
+			url: `/clinics/${clinicId}/availability?${params}`,
 		});
 	},
 };

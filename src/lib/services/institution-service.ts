@@ -2,6 +2,7 @@ import { httpSingleton } from '@/lib/singletons/http-singleton';
 import {
 	AccountSource,
 	Institution,
+	InstitutionFeature,
 	InstitutionLocation,
 	InstitutionResource,
 	InstitutionResourceGroup,
@@ -65,6 +66,14 @@ export const institutionService = {
 		}>({
 			method: 'GET',
 			url: '/institution/locations',
+		});
+	},
+	getInstitutionLocationByIinstitutionLocationId(institutionLocationId: string) {
+		return httpSingleton.orchestrateRequest<{
+			location: InstitutionLocation;
+		}>({
+			method: 'GET',
+			url: `/institution/locations/${institutionLocationId}`,
 		});
 	},
 	dismissAlert(alertId: string) {
@@ -139,6 +148,12 @@ export const institutionService = {
 		return httpSingleton.orchestrateRequest<{ video: CourseVideoModel }>({
 			method: 'GET',
 			url: `/videos/${videoId}`,
+		});
+	},
+	getCareTypes() {
+		return httpSingleton.orchestrateRequest<{ careTypes: InstitutionFeature[] }>({
+			method: 'GET',
+			url: `/institution/care-types`,
 		});
 	},
 };

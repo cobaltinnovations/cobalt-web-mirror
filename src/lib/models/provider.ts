@@ -1,4 +1,5 @@
 import { AppointmentType } from './appointments';
+import { ResourcePacketAddress } from './care-resource-models';
 
 // https://github.com/Penn-Medicine-CHCI/cobalt-api/blob/master/src/main/java/com/cobaltplatform/api/model/db/SupportRole.java#L18
 export enum SupportRoleId {
@@ -52,8 +53,10 @@ export interface AvailabilityTimeSlot {
 	appointmentParticipantStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentStatusCodesByAppointmentTypeId?: Record<string, string>;
 	appointmentTypeIds: string[];
+	appointmentTypeDescription?: string;
 	epicAppointmentFhirId?: string;
 	epicDepartmentId?: string;
+	providerId?: string;
 	slotStatusCodesByAppointmentTypeId?: Record<string, string>;
 	status: string;
 	time: string;
@@ -65,11 +68,32 @@ export interface SupportRole {
 	description: string;
 }
 
+enum ClinicBookingPreferenceId {
+	DIRECT = 'DIRECT',
+	NONE = 'NONE',
+}
+
+export interface ProviderLocation {
+	locationId: string;
+	name?: string;
+	shortName?: string;
+	address?: ResourcePacketAddress;
+}
+
 export interface Clinic {
 	clinicId: string;
 	description: string;
 	institutionId: string;
 	showIntakeAssessmentPrompt: boolean;
+	clinicBookingPreferenceId: ClinicBookingPreferenceId;
+	treatmentDescription?: string;
+	phoneNumber?: string;
+	phoneNumberDescription?: string;
+	formattedPhoneNumber?: string;
+	emailAddress?: string;
+	locations: ProviderLocation[];
+	websiteUrl: string;
+	detailsHtml: string;
 }
 
 export interface Provider {
@@ -107,9 +131,106 @@ export interface Provider {
 	bioUrl?: string;
 	displayPhoneNumberOnlyForBooking: boolean;
 	description?: string;
+	urlName?: string;
+
+	supportedAppointmentModalities: AppointmentModality[];
+	locations: ProviderLocation[];
+	websiteUrl: string;
+	detailsHtml: string;
 }
 
 export interface Specialty {
 	description: string;
 	specialtyId: string;
+}
+
+export enum ProviderSearchResultTypeId {
+	PROVIDER = 'PROVIDER',
+	CLINIC = 'CLINIC',
+}
+
+export enum ProviderAppointmentModalityId {
+	PHONE = 'PHONE',
+	IN_PERSON = 'IN_PERSON',
+	VIRTUAL = 'VIRTUAL',
+}
+
+export interface AppointmentModality {
+	appointmentModalityId: ProviderAppointmentModalityId;
+	availability: { date: string; times: AvailabilityTimeSlot[] }[];
+	description: string;
+}
+
+export enum ProviderAppointmentSelectionTypeId {
+	APPOINTMENT_PREDETERMINED = 'APPOINTMENT_PREDETERMINED',
+	APPOINTMENT_UNDETERMINED = 'APPOINTMENT_UNDETERMINED',
+	APPOINTMENT_BY_PHONE = 'APPOINTMENT_BY_PHONE',
+}
+
+export interface ProviderSearchResponse {
+	providers: ProviderSearchResultModel[];
+}
+
+export interface ProviderSearchResultModel {
+	appointmentBookingLevelId: string;
+	appointmentDescription?: string;
+	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
+	clinicId?: string;
+	description?: string;
+	firstAvailableAppointment?: FirstAvailableAppointmentModel;
+	formattedPhoneNumber?: string;
+	hasMoreAppointments: boolean;
+	imageUrl?: string;
+	institutionId?: string;
+	name?: string;
+	phoneNumber?: string;
+	phoneNumberDescription?: string;
+	providerId?: string;
+	providerSearchResultId?: string;
+	providerSearchResultTypeId: ProviderSearchResultTypeId;
+	screeningRequirement?: ScreeningRequirement;
+	supportedAppointmentModalities: ProviderAppointmentModality[];
+	title?: string;
+	treatmentDescription?: string;
+}
+
+export interface ScreeningRequirement {
+	appointmentBookingRequirementsDestinationId: AppointmentBookingRequirementsDestinationId;
+	screeningFlowId?: string;
+	screeningRequired: boolean;
+	screeningSatisfied: boolean;
+}
+
+export enum AppointmentBookingRequirementsDestinationId {
+	APPOINTMENT_BOOKING = 'APPOINTMENT_BOOKING',
+	SCREENING_SESSION = 'SCREENING_SESSION',
+}
+
+export interface AppointmentTypeSummary {
+	appointmentTypeId: string;
+	name?: string;
+	description?: string;
+	durationInMinutes?: number;
+	durationInMinutesDescription?: string;
+	screeningFlowId?: string;
+	assessmentId?: string;
+}
+
+export interface ProviderAppointmentModality {
+	appointmentModalityId: ProviderAppointmentModalityId;
+	description: string;
+}
+
+export interface FirstAvailableAppointmentModel {
+	providerId?: string;
+	date: string;
+	time: string;
+	dateTime: string;
+	timeDescription: string;
+	appointmentTypeId?: string;
+	appointmentTypeIds?: string[];
+	appointmentDescription?: string;
+	assessmentId?: string;
+	epicDepartmentId?: string;
+	epicAppointmentFhirId?: string;
 }

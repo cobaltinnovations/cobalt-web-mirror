@@ -8,7 +8,6 @@ const useStyles = createUseThemedStyles((theme) => ({
 	header: {
 		backgroundColor: theme.colors.n0,
 		borderBottom: `1px solid ${theme.colors.n100}`,
-		boxShadow: '0 0 1px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(26, 26, 26, 0.07)',
 		position: 'sticky',
 		top: 0,
 		zIndex: 4,

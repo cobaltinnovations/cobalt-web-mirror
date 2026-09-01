@@ -38,7 +38,7 @@ import {
 	CourseModel,
 } from '@/lib/models';
 
-import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession } from '@/lib/utils';
+import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getGeneralNavigationFeatures } from '@/lib/utils';
 import { useAppRootLoaderData } from '@/routes/root';
 import { useScreeningFlow } from './screening/screening.hooks';
 import useAnalytics from '@/hooks/use-analytics';
@@ -195,7 +195,7 @@ const Index: FC = () => {
 		return renderedPreScreeningLoader;
 	}
 
-	const hasLandingPageFeatures = institution?.features.filter((f) => f.landingPageVisible).length > 0;
+	const hasLandingPageFeatures = getGeneralNavigationFeatures(institution).some((feature) => feature.landingPageVisible);
 	const showFeatureScreeningCta =
 		!institution.epicFhirEnabled && institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening;
 
