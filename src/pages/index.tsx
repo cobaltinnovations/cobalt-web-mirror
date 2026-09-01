@@ -54,7 +54,6 @@ import FeatureScreeningCta from '@/components/feature-screening-cta';
 import { CourseContinue } from '@/components/courses';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import { ScreeningFlow } from '@/components/screening-v2';
-import { shouldPromptForInstitutionLocation } from '@/lib/utils/onboarding-utils';
 
 const Index: FC = () => {
 	const { featuredTopicCenters, legacyFeaturedTopicCenter, legacySecondaryFeaturedTopicCenter } =
@@ -126,13 +125,7 @@ const Index: FC = () => {
 		setCompletedCourses(coursesResponse.completed);
 		setInstitutionBlurbs(blurbsResponse.institutionBlurbsByInstitutionBlurbTypeId);
 
-		if (
-			institution.onboardingScreeningFlowId &&
-			shouldPromptForInstitutionLocation({
-				institutionLocationId: account.institutionLocationId,
-				promptedForInstitutionLocation: account.promptedForInstitutionLocation,
-			})
-		) {
+		if (institution.onboardingScreeningFlowId) {
 			const { sessionFullyCompleted } = await screeningService
 				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.onboardingScreeningFlowId)
 				.fetch();
@@ -153,12 +146,7 @@ const Index: FC = () => {
 		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_HOME);
-	}, [
-		account?.accountId,
-		account?.institutionLocationId,
-		account?.promptedForInstitutionLocation,
-		institution.onboardingScreeningFlowId,
-	]);
+	}, [account?.accountId, institution.onboardingScreeningFlowId]);
 
 	const fetchCallsToAction = useCallback(async () => {
 		const response = await callToActionService
@@ -207,9 +195,7 @@ const Index: FC = () => {
 		return renderedPreScreeningLoader;
 	}
 
-	const hasLandingPageFeatures = getGeneralNavigationFeatures(institution).some(
-		(feature) => feature.landingPageVisible
-	);
+	const hasLandingPageFeatures = getGeneralNavigationFeatures(institution).some((feature) => feature.landingPageVisible);
 	const showFeatureScreeningCta =
 		!institution.epicFhirEnabled && institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening;
 
