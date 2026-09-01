@@ -90,6 +90,8 @@ const careEncounter: CareEncounterModel = {
 	careEncounterId: 'care-encounter-1',
 	appointmentId: 'appointment-1',
 	accountId: 'account-1',
+	careNavigatorAccountId: 'care-navigator-1',
+	careNavigatorDisplayName: 'First Navigator',
 	careEncounterStatusId: CareEncounterStatusId.OPEN,
 	careEncounterStatusDisplayLabel: 'Open',
 	patientFullName: 'Avery Morgan',
@@ -100,6 +102,7 @@ const careEncounter: CareEncounterModel = {
 	notesEditable: true,
 	careEncounterScheduledMessages: [],
 	createdByAccountId: 'account-2',
+	createdByAccountDisplayName: 'Avery Morgan (Patient — self-booked)',
 	lastUpdatedByAccountId: 'account-2',
 	created: '2026-07-28T14:00:00Z',
 	createdDescription: 'Jul 28, 2026 at 10:00 AM',
@@ -626,6 +629,7 @@ it('opens an encounter shelf from an API row and preserves list query parameters
 	expect(router.state.location.search).toBe('?source=admin&status=OPEN');
 	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
 	expect(screen.getByText('Care Navigator:')).toBeInTheDocument();
+	expect(screen.getByText('First Navigator')).toBeInTheDocument();
 	expect(getCareEncounterSpy).toHaveBeenCalledWith('care-encounter-1');
 
 	await act(async () => {
@@ -640,9 +644,9 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	const router = renderEncounters('/admin/encounters/any-encounter-id?status=CLOSED');
 
 	expect(await screen.findByRole('heading', { name: 'Avery Morgan' })).toBeInTheDocument();
-	expect(screen.getByText('Navigator Name')).toBeInTheDocument();
+	expect(screen.getByText('First Navigator')).toBeInTheDocument();
 	expect(screen.getAllByText('Backend Created Date')).toHaveLength(3);
-	expect(screen.getAllByText('Unknown').length).toBeGreaterThan(0);
+	expect(screen.getByText('Avery Morgan (Patient — self-booked)')).toBeInTheDocument();
 	expect(screen.getByText('patient@example.com')).toBeInTheDocument();
 	expect(screen.getByText('Navigator Appointment')).toBeInTheDocument();
 	expect(screen.getByRole('heading', { name: 'No Screening Answers' })).toBeInTheDocument();
@@ -1466,7 +1470,10 @@ it('renders neutral fallbacks for unavailable encounter details', async () => {
 					...defaultDetailResponse,
 					careEncounter: {
 						...careEncounter,
+						careNavigatorAccountId: undefined,
+						careNavigatorDisplayName: undefined,
 						emailAddress: undefined,
+						createdByAccountDisplayName: undefined,
 						appointment: {
 							...careEncounter.appointment,
 							provider: undefined,
@@ -1518,7 +1525,7 @@ it('renders encounter notes in backend order and updates the notes tab count', a
 
 	expect(await screen.findByText('First encounter note')).toBeInTheDocument();
 	expect(screen.getByText('Second encounter note')).toBeInTheDocument();
-	expect(screen.getByText('First Navigator')).toBeInTheDocument();
+	expect(screen.getAllByText('First Navigator')).toHaveLength(2);
 	expect(screen.getAllByText('Unknown').length).toBeGreaterThan(0);
 	expect(screen.getByText('Aug 20, 2026 at 11:04 AM')).toBeInTheDocument();
 	expect(screen.getByText('Aug 19, 2026 at 10:00 AM')).toBeInTheDocument();

@@ -158,6 +158,18 @@ export const AppointmentDetailPanel = ({
 
 	const showIntakeResponses =
 		!!assessment && Array.isArray(assessment.assessmentQuestions) && assessment.assessmentQuestions.length > 0;
+	const screeningResults = appointment?.screeningSessionResult?.screeningSessionScreeningResults ?? [];
+	const showScreeningResponses = screeningResults.some(
+		(screeningResult) => (screeningResult.screeningQuestionResults?.length ?? 0) > 0
+	);
+	const patientFirstName = appointment?.firstName ?? patient?.firstName;
+	const patientLastName = appointment?.lastName ?? patient?.lastName;
+	const patientEmailAddress = appointment?.emailAddress ?? patient?.emailAddress;
+	const patientPhoneNumber =
+		appointment?.contactPhoneNumberDescription ??
+		appointment?.contactPhoneNumber ??
+		patient?.phoneNumberDescription ??
+		patient?.phoneNumber;
 
 	const handleCancelAppointmentButtonClick = useCallback(async () => {
 		setConfirmDialogIsShowing(true);
@@ -185,7 +197,7 @@ export const AppointmentDetailPanel = ({
 					setConfirmDialogIsShowing(false);
 				}}
 				titleText="Cancel Appointment"
-				bodyText={`Are you sure you want to cancel this appointment? An email will be sent to ${patient?.emailAddress} letting them know the appointment has been canceled.`}
+				bodyText={`Are you sure you want to cancel this appointment? An email will be sent to ${patientEmailAddress} letting them know the appointment has been canceled.`}
 				dismissText="Do Not Cancel"
 				confirmText="Cancel Appointment"
 				onConfirm={handleCancelAppointmentConfirm}
@@ -196,8 +208,8 @@ export const AppointmentDetailPanel = ({
 				<div className="d-flex align-items-center justify-content-between py-4">
 					<div>
 						<h4>
-							{patient?.firstName || patient?.lastName
-								? `${patient?.firstName} ${patient?.lastName}`
+							{patientFirstName || patientLastName
+								? `${patientFirstName ?? ''} ${patientLastName ?? ''}`.trim()
 								: 'Anonymous'}
 						</h4>
 
@@ -224,7 +236,7 @@ export const AppointmentDetailPanel = ({
 						as="a"
 						variant="primary"
 						size="sm"
-						className="py-2 me-1 text-decoration-none"
+						className="py-2 me-1 text-white text-decoration-none"
 						href={appointment?.videoconferenceUrl}
 						target="_blank"
 					>
@@ -280,15 +292,57 @@ export const AppointmentDetailPanel = ({
 					<p className="mb-0">
 						<strong>Phone</strong>
 					</p>
-					<p>{patient?.phoneNumber || 'Not available'}</p>
+					<p>{patientPhoneNumber || 'Not available'}</p>
 
 					<p className="mb-0">
 						<strong>Email</strong>
 					</p>
-					<p>{patient?.emailAddress || 'Not available'}</p>
+					<p>{patientEmailAddress || 'Not available'}</p>
 				</div>
 
-				{showIntakeResponses && (
+				{showScreeningResponses && (
+					<div className="border py-2 px-3 mt-2">
+						<div className="d-flex mb-1 justify-content-between align-items-center">
+							<p className="mb-0">
+								<strong>Screening Responses</strong>
+							</p>
+						</div>
+
+						{screeningResults.map((screeningResult, screeningResultIndex) => (
+							<div
+								key={
+									screeningResult.screeningId ??
+									screeningResult.screeningVersionId ??
+									screeningResultIndex
+								}
+								className="mb-1"
+							>
+								{screeningResults.length > 1 && screeningResult.screeningName && (
+									<p className="mb-1">
+										<strong>{screeningResult.screeningName}</strong>
+									</p>
+								)}
+								{screeningResult.screeningQuestionResults?.map((question, questionIndex) => (
+									<React.Fragment key={question.screeningQuestionId ?? questionIndex}>
+										<p className="mb-0">
+											<strong>{question.screeningQuestionText}</strong>
+										</p>
+										{question.screeningAnswerResults?.map((answer, answerIndex) => (
+											<React.Fragment key={answer.screeningAnswerId ?? answerIndex}>
+												{answer.answerOptionText && (
+													<p className="mb-0">{answer.answerOptionText}</p>
+												)}
+												{answer.text && <p>{answer.text}</p>}
+											</React.Fragment>
+										))}
+									</React.Fragment>
+								))}
+							</div>
+						))}
+					</div>
+				)}
+
+				{!showScreeningResponses && showIntakeResponses && (
 					<div className="border py-2 px-3 mt-2">
 						<div className="d-flex mb-1 justify-content-between align-items-center">
 							<p className="mb-0">

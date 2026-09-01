@@ -26,7 +26,7 @@ import {
 
 const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
-		maxWidth: 620,
+		maxWidth: 680,
 	},
 	field: {
 		flex: 1,
@@ -35,6 +35,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		borderTop: `1px solid ${theme.colors.border}`,
 	},
 	preview: {
+		overflowX: 'auto',
 		'& p, & div': {
 			marginBottom: 20,
 		},
@@ -143,11 +144,6 @@ export const CareEncounterMessageModal = ({ careEncounterId, messageToEdit, onCh
 
 		if (!scheduledAt.isValid()) {
 			setValidationMessage('Enter a valid scheduled time.');
-			return undefined;
-		}
-
-		if (scheduledAt.isBefore(moment().startOf('minute'))) {
-			setValidationMessage('Scheduled time cannot be in the past.');
 			return undefined;
 		}
 
@@ -261,7 +257,7 @@ export const CareEncounterMessageModal = ({ careEncounterId, messageToEdit, onCh
 								Below is the text that will be included in your follow-up message. Please review your
 								email text before sending.
 							</p>
-							<WysiwygDisplay html={preview.emailContentHtml} className={classes.preview} />
+							<WysiwygDisplay html={preview.emailBody} className={classes.preview} />
 						</Modal.Body>
 						<Modal.Footer className="d-flex justify-content-between">
 							<Button
@@ -291,7 +287,6 @@ export const CareEncounterMessageModal = ({ careEncounterId, messageToEdit, onCh
 									<DatePicker
 										labelText="Date"
 										selected={formValues.date}
-										minDate={new Date()}
 										onChange={(date) => {
 											setFormValues((current) => ({ ...current, date: date ?? undefined }));
 										}}

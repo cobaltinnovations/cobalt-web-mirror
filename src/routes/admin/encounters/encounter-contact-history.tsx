@@ -105,7 +105,7 @@ const ReadOnlyMessage = ({ message }: { message: CareEncounterScheduledMessageMo
 				<p className="mb-0 text-n500">{sent ? message.sentAtDescription : message.scheduledAtDescription}</p>
 			</div>
 			{!sent && <p className="mb-0 text-n500">Status: {statusDescription}</p>}
-			<WysiwygDisplay html={message.emailContentHtml} className={classes.readOnlyBody} />
+			<WysiwygDisplay html={message.emailBody} className={classes.readOnlyBody} />
 		</article>
 	);
 };

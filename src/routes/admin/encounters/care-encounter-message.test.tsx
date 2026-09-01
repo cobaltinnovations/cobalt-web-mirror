@@ -98,7 +98,6 @@ const pendingMessage = {
 	recipientEmailAddress: 'patient@example.com',
 	customEmailText: '<p>Original resources.</p>',
 	emailSubject: 'Follow-up from Cobalt',
-	emailContentHtml: '<p>Hello Avery,</p><p>Original resources.</p>',
 	emailBody: '<html><body><p>Hello Avery,</p><p>Original resources.</p></body></html>',
 	editable: true,
 	cancelable: true,
@@ -150,7 +149,6 @@ beforeEach(() => {
 		fetch: jest.fn().mockResolvedValue({
 			careEncounterScheduledMessagePreview: {
 				emailSubject: 'Follow-up from Cobalt',
-				emailContentHtml: '<p>Previewed follow-up copy</p>',
 				emailBody: '<html><body><p>Previewed follow-up copy</p></body></html>',
 			},
 		}),
@@ -220,7 +218,7 @@ it('uses one form state across the create and preview pages and schedules the me
 	});
 });
 
-it('rejects a past local time before requesting a preview', async () => {
+it('allows a past local time to proceed to preview', async () => {
 	renderWithTheme(
 		<CareEncounterMessageModal show careEncounterId="care-encounter-1" onHide={jest.fn()} onChanged={jest.fn()} />
 	);
@@ -233,8 +231,9 @@ it('rejects a past local time before requesting a preview', async () => {
 	fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: '12:00 AM' } });
 	fireEvent.click(screen.getByRole('button', { name: 'Next: Preview' }));
 
-	expect(await screen.findByRole('alert')).toHaveTextContent('Scheduled time cannot be in the past.');
-	expect(previewMessageSpy).not.toHaveBeenCalled();
+	expect(await screen.findByText('Previewed follow-up copy')).toBeInTheDocument();
+	expect(previewMessageSpy).toHaveBeenCalledTimes(1);
+	expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 });
 
 it('edits directly from the form and confirms deletion', async () => {
