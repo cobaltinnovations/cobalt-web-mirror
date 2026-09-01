@@ -195,9 +195,10 @@ const Index: FC = () => {
 		return renderedPreScreeningLoader;
 	}
 
-	const hasLandingPageFeatures = getGeneralNavigationFeatures(institution).some((feature) => feature.landingPageVisible);
-	const showFeatureScreeningCta =
-		!institution.epicFhirEnabled && institution?.featureScreeningFlowId && !institution.hasTakenFeatureScreening;
+	const hasLandingPageFeatures = getGeneralNavigationFeatures(institution).some(
+		(feature) => feature.landingPageVisible
+	);
+	const showFeatureScreeningCta = !institution.epicFhirEnabled && Boolean(institution?.featureScreeningFlowId);
 
 	return (
 		<>
@@ -246,9 +247,7 @@ const Index: FC = () => {
 							)}
 						</Row>
 					</Container>
-					{hasLandingPageFeatures && (
-						<PathwaysSection className="mb-10" featuresScreeningFlow={featuresScreeningFlow} />
-					)}
+					{hasLandingPageFeatures && <PathwaysSection className="mb-10" />}
 					{showFeatureScreeningCta && (
 						<FeatureScreeningCta
 							onStartAssessment={() => {
