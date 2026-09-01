@@ -44,7 +44,7 @@ const ProviderInfoDetailContact = ({
 	const source = provider ?? clinic;
 	const phoneNumber = source?.phoneNumber;
 	const phoneNumberDescription = source?.formattedPhoneNumber ?? source?.phoneNumber;
-	const locations = source?.locations ?? [];
+	const locations = (source?.locations ?? []).filter((location) => location.address);
 	const websiteUrl = source?.websiteUrl;
 
 	if (!phoneNumber && locations.length === 0 && !websiteUrl) {

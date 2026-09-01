@@ -247,7 +247,7 @@ export const accountService = {
 			account: AccountModel;
 			appointment: AppointmentModel;
 			appointments: AppointmentModel[];
-			assessment: PersonalizationDetails;
+			assessment?: PersonalizationDetails;
 		}>({
 			method: 'GET',
 			url: `/accounts/${accountId}/appointment-details/${appointmentId}`,

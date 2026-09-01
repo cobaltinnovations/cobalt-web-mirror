@@ -35,13 +35,17 @@ it('renders the provider header as a tinted, full-width hero', () => {
 	expect(providerContainers).toHaveLength(2);
 
 	const header = providerContainers[0].parentElement;
+	const body = providerContainers[1];
 	expect(header).toHaveStyle({
 		backgroundColor: '#F5F0EC',
-		marginBottom: '32px',
 		paddingTop: '40px',
 		paddingBottom: '40px',
 		marginTop: '-32px',
 		marginLeft: '-40px',
 		marginRight: '-40px',
+	});
+	expect(body).toHaveStyle({
+		paddingTop: '32px',
+		paddingBottom: '64px',
 	});
 });

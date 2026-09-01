@@ -85,7 +85,6 @@ export type PreviewCareEncounterScheduledMessageRequestBody = Pick<
 
 export interface CareEncounterScheduledMessagePreviewModel {
 	emailSubject: string;
-	emailContentHtml: string;
 	emailBody: string;
 }
 

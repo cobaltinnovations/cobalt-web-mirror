@@ -30,7 +30,6 @@ import {
 
 const useStyles = createUseThemedStyles((theme) => ({
 	header: {
-		marginBottom: 32,
 		padding: '40px 0',
 		backgroundColor: theme.colors.n75,
 	},
@@ -42,6 +41,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 			marginLeft: -32,
 			marginRight: -32,
 		},
+	},
+	body: {
+		padding: '32px 0 64px',
 	},
 	imageOuter: {
 		width: 120,
@@ -185,7 +187,7 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 							</Row>
 						</Container>
 					</div>
-					<Container>
+					<Container className={classes.body}>
 						<Row>
 							<Col xs={12} xl={7}>
 								<div

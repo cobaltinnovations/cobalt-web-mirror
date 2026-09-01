@@ -36,6 +36,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 		'-webkit-box-orient': 'vertical',
 		'box-orient': 'vertical',
 		overflow: 'hidden',
+		'& > :last-child': {
+			marginBottom: 0,
+		},
 	},
 }));
 
@@ -70,7 +73,7 @@ const ProviderSearchResult = ({
 								<h3 className="mb-2">
 									<Button
 										variant="link"
-										className="p-0 text-decoration-none fs-h3"
+										className="p-0 text-start text-decoration-none fs-h3"
 										onClick={onTitleButtonClick}
 									>
 										{provider.name}
@@ -89,9 +92,10 @@ const ProviderSearchResult = ({
 										</div>
 									))}
 								</div>
-								<p className={classNames(classes.description, 'mb-0 fs-large')}>
-									{provider.description}
-								</p>
+								<div
+									className={classNames(classes.description, 'mb-0 fs-large')}
+									dangerouslySetInnerHTML={{ __html: provider.description ?? '' }}
+								/>
 							</div>
 						</div>
 						<hr className="mb-6 d-xl-none" />

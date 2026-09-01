@@ -44,7 +44,7 @@ describe('provider booking experience', () => {
 			featureId,
 			urlName,
 			supportRoleIds,
-		}) as InstitutionFeature;
+		} as InstitutionFeature);
 
 	it.each([
 		{ bookingV2Enabled: false, integratedCareEnabled: false, expected: false },
@@ -63,7 +63,7 @@ describe('provider booking experience', () => {
 		expect(getBookingExperienceId(true)).toBe(BookingExperienceId.V2);
 	});
 
-	it('uses Mental Health Providers as the canonical V2 navigation feature', () => {
+	it('preserves institution navigation features when booking V2 is enabled', () => {
 		const therapy = providerFeature({
 			featureId: FeatureId.THERAPY,
 			urlName: '/providers?featureId=THERAPY',
@@ -99,6 +99,11 @@ describe('provider booking experience', () => {
 			urlName: '/group-sessions',
 			supportRoleIds: [],
 		});
+		const careNavigator = providerFeature({
+			featureId: FeatureId.RESOURCE_NAVIGATOR,
+			urlName: '/provider-info/care-navigator-provider-id',
+			supportRoleIds: [],
+		});
 		const features = [
 			therapy,
 			medicationPrescriber,
@@ -107,16 +112,11 @@ describe('provider booking experience', () => {
 			mentalHealthProviders,
 			coaching,
 			spiritualSupport,
+			careNavigator,
 		];
 
 		expect(getGeneralNavigationFeatures({ features, bookingV2Enabled: false })).toBe(features);
-		expect(getGeneralNavigationFeatures({ features, bookingV2Enabled: true })).toEqual([
-			groupSessions,
-			{
-				...mentalHealthProviders,
-				urlName: '/providers',
-			},
-		]);
+		expect(getGeneralNavigationFeatures({ features, bookingV2Enabled: true })).toBe(features);
 		expect(mentalHealthProviders.urlName).toBe('/providers?featureId=MENTAL_HEALTH_PROVIDERS');
 	});
 

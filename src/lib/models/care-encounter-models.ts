@@ -109,7 +109,6 @@ export interface CareEncounterScheduledMessageModel {
 	recipientEmailAddress: string;
 	customEmailText: string;
 	emailSubject: string;
-	emailContentHtml: string;
 	emailBody: string;
 	editable: boolean;
 	cancelable: boolean;
@@ -146,6 +145,7 @@ interface CareEncounterBaseModel {
 	careEncounterCancellationReasonId?: CareEncounterCancellationReasonId;
 	careEncounterCancellationReasonOtherText?: string;
 	createdByAccountId: string;
+	createdByAccountDisplayName?: string;
 	lastUpdatedByAccountId: string;
 	created: string;
 	createdDescription: string;

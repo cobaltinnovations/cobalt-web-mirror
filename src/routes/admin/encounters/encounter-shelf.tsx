@@ -363,7 +363,7 @@ const EncounterShelfContent = ({
 				<h4 className="mb-2">{careEncounter.patientFullName}</h4>
 				<p className="mb-6 fs-large">
 					Care Navigator:{' '}
-					<span className="fw-bold">{careEncounter.appointment.provider?.name ?? 'Unassigned'}</span>
+					<span className="fw-bold">{careEncounter.careNavigatorDisplayName ?? 'Unassigned'}</span>
 				</p>
 
 				<TabBar
@@ -415,7 +415,9 @@ const EncounterShelfContent = ({
 											<p className="mb-0">Created By</p>
 										</Col>
 										<Col xs={9}>
-											<p className="mb-0">Unknown</p>
+											<p className="mb-0">
+												{careEncounter.createdByAccountDisplayName ?? 'Unknown'}
+											</p>
 										</Col>
 									</Row>
 								</Container>
