@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 
 import { CobaltThemeProvider } from '@/jss/theme';
-import { ProviderAppointmentModalityId } from '@/lib/models';
+import { ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
+import { providerService } from '@/lib/services';
 import AppointmentDateTimePicker, { getDefaultAppointmentDateTimePickerValue } from './appointment-date-time-picker';
 
 const mockHandleError = jest.fn();
@@ -75,4 +76,52 @@ it('shows the appointment modality tab bar when multiple modalities are availabl
 
 	expect(await screen.findByRole('button', { name: 'In Person' })).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Virtual' })).toBeInTheDocument();
+});
+
+it('filters the provider availability request to the appointment type shown on the card', async () => {
+	let resolveFetch: (value: unknown) => void = () => undefined;
+	const fetch = jest.fn().mockReturnValue(
+		new Promise((resolve) => {
+			resolveFetch = resolve;
+		})
+	);
+	const providerAvailabilityResponse = {
+		providerAvailability: {
+			appointmentTypes: [],
+			appointmentModalities: [],
+			startDate: '2026-09-01',
+			endDate: '2026-11-30',
+		},
+	};
+	const getProviderAvailability = jest
+		.spyOn(providerService, 'getProviderAvailability')
+		.mockReturnValue({ fetch } as ReturnType<typeof providerService.getProviderAvailability>);
+
+	render(
+		<CobaltThemeProvider>
+			<AppointmentDateTimePicker
+				value={getDefaultAppointmentDateTimePickerValue()}
+				onChange={jest.fn()}
+				config={{
+					featureId: 'THERAPY',
+					institutionLocationId: 'institution-location-id',
+					providerId: 'provider-id',
+					appointmentTypeId: 'clinician-appointment-type-id',
+					providerSearchResultTypeId: ProviderSearchResultTypeId.PROVIDER,
+				}}
+			/>
+		</CobaltThemeProvider>
+	);
+
+	await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+	await act(async () => {
+		resolveFetch(providerAvailabilityResponse);
+	});
+	expect(getProviderAvailability).toHaveBeenCalledWith('provider-id', {
+		featureId: 'THERAPY',
+		institutionLocationId: 'institution-location-id',
+		appointmentTypeId: 'clinician-appointment-type-id',
+	});
+
+	getProviderAvailability.mockRestore();
 });

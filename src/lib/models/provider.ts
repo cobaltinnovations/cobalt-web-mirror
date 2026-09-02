@@ -80,6 +80,12 @@ export interface ProviderLocation {
 	address?: ResourcePacketAddress;
 }
 
+export interface ProviderReferralBooking {
+	institutionReferrerId: string;
+	urlName: string;
+	intakeScreeningFlowId?: string | null;
+}
+
 export interface Clinic {
 	clinicId: string;
 	description: string;
@@ -109,7 +115,7 @@ export interface Provider {
 	clinic?: string;
 	license?: string;
 	specialty?: string;
-	imageUrl: string;
+	imageUrl?: string | null;
 	isDefaultImageUrl?: boolean;
 	timeZone?: string;
 	locale?: string;
@@ -137,6 +143,7 @@ export interface Provider {
 	locations: ProviderLocation[];
 	websiteUrl: string;
 	detailsHtml: string;
+	referralBooking?: ProviderReferralBooking;
 }
 
 export interface Specialty {
@@ -174,13 +181,13 @@ export interface ProviderSearchResponse {
 export interface ProviderSearchResultModel {
 	appointmentBookingLevelId: string;
 	appointmentDescription?: string;
-	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
+	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId | null;
 	clinicId?: string;
 	description?: string;
 	firstAvailableAppointment?: FirstAvailableAppointmentModel;
 	formattedPhoneNumber?: string;
 	hasMoreAppointments: boolean;
-	imageUrl?: string;
+	imageUrl?: string | null;
 	institutionId?: string;
 	name?: string;
 	phoneNumber?: string;
@@ -189,6 +196,7 @@ export interface ProviderSearchResultModel {
 	providerSearchResultId?: string;
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
 	screeningRequirement?: ScreeningRequirement;
+	referralBooking?: ProviderReferralBooking;
 	supportedAppointmentModalities: ProviderAppointmentModality[];
 	title?: string;
 	treatmentDescription?: string;

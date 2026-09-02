@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoaderFunctionArgs, useLoaderData, useLocation } from 'react-router-dom';
+import { LoaderFunctionArgs, redirect, useLoaderData, useLocation } from 'react-router-dom';
 import { Button, Container } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
@@ -201,7 +201,7 @@ const normalizeContentSnippetSections = (
 	}));
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 	const { urlName } = params;
 
 	if (!urlName) {
@@ -209,6 +209,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 	}
 
 	const { institutionReferrer } = await institutionReferrersService.getReferrerByUrlName(urlName).fetch();
+
+	if (institutionReferrer.providerId) {
+		const requestUrl = new URL(request.url);
+		throw redirect(`/provider-info/${encodeURIComponent(institutionReferrer.providerId)}${requestUrl.search}`);
+	}
+
 	const contentSnippetSections = normalizeContentSnippetSections(institutionReferrer);
 	const contentSnippetKeys = Array.from(
 		new Set(contentSnippetSections.map((section) => section.contentSnippetKey).filter(Boolean))

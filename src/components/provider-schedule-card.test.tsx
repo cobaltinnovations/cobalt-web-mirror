@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { ProviderAppointmentSelectionTypeId } from '@/lib/models';
 import ProviderScheduleCard from './provider-schedule-card';
@@ -24,6 +24,33 @@ const defaultProps = {
 	onViewAppointmentsButtonClick: jest.fn(),
 	onScheduleAppointmentButtonClick: jest.fn(),
 };
+
+it('offers eligibility screening for referral-backed providers without showing unavailable scheduling', () => {
+	const onScheduleAppointmentButtonClick = jest.fn();
+
+	render(
+		<ProviderScheduleCard
+			isReferralBooking
+			scheduleAppointmentDescription=""
+			scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED}
+			showMoreAppointmentsButton
+			onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
+			onViewAppointmentsButtonClick={jest.fn()}
+		/>
+	);
+
+	const screeningButton = screen.getByRole('button', { name: 'Check Eligibility & Schedule Online' });
+	expect(
+		screen.getByText('Complete a brief eligibility screening to continue to online scheduling.')
+	).toBeInTheDocument();
+	expect(screen.queryByText('No appointments are currently available.')).not.toBeInTheDocument();
+	expect(screen.queryByText('Scheduling contact information is currently unavailable.')).not.toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Schedule Appointment' })).not.toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'View more appointments' })).not.toBeInTheDocument();
+
+	fireEvent.click(screeningButton);
+	expect(onScheduleAppointmentButtonClick).toHaveBeenCalledTimes(1);
+});
 
 it('shows online phone availability when appointment selection is predetermined', () => {
 	render(

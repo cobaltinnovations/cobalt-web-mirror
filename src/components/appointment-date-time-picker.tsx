@@ -230,6 +230,7 @@ export interface AppointmentDateTimePickerConfig {
 	institutionLocationId?: string;
 	clinicId?: string;
 	providerId?: string;
+	appointmentTypeId?: string;
 	providerSearchResultTypeId: ProviderSearchResultTypeId;
 	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
 }
@@ -416,6 +417,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 							...(shouldFetchInstitutionLocation(config.institutionLocationId) && {
 								institutionLocationId: config.institutionLocationId,
 							}),
+							...(config.appointmentTypeId && { appointmentTypeId: config.appointmentTypeId }),
 						})
 						.fetch();
 
@@ -438,6 +440,7 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 							...(shouldFetchInstitutionLocation(config.institutionLocationId) && {
 								institutionLocationId: config.institutionLocationId,
 							}),
+							...(config.appointmentTypeId && { appointmentTypeId: config.appointmentTypeId }),
 						})
 						.fetch();
 

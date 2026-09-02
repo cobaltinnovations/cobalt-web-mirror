@@ -7,7 +7,11 @@ import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 import ProviderScheduleCard from './provider-schedule-card';
-import { ProviderAppointmentModalityId, ProviderSearchResultModel } from '@/lib/models';
+import {
+	ProviderAppointmentModalityId,
+	ProviderAppointmentSelectionTypeId,
+	ProviderSearchResultModel,
+} from '@/lib/models';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	providerResult: {
@@ -67,7 +71,7 @@ const ProviderSearchResult = ({
 						<div className="d-flex mb-6 mb-xl-0">
 							<div
 								className={classNames(classes.imageOuter, 'me-6')}
-								style={{ backgroundImage: `url(${provider.imageUrl})` }}
+								style={{ backgroundImage: `url(${provider.imageUrl ?? ''})` }}
 							/>
 							<div>
 								<h3 className="mb-2">
@@ -104,13 +108,17 @@ const ProviderSearchResult = ({
 						<ProviderScheduleCard
 							showCardStyle={false}
 							scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
-							scheduleTypeId={provider.appointmentSelectionTypeId}
+							scheduleTypeId={
+								provider.appointmentSelectionTypeId ??
+								ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED
+							}
 							firstAvailableAppointment={provider.firstAvailableAppointment ?? undefined}
 							onScheduleAppointmentButtonClick={onScheduleAppointmentButtonClick}
 							onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
 							showMoreAppointmentsButton={provider.hasMoreAppointments}
 							phoneNumber={provider.phoneNumber}
 							phoneNumberDescription={provider.phoneNumberDescription}
+							isReferralBooking={Boolean(provider.referralBooking?.intakeScreeningFlowId)}
 						/>
 					</Col>
 				</Row>

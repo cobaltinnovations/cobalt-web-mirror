@@ -9,6 +9,7 @@ import {
 	Provider,
 	ProviderAppointmentModalityId,
 	ProviderAppointmentSelectionTypeId,
+	ProviderReferralBooking,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -120,13 +121,18 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 		};
 
 		if (providerId) {
-			const [providerResponse, availabilityResponse] = await Promise.all([
-				providerService.getProviderById(providerId).fetch(),
-				providerService.getProviderAvailability(providerId, availabilityQueryParams).fetch(),
-			]);
-
+			const providerResponse = await providerService.getProviderById(providerId).fetch();
 			setProvider(providerResponse.provider);
 			setClinic(undefined);
+
+			if (providerResponse.provider.referralBooking) {
+				setAvailability(undefined);
+				return;
+			}
+
+			const availabilityResponse = await providerService
+				.getProviderAvailability(providerId, availabilityQueryParams)
+				.fetch();
 			setAvailability(availabilityResponse.providerAvailability);
 		} else if (clinicId) {
 			const [clinicResponse, availabilityResponse] = await Promise.all([
@@ -197,7 +203,9 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 								/>
 							</Col>
 							<Col xs={12} xl={5}>
-								{availability && (
+								{provider?.referralBooking?.intakeScreeningFlowId ? (
+									<ProviderInfoDetailReferralSchedule referralBooking={provider.referralBooking} />
+								) : availability ? (
 									<ProviderInfoDetailSchedule
 										featureId={featureId}
 										institutionLocationId={institutionLocationId}
@@ -211,13 +219,44 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 											setShowProviderScheduleModal(true);
 										}}
 									/>
-								)}
+								) : null}
 								<ProviderInfoDetailContact className="mt-6" provider={provider} clinic={clinic} />
 							</Col>
 						</Row>
 					</Container>
 				</div>
 			</AsyncWrapper>
+		</>
+	);
+};
+
+const REFERRAL_BOOKING_DESCRIPTION = 'Complete a brief eligibility screening to continue to online scheduling.';
+
+const ProviderInfoDetailReferralSchedule = ({ referralBooking }: { referralBooking: ProviderReferralBooking }) => {
+	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
+		useScreeningFlow({
+			screeningFlowId: referralBooking.intakeScreeningFlowId ?? undefined,
+			instantiateOnLoad: false,
+			disabled: !referralBooking.intakeScreeningFlowId,
+		});
+
+	if (renderedPreScreeningLoader) {
+		return renderedPreScreeningLoader;
+	}
+
+	return (
+		<>
+			{renderedCollectPhoneModal}
+			{renderedAccountSourcesModal}
+			<ProviderScheduleCard
+				isReferralBooking
+				scheduleAppointmentDescription={REFERRAL_BOOKING_DESCRIPTION}
+				scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED}
+				onScheduleAppointmentButtonClick={() => {
+					startScreeningFlow();
+				}}
+				onViewAppointmentsButtonClick={() => undefined}
+			/>
 		</>
 	);
 };

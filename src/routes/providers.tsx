@@ -7,7 +7,10 @@ import useAccount from '@/hooks/use-account';
 import InputHelper from '@/components/input-helper';
 import { PreviewCanvas } from '@/components/preview-canvas';
 import ProviderSearchResult from '@/components/provider-search-result';
-import ProviderScheduleModal, { ProviderScheduleModalConfig } from '@/components/provider-schedule-modal';
+import ProviderScheduleModal, {
+	createProviderScheduleModalConfig,
+	ProviderScheduleModalConfig,
+} from '@/components/provider-schedule-modal';
 import ProviderInfoDetail from '@/components/provider-info-detail';
 import {
 	InstitutionFeature,
@@ -51,7 +54,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 }) => {
 	const firstAvailableAppointment = provider.firstAvailableAppointment;
 
-	if (!firstAvailableAppointment) {
+	if (!firstAvailableAppointment || !provider.appointmentSelectionTypeId) {
 		return;
 	}
 
@@ -141,7 +144,9 @@ const appointmentBookingContextForProviderSearchResult = ({
 	}
 
 	context.providerSearchResultTypeId = provider.providerSearchResultTypeId;
-	context.appointmentSelectionTypeId = provider.appointmentSelectionTypeId;
+	if (provider.appointmentSelectionTypeId) {
+		context.appointmentSelectionTypeId = provider.appointmentSelectionTypeId;
+	}
 
 	const appointmentModalityId = provider.supportedAppointmentModalities[0]?.appointmentModalityId;
 
@@ -184,14 +189,16 @@ interface ProviderSearchResultWithScreeningProps {
 
 interface ProviderScreeningLauncherProps {
 	screeningFlowId: string;
-	screeningQuestionSearch: string;
+	screeningQuestionSearch?: string;
 	appointmentBookingContext?: Record<string, string>;
+	isReferralBooking?: boolean;
 }
 
 const ProviderScreeningLauncher = ({
 	screeningFlowId,
 	screeningQuestionSearch,
 	appointmentBookingContext,
+	isReferralBooking = false,
 }: ProviderScreeningLauncherProps) => {
 	const didStartRef = useRef(false);
 	const handleError = useHandleError();
@@ -204,9 +211,9 @@ const ProviderScreeningLauncher = ({
 	} = useScreeningFlow({
 		screeningFlowId,
 		instantiateOnLoad: false,
-		checkCompletionState: false,
-		screeningQuestionPathPrefix: '/screening-questions-fullscreen',
-		screeningQuestionSearch,
+		checkCompletionState: isReferralBooking,
+		screeningQuestionPathPrefix: isReferralBooking ? undefined : '/screening-questions-fullscreen',
+		screeningQuestionSearch: isReferralBooking ? undefined : screeningQuestionSearch,
 		...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
 	});
 
@@ -216,8 +223,8 @@ const ProviderScreeningLauncher = ({
 		}
 
 		didStartRef.current = true;
-		startScreeningFlow(true).catch(handleError);
-	}, [didCheckScreeningSessions, handleError, startScreeningFlow]);
+		startScreeningFlow(isReferralBooking ? undefined : true).catch(handleError);
+	}, [didCheckScreeningSessions, handleError, isReferralBooking, startScreeningFlow]);
 
 	return (
 		<>
@@ -245,10 +252,15 @@ const ProviderSearchResultWithScreening = ({
 		() => getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search)),
 		[location.search]
 	);
-	const screeningRequired =
-		provider.screeningRequirement?.screeningRequired &&
-		!provider.screeningRequirement?.screeningSatisfied &&
-		!!provider.screeningRequirement?.screeningFlowId;
+	const isReferralBooking = Boolean(provider.referralBooking?.intakeScreeningFlowId);
+	const screeningRequired = Boolean(
+		provider.referralBooking?.intakeScreeningFlowId ||
+			(provider.screeningRequirement?.screeningRequired &&
+				!provider.screeningRequirement?.screeningSatisfied &&
+				provider.screeningRequirement?.screeningFlowId)
+	);
+	const screeningFlowId =
+		provider.referralBooking?.intakeScreeningFlowId ?? provider.screeningRequirement?.screeningFlowId;
 	const appointmentBookingContext = useMemo(
 		() =>
 			appointmentBookingContextForProviderSearchResult({
@@ -272,12 +284,13 @@ const ProviderSearchResultWithScreening = ({
 	}, [bookingV1FallbackUrl, location.pathname, location.search]);
 	return (
 		<React.Fragment>
-			{screeningRequired && screeningLaunchSequence > 0 && provider.screeningRequirement?.screeningFlowId && (
+			{screeningRequired && screeningLaunchSequence > 0 && screeningFlowId && (
 				<ProviderScreeningLauncher
 					key={screeningLaunchSequence}
-					screeningFlowId={provider.screeningRequirement.screeningFlowId}
+					screeningFlowId={screeningFlowId}
 					screeningQuestionSearch={screeningQuestionSearch}
-					appointmentBookingContext={appointmentBookingContext}
+					appointmentBookingContext={isReferralBooking ? undefined : appointmentBookingContext}
+					isReferralBooking={isReferralBooking}
 				/>
 			)}
 			<ProviderSearchResult
@@ -790,15 +803,14 @@ export const Component = () => {
 											setShowProviderCanvas(true);
 										}}
 										onViewAppointmentsButtonClick={() => {
-											setProviderScheduleModalConfig({
-												featureId,
-												institutionLocationId,
-												clinicId: provider.clinicId ?? undefined,
-												providerId: provider.providerId ?? undefined,
-												providerSearchResultTypeId: provider.providerSearchResultTypeId,
-												appointmentSelectionTypeId: provider.appointmentSelectionTypeId,
-												bookingV1FallbackUrl,
-											});
+											setProviderScheduleModalConfig(
+												createProviderScheduleModalConfig({
+													featureId,
+													institutionLocationId,
+													provider,
+													bookingV1FallbackUrl,
+												})
+											);
 										}}
 									/>
 								))}
