@@ -33,6 +33,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 		padding: '40px 0',
 		backgroundColor: theme.colors.n75,
 	},
+	flushHeader: {
+		marginTop: -32,
+		marginLeft: -40,
+		marginRight: -40,
+		[mediaQueries.lg]: {
+			marginLeft: -32,
+			marginRight: -32,
+		},
+	},
 	body: {
 		padding: '32px 0 64px',
 	},
@@ -43,6 +52,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
+		backgroundColor: theme.colors.n0,
 		[mediaQueries.md]: {
 			width: 64,
 			height: 64,
@@ -54,9 +64,10 @@ interface ProviderInfoDetailProps {
 	providerId?: string;
 	clinicId?: string;
 	className?: string;
+	flushHeader?: boolean;
 }
 
-const ProviderInfoDetail = ({ providerId, clinicId, className }: ProviderInfoDetailProps) => {
+const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = false }: ProviderInfoDetailProps) => {
 	const classes = useStyles();
 	const [searchParams] = useSearchParams();
 	const featureId = useMemo(() => searchParams.get('featureId') ?? undefined, [searchParams]);
@@ -142,7 +153,7 @@ const ProviderInfoDetail = ({ providerId, clinicId, className }: ProviderInfoDet
 
 			<AsyncWrapper fetchData={fetchData}>
 				<div className={className}>
-					<div className={classes.header}>
+					<div className={classNames(classes.header, { [classes.flushHeader]: flushHeader })}>
 						<Container>
 							<Row>
 								<Col>

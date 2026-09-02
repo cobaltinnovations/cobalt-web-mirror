@@ -78,10 +78,16 @@ const ProviderScheduleCard = ({
 	const firstAvailableAppointmentDateDescription = formatFirstAvailableAppointmentDate(
 		firstAvailableAppointment?.date
 	);
+	const schedulingContactUnavailable =
+		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && !phoneNumber?.trim();
 	const schedulingUnavailable =
 		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE
-			? !phoneNumber
+			? schedulingContactUnavailable
 			: !firstAvailableAppointment;
+	const showViewMoreAppointmentsButton =
+		showMoreAppointmentsButton &&
+		!schedulingUnavailable &&
+		scheduleTypeId !== ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE;
 
 	return (
 		<div className={classNames(classes.providerScheduleCard, className)}>
@@ -90,7 +96,13 @@ const ProviderScheduleCard = ({
 			</p>
 			<p className="mb-4">{scheduleAppointmentDescription}</p>
 			<div className={classes.providerNextAppointmentCard}>
-				{schedulingUnavailable && <p className="mb-0 text-muted">No appointments are currently available.</p>}
+				{schedulingUnavailable && (
+					<p className="mb-0 text-muted">
+						{schedulingContactUnavailable
+							? 'Scheduling contact information is currently unavailable.'
+							: 'No appointments are currently available.'}
+					</p>
+				)}
 				{!schedulingUnavailable &&
 					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
 						<div className="d-md-flex justify-content-between">
@@ -144,7 +156,7 @@ const ProviderScheduleCard = ({
 						</div>
 					)}
 			</div>
-			{showMoreAppointmentsButton && (
+			{showViewMoreAppointmentsButton && (
 				<Button
 					variant="link"
 					className="mt-2 d-block w-100 text-decoration-none"

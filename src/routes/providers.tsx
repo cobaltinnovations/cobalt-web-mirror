@@ -678,6 +678,7 @@ export const Component = () => {
 					<ProviderInfoDetail
 						providerId={selectedProviderIds.providerId}
 						clinicId={selectedProviderIds.clinicId}
+						flushHeader
 					/>
 				)}
 			</PreviewCanvas>
