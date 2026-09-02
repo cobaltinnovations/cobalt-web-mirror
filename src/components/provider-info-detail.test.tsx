@@ -2,31 +2,20 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
+import { CobaltThemeProvider } from '@/jss/theme';
 import { Provider, ProviderAppointmentModalityId } from '@/lib/models';
 import { providerService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import ProviderInfoDetail from './provider-info-detail';
 
-jest.mock('@/jss/theme', () => ({
-	createUseThemedStyles: () => () =>
-		new Proxy(
-			{},
-			{
-				get: (_target, property) => String(property),
-			}
-		),
-}));
-
 jest.mock('@/components/svg-icon', () => ({
 	__esModule: true,
 	default: () => null,
 }));
-
 jest.mock('./provider-schedule-modal', () => ({
 	__esModule: true,
 	default: () => null,
 }));
-
 jest.mock('@/components/ineligible-booking-modal', () => ({
 	__esModule: true,
 	default: () => null,
@@ -92,9 +81,11 @@ it('starts the referrer screening flow and does not fetch provider availability'
 	} as ReturnType<typeof useScreeningFlow>);
 
 	render(
-		<MemoryRouter>
-			<ProviderInfoDetail providerId={provider.providerId} />
-		</MemoryRouter>
+		<CobaltThemeProvider>
+			<MemoryRouter>
+				<ProviderInfoDetail providerId={provider.providerId} />
+			</MemoryRouter>
+		</CobaltThemeProvider>
 	);
 
 	const screeningButton = await screen.findByRole('button', {
@@ -112,4 +103,56 @@ it('starts the referrer screening flow and does not fetch provider availability'
 
 	fireEvent.click(screeningButton);
 	await waitFor(() => expect(startScreeningFlow).toHaveBeenCalledWith());
+});
+
+it('renders the provider header as a tinted, full-width hero', async () => {
+	const provider = {
+		providerId: 'provider-id',
+		name: 'Provider Name',
+		detailsHtml: '<h2>About</h2>',
+		locations: [],
+		websiteUrl: '',
+		imageUrl: '',
+		supportedAppointmentModalities: [],
+		referralBooking: {
+			institutionReferrerId: 'referrer-id',
+			urlName: 'referrer',
+			intakeScreeningFlowId: 'screening-flow-id',
+		},
+	} as Provider;
+
+	mockGetProviderById.mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({ provider }),
+	} as ReturnType<typeof providerService.getProviderById>);
+	mockUseScreeningFlow.mockReturnValue({
+		startScreeningFlow: jest.fn(),
+	} as ReturnType<typeof useScreeningFlow>);
+
+	const { container } = render(
+		<CobaltThemeProvider>
+			<MemoryRouter>
+				<ProviderInfoDetail providerId="provider-id" flushHeader />
+			</MemoryRouter>
+		</CobaltThemeProvider>
+	);
+
+	await screen.findByText('Provider Name');
+
+	const providerContainers = container.querySelectorAll('.container');
+	expect(providerContainers).toHaveLength(2);
+
+	const header = providerContainers[0].parentElement;
+	const body = providerContainers[1];
+	expect(header).toHaveStyle({
+		backgroundColor: '#F5F0EC',
+		paddingTop: '40px',
+		paddingBottom: '40px',
+		marginTop: '-32px',
+		marginLeft: '-40px',
+		marginRight: '-40px',
+	});
+	expect(body).toHaveStyle({
+		paddingTop: '32px',
+		paddingBottom: '64px',
+	});
 });

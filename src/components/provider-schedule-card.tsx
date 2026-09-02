@@ -83,11 +83,20 @@ const ProviderScheduleCard = ({
 	const appointmentDescription =
 		scheduleAppointmentDescription ||
 		(isReferralBooking ? 'Complete a brief eligibility screening to continue to online scheduling.' : undefined);
+	const schedulingContactUnavailable =
+		!isReferralBooking &&
+		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE &&
+		!phoneNumber?.trim();
 	const schedulingUnavailable = isReferralBooking
 		? false
 		: scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE
-		? !phoneNumber
+		? schedulingContactUnavailable
 		: !firstAvailableAppointment;
+	const showViewMoreAppointmentsButton =
+		!isReferralBooking &&
+		showMoreAppointmentsButton &&
+		!schedulingUnavailable &&
+		scheduleTypeId !== ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE;
 
 	return (
 		<div className={classNames(classes.providerScheduleCard, className)}>
@@ -101,7 +110,13 @@ const ProviderScheduleCard = ({
 						Check Eligibility &amp; Schedule Online
 					</Button>
 				)}
-				{schedulingUnavailable && <p className="mb-0 text-muted">No appointments are currently available.</p>}
+				{schedulingUnavailable && (
+					<p className="mb-0 text-muted">
+						{schedulingContactUnavailable
+							? 'Scheduling contact information is currently unavailable.'
+							: 'No appointments are currently available.'}
+					</p>
+				)}
 				{!isReferralBooking &&
 					!schedulingUnavailable &&
 					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
@@ -158,7 +173,7 @@ const ProviderScheduleCard = ({
 						</div>
 					)}
 			</div>
-			{!isReferralBooking && showMoreAppointmentsButton && (
+			{showViewMoreAppointmentsButton && (
 				<Button
 					variant="link"
 					className="mt-2 d-block w-100 text-decoration-none"
