@@ -63,6 +63,7 @@ export interface InstitutionReferrerMetadata {
 
 export interface InstitutionReferrer {
 	institutionReferrerId: string;
+	providerId?: string;
 	fromInstitutionId: string;
 	toInstitutionId: string;
 	urlName: string;

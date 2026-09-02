@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 import AppointmentDateTimePicker, {
 	AppointmentDateTimePickerConfig,
@@ -8,6 +9,7 @@ import AppointmentDateTimePicker, {
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
 import { createUseThemedStyles } from '@/jss/theme';
+import { FirstAvailableAppointmentModel, ProviderAppointmentModalityId, ProviderSearchResultModel } from '@/lib/models';
 import { buildBookingV2UrlWithV1Fallback, setProviderIdToScheduleSearchParam } from '@/lib/utils';
 
 const useStyles = createUseThemedStyles(() => ({
@@ -21,6 +23,64 @@ const useStyles = createUseThemedStyles(() => ({
 
 export type ProviderScheduleModalConfig = AppointmentDateTimePickerConfig & {
 	bookingV1FallbackUrl?: string;
+	initialAppointment?: FirstAvailableAppointmentModel;
+	initialAppointmentModalityId?: ProviderAppointmentModalityId;
+};
+
+export const createProviderScheduleModalConfig = ({
+	featureId,
+	institutionLocationId,
+	provider,
+	bookingV1FallbackUrl,
+}: {
+	featureId: string;
+	institutionLocationId: string;
+	provider: ProviderSearchResultModel;
+	bookingV1FallbackUrl?: string;
+}): ProviderScheduleModalConfig => {
+	const initialAppointment = provider.firstAvailableAppointment ?? undefined;
+
+	return {
+		featureId,
+		institutionLocationId,
+		clinicId: provider.clinicId ?? undefined,
+		providerId: provider.providerId ?? undefined,
+		appointmentTypeId: initialAppointment?.appointmentTypeId,
+		providerSearchResultTypeId: provider.providerSearchResultTypeId,
+		appointmentSelectionTypeId: provider.appointmentSelectionTypeId ?? undefined,
+		bookingV1FallbackUrl,
+		initialAppointment,
+		initialAppointmentModalityId: provider.supportedAppointmentModalities[0]?.appointmentModalityId,
+	};
+};
+
+export const getInitialAppointmentDateTimePickerValue = (
+	config?: ProviderScheduleModalConfig
+): AppointmentDateTimePickerValue => {
+	const defaultValue = getDefaultAppointmentDateTimePickerValue();
+	const initialAppointment = config?.initialAppointment;
+
+	if (!initialAppointment) {
+		return defaultValue;
+	}
+
+	return {
+		...defaultValue,
+		dateTime: moment.utc(`${initialAppointment.date} ${initialAppointment.time}`, [
+			'YYYY-MM-DD HH:mm:ss',
+			'YYYY-MM-DD HH:mm',
+			'YYYY-MM-DD h:mmA',
+		]),
+		appointmentModalityId: config.initialAppointmentModalityId,
+		appointmentTypeIds:
+			initialAppointment.appointmentTypeIds ??
+			(initialAppointment.appointmentTypeId ? [initialAppointment.appointmentTypeId] : undefined),
+		appointmentTypeId: initialAppointment.appointmentTypeId,
+		appointmentTypeDescription: initialAppointment.appointmentDescription,
+		epicDepartmentId: initialAppointment.epicDepartmentId,
+		epicAppointmentFhirId: initialAppointment.epicAppointmentFhirId,
+		providerId: initialAppointment.providerId ?? config.providerId,
+	};
 };
 
 interface ProviderScheduleModalContinueOptions {
@@ -94,12 +154,12 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
-	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(
-		getDefaultAppointmentDateTimePickerValue
+	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
+		getInitialAppointmentDateTimePickerValue(config)
 	);
 
 	useEffect(() => {
-		setSelectedAppointmentDateTimePickerValue(getDefaultAppointmentDateTimePickerValue());
+		setSelectedAppointmentDateTimePickerValue(getInitialAppointmentDateTimePickerValue(config));
 	}, [config, props.show]);
 	const selectedDateLabel = selectedAppointmentDateTimePickerValue.dateTime.format('MMMM D, YYYY');
 	const selectedTimeLabel = selectedAppointmentDateTimePickerValue.dateTime.format('h:mmA');

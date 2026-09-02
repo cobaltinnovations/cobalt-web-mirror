@@ -742,7 +742,7 @@ const ConnectWithSupportV2 = () => {
 											<React.Fragment key={provider.providerId}>
 												<ConnectWithSupportItem
 													providerId={provider.providerId}
-													imageUrl={provider.imageUrl}
+													imageUrl={provider.imageUrl ?? ''}
 													title={provider.name}
 													subtitle={provider.title}
 													descriptionHtml={provider.description ?? ''}

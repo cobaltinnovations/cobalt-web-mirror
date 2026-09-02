@@ -50,6 +50,7 @@ interface ProviderScheduleCardProps {
 	phoneNumberDescription?: string;
 	showMoreAppointmentsButton?: boolean;
 	showCardStyle?: boolean;
+	isReferralBooking?: boolean;
 	className?: string;
 }
 
@@ -72,26 +73,37 @@ const ProviderScheduleCard = ({
 	phoneNumberDescription,
 	showMoreAppointmentsButton,
 	showCardStyle = true,
+	isReferralBooking = false,
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
 	const firstAvailableAppointmentDateDescription = formatFirstAvailableAppointmentDate(
 		firstAvailableAppointment?.date
 	);
-	const schedulingUnavailable =
-		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE
-			? !phoneNumber
-			: !firstAvailableAppointment;
+	const appointmentDescription =
+		scheduleAppointmentDescription ||
+		(isReferralBooking ? 'Complete a brief eligibility screening to continue to online scheduling.' : undefined);
+	const schedulingUnavailable = isReferralBooking
+		? false
+		: scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE
+		? !phoneNumber
+		: !firstAvailableAppointment;
 
 	return (
 		<div className={classNames(classes.providerScheduleCard, className)}>
 			<p className="mb-2 fs-large">
 				<strong>Schedule Appointment</strong>
 			</p>
-			<p className="mb-4">{scheduleAppointmentDescription}</p>
+			{appointmentDescription && <p className="mb-4">{appointmentDescription}</p>}
 			<div className={classes.providerNextAppointmentCard}>
+				{isReferralBooking && (
+					<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
+						Check Eligibility &amp; Schedule Online
+					</Button>
+				)}
 				{schedulingUnavailable && <p className="mb-0 text-muted">No appointments are currently available.</p>}
-				{!schedulingUnavailable &&
+				{!isReferralBooking &&
+					!schedulingUnavailable &&
 					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
 						<div className="d-md-flex justify-content-between">
 							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
@@ -113,13 +125,15 @@ const ProviderScheduleCard = ({
 							</Button>
 						</div>
 					)}
-				{!schedulingUnavailable &&
+				{!isReferralBooking &&
+					!schedulingUnavailable &&
 					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
 						<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
 							Schedule Appointment
 						</Button>
 					)}
-				{!schedulingUnavailable &&
+				{!isReferralBooking &&
+					!schedulingUnavailable &&
 					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && (
 						<div className="d-md-flex justify-content-between">
 							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
@@ -144,7 +158,7 @@ const ProviderScheduleCard = ({
 						</div>
 					)}
 			</div>
-			{showMoreAppointmentsButton && (
+			{!isReferralBooking && showMoreAppointmentsButton && (
 				<Button
 					variant="link"
 					className="mt-2 d-block w-100 text-decoration-none"

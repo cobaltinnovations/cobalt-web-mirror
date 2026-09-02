@@ -72,7 +72,7 @@ export const isClinicResult = (result: Provider | Clinic): result is Clinic => {
 
 export const mapProviderToResult = (provider: Provider): ProviderSearchResult => ({
 	id: provider.providerId,
-	imageUrl: provider.imageUrl,
+	imageUrl: provider.imageUrl ?? '',
 	type: 'provider',
 	displayName: provider.name + (provider.license ? `, ${provider.license}` : ''),
 	description: provider.supportRolesDescription,

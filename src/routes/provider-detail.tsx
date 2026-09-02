@@ -118,7 +118,7 @@ export const Component = () => {
 								<div className="d-flex align-items-center">
 									<div
 										className={classes.imageOuter}
-										style={{ backgroundImage: `url(${provider.imageUrl})` }}
+										style={{ backgroundImage: `url(${provider.imageUrl ?? ''})` }}
 									/>
 									<div>
 										<h2 className="mb-2">{provider.name}</h2>

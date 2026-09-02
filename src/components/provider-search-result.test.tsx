@@ -21,7 +21,9 @@ jest.mock('@/components/svg-icon', () => ({
 
 jest.mock('./provider-schedule-card', () => ({
 	__esModule: true,
-	default: () => <div data-testid="provider-schedule-card" />,
+	default: ({ isReferralBooking }: { isReferralBooking?: boolean }) => (
+		<div data-testid="provider-schedule-card" data-is-referral-booking={String(Boolean(isReferralBooking))} />
+	),
 }));
 
 it('renders trusted provider description markup and left-aligns a wrapping provider name', () => {
@@ -45,4 +47,27 @@ it('renders trusted provider description markup and left-aligns a wrapping provi
 	expect(screen.getByText('important')).toHaveProperty('tagName', 'STRONG');
 	expect(container.querySelector('.description br')).toBeInTheDocument();
 	expect(screen.queryByText(/<p>/)).not.toBeInTheDocument();
+});
+
+it('marks a referral-backed result as actionable without a first available appointment', () => {
+	const provider = {
+		name: 'TEAM Clinic',
+		supportedAppointmentModalities: [],
+		referralBooking: {
+			institutionReferrerId: 'team-clinic-referrer-id',
+			urlName: 'team-clinic-pilot',
+			intakeScreeningFlowId: 'team-clinic-screening-flow-id',
+		},
+	} as ProviderSearchResultModel;
+
+	render(
+		<ProviderSearchResult
+			provider={provider}
+			onTitleButtonClick={jest.fn()}
+			onScheduleAppointmentButtonClick={jest.fn()}
+			onViewAppointmentsButtonClick={jest.fn()}
+		/>
+	);
+
+	expect(screen.getByTestId('provider-schedule-card')).toHaveAttribute('data-is-referral-booking', 'true');
 });
