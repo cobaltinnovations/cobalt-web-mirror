@@ -765,15 +765,6 @@ export const Component = () => {
 				<AsyncWrapper fetchData={fetchProviders} abortFetch={abortProviderSearch}>
 					<Row>
 						<Col>
-							{featureId && institutionLocationId && (
-								<p className="mb-7 mb-lg-9">
-									<strong>
-										{providers.length} available {selectedInstitutionFeatureName} provider
-										{providers.length === 1 ? '' : 's'} for {selectedInstitutionLocationName}{' '}
-										employees
-									</strong>
-								</p>
-							)}
 							{providerNoDataConfig && (
 								<NoData
 									title={providerNoDataConfig.title}
