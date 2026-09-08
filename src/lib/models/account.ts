@@ -15,6 +15,11 @@ export enum LoginDestinationId {
 	IC_PANEL = 'IC_PANEL',
 }
 
+export enum OnboardingTreatmentId {
+	DEFAULT = 'DEFAULT',
+	MODAL = 'MODAL',
+}
+
 export interface AccountModel {
 	accountId: string;
 	accountSourceId?: AccountSourceId;
@@ -56,6 +61,7 @@ export interface AccountModel {
 	lastUpdatedDescription: string;
 	locale: string;
 	loginDestinationId: LoginDestinationId;
+	onboardingTreatmentId?: string;
 	phoneNumber?: string;
 	phoneNumberDescription?: string;
 	providerId?: string;

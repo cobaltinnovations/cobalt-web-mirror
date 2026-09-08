@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useRevalidator } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 
@@ -36,6 +36,7 @@ import {
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	SITE_LOCATION_ID,
 	CourseModel,
+	OnboardingTreatmentId,
 } from '@/lib/models';
 
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getGeneralNavigationFeatures } from '@/lib/utils';
@@ -199,6 +200,13 @@ const Index: FC = () => {
 		(feature) => feature.landingPageVisible
 	);
 	const showFeatureScreeningCta = !institution.epicFhirEnabled && Boolean(institution?.featureScreeningFlowId);
+	const showOnboardingInModal = account?.onboardingTreatmentId === OnboardingTreatmentId.MODAL;
+	const renderedOnboardingScreeningFlow = showOnboardingModal && institution.onboardingScreeningFlowId && (
+		<ScreeningFlow
+			screeningFlowParams={memoizedOnboardingScreeningFlowParams}
+			onScreeningFlowComplete={handleOnboardingScreeningFlowComplete}
+		/>
+	);
 
 	return (
 		<>
@@ -206,20 +214,26 @@ const Index: FC = () => {
 				<title>{institution.platformName ?? 'Cobalt'}</title>
 			</Helmet>
 
-			<PreviewCanvas title={institution.name} show={showOnboardingModal}>
-				{showOnboardingModal && institution.onboardingScreeningFlowId && (
-					<Container className="pb-8">
-						<Row>
-							<Col md={12} lg={{ span: 6, offset: 3 }}>
-								<ScreeningFlow
-									screeningFlowParams={memoizedOnboardingScreeningFlowParams}
-									onScreeningFlowComplete={handleOnboardingScreeningFlowComplete}
-								/>
-							</Col>
-						</Row>
-					</Container>
-				)}
-			</PreviewCanvas>
+			{showOnboardingInModal ? (
+				<Modal centered backdrop="static" keyboard={false} show={showOnboardingModal}>
+					<Modal.Header>
+						<Modal.Title>{institution.name}</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>{renderedOnboardingScreeningFlow}</Modal.Body>
+				</Modal>
+			) : (
+				<PreviewCanvas title={institution.name} show={showOnboardingModal}>
+					{renderedOnboardingScreeningFlow && (
+						<Container className="pb-8">
+							<Row>
+								<Col md={12} lg={{ span: 6, offset: 3 }}>
+									{renderedOnboardingScreeningFlow}
+								</Col>
+							</Row>
+						</Container>
+					)}
+				</PreviewCanvas>
+			)}
 
 			{institution?.featuresEnabled ? (
 				<>
