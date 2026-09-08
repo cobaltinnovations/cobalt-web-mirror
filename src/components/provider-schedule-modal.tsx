@@ -161,8 +161,8 @@ const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps)
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(getInitialAppointmentDateTimePickerValue(config));
 	}, [config, props.show]);
-	const selectedDateLabel = selectedAppointmentDateTimePickerValue.dateTime.format('MMMM D, YYYY');
-	const selectedTimeLabel = selectedAppointmentDateTimePickerValue.dateTime.format('h:mmA');
+	const selectedDateLabel = selectedAppointmentDateTimePickerValue.dateTime.format('ddd, MMM D, YYYY');
+	const selectedTimeLabel = selectedAppointmentDateTimePickerValue.dateTime.format('h:mm a');
 	const canContinue = Boolean(
 		selectedAppointmentDateTimePickerValue.appointmentModalityId &&
 			selectedAppointmentDateTimePickerValue.appointmentTypeId &&

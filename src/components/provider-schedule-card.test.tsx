@@ -59,10 +59,10 @@ it('shows online phone availability when appointment selection is predetermined'
 			scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED}
 			firstAvailableAppointment={{
 				providerId: '1e85daa7-888a-45be-a621-214ecdb29050',
-				date: '2026-09-07',
-				time: '10:00',
-				dateTime: '2026-09-07T10:00',
-				timeDescription: '10:00 am',
+				date: '2026-09-10',
+				time: '19:00',
+				dateTime: '2026-09-10T19:00',
+				timeDescription: '7:00 PM',
 				appointmentTypeId: '5b3cb43d-e394-456a-95ca-6f40d7a8b0f7',
 			}}
 			showMoreAppointmentsButton
@@ -70,7 +70,7 @@ it('shows online phone availability when appointment selection is predetermined'
 	);
 
 	expect(screen.getByText('First Available Appointment:')).toBeInTheDocument();
-	expect(screen.getByText(/September 7, 2026/)).toHaveTextContent('September 7, 2026 10:00 am');
+	expect(screen.getByText(/Thu, Sep 10, 2026/)).toHaveTextContent('Thu, Sep 10, 2026 7:00 pm');
 	expect(screen.getByRole('button', { name: 'View more appointments' })).toBeInTheDocument();
 	expect(screen.queryByText('No appointments are currently available.')).not.toBeInTheDocument();
 });

@@ -241,4 +241,5 @@ export interface FirstAvailableAppointmentModel {
 	assessmentId?: string;
 	epicDepartmentId?: string;
 	epicAppointmentFhirId?: string;
+	dateTimeDescription?: string;
 }

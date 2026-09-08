@@ -562,7 +562,7 @@ export const Component = () => {
 										className="text-primary me-2 mt-1 flex-shrink-0"
 									/>
 									<p className="mb-0 fs-large fw-bold">
-										{appointmentDateTime?.format('MMMM D, YYYY [at] h:mmA')}
+										{appointmentDateTime?.format('ddd, MMM D, YYYY h:mm a')}
 									</p>
 								</div>
 

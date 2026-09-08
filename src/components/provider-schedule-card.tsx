@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
 
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -54,15 +53,6 @@ interface ProviderScheduleCardProps {
 	className?: string;
 }
 
-export const formatFirstAvailableAppointmentDate = (date?: string) => {
-	if (!date) {
-		return '';
-	}
-
-	const parsedDate = moment(date, 'YYYY-MM-DD', true);
-	return parsedDate.isValid() ? parsedDate.format('MMMM D, YYYY') : date;
-};
-
 const ProviderScheduleCard = ({
 	scheduleAppointmentDescription,
 	scheduleTypeId,
@@ -77,9 +67,6 @@ const ProviderScheduleCard = ({
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
-	const firstAvailableAppointmentDateDescription = formatFirstAvailableAppointmentDate(
-		firstAvailableAppointment?.date
-	);
 	const appointmentDescription =
 		scheduleAppointmentDescription ||
 		(isReferralBooking ? 'Complete a brief eligibility screening to continue to online scheduling.' : undefined);
@@ -128,10 +115,7 @@ const ProviderScheduleCard = ({
 								<div>
 									<p className="mb-0">First Available Appointment:</p>
 									<p className="mb-0">
-										<strong>
-											{firstAvailableAppointmentDateDescription}{' '}
-											{firstAvailableAppointment?.timeDescription}
-										</strong>
+										<strong>{firstAvailableAppointment?.dateTimeDescription}</strong>
 									</p>
 								</div>
 							</div>
