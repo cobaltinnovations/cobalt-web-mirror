@@ -229,6 +229,7 @@ interface WysiwygProps {
 	className?: string;
 	height?: number;
 	toolbarPreset?: WysiwygToolbarPreset;
+	ariaLabel?: string;
 }
 
 const SizeStyle = Quill.import('attributors/style/size');
@@ -285,7 +286,10 @@ const getPageBuilderTextStyleIdForFormats = (formats: Record<string, unknown>): 
 };
 
 const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
-	({ value, onChange, disabled, className, height, toolbarPreset = 'default' }: WysiwygProps, forwardedRef) => {
+	(
+		{ value, onChange, disabled, className, height, toolbarPreset = 'default', ariaLabel }: WysiwygProps,
+		forwardedRef
+	) => {
 		const classes = useWysiwygStyles({ height });
 		const reactQuillId = useRef(`quill-${uuidv4()}`).current;
 		const pageBuilderToolbarId = `${reactQuillId}-toolbar`;
@@ -411,6 +415,20 @@ const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
 			syncActivePageBuilderTextStyle();
 		}, [syncActivePageBuilderTextStyle, value]);
 
+		useEffect(() => {
+			const editorRoot = quillRef.current?.getEditor().root;
+
+			if (!editorRoot) {
+				return;
+			}
+
+			if (ariaLabel) {
+				editorRoot.setAttribute('aria-label', ariaLabel);
+			} else {
+				editorRoot.removeAttribute('aria-label');
+			}
+		}, [ariaLabel]);
+
 		return (
 			<>
 				{toolbarPreset === 'page-builder' && (
@@ -512,6 +530,12 @@ const WysiwygBasic = React.forwardRef<ReactQuill, WysiwygProps>(
 		);
 	}
 );
+
+export const wysiwygValueHasContent = (value: string) =>
+	value
+		.replace(/<[^>]*>/g, '')
+		.replace(/&nbsp;|&#160;/gi, ' ')
+		.trim().length > 0;
 
 export const wysiwygIsValid = (
 	ref: React.RefObject<ReactQuill> | null,

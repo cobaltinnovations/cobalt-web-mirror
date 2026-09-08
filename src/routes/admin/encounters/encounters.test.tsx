@@ -26,6 +26,49 @@ jest.mock('@/components/svg-icon', () => ({
 	default: () => null,
 }));
 
+jest.mock('@/components/wysiwyg-basic', () => {
+	const React = require('react');
+
+	return {
+		__esModule: true,
+		default: React.forwardRef(
+			(
+				{
+					ariaLabel,
+					disabled,
+					onChange,
+					toolbarPreset,
+					value,
+				}: {
+					ariaLabel?: string;
+					disabled?: boolean;
+					onChange(value: string): void;
+					toolbarPreset?: string;
+					value: string;
+				},
+				ref: React.ForwardedRef<HTMLTextAreaElement>
+			) => (
+				<textarea
+					ref={ref}
+					aria-label={ariaLabel}
+					data-toolbar-preset={toolbarPreset}
+					disabled={disabled}
+					value={value}
+					onChange={(event) => {
+						onChange(event.currentTarget.value);
+					}}
+				/>
+			)
+		),
+		WysiwygDisplay: ({ html }: { html: string }) => <div dangerouslySetInnerHTML={{ __html: html }} />,
+		wysiwygValueHasContent: (value: string) =>
+			value
+				.replace(/<[^>]*>/g, '')
+				.replace(/&nbsp;|&#160;/gi, ' ')
+				.trim().length > 0,
+	};
+});
+
 jest.mock('@/hooks/use-handle-error', () => {
 	return {
 		__esModule: true,
@@ -1530,14 +1573,18 @@ it('renders encounter notes in backend order and updates the notes tab count', a
 	expect(screen.getByText('Aug 20, 2026 at 11:04 AM')).toBeInTheDocument();
 	expect(screen.getByText('Aug 19, 2026 at 10:00 AM')).toBeInTheDocument();
 	expect(screen.getAllByRole('button', { name: 'Edit Note' })).toHaveLength(2);
-	expect(screen.getByRole('textbox', { name: 'Your Note:' })).toBeInTheDocument();
+	expect(screen.getByRole('textbox', { name: 'Your Note:' })).toHaveAttribute(
+		'data-toolbar-preset',
+		'care-encounter-message'
+	);
 	expectTabToBeActive('Notes (2)');
 });
 
-it('adds a trimmed encounter note, refreshes the table, and preserves the shelf route', async () => {
+it('adds a rich-text encounter note, refreshes the table, and preserves the shelf route', async () => {
+	const noteHtml = '<p>A persisted <strong>note</strong></p>';
 	const addedCareEncounterNote = {
 		...careEncounterNote,
-		note: 'A persisted note',
+		note: noteHtml,
 	};
 	createCareEncounterNoteSpy.mockImplementationOnce(
 		() =>
@@ -1556,14 +1603,16 @@ it('adds a trimmed encounter note, refreshes the table, and preserves the shelf 
 	expect(addNoteButton).toBeDisabled();
 	expect(noteInput).not.toHaveAttribute('minlength');
 	expect(noteInput).not.toHaveAttribute('maxlength');
-	fireEvent.change(noteInput, { target: { value: '  A persisted note  ' } });
+	fireEvent.change(noteInput, { target: { value: '<p><br></p>' } });
+	expect(addNoteButton).toBeDisabled();
+	fireEvent.change(noteInput, { target: { value: `  ${noteHtml}  ` } });
 	expect(addNoteButton).toBeEnabled();
 	const tableRequestCount = getCareEncountersSpy.mock.calls.length;
 	await clickAndFlush(addNoteButton);
 
-	expect(createCareEncounterNoteSpy).toHaveBeenCalledWith('care-encounter-1', { note: 'A persisted note' });
+	expect(createCareEncounterNoteSpy).toHaveBeenCalledWith('care-encounter-1', { note: noteHtml });
 	await waitFor(() => expect(noteInput).toHaveValue(''));
-	expect(await screen.findByText('A persisted note')).toBeInTheDocument();
+	expect(await screen.findByText('note')).toHaveProperty('tagName', 'STRONG');
 	expect(screen.queryByRole('heading', { name: 'No Notes' })).not.toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Notes (1)' })).toBeInTheDocument();
 	expect(getCareEncountersSpy).toHaveBeenCalledTimes(tableRequestCount + 1);
@@ -1594,6 +1643,7 @@ it('retains add-note input and reports the error when creation fails', async () 
 });
 
 it('edits an encounter note without reordering notes', async () => {
+	const updatedNoteHtml = '<p>Updated <strong>first note</strong></p>';
 	const secondCareEncounterNote: CareEncounterNoteModel = {
 		...careEncounterNote,
 		careEncounterNoteId: 'care-encounter-note-2',
@@ -1601,7 +1651,7 @@ it('edits an encounter note without reordering notes', async () => {
 	};
 	const updatedCareEncounterNote = {
 		...careEncounterNote,
-		note: 'Updated first note',
+		note: updatedNoteHtml,
 		lastUpdatedDescription: 'Aug 21, 2026 at 9:00 AM',
 	};
 	getCareEncounterSpy.mockImplementationOnce(
@@ -1631,19 +1681,21 @@ it('edits an encounter note without reordering notes', async () => {
 	const dialog = await findEditNoteDialog();
 	const noteInput = within(dialog).getByRole('textbox', { name: 'Note' });
 	expect(noteInput).toHaveValue('First encounter note');
+	expect(noteInput).toHaveAttribute('data-toolbar-preset', 'care-encounter-message');
 	expect(noteInput).not.toHaveAttribute('minlength');
 	expect(noteInput).not.toHaveAttribute('maxlength');
-	fireEvent.change(noteInput, { target: { value: '  Updated first note  ' } });
+	fireEvent.change(noteInput, { target: { value: '<p><br></p>' } });
+	expect(within(dialog).getByRole('button', { name: 'Save' })).toBeDisabled();
+	fireEvent.change(noteInput, { target: { value: `  ${updatedNoteHtml}  ` } });
 	const tableRequestCount = getCareEncountersSpy.mock.calls.length;
 	await clickAndFlush(within(dialog).getByRole('button', { name: 'Save' }));
 
 	expect(updateCareEncounterNoteSpy).toHaveBeenCalledWith('care-encounter-1', 'care-encounter-note-1', {
-		note: 'Updated first note',
+		note: updatedNoteHtml,
 	});
 	await waitFor(() => expect(screen.queryByText('Edit Note')).not.toBeInTheDocument());
-	const renderedNotes = screen.getAllByText(/Updated first note|Older note/);
-	expect(renderedNotes[0]).toHaveTextContent('Updated first note');
-	expect(renderedNotes[1]).toHaveTextContent('Older note');
+	expect(screen.getByText('first note')).toHaveProperty('tagName', 'STRONG');
+	expect(screen.getByText('Older note')).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'Notes (2)' })).toBeInTheDocument();
 	expect(getCareEncountersSpy).toHaveBeenCalledTimes(tableRequestCount + 1);
 	expect(mockAddFlag).toHaveBeenCalledWith({ variant: 'success', title: 'Note Updated', actions: [] });
