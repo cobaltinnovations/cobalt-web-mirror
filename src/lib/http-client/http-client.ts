@@ -24,6 +24,7 @@ export type OrchestratedRequest<T = undefined> = {
 	fetch(fetchConfig?: { isPolling?: boolean }): Promise<T>;
 	abort(): void;
 	cobaltResponseChecksum?: string;
+	responseHeaders?: Record<string, string | undefined>;
 };
 
 export class HttpClient {
@@ -118,6 +119,21 @@ export class HttpClient {
 			const response: AxiosResponse = await this._axiosInstance(config);
 			return response;
 		} catch (error) {
+			// Blob downloads can still return the API's normal JSON error payload. Axios
+			// exposes that payload as a Blob when responseType is "blob", so normalize it
+			// before CobaltError inspects authentication/authorization error details.
+			if (
+				axios.isAxiosError(error) &&
+				error.response?.data instanceof Blob &&
+				error.response.data.type.includes('json')
+			) {
+				try {
+					error.response.data = JSON.parse(await this.readBlobAsText(error.response.data));
+				} catch (ignored) {
+					// Preserve the original Blob and fall back to generic error handling.
+				}
+			}
+
 			// See https://axios-http.com/docs/handling_errors for details
 			const axiosError = axios.isAxiosError(error) ? CobaltError.fromAxiosError(error) : undefined;
 
@@ -158,6 +174,19 @@ export class HttpClient {
 				throw CobaltError.fromUnknownError(error);
 			}
 		}
+	}
+
+	private readBlobAsText(blob: Blob) {
+		if (typeof blob.text === 'function') {
+			return blob.text();
+		}
+
+		return new Promise<string>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(String(reader.result ?? ''));
+			reader.onerror = () => reject(reader.error);
+			reader.readAsText(blob);
+		});
 	}
 
 	private serializableRequestBody(config: AxiosRequestConfig) {
@@ -214,6 +243,7 @@ export class HttpClient {
 
 			orchestratedRequest.requestComplete = true;
 			orchestratedRequest.cobaltResponseChecksum = response.headers['x-cobalt-checksum'];
+			orchestratedRequest.responseHeaders = response.headers;
 
 			delete this._requests[orchestratedRequest.requestId];
 

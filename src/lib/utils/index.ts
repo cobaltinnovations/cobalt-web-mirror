@@ -5,6 +5,7 @@ export * from './course-utils';
 export * from './date-utils';
 export * from './device-utils';
 export * from './error-utils';
+export * from './file-utils';
 export * from './form-utils';
 export * from './page-builder-utils';
 export * from './patient-order-utils';
