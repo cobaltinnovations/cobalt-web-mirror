@@ -30,6 +30,9 @@ jest.mock('./svg-icon', () => ({
 }));
 
 const mockNavigateToNext = jest.fn();
+const mockUseScreeningNavigation = jest.fn((options?: { screeningQuestionSearch?: string }) => ({
+	navigateToNext: mockNavigateToNext,
+}));
 const mockHandleError = jest.fn();
 
 jest.mock('@/hooks/use-handle-error', () => ({
@@ -38,7 +41,7 @@ jest.mock('@/hooks/use-handle-error', () => ({
 }));
 
 jest.mock('@/pages/screening/screening.hooks', () => ({
-	useScreeningNavigation: () => ({ navigateToNext: mockNavigateToNext }),
+	useScreeningNavigation: (options?: { screeningQuestionSearch?: string }) => mockUseScreeningNavigation(options),
 }));
 
 jest.mock('@/lib/services', () => ({
@@ -52,6 +55,7 @@ jest.mock('@/lib/services', () => ({
 
 beforeEach(() => {
 	jest.clearAllMocks();
+	mockUseScreeningNavigation.mockReturnValue({ navigateToNext: mockNavigateToNext });
 	(appointmentService.getAppointmentBookingRequirements as jest.Mock).mockReturnValue({
 		fetch: jest.fn().mockResolvedValue({
 			appointmentBookingRequirements: {
@@ -262,11 +266,18 @@ it('starts a required screening directly from the appointment modal', async () =
 			null,
 			React.createElement(
 				MemoryRouter,
-				null,
+				{
+					initialEntries: ['/providers?featureId=THERAPY&institutionLocationId=institution-location-id'],
+				},
 				React.createElement(ProviderScheduleModal, { animation: false, show: true, config })
 			)
 		)
 	);
+
+	expect(mockUseScreeningNavigation).toHaveBeenCalledWith({
+		screeningQuestionSearch:
+			'featureId=THERAPY&institutionLocationId=institution-location-id&returnTo=%2Fproviders%3FfeatureId%3DTHERAPY%26institutionLocationId%3Dinstitution-location-id',
+	});
 
 	fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 

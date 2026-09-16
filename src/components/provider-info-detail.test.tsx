@@ -110,7 +110,9 @@ it('starts the referrer screening flow and does not fetch provider availability'
 
 	render(
 		<CobaltThemeProvider>
-			<MemoryRouter>
+			<MemoryRouter
+				initialEntries={['/providers?featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id']}
+			>
 				<ProviderInfoDetail providerId={provider.providerId} />
 			</MemoryRouter>
 		</CobaltThemeProvider>
@@ -129,6 +131,9 @@ it('starts the referrer screening flow and does not fetch provider availability'
 		expect.objectContaining({
 			screeningFlowId: 'team-clinic-screening-flow-id',
 			instantiateOnLoad: false,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch:
+				'featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id&returnTo=%2Fproviders%3FfeatureId%3DMEDICATION_PRESCRIBER%26institutionLocationId%3Dlocation-id',
 		})
 	);
 

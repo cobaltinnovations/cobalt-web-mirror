@@ -36,7 +36,9 @@ import {
 import AsyncWrapper from '@/components/async-page';
 import {
 	PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM,
+	getProviderBookingScreeningSearchParams,
 	getProviderBookingAnalyticsDataFromSearchParams,
+	getProviderListUrlFromSearchParams,
 	parseProviderAppointmentDateTime,
 	setProviderIdToScheduleSearchParam,
 	shouldFetchInstitutionLocation,
@@ -170,7 +172,6 @@ export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const { navigateToNext } = useScreeningNavigation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isCheckingBookingRequirements, setIsCheckingBookingRequirements] = useState(false);
 	const didPersistAppointmentSelectionViewedRef = useRef(false);
@@ -190,6 +191,11 @@ export const Component = () => {
 	);
 
 	const searchString = searchParams.toString();
+	const screeningQuestionSearch = useMemo(
+		() => getProviderBookingScreeningSearchParams(new URLSearchParams(searchString)),
+		[searchString]
+	);
+	const { navigateToNext } = useScreeningNavigation({ screeningQuestionSearch });
 	const appointmentDateTimePickerConfig = useMemo(() => {
 		const params = new URLSearchParams();
 
@@ -484,7 +490,7 @@ export const Component = () => {
 							: 'Appointment Scheduling'
 					}
 					onExit={() => {
-						navigate('/providers');
+						navigate(getProviderListUrlFromSearchParams(searchParams));
 					}}
 				/>
 

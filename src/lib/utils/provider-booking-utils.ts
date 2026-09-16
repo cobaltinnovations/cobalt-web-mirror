@@ -31,6 +31,30 @@ export const getProviderSearchInstitutionLocationIdForAccount = (
 	account?.institutionLocationId ||
 	(account?.promptedForInstitutionLocation ? ALL_INSTITUTION_LOCATIONS_ID : undefined);
 
+export const getProviderListUrlFromSearchParams = (searchParams: URLSearchParams) => {
+	const providerListSearchParams = new URLSearchParams();
+	const featureId = searchParams.get('featureId');
+	const institutionLocationId = searchParams.get('institutionLocationId');
+
+	if (featureId) {
+		providerListSearchParams.set('featureId', featureId);
+	}
+
+	if (institutionLocationId) {
+		providerListSearchParams.set('institutionLocationId', institutionLocationId);
+	}
+
+	const queryString = providerListSearchParams.toString();
+	return queryString ? `/providers?${queryString}` : '/providers';
+};
+
+export const getProviderBookingScreeningSearchParams = (searchParams: URLSearchParams) => {
+	const screeningSearchParams = new URLSearchParams(searchParams);
+	screeningSearchParams.set('returnTo', getProviderListUrlFromSearchParams(searchParams));
+
+	return screeningSearchParams.toString();
+};
+
 export const shouldFetchInstitutionLocation = (institutionLocationId?: string) =>
 	Boolean(institutionLocationId && !isAllInstitutionLocationsId(institutionLocationId));
 
