@@ -15,9 +15,9 @@ export enum LoginDestinationId {
 	IC_PANEL = 'IC_PANEL',
 }
 
-export enum OnboardingTreatmentId {
-	DEFAULT = 'DEFAULT',
-	MODAL = 'MODAL',
+export enum OnboardingScreeningPresentationId {
+	LARGE_MODAL = 'LARGE_MODAL',
+	SMALL_MODAL = 'SMALL_MODAL',
 }
 
 export interface AccountModel {
@@ -53,6 +53,7 @@ export interface AccountModel {
 	genderIdentityId?: string;
 	institutionId: string;
 	institutionLocationId: string;
+	promptedForInstitutionLocation: boolean;
 	insuranceId?: string;
 	jobTitle?: string;
 	languageCode?: string;
@@ -61,7 +62,8 @@ export interface AccountModel {
 	lastUpdatedDescription: string;
 	locale: string;
 	loginDestinationId: LoginDestinationId;
-	onboardingTreatmentId?: string;
+	onboardingScreeningPresentationId: string;
+	onboardingScreeningFlowAppliesToAccount: boolean;
 	phoneNumber?: string;
 	phoneNumberDescription?: string;
 	providerId?: string;

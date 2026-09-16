@@ -885,6 +885,9 @@ export const routes: RouteObject[] = [
 					},
 					{
 						element: <ProviderBookingV2Outlet />,
+						handle: {
+							fullscreenScreening: true,
+						} as RouteHandle,
 						children: [
 							{
 								id: 'providers',

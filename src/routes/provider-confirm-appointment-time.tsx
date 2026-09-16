@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -16,6 +16,8 @@ import {
 	isProviderAppointmentModalityId,
 } from '@/components/provider-appointment-modality-summary';
 import {
+	AnalyticsNativeEventProviderAppointmentSelectionPresentationId,
+	AnalyticsNativeEventTypeId,
 	AppointmentBookingRequirementsDestinationId,
 	Clinic,
 	InstitutionLocation,
@@ -25,6 +27,7 @@ import {
 } from '@/lib/models';
 import {
 	appointmentService,
+	analyticsService,
 	AvailabilityModel,
 	clinicService,
 	institutionService,
@@ -33,6 +36,7 @@ import {
 import AsyncWrapper from '@/components/async-page';
 import {
 	PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM,
+	getProviderBookingAnalyticsDataFromSearchParams,
 	parseProviderAppointmentDateTime,
 	setProviderIdToScheduleSearchParam,
 	shouldFetchInstitutionLocation,
@@ -169,11 +173,13 @@ export const Component = () => {
 	const { navigateToNext } = useScreeningNavigation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isCheckingBookingRequirements, setIsCheckingBookingRequirements] = useState(false);
+	const didPersistAppointmentSelectionViewedRef = useRef(false);
 
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
+	const screeningSessionId = useMemo(() => searchParams.get('screeningSessionId') ?? '', [searchParams]);
 	const appointmentSelectionTypeId = useMemo(() => {
 		const value = searchParams.get('appointmentSelectionTypeId');
 		return isProviderAppointmentSelectionTypeId(value) ? value : undefined;
@@ -245,6 +251,18 @@ export const Component = () => {
 	const [provider, setProvider] = useState<Provider>();
 	const [clinic, setClinic] = useState<Clinic>();
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
+
+	useEffect(() => {
+		if (!appointmentDateTimePickerConfig || didPersistAppointmentSelectionViewedRef.current) {
+			return;
+		}
+
+		didPersistAppointmentSelectionViewedRef.current = true;
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTION_VIEWED, {
+			...getProviderBookingAnalyticsDataFromSearchParams(new URLSearchParams(searchString)),
+			presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.PAGE,
+		});
+	}, [appointmentDateTimePickerConfig, searchString]);
 
 	const fetchData = useCallback(async (): Promise<AppointmentAvailabilityData> => {
 		const institutionLocationRequest = shouldFetchInstitutionLocation(institutionLocationId)
@@ -371,12 +389,20 @@ export const Component = () => {
 		}
 
 		setIsCheckingBookingRequirements(true);
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTED, {
+			...getProviderBookingAnalyticsDataFromSearchParams(new URLSearchParams(searchString)),
+			providerIdToSchedule: selectedProviderId,
+			appointmentTypeId: selectedAppointmentTypeId,
+			appointmentModalityId: selectedAppointmentDateTimePickerValue.appointmentModalityId,
+			presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.PAGE,
+		});
 
 		try {
 			const response = await appointmentService
 				.getAppointmentBookingRequirements({
 					providerId: selectedProviderId,
 					appointmentTypeId: selectedAppointmentTypeId,
+					...(screeningSessionId && { screeningSessionId }),
 					...(appointmentSelectionTypeId && { appointmentSelectionTypeId }),
 					...(selectedAppointmentDateTimePickerValue.appointmentModalityId && {
 						appointmentModalityId: selectedAppointmentDateTimePickerValue.appointmentModalityId,
@@ -434,6 +460,7 @@ export const Component = () => {
 		providerId,
 		providerSearchResultTypeId,
 		searchString,
+		screeningSessionId,
 		selectedAppointmentDateTimePickerValue,
 	]);
 

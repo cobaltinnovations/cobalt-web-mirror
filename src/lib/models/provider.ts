@@ -97,6 +97,7 @@ export interface Clinic {
 	phoneNumberDescription?: string;
 	formattedPhoneNumber?: string;
 	emailAddress?: string;
+	imageUrl?: string | null;
 	locations: ProviderLocation[];
 	websiteUrl: string;
 	detailsHtml: string;

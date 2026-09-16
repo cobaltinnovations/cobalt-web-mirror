@@ -37,24 +37,29 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 	const navigate = useNavigate();
 	const classes = useHeaderStyles();
 	const header = useRef<HTMLElement>(null);
+	const routeMatches = useMatches();
+	const hideHeader = useMemo(
+		() => routeMatches.some((match) => (match.handle as RouteHandle | undefined)?.hideHeader),
+		[routeMatches]
+	);
 	const signInMatch = !!useMatch({
 		path: '/sign-in',
 		end: true,
 	});
 
-	const handleWindowResize = useCallback(() => {
-		setBodyPadding();
-	}, []);
-
-	function setBodyPadding() {
-		if (!header.current) {
+	const setBodyPadding = useCallback(() => {
+		if (hideHeader || !header.current) {
 			document.body.style.paddingTop = '0px';
 			return;
 		}
 
 		const headerHeight = header.current.clientHeight;
 		document.body.style.paddingTop = `${headerHeight}px`;
-	}
+	}, [hideHeader]);
+
+	const handleWindowResize = useCallback(() => {
+		setBodyPadding();
+	}, [setBodyPadding]);
 
 	useEffect(() => {
 		setBodyPadding();
@@ -64,13 +69,8 @@ const HeaderUnauthenticated = ({ hideSignInButton }: HeaderUnauthenticatedProps)
 			window.removeEventListener('resize', handleWindowResize);
 			document.body.style.paddingTop = '0px';
 		};
-	}, [handleWindowResize]);
+	}, [handleWindowResize, setBodyPadding]);
 
-	const routeMatches = useMatches();
-	const hideHeader = useMemo(
-		() => routeMatches.some((match) => (match.handle as RouteHandle | undefined)?.hideHeader),
-		[routeMatches]
-	);
 	if (hideHeader) {
 		return null;
 	}

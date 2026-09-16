@@ -336,6 +336,11 @@ const HeaderV2 = () => {
 	const handleError = useHandleError();
 	const classes = useHeaderV2Styles();
 	const revalidator = useRevalidator();
+	const routeMatches = useMatches();
+	const hideHeader = useMemo(
+		() => routeMatches.some((match) => (match.handle as RouteHandle | undefined)?.hideHeader),
+		[routeMatches]
+	);
 
 	const { account, institution, isAdmin, signOutAndClearContext } = useAccount();
 	const { trackEvent } = useAnalytics();
@@ -349,34 +354,34 @@ const HeaderV2 = () => {
 	const header = useRef<HTMLDivElement | null>(null);
 	const movileNavRef = useRef<HTMLDivElement | null>(null);
 
-	const handleWindowResize = useCallback(() => {
-		setBodyPadding();
-		setMobileNavTop();
-	}, []);
-
-	function setBodyPadding() {
-		if (!header.current) {
+	const setBodyPadding = useCallback(() => {
+		if (hideHeader || !header.current) {
 			document.body.style.paddingTop = '0px';
 			return;
 		}
 
 		const headerHeight = header.current.getBoundingClientRect().height;
 		document.body.style.paddingTop = `${headerHeight}px`;
-	}
+	}, [hideHeader]);
 
-	function setMobileNavTop() {
+	const setMobileNavTop = useCallback(() => {
 		if (!movileNavRef.current) {
 			return;
 		}
 
-		if (!header.current) {
+		if (hideHeader || !header.current) {
 			movileNavRef.current.style.top = '0px';
 			return;
 		}
 
 		const headerHeight = header.current.clientHeight;
 		movileNavRef.current.style.top = `${headerHeight}px`;
-	}
+	}, [hideHeader]);
+
+	const handleWindowResize = useCallback(() => {
+		setBodyPadding();
+		setMobileNavTop();
+	}, [setBodyPadding, setMobileNavTop]);
 
 	useEffect(() => {
 		setBodyPadding();
@@ -387,7 +392,7 @@ const HeaderV2 = () => {
 		return () => {
 			window.removeEventListener('resize', handleWindowResize);
 		};
-	}, [handleWindowResize]);
+	}, [handleWindowResize, setBodyPadding, setMobileNavTop]);
 
 	useEffect(() => {
 		setBodyPadding();
@@ -395,7 +400,7 @@ const HeaderV2 = () => {
 		return () => {
 			document.body.style.paddingTop = '0px';
 		};
-	}, [account]);
+	}, [account, setBodyPadding]);
 
 	/* ----------------------------------------------------------- */
 	/* Disable scrolling when menu is open */
@@ -694,11 +699,6 @@ const HeaderV2 = () => {
 			: undefined;
 	}, [featuredTopicCenter, institution.preferLegacyTopicCenters, legacyFeaturedTopicCenter]);
 
-	const routeMatches = useMatches();
-	const hideHeader = useMemo(
-		() => routeMatches.some((match) => (match.handle as RouteHandle | undefined)?.hideHeader),
-		[routeMatches]
-	);
 	if (hideHeader) {
 		return null;
 	}

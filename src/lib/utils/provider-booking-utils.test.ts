@@ -1,6 +1,7 @@
 import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	getPersistedInstitutionLocationId,
+	getProviderSearchInstitutionLocationIdForAccount,
 	isAllInstitutionLocationsId,
 	shouldFetchInstitutionLocation,
 	getBookingExperienceId,
@@ -14,6 +15,7 @@ import {
 	PROVIDER_BOOKING_EXPERIENCE_ID,
 	buildBookingV2UrlWithV1Fallback,
 	didBookingExperienceChange,
+	getProviderBookingPathForScreeningDestination,
 	getSafeBookingV1FallbackUrl,
 } from './provider-booking-utils';
 import { BookingExperienceId, FeatureId, InstitutionFeature, SupportRoleId } from '@/lib/models';
@@ -31,6 +33,28 @@ describe('provider booking institution locations', () => {
 		expect(shouldFetchInstitutionLocation(ALL_INSTITUTION_LOCATIONS_ID)).toBe(false);
 		expect(shouldFetchInstitutionLocation('location-id')).toBe(true);
 		expect(shouldFetchInstitutionLocation()).toBe(false);
+	});
+
+	it('restores a saved employer or the synthetic declined-to-answer option from the account', () => {
+		expect(
+			getProviderSearchInstitutionLocationIdForAccount({
+				institutionLocationId: 'location-id',
+				promptedForInstitutionLocation: true,
+			})
+		).toBe('location-id');
+		expect(
+			getProviderSearchInstitutionLocationIdForAccount({
+				institutionLocationId: '',
+				promptedForInstitutionLocation: true,
+			})
+		).toBe(ALL_INSTITUTION_LOCATIONS_ID);
+		expect(
+			getProviderSearchInstitutionLocationIdForAccount({
+				institutionLocationId: '',
+				promptedForInstitutionLocation: false,
+			})
+		).toBeUndefined();
+		expect(getProviderSearchInstitutionLocationIdForAccount()).toBeUndefined();
 	});
 });
 
@@ -209,5 +233,29 @@ describe('provider booking experience', () => {
 				bookingV1FallbackUrl: 'https://example.com/steal',
 			})
 		).toBe('/connect-with-support/therapy');
+	});
+
+	it('continues directly to booking after screening an already-confirmed appointment time', () => {
+		expect(
+			getProviderBookingPathForScreeningDestination({
+				accountId: 'account-id',
+				providerSearchResultTypeId: 'PROVIDER',
+				providerId: 'provider-id',
+				appointmentTypeId: 'appointment-type-id',
+				appointmentModalityId: 'VIRTUAL',
+				date: '2026-09-24',
+				time: '20:00:00',
+			})
+		).toBe('/provider-book-appointment');
+	});
+
+	it('returns to time selection when screening began before an exact appointment was confirmed', () => {
+		expect(
+			getProviderBookingPathForScreeningDestination({
+				providerSearchResultTypeId: 'PROVIDER',
+				providerId: 'provider-id',
+				appointmentTypeId: 'appointment-type-id',
+			})
+		).toBe('/provider-confirm-appointment-time');
 	});
 });

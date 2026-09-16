@@ -22,7 +22,9 @@ import useAccountSourceClickHandler from '@/hooks/use-account-source-click-handl
 import {
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
 	getBookingV1FallbackUrlFromSearchParams,
+	getProviderBookingPathForScreeningDestination,
 	getSafeBookingV1FallbackUrl,
+	getScreeningSessionDestinationWithSessionId,
 } from '@/lib/utils';
 
 export function useScreeningNavigation() {
@@ -209,7 +211,7 @@ export function useScreeningNavigation() {
 
 						navigate(
 							{
-								pathname: '/provider-confirm-appointment-time',
+								pathname: getProviderBookingPathForScreeningDestination(destination.context),
 								search: destinationSearchParams.toString(),
 							},
 							{
@@ -253,7 +255,12 @@ export function useScreeningNavigation() {
 			if (session?.nextScreeningQuestionContextId) {
 				navigateToQuestion(session.nextScreeningQuestionContextId);
 			} else if (session?.screeningSessionDestination) {
-				navigateToDestination(session.screeningSessionDestination);
+				navigateToDestination(
+					getScreeningSessionDestinationWithSessionId(
+						session.screeningSessionDestination,
+						session.screeningSessionId
+					)
+				);
 			}
 		},
 		[navigateToDestination, navigateToQuestion]
@@ -315,7 +322,12 @@ export function useScreeningFlow({
 
 				navigateToQuestion(session.nextScreeningQuestionContextId);
 			} else if (session?.screeningSessionDestination) {
-				navigateToDestination(session.screeningSessionDestination);
+				navigateToDestination(
+					getScreeningSessionDestinationWithSessionId(
+						session.screeningSessionDestination,
+						session.screeningSessionId
+					)
+				);
 			}
 		},
 		[navigate, navigateToDestination, navigateToQuestion, screeningQuestionPathPrefix, screeningQuestionSearch]
