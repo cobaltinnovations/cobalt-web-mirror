@@ -33,7 +33,7 @@ import useHandleError from '@/hooks/use-handle-error';
 import {
 	parseProviderAppointmentDateTime,
 	getProviderBookingAnalyticsDataFromSearchParams,
-	getProviderListUrlFromSearchParams,
+	getProviderBookingReturnUrlFromSearchParams,
 	PROVIDER_BOOKING_EXPERIENCE_ID,
 	shouldFetchInstitutionLocation,
 } from '@/lib/utils';
@@ -418,7 +418,7 @@ export const Component = () => {
 							: 'Appointment Scheduling'
 					}
 					onExit={() => {
-						navigate(getProviderListUrlFromSearchParams(searchParams));
+						navigate(getProviderBookingReturnUrlFromSearchParams(searchParams));
 					}}
 				/>
 

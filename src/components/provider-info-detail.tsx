@@ -27,6 +27,7 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import {
 	buildBookingV2UrlWithV1Fallback,
 	buildProviderBookingAnalyticsData,
+	getProviderBookingReturnUrl,
 	getProviderBookingScreeningSearchParams,
 	getBookingV1FallbackUrlFromSearchParams,
 	setFirstAvailableAppointmentSearchParams,
@@ -257,9 +258,17 @@ const ProviderInfoDetailReferralSchedule = ({
 	referralBooking: ProviderReferralBooking;
 }) => {
 	const location = useLocation();
+	const returnTo = useMemo(
+		() =>
+			getProviderBookingReturnUrl({
+				pathname: location.pathname,
+				searchParams: new URLSearchParams(location.search),
+			}),
+		[location.pathname, location.search]
+	);
 	const screeningQuestionSearch = useMemo(
-		() => getProviderBookingScreeningSearchParams(new URLSearchParams(location.search)),
-		[location.search]
+		() => getProviderBookingScreeningSearchParams(new URLSearchParams(location.search), returnTo),
+		[location.search, returnTo]
 	);
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
 		useScreeningFlow({
@@ -323,6 +332,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	clinicId,
 	appointmentSelectionTypeId,
 	bookingV1FallbackUrl,
+	returnTo,
 }: {
 	featureId?: string;
 	institutionLocationId?: string;
@@ -331,6 +341,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	clinicId?: string;
 	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
 	bookingV1FallbackUrl?: string;
+	returnTo?: string;
 }) => {
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 
@@ -346,6 +357,10 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 
 	if (institutionLocationId) {
 		params.set('institutionLocationId', institutionLocationId);
+	}
+
+	if (returnTo) {
+		params.set('returnTo', returnTo);
 	}
 
 	if (clinicId) {
@@ -435,6 +450,15 @@ const ProviderInfoDetailSchedule = ({
 	onViewAppointmentsButtonClick,
 }: ProviderInfoDetailScheduleProps) => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const returnTo = useMemo(
+		() =>
+			getProviderBookingReturnUrl({
+				pathname: location.pathname,
+				searchParams: new URLSearchParams(location.search),
+			}),
+		[location.pathname, location.search]
+	);
 	const phoneNumber = provider?.phoneNumber ?? clinic?.phoneNumber;
 	const phoneNumberDescription =
 		provider?.formattedPhoneNumber ?? clinic?.formattedPhoneNumber ?? provider?.phoneNumber ?? clinic?.phoneNumber;
@@ -476,6 +500,7 @@ const ProviderInfoDetailSchedule = ({
 					clinicId,
 					appointmentSelectionTypeId: scheduleTypeId,
 					bookingV1FallbackUrl,
+					returnTo,
 				});
 
 				if (providerConfirmAppointmentTimeUrl) {

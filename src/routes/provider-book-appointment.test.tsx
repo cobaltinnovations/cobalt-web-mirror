@@ -174,3 +174,24 @@ it('exits to the provider list with the selected care type and employer', () => 
 		'/providers?featureId=THERAPY&institutionLocationId=location-id'
 	);
 });
+
+it('exits to the provider information page that launched booking', () => {
+	render(
+		<CobaltThemeProvider>
+			<MemoryRouter
+				initialEntries={[
+					'/provider-book-appointment?institutionLocationId=location-id&providerSearchResultTypeId=PROVIDER&providerId=provider-id&appointmentModalityId=VIRTUAL&returnTo=%2Fprovider-info%2Fprovider-id%3FinstitutionLocationId%3Dlocation-id',
+				]}
+			>
+				<Component />
+				<LocationDisplay />
+			</MemoryRouter>
+		</CobaltThemeProvider>
+	);
+
+	fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'/provider-info/provider-id?institutionLocationId=location-id'
+	);
+});

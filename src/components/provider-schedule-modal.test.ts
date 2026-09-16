@@ -20,7 +20,26 @@ import ProviderScheduleModal, {
 
 jest.mock('@/components/appointment-date-time-picker', () => ({
 	__esModule: true,
-	default: () => null,
+	default: ({
+		onFirstAvailableAppointmentSelect,
+	}: {
+		onFirstAvailableAppointmentSelect?: (value: unknown) => void;
+	}) =>
+		require('react').createElement(
+			'button',
+			{
+				type: 'button',
+				onClick: () =>
+					onFirstAvailableAppointmentSelect?.({
+						dateTime: require('moment').utc('2026-09-24 20:00:00', 'YYYY-MM-DD HH:mm:ss'),
+						appointmentModalityId: 'PHONE',
+						appointmentTypeIds: ['appointment-type-id'],
+						appointmentTypeId: 'appointment-type-id',
+						providerId: 'clinic-provider-id',
+					}),
+			},
+			'First available shortcut'
+		),
 	getDefaultAppointmentDateTimePickerValue: () => ({ dateTime: undefined }),
 }));
 
@@ -178,7 +197,7 @@ it('uses the concrete provider from a clinic card first appointment', () => {
 	expect(initialValue.providerId).toBe('clinic-provider-id');
 });
 
-it('records a pooled clinic selection and advances directly to booking', async () => {
+it('uses the first-available shortcut to select a pooled clinic slot and advance directly to booking', async () => {
 	const provider = createClinicProviderSearchResult();
 	const config = createProviderScheduleModalConfig({
 		featureId: 'THERAPY',
@@ -192,7 +211,11 @@ it('records a pooled clinic selection and advances directly to booking', async (
 			null,
 			React.createElement(
 				MemoryRouter,
-				{ initialEntries: ['/providers?institutionLocationId=institution-location-id'] },
+				{
+					initialEntries: [
+						'/provider-info/care-navigator-provider-id?institutionLocationId=institution-location-id',
+					],
+				},
 				React.createElement(
 					React.Fragment,
 					null,
@@ -216,7 +239,7 @@ it('records a pooled clinic selection and advances directly to booking', async (
 		);
 	});
 
-	fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+	fireEvent.click(screen.getByRole('button', { name: 'First available shortcut' }));
 
 	await waitFor(() => {
 		expect(analyticsService.persistEvent).toHaveBeenCalledWith(
@@ -240,6 +263,9 @@ it('records a pooled clinic selection and advances directly to booking', async (
 		});
 		expect(screen.getByTestId('location')).toHaveTextContent('/provider-book-appointment?');
 		expect(screen.getByTestId('location')).not.toHaveTextContent('/provider-confirm-appointment-time');
+		expect(screen.getByTestId('location')).toHaveTextContent(
+			'returnTo=%2Fprovider-info%2Fcare-navigator-provider-id%3FinstitutionLocationId%3Dinstitution-location-id'
+		);
 	});
 });
 

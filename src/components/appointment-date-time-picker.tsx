@@ -242,6 +242,7 @@ type AppointmentDateTimePickerFetchData = {
 export interface AppointmentDateTimePickerProps {
 	value: AppointmentDateTimePickerValue;
 	onChange(value: AppointmentDateTimePickerValue): void;
+	onFirstAvailableAppointmentSelect?(value: AppointmentDateTimePickerValue): void;
 	config?: AppointmentDateTimePickerConfig;
 	fetchData?(): Promise<AppointmentDateTimePickerFetchData>;
 }
@@ -259,7 +260,13 @@ const getAppointmentTypesFromFetchData = (data: AppointmentDateTimePickerFetchDa
 	return Array.from(appointmentTypesById.values());
 };
 
-const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: AppointmentDateTimePickerProps) => {
+const AppointmentDateTimePicker = ({
+	value,
+	onChange,
+	onFirstAvailableAppointmentSelect,
+	config,
+	fetchData,
+}: AppointmentDateTimePickerProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const minSelectableDate = moment().startOf('day').toDate();
@@ -372,7 +379,14 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 	const handleFirstAvailableSelect = () => {
 		if (firstAvailableAppointment) {
-			onChange(getValueForTimeSlot(value, firstAvailableAppointment.date, firstAvailableAppointment.timeSlot));
+			const nextValue = getValueForTimeSlot(
+				value,
+				firstAvailableAppointment.date,
+				firstAvailableAppointment.timeSlot
+			);
+
+			onChange(nextValue);
+			onFirstAvailableAppointmentSelect?.(nextValue);
 		}
 	};
 
