@@ -9,8 +9,23 @@ import AppointmentDateTimePicker, {
 	getDefaultAppointmentDateTimePickerValue,
 } from '@/components/appointment-date-time-picker';
 import { createUseThemedStyles } from '@/jss/theme';
-import { FirstAvailableAppointmentModel, ProviderAppointmentModalityId, ProviderSearchResultModel } from '@/lib/models';
-import { buildBookingV2UrlWithV1Fallback, setProviderIdToScheduleSearchParam } from '@/lib/utils';
+import {
+	AnalyticsNativeEventProviderAppointmentSelectionPresentationId,
+	AnalyticsNativeEventTypeId,
+	AppointmentBookingRequirementsDestinationId,
+	FirstAvailableAppointmentModel,
+	ProviderAppointmentModalityId,
+	ProviderSearchResultModel,
+	ProviderSearchResultTypeId,
+} from '@/lib/models';
+import { analyticsService, appointmentService } from '@/lib/services';
+import {
+	buildBookingV2UrlWithV1Fallback,
+	buildProviderBookingAnalyticsData,
+	setProviderIdToScheduleSearchParam,
+} from '@/lib/utils';
+import useHandleError from '@/hooks/use-handle-error';
+import { useScreeningNavigation } from '@/pages/screening/screening.hooks';
 
 const useStyles = createUseThemedStyles(() => ({
 	providerScheduleModal: {
@@ -23,6 +38,7 @@ const useStyles = createUseThemedStyles(() => ({
 
 export type ProviderScheduleModalConfig = AppointmentDateTimePickerConfig & {
 	bookingV1FallbackUrl?: string;
+	providerSearchResultId?: string;
 	initialAppointment?: FirstAvailableAppointmentModel;
 	initialAppointmentModalityId?: ProviderAppointmentModalityId;
 };
@@ -45,8 +61,12 @@ export const createProviderScheduleModalConfig = ({
 		institutionLocationId,
 		clinicId: provider.clinicId ?? undefined,
 		providerId: provider.providerId ?? undefined,
-		appointmentTypeId: initialAppointment?.appointmentTypeId,
+		appointmentTypeId:
+			provider.providerSearchResultTypeId === ProviderSearchResultTypeId.PROVIDER
+				? initialAppointment?.appointmentTypeId
+				: undefined,
 		providerSearchResultTypeId: provider.providerSearchResultTypeId,
+		providerSearchResultId: provider.providerSearchResultId,
 		appointmentSelectionTypeId: provider.appointmentSelectionTypeId ?? undefined,
 		bookingV1FallbackUrl,
 		initialAppointment,
@@ -92,9 +112,9 @@ interface ProviderScheduleModalProps extends ModalProps {
 	config?: ProviderScheduleModalConfig;
 }
 
-const providerConfirmAppointmentTimePath = '/provider-confirm-appointment-time';
+const providerBookAppointmentPath = '/provider-book-appointment';
 
-const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderScheduleModalContinueOptions) => {
+const buildProviderBookAppointmentUrl = ({ config, value }: ProviderScheduleModalContinueOptions) => {
 	const params = new URLSearchParams();
 
 	if (config?.featureId) {
@@ -117,6 +137,10 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 
 	if (config?.providerSearchResultTypeId) {
 		params.set('providerSearchResultTypeId', config.providerSearchResultTypeId);
+	}
+
+	if (config?.providerSearchResultId) {
+		params.set('providerSearchResultId', config.providerSearchResultId);
 	}
 
 	if (config?.appointmentSelectionTypeId) {
@@ -144,16 +168,19 @@ const buildProviderConfirmAppointmentTimeUrl = ({ config, value }: ProviderSched
 
 	const queryString = params.toString();
 
-	const providerConfirmAppointmentTimeUrl = queryString
-		? `${providerConfirmAppointmentTimePath}?${queryString}`
-		: providerConfirmAppointmentTimePath;
+	const providerBookAppointmentUrl = queryString
+		? `${providerBookAppointmentPath}?${queryString}`
+		: providerBookAppointmentPath;
 
-	return buildBookingV2UrlWithV1Fallback(providerConfirmAppointmentTimeUrl, config?.bookingV1FallbackUrl);
+	return buildBookingV2UrlWithV1Fallback(providerBookAppointmentUrl, config?.bookingV1FallbackUrl);
 };
 
 const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const handleError = useHandleError();
+	const { navigateToNext } = useScreeningNavigation();
+	const [isCheckingBookingRequirements, setIsCheckingBookingRequirements] = useState(false);
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
 		getInitialAppointmentDateTimePickerValue(config)
 	);
@@ -161,13 +188,117 @@ const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps)
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(getInitialAppointmentDateTimePickerValue(config));
 	}, [config, props.show]);
-	const selectedDateLabel = selectedAppointmentDateTimePickerValue.dateTime.format('MMMM D, YYYY');
-	const selectedTimeLabel = selectedAppointmentDateTimePickerValue.dateTime.format('h:mmA');
+	useEffect(() => {
+		if (!props.show || !config) {
+			return;
+		}
+
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTION_VIEWED, {
+			...buildProviderBookingAnalyticsData({
+				featureId: config.featureId,
+				institutionLocationId: config.institutionLocationId,
+				providerSearchResultId: config.providerSearchResultId,
+				providerSearchResultTypeId: config.providerSearchResultTypeId,
+				providerId: config.providerId,
+				clinicId: config.clinicId,
+				providerIdToSchedule: config.initialAppointment?.providerId ?? config.providerId,
+				appointmentSelectionTypeId: config.appointmentSelectionTypeId,
+				appointmentTypeId: config.initialAppointment?.appointmentTypeId ?? config.appointmentTypeId,
+				appointmentModalityId: config.initialAppointmentModalityId,
+			}),
+			presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.MODAL,
+		});
+	}, [config, props.show]);
+	const selectedDateLabel = selectedAppointmentDateTimePickerValue.dateTime.format('ddd, MMM D, YYYY');
+	const selectedTimeLabel = selectedAppointmentDateTimePickerValue.dateTime.format('h:mm a');
 	const canContinue = Boolean(
 		selectedAppointmentDateTimePickerValue.appointmentModalityId &&
 			selectedAppointmentDateTimePickerValue.appointmentTypeId &&
 			selectedAppointmentDateTimePickerValue.providerId
 	);
+	const handleContinue = async () => {
+		const selectedProviderId = selectedAppointmentDateTimePickerValue.providerId;
+		const selectedAppointmentTypeId = selectedAppointmentDateTimePickerValue.appointmentTypeId;
+		const selectedAppointmentModalityId = selectedAppointmentDateTimePickerValue.appointmentModalityId;
+
+		if (
+			!selectedProviderId ||
+			!selectedAppointmentTypeId ||
+			!selectedAppointmentModalityId ||
+			isCheckingBookingRequirements
+		) {
+			return;
+		}
+
+		setIsCheckingBookingRequirements(true);
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTED, {
+			...buildProviderBookingAnalyticsData({
+				featureId: config?.featureId,
+				institutionLocationId: config?.institutionLocationId,
+				providerSearchResultId: config?.providerSearchResultId,
+				providerSearchResultTypeId: config?.providerSearchResultTypeId,
+				providerId: config?.providerId,
+				clinicId: config?.clinicId,
+				providerIdToSchedule: selectedProviderId,
+				appointmentSelectionTypeId: config?.appointmentSelectionTypeId,
+				appointmentTypeId: selectedAppointmentTypeId,
+				appointmentModalityId: selectedAppointmentModalityId,
+			}),
+			presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.MODAL,
+		});
+
+		try {
+			const response = await appointmentService
+				.getAppointmentBookingRequirements({
+					providerId: selectedProviderId,
+					appointmentTypeId: selectedAppointmentTypeId,
+					...(config?.appointmentSelectionTypeId && {
+						appointmentSelectionTypeId: config.appointmentSelectionTypeId,
+					}),
+					appointmentModalityId: selectedAppointmentModalityId,
+					date: selectedAppointmentDateTimePickerValue.dateTime.format('YYYY-MM-DD'),
+					time: selectedAppointmentDateTimePickerValue.dateTime.format('HH:mm:ss'),
+					...(selectedAppointmentDateTimePickerValue.epicDepartmentId && {
+						epicDepartmentId: selectedAppointmentDateTimePickerValue.epicDepartmentId,
+					}),
+					...(selectedAppointmentDateTimePickerValue.epicAppointmentFhirId && {
+						epicAppointmentFhirId: selectedAppointmentDateTimePickerValue.epicAppointmentFhirId,
+					}),
+				})
+				.fetch();
+			const bookingRequirements = response.appointmentBookingRequirements;
+
+			if (
+				bookingRequirements.appointmentBookingRequirementsDestinationId ===
+				AppointmentBookingRequirementsDestinationId.SCREENING_SESSION
+			) {
+				if (!bookingRequirements.screeningSession) {
+					throw new Error('Screening session is required but was not returned.');
+				}
+
+				navigateToNext(bookingRequirements.screeningSession);
+				return;
+			}
+
+			if (
+				bookingRequirements.appointmentBookingRequirementsDestinationId !==
+				AppointmentBookingRequirementsDestinationId.APPOINTMENT_BOOKING
+			) {
+				throw new Error('Unknown appointment booking destination.');
+			}
+
+			navigate(
+				buildProviderBookAppointmentUrl({
+					config,
+					value: selectedAppointmentDateTimePickerValue,
+				})
+			);
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setIsCheckingBookingRequirements(false);
+		}
+	};
 
 	return (
 		<Modal {...props} dialogClassName={classes.providerScheduleModal} centered>
@@ -190,15 +321,8 @@ const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps)
 				</p>
 				<Button
 					variant="primary"
-					disabled={!canContinue}
-					onClick={() => {
-						navigate(
-							buildProviderConfirmAppointmentTimeUrl({
-								config,
-								value: selectedAppointmentDateTimePickerValue,
-							})
-						);
-					}}
+					disabled={!canContinue || isCheckingBookingRequirements}
+					onClick={handleContinue}
 				>
 					Continue
 				</Button>

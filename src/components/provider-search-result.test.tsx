@@ -21,8 +21,18 @@ jest.mock('@/components/svg-icon', () => ({
 
 jest.mock('./provider-schedule-card', () => ({
 	__esModule: true,
-	default: ({ isReferralBooking }: { isReferralBooking?: boolean }) => (
-		<div data-testid="provider-schedule-card" data-is-referral-booking={String(Boolean(isReferralBooking))} />
+	default: ({
+		isReferralBooking,
+		scheduleAppointmentDescription,
+	}: {
+		isReferralBooking?: boolean;
+		scheduleAppointmentDescription?: string;
+	}) => (
+		<div
+			data-testid="provider-schedule-card"
+			data-is-referral-booking={String(Boolean(isReferralBooking))}
+			data-schedule-appointment-description={scheduleAppointmentDescription}
+		/>
 	),
 }));
 
@@ -47,6 +57,51 @@ it('renders trusted provider description markup and left-aligns a wrapping provi
 	expect(screen.getByText('important')).toHaveProperty('tagName', 'STRONG');
 	expect(container.querySelector('.description br')).toBeInTheDocument();
 	expect(screen.queryByText(/<p>/)).not.toBeInTheDocument();
+});
+
+it('uses the provider title as the appointment description when available', () => {
+	const provider = {
+		name: 'University of Pennsylvania Employee Assistance Program',
+		title: 'EAP Intake Counselor from CuraLinc',
+		appointmentDescription: '1:1 With CuraLinc',
+		supportedAppointmentModalities: [],
+	} as ProviderSearchResultModel;
+
+	render(
+		<ProviderSearchResult
+			provider={provider}
+			onTitleButtonClick={jest.fn()}
+			onScheduleAppointmentButtonClick={jest.fn()}
+			onViewAppointmentsButtonClick={jest.fn()}
+		/>
+	);
+
+	expect(screen.getByTestId('provider-schedule-card')).toHaveAttribute(
+		'data-schedule-appointment-description',
+		provider.title
+	);
+});
+
+it('uses the appointment description when the provider has no title', () => {
+	const provider = {
+		name: 'TEAM Clinic',
+		appointmentDescription: 'Schedule an intake',
+		supportedAppointmentModalities: [],
+	} as ProviderSearchResultModel;
+
+	render(
+		<ProviderSearchResult
+			provider={provider}
+			onTitleButtonClick={jest.fn()}
+			onScheduleAppointmentButtonClick={jest.fn()}
+			onViewAppointmentsButtonClick={jest.fn()}
+		/>
+	);
+
+	expect(screen.getByTestId('provider-schedule-card')).toHaveAttribute(
+		'data-schedule-appointment-description',
+		provider.appointmentDescription
+	);
 });
 
 it('marks a referral-backed result as actionable without a first available appointment', () => {

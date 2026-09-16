@@ -107,7 +107,7 @@ const ProviderSearchResult = ({
 					<Col xl={5}>
 						<ProviderScheduleCard
 							showCardStyle={false}
-							scheduleAppointmentDescription={provider.appointmentDescription ?? ''}
+							scheduleAppointmentDescription={provider.title ?? provider.appointmentDescription ?? ''}
 							scheduleTypeId={
 								provider.appointmentSelectionTypeId ??
 								ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED

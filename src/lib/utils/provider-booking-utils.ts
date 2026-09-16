@@ -1,10 +1,20 @@
-import { BookingExperienceId, FeatureId, Institution, InstitutionFeature } from '@/lib/models';
+import { AccountModel, BookingExperienceId, FeatureId, Institution, InstitutionFeature } from '@/lib/models';
 import { buildQueryParamUrl } from './url-utils';
 
 export const ALL_INSTITUTION_LOCATIONS_ID = 'na';
 export const BOOKING_V1_FALLBACK_URL_SEARCH_PARAM = 'bookingV1FallbackUrl';
 export const LEGACY_BOOKING_EXPERIENCE_ID = BookingExperienceId.V1;
 export const PROVIDER_BOOKING_EXPERIENCE_ID = BookingExperienceId.V2;
+
+const confirmedProviderBookingContextKeys = [
+	'accountId',
+	'providerSearchResultTypeId',
+	'providerId',
+	'appointmentTypeId',
+	'appointmentModalityId',
+	'date',
+	'time',
+] as const;
 
 export const didBookingExperienceChange = (metadata?: Record<string, unknown>) =>
 	metadata?.bookingExperienceChanged === true;
@@ -14,6 +24,12 @@ export const isAllInstitutionLocationsId = (institutionLocationId?: string) =>
 
 export const getPersistedInstitutionLocationId = (institutionLocationId: string) =>
 	isAllInstitutionLocationsId(institutionLocationId) ? '' : institutionLocationId;
+
+export const getProviderSearchInstitutionLocationIdForAccount = (
+	account?: Pick<AccountModel, 'institutionLocationId' | 'promptedForInstitutionLocation'>
+) =>
+	account?.institutionLocationId ||
+	(account?.promptedForInstitutionLocation ? ALL_INSTITUTION_LOCATIONS_ID : undefined);
 
 export const shouldFetchInstitutionLocation = (institutionLocationId?: string) =>
 	Boolean(institutionLocationId && !isAllInstitutionLocationsId(institutionLocationId));
@@ -63,6 +79,18 @@ export const buildBookingV2UrlWithV1Fallback = (bookingV2Url: string, bookingV1F
 				[BOOKING_V1_FALLBACK_URL_SEARCH_PARAM]: safeBookingV1FallbackUrl,
 		  })
 		: bookingV2Url;
+};
+
+export const getProviderBookingPathForScreeningDestination = (context: Record<string, unknown>) => {
+	// Context created by the booking-requirements endpoint includes the account and
+	// the exact selected slot. Screenings launched before slot selection do not.
+	const appointmentTimeWasConfirmed = confirmedProviderBookingContextKeys.every((key) => {
+		const value = context[key];
+
+		return typeof value === 'string' && value.trim().length > 0;
+	});
+
+	return appointmentTimeWasConfirmed ? '/provider-book-appointment' : '/provider-confirm-appointment-time';
 };
 
 export const getFeatureIdForLegacyCareUrlName = (urlName?: string) => {

@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useRevalidator } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 
@@ -36,6 +36,7 @@ import {
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	SITE_LOCATION_ID,
 	CourseModel,
+	OnboardingScreeningPresentationId,
 } from '@/lib/models';
 
 import { getFirstUnlockedAndIncompleteCourseUnitIdByCourseSession, getGeneralNavigationFeatures } from '@/lib/utils';
@@ -125,14 +126,14 @@ const Index: FC = () => {
 		setCompletedCourses(coursesResponse.completed);
 		setInstitutionBlurbs(blurbsResponse.institutionBlurbsByInstitutionBlurbTypeId);
 
-		if (institution.onboardingScreeningFlowId) {
+		if (institution.onboardingScreeningFlowId && account.onboardingScreeningFlowAppliesToAccount) {
 			const { sessionFullyCompleted } = await screeningService
 				.getScreeningFlowCompletionStatusByScreeningFlowId(institution.onboardingScreeningFlowId)
 				.fetch();
 
-			if (!sessionFullyCompleted) {
-				setShowOnboardingModal(true);
-			}
+			setShowOnboardingModal(!sessionFullyCompleted);
+		} else {
+			setShowOnboardingModal(false);
 		}
 
 		const roleId = Cookies.get('roleId');
@@ -146,7 +147,7 @@ const Index: FC = () => {
 		}
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_HOME);
-	}, [account?.accountId, institution.onboardingScreeningFlowId]);
+	}, [account?.accountId, account?.onboardingScreeningFlowAppliesToAccount, institution.onboardingScreeningFlowId]);
 
 	const fetchCallsToAction = useCallback(async () => {
 		const response = await callToActionService
@@ -199,6 +200,18 @@ const Index: FC = () => {
 		(feature) => feature.landingPageVisible
 	);
 	const showFeatureScreeningCta = !institution.epicFhirEnabled && Boolean(institution?.featureScreeningFlowId);
+	const onboardingScreeningFlowAppliesToAccount = Boolean(account?.onboardingScreeningFlowAppliesToAccount);
+	const showOnboardingInSmallModal =
+		account?.onboardingScreeningPresentationId === OnboardingScreeningPresentationId.SMALL_MODAL;
+	const showOnboardingScreeningFlow = Boolean(
+		showOnboardingModal && onboardingScreeningFlowAppliesToAccount && institution.onboardingScreeningFlowId
+	);
+	const renderedOnboardingScreeningFlow = showOnboardingScreeningFlow ? (
+		<ScreeningFlow
+			screeningFlowParams={memoizedOnboardingScreeningFlowParams}
+			onScreeningFlowComplete={handleOnboardingScreeningFlowComplete}
+		/>
+	) : null;
 
 	return (
 		<>
@@ -206,20 +219,26 @@ const Index: FC = () => {
 				<title>{institution.platformName ?? 'Cobalt'}</title>
 			</Helmet>
 
-			<PreviewCanvas title={institution.name} show={showOnboardingModal}>
-				{showOnboardingModal && institution.onboardingScreeningFlowId && (
-					<Container className="pb-8">
-						<Row>
-							<Col md={12} lg={{ span: 6, offset: 3 }}>
-								<ScreeningFlow
-									screeningFlowParams={memoizedOnboardingScreeningFlowParams}
-									onScreeningFlowComplete={handleOnboardingScreeningFlowComplete}
-								/>
-							</Col>
-						</Row>
-					</Container>
-				)}
-			</PreviewCanvas>
+			{showOnboardingInSmallModal ? (
+				<Modal centered backdrop="static" keyboard={false} show={showOnboardingScreeningFlow}>
+					<Modal.Header>
+						<Modal.Title>{institution.name}</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>{renderedOnboardingScreeningFlow}</Modal.Body>
+				</Modal>
+			) : (
+				<PreviewCanvas title={institution.name} show={showOnboardingScreeningFlow}>
+					{renderedOnboardingScreeningFlow && (
+						<Container className="pb-8">
+							<Row>
+								<Col md={12} lg={{ span: 6, offset: 3 }}>
+									{renderedOnboardingScreeningFlow}
+								</Col>
+							</Row>
+						</Container>
+					)}
+				</PreviewCanvas>
+			)}
 
 			{institution?.featuresEnabled ? (
 				<>

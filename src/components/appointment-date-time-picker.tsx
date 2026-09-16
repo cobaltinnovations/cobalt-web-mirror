@@ -646,14 +646,14 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 						<div
 							key={timeSlotGroup.label}
 							className={classNames({
-								'mb-6': timeSlotGroupIndex < timeSlotGroups.length - 1,
+								'mb-2': timeSlotGroupIndex < timeSlotGroups.length - 1,
 							})}
 						>
 							<p className="mb-2">{timeSlotGroup.label}</p>
 							{timeSlotGroup.slots.length === 0 ? (
 								<p className="text-muted">No Appointment Slots</p>
 							) : (
-								<div className="w-100 d-flex overflow-auto">
+								<div className="w-100 d-flex overflow-auto pb-4">
 									{timeSlotGroup.slots.map((timeSlot, timeSlotIndex) => {
 										const timeSlotDateTime = createAppointmentDateTime(
 											selectedAppointmentDateTime.format('YYYY-MM-DD'),

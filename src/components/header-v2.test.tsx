@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { act, render, screen } from '@testing-library/react';
+import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
 import { CobaltThemeProvider } from '@/jss/theme';
@@ -161,4 +161,44 @@ it('hides Patient Scheduling for a provider-role account without a linked provid
 	renderHeader();
 
 	expect(screen.queryByText('Patient Scheduling')).not.toBeInTheDocument();
+});
+
+it('clears fixed-header body spacing when navigating to a route that hides the header', async () => {
+	mockAccount({
+		roleId: ROLE_ID.MEMBER,
+		isAdmin: false,
+		isProvider: false,
+	});
+
+	const router = createMemoryRouter(
+		[
+			{
+				element: (
+					<CobaltThemeProvider>
+						<HeaderV2 />
+						<Outlet />
+					</CobaltThemeProvider>
+				),
+				children: [
+					{ index: true, element: null },
+					{
+						path: 'fullscreen',
+						element: null,
+						handle: { hideHeader: true },
+					},
+				],
+			},
+		],
+		{ initialEntries: ['/'] }
+	);
+
+	render(<RouterProvider router={router} />);
+	document.body.style.paddingTop = '60px';
+
+	await act(async () => {
+		await router.navigate('/fullscreen');
+	});
+
+	expect(document.body.style.paddingTop).toBe('0px');
+	expect(screen.queryByRole('button', { name: 'Open account menu' })).not.toBeInTheDocument();
 });
