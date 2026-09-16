@@ -2,6 +2,8 @@ import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	getPersistedInstitutionLocationId,
 	getProviderSearchInstitutionLocationIdForAccount,
+	getProviderBookingReturnUrl,
+	getProviderBookingReturnUrlFromSearchParams,
 	getProviderListUrlFromSearchParams,
 	getProviderBookingScreeningSearchParams,
 	isAllInstitutionLocationsId,
@@ -50,6 +52,42 @@ describe('provider booking institution locations', () => {
 		expect(screeningSearchParams.get('returnTo')).toBe(
 			'/providers?featureId=THERAPY&institutionLocationId=location-id'
 		);
+	});
+
+	it('returns standalone provider bookings to the provider information page that launched them', () => {
+		const searchParams = new URLSearchParams({
+			institutionLocationId: 'location-id',
+		});
+		const returnTo = getProviderBookingReturnUrl({
+			pathname: '/provider-info/provider-id',
+			searchParams,
+		});
+		const screeningSearchParams = new URLSearchParams(
+			getProviderBookingScreeningSearchParams(searchParams, returnTo)
+		);
+
+		expect(returnTo).toBe('/provider-info/provider-id?institutionLocationId=location-id');
+		expect(screeningSearchParams.get('returnTo')).toBe(returnTo);
+		expect(
+			getProviderBookingReturnUrlFromSearchParams(
+				new URLSearchParams({
+					returnTo,
+					institutionLocationId: 'location-id',
+				})
+			)
+		).toBe(returnTo);
+	});
+
+	it('rejects unsafe provider booking return destinations', () => {
+		expect(
+			getProviderBookingReturnUrlFromSearchParams(
+				new URLSearchParams({
+					returnTo: 'https://example.com',
+					featureId: 'THERAPY',
+					institutionLocationId: 'location-id',
+				})
+			)
+		).toBe('/providers?featureId=THERAPY&institutionLocationId=location-id');
 	});
 
 	it('recognizes the synthetic all-locations option case-insensitively', () => {

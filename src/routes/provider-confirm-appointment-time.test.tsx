@@ -47,7 +47,26 @@ jest.mock('@/components/svg-icon', () => ({
 
 jest.mock('@/components/appointment-date-time-picker', () => ({
 	__esModule: true,
-	default: () => null,
+	default: ({
+		onFirstAvailableAppointmentSelect,
+	}: {
+		onFirstAvailableAppointmentSelect?: (value: unknown) => void;
+	}) => (
+		<button
+			type="button"
+			onClick={() =>
+				onFirstAvailableAppointmentSelect?.({
+					dateTime: require('moment').utc('2026-09-24 20:00:00', 'YYYY-MM-DD HH:mm:ss'),
+					appointmentModalityId: 'PHONE',
+					appointmentTypeIds: ['appointment-type-id'],
+					appointmentTypeId: 'appointment-type-id',
+					providerId: 'provider-id',
+				})
+			}
+		>
+			First available shortcut
+		</button>
+	),
 	getDefaultAppointmentDateTimePickerValue: () => ({ dateTime: undefined }),
 }));
 
@@ -71,7 +90,7 @@ const LocationDisplay = () => {
 	return <div data-testid="location">{`${location.pathname}${location.search}`}</div>;
 };
 
-it('records the appointment selector page and the confirmed clinic slot', async () => {
+it('records the appointment selector page and advances with the first-available clinic slot', async () => {
 	(appointmentService.getAppointmentBookingRequirements as jest.Mock).mockReturnValue({
 		fetch: jest.fn().mockResolvedValue({
 			appointmentBookingRequirements: {
@@ -88,6 +107,7 @@ it('records the appointment selector page and the confirmed clinic slot', async 
 			]}
 		>
 			<Component />
+			<LocationDisplay />
 		</MemoryRouter>
 	);
 
@@ -111,7 +131,7 @@ it('records the appointment selector page and the confirmed clinic slot', async 
 		);
 	});
 
-	fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+	fireEvent.click(screen.getByRole('button', { name: 'First available shortcut' }));
 
 	await waitFor(() => {
 		expect(analyticsService.persistEvent).toHaveBeenCalledWith(
@@ -125,6 +145,7 @@ it('records the appointment selector page and the confirmed clinic slot', async 
 				appointmentModalityId: 'PHONE',
 			})
 		);
+		expect(screen.getByTestId('location')).toHaveTextContent('/provider-book-appointment?');
 	});
 });
 
@@ -144,5 +165,24 @@ it('exits to the provider list with the selected care type and employer', () => 
 
 	expect(screen.getByTestId('location')).toHaveTextContent(
 		'/providers?featureId=THERAPY&institutionLocationId=location-id'
+	);
+});
+
+it('exits to the provider information page that launched booking', () => {
+	render(
+		<MemoryRouter
+			initialEntries={[
+				'/provider-confirm-appointment-time?institutionLocationId=location-id&providerSearchResultTypeId=PROVIDER&providerId=provider-id&returnTo=%2Fprovider-info%2Fprovider-id%3FinstitutionLocationId%3Dlocation-id',
+			]}
+		>
+			<Component />
+			<LocationDisplay />
+		</MemoryRouter>
+	);
+
+	fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'/provider-info/provider-id?institutionLocationId=location-id'
 	);
 });

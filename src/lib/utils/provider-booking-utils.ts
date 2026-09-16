@@ -3,6 +3,7 @@ import { buildQueryParamUrl } from './url-utils';
 
 export const ALL_INSTITUTION_LOCATIONS_ID = 'na';
 export const BOOKING_V1_FALLBACK_URL_SEARCH_PARAM = 'bookingV1FallbackUrl';
+export const PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM = 'returnTo';
 export const LEGACY_BOOKING_EXPERIENCE_ID = BookingExperienceId.V1;
 export const PROVIDER_BOOKING_EXPERIENCE_ID = BookingExperienceId.V2;
 
@@ -48,9 +49,34 @@ export const getProviderListUrlFromSearchParams = (searchParams: URLSearchParams
 	return queryString ? `/providers?${queryString}` : '/providers';
 };
 
-export const getProviderBookingScreeningSearchParams = (searchParams: URLSearchParams) => {
+export const getProviderBookingReturnUrl = ({
+	pathname,
+	searchParams,
+}: {
+	pathname: string;
+	searchParams: URLSearchParams;
+}) => {
+	if (pathname.startsWith('/provider-info/')) {
+		const queryString = searchParams.toString();
+		return queryString ? `${pathname}?${queryString}` : pathname;
+	}
+
+	return getProviderListUrlFromSearchParams(searchParams);
+};
+
+export const getProviderBookingReturnUrlFromSearchParams = (searchParams: URLSearchParams) =>
+	getSafeBookingV1FallbackUrl(searchParams.get(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM) ?? undefined) ??
+	getProviderListUrlFromSearchParams(searchParams);
+
+export const getProviderBookingScreeningSearchParams = (searchParams: URLSearchParams, returnTo?: string) => {
 	const screeningSearchParams = new URLSearchParams(searchParams);
-	screeningSearchParams.set('returnTo', getProviderListUrlFromSearchParams(searchParams));
+	const safeReturnTo =
+		getSafeBookingV1FallbackUrl(screeningSearchParams.get(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM) ?? undefined) ??
+		getSafeBookingV1FallbackUrl(returnTo);
+	screeningSearchParams.set(
+		PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM,
+		safeReturnTo ?? getProviderListUrlFromSearchParams(searchParams)
+	);
 
 	return screeningSearchParams.toString();
 };

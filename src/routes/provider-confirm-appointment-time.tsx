@@ -38,7 +38,7 @@ import {
 	PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM,
 	getProviderBookingScreeningSearchParams,
 	getProviderBookingAnalyticsDataFromSearchParams,
-	getProviderListUrlFromSearchParams,
+	getProviderBookingReturnUrlFromSearchParams,
 	parseProviderAppointmentDateTime,
 	setProviderIdToScheduleSearchParam,
 	shouldFetchInstitutionLocation,
@@ -386,89 +386,91 @@ export const Component = () => {
 		[syncAppointmentDateTimePickerValueToSearchParams]
 	);
 
-	const handleContinue = useCallback(async () => {
-		const selectedProviderId = selectedAppointmentDateTimePickerValue.providerId;
-		const selectedAppointmentTypeId = selectedAppointmentDateTimePickerValue.appointmentTypeId;
+	const handleContinue = useCallback(
+		async (appointmentDateTimePickerValue: AppointmentDateTimePickerValue) => {
+			const selectedProviderId = appointmentDateTimePickerValue.providerId;
+			const selectedAppointmentTypeId = appointmentDateTimePickerValue.appointmentTypeId;
 
-		if (!selectedProviderId || !selectedAppointmentTypeId || isCheckingBookingRequirements) {
-			return;
-		}
-
-		setIsCheckingBookingRequirements(true);
-		analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTED, {
-			...getProviderBookingAnalyticsDataFromSearchParams(new URLSearchParams(searchString)),
-			providerIdToSchedule: selectedProviderId,
-			appointmentTypeId: selectedAppointmentTypeId,
-			appointmentModalityId: selectedAppointmentDateTimePickerValue.appointmentModalityId,
-			presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.PAGE,
-		});
-
-		try {
-			const response = await appointmentService
-				.getAppointmentBookingRequirements({
-					providerId: selectedProviderId,
-					appointmentTypeId: selectedAppointmentTypeId,
-					...(screeningSessionId && { screeningSessionId }),
-					...(appointmentSelectionTypeId && { appointmentSelectionTypeId }),
-					...(selectedAppointmentDateTimePickerValue.appointmentModalityId && {
-						appointmentModalityId: selectedAppointmentDateTimePickerValue.appointmentModalityId,
-					}),
-					date: selectedAppointmentDateTimePickerValue.dateTime.format('YYYY-MM-DD'),
-					time: selectedAppointmentDateTimePickerValue.dateTime.format('HH:mm:ss'),
-					...(selectedAppointmentDateTimePickerValue.epicDepartmentId && {
-						epicDepartmentId: selectedAppointmentDateTimePickerValue.epicDepartmentId,
-					}),
-					...(selectedAppointmentDateTimePickerValue.epicAppointmentFhirId && {
-						epicAppointmentFhirId: selectedAppointmentDateTimePickerValue.epicAppointmentFhirId,
-					}),
-				})
-				.fetch();
-			const bookingRequirements = response.appointmentBookingRequirements;
-
-			if (
-				bookingRequirements.appointmentBookingRequirementsDestinationId ===
-				AppointmentBookingRequirementsDestinationId.SCREENING_SESSION
-			) {
-				if (!bookingRequirements.screeningSession) {
-					throw new Error('Screening session is required but was not returned.');
-				}
-
-				navigateToNext(bookingRequirements.screeningSession);
+			if (!selectedProviderId || !selectedAppointmentTypeId || isCheckingBookingRequirements) {
 				return;
 			}
 
-			if (
-				bookingRequirements.appointmentBookingRequirementsDestinationId !==
-				AppointmentBookingRequirementsDestinationId.APPOINTMENT_BOOKING
-			) {
-				throw new Error('Unknown appointment booking destination.');
-			}
+			setIsCheckingBookingRequirements(true);
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTED, {
+				...getProviderBookingAnalyticsDataFromSearchParams(new URLSearchParams(searchString)),
+				providerIdToSchedule: selectedProviderId,
+				appointmentTypeId: selectedAppointmentTypeId,
+				appointmentModalityId: appointmentDateTimePickerValue.appointmentModalityId,
+				presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.PAGE,
+			});
 
-			navigate(
-				buildProviderBookAppointmentUrl({
-					currentSearchString: searchString,
-					providerId,
-					providerSearchResultTypeId,
-					value: selectedAppointmentDateTimePickerValue,
-				})
-			);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsCheckingBookingRequirements(false);
-		}
-	}, [
-		appointmentSelectionTypeId,
-		handleError,
-		isCheckingBookingRequirements,
-		navigate,
-		navigateToNext,
-		providerId,
-		providerSearchResultTypeId,
-		searchString,
-		screeningSessionId,
-		selectedAppointmentDateTimePickerValue,
-	]);
+			try {
+				const response = await appointmentService
+					.getAppointmentBookingRequirements({
+						providerId: selectedProviderId,
+						appointmentTypeId: selectedAppointmentTypeId,
+						...(screeningSessionId && { screeningSessionId }),
+						...(appointmentSelectionTypeId && { appointmentSelectionTypeId }),
+						...(appointmentDateTimePickerValue.appointmentModalityId && {
+							appointmentModalityId: appointmentDateTimePickerValue.appointmentModalityId,
+						}),
+						date: appointmentDateTimePickerValue.dateTime.format('YYYY-MM-DD'),
+						time: appointmentDateTimePickerValue.dateTime.format('HH:mm:ss'),
+						...(appointmentDateTimePickerValue.epicDepartmentId && {
+							epicDepartmentId: appointmentDateTimePickerValue.epicDepartmentId,
+						}),
+						...(appointmentDateTimePickerValue.epicAppointmentFhirId && {
+							epicAppointmentFhirId: appointmentDateTimePickerValue.epicAppointmentFhirId,
+						}),
+					})
+					.fetch();
+				const bookingRequirements = response.appointmentBookingRequirements;
+
+				if (
+					bookingRequirements.appointmentBookingRequirementsDestinationId ===
+					AppointmentBookingRequirementsDestinationId.SCREENING_SESSION
+				) {
+					if (!bookingRequirements.screeningSession) {
+						throw new Error('Screening session is required but was not returned.');
+					}
+
+					navigateToNext(bookingRequirements.screeningSession);
+					return;
+				}
+
+				if (
+					bookingRequirements.appointmentBookingRequirementsDestinationId !==
+					AppointmentBookingRequirementsDestinationId.APPOINTMENT_BOOKING
+				) {
+					throw new Error('Unknown appointment booking destination.');
+				}
+
+				navigate(
+					buildProviderBookAppointmentUrl({
+						currentSearchString: searchString,
+						providerId,
+						providerSearchResultTypeId,
+						value: appointmentDateTimePickerValue,
+					})
+				);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsCheckingBookingRequirements(false);
+			}
+		},
+		[
+			appointmentSelectionTypeId,
+			handleError,
+			isCheckingBookingRequirements,
+			navigate,
+			navigateToNext,
+			providerId,
+			providerSearchResultTypeId,
+			searchString,
+			screeningSessionId,
+		]
+	);
 
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(
@@ -490,7 +492,7 @@ export const Component = () => {
 							: 'Appointment Scheduling'
 					}
 					onExit={() => {
-						navigate(getProviderListUrlFromSearchParams(searchParams));
+						navigate(getProviderBookingReturnUrlFromSearchParams(searchParams));
 					}}
 				/>
 
@@ -508,13 +510,14 @@ export const Component = () => {
 									fetchData={fetchAppointmentAvailabilityData}
 									value={selectedAppointmentDateTimePickerValue}
 									onChange={handleAppointmentDateTimePickerChange}
+									onFirstAvailableAppointmentSelect={handleContinue}
 								/>
 							</div>
 							<div className="text-right">
 								<Button
 									className="d-inline-flex align-items-center"
 									disabled={!canContinue || isCheckingBookingRequirements}
-									onClick={handleContinue}
+									onClick={() => handleContinue(selectedAppointmentDateTimePickerValue)}
 								>
 									Continue
 									<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-2" />

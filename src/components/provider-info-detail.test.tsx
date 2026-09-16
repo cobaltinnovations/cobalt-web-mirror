@@ -111,7 +111,9 @@ it('starts the referrer screening flow and does not fetch provider availability'
 	render(
 		<CobaltThemeProvider>
 			<MemoryRouter
-				initialEntries={['/providers?featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id']}
+				initialEntries={[
+					'/provider-info/team-clinic-provider-id?featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id',
+				]}
 			>
 				<ProviderInfoDetail providerId={provider.providerId} />
 			</MemoryRouter>
@@ -133,7 +135,7 @@ it('starts the referrer screening flow and does not fetch provider availability'
 			instantiateOnLoad: false,
 			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
 			screeningQuestionSearch:
-				'featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id&returnTo=%2Fproviders%3FfeatureId%3DMEDICATION_PRESCRIBER%26institutionLocationId%3Dlocation-id',
+				'featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id&returnTo=%2Fprovider-info%2Fteam-clinic-provider-id%3FfeatureId%3DMEDICATION_PRESCRIBER%26institutionLocationId%3Dlocation-id',
 		})
 	);
 
@@ -209,7 +211,9 @@ it('selects an appointment time before launching a provider intake screening fro
 
 	render(
 		<CobaltThemeProvider>
-			<MemoryRouter initialEntries={['/providers?featureId=THERAPY&institutionLocationId=location-id']}>
+			<MemoryRouter
+				initialEntries={['/provider-info/provider-id?featureId=THERAPY&institutionLocationId=location-id']}
+			>
 				<ProviderInfoDetail providerId={provider.providerId} />
 				<LocationProbe />
 			</MemoryRouter>
@@ -223,6 +227,9 @@ it('selects an appointment time before launching a provider intake screening fro
 	});
 	expect(screen.getByTestId('location')).toHaveTextContent('providerId=provider-id');
 	expect(screen.getByTestId('location')).toHaveTextContent('appointmentTypeId=appointment-type-id');
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'returnTo=%2Fprovider-info%2Fprovider-id%3FfeatureId%3DTHERAPY%26institutionLocationId%3Dlocation-id'
+	);
 	expect(mockUseScreeningFlow).not.toHaveBeenCalled();
 	expect(analyticsService.persistEvent).toHaveBeenCalledWith(
 		AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT,

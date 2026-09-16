@@ -21,7 +21,9 @@ import useAccount from '@/hooks/use-account';
 import useAccountSourceClickHandler from '@/hooks/use-account-source-click-handler';
 import {
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
+	PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM,
 	getBookingV1FallbackUrlFromSearchParams,
+	getProviderBookingReturnUrlFromSearchParams,
 	getProviderBookingPathForScreeningDestination,
 	getSafeBookingV1FallbackUrl,
 	getScreeningSessionDestinationWithSessionId,
@@ -204,11 +206,27 @@ export function useScreeningNavigation({ screeningQuestionSearch }: { screeningQ
 								? getSafeBookingV1FallbackUrl(destinationFallbackUrl)
 								: undefined) ??
 							getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search));
+						const returnTo =
+							getSafeBookingV1FallbackUrl(
+								typeof destination.context[PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM] === 'string'
+									? destination.context[PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM]
+									: undefined
+							) ??
+							getSafeBookingV1FallbackUrl(
+								new URLSearchParams(location.search).get(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM) ??
+									undefined
+							);
 
 						if (bookingV1FallbackUrl) {
 							destinationSearchParams.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
 						} else {
 							destinationSearchParams.delete(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM);
+						}
+
+						if (returnTo) {
+							destinationSearchParams.set(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM, returnTo);
+						} else {
+							destinationSearchParams.delete(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM);
 						}
 
 						navigate(
@@ -223,7 +241,7 @@ export function useScreeningNavigation({ screeningQuestionSearch }: { screeningQ
 						return;
 					}
 
-					const returnTo = new URLSearchParams(location.search).get('returnTo') ?? '/providers';
+					const returnTo = getProviderBookingReturnUrlFromSearchParams(new URLSearchParams(location.search));
 					const ineligibleMessage = destination.context.ineligibleMessage;
 
 					navigate(returnTo, {
