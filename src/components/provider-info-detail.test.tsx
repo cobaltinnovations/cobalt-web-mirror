@@ -117,9 +117,12 @@ it('starts the referrer screening flow and does not fetch provider availability'
 	);
 
 	const screeningButton = await screen.findByRole('button', {
-		name: 'Check Eligibility & Schedule Online',
+		name: 'Schedule Online',
 	});
 	expect(screen.getByText('In-person')).toBeInTheDocument();
+	expect(
+		screen.getByText('Complete a brief eligibility screening to continue to online scheduling.')
+	).toBeInTheDocument();
 	expect(screen.queryByRole('heading', { name: 'Contact' })).not.toBeInTheDocument();
 	expect(mockGetProviderAvailability).not.toHaveBeenCalled();
 	expect(mockUseScreeningFlow).toHaveBeenCalledWith(

@@ -25,7 +25,7 @@ const defaultProps = {
 	onScheduleAppointmentButtonClick: jest.fn(),
 };
 
-it('offers eligibility screening for referral-backed providers without showing unavailable scheduling', () => {
+it('offers eligibility screening for referral-backed provider results without helper text', () => {
 	const onScheduleAppointmentButtonClick = jest.fn();
 
 	render(
@@ -41,8 +41,8 @@ it('offers eligibility screening for referral-backed providers without showing u
 
 	const screeningButton = screen.getByRole('button', { name: 'Check Eligibility & Schedule Online' });
 	expect(
-		screen.getByText('Complete a brief eligibility screening to continue to online scheduling.')
-	).toBeInTheDocument();
+		screen.queryByText('Complete a brief eligibility screening to continue to online scheduling.')
+	).not.toBeInTheDocument();
 	expect(screen.queryByText('No appointments are currently available.')).not.toBeInTheDocument();
 	expect(screen.queryByText('Scheduling contact information is currently unavailable.')).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Schedule Appointment' })).not.toBeInTheDocument();

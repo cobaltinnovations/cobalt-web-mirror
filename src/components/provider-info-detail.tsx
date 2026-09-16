@@ -272,6 +272,7 @@ const ProviderInfoDetailReferralSchedule = ({
 			{renderedAccountSourcesModal}
 			<ProviderScheduleCard
 				isReferralBooking
+				referralBookingButtonText="Schedule Online"
 				scheduleAppointmentDescription={REFERRAL_BOOKING_DESCRIPTION}
 				scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED}
 				onScheduleAppointmentButtonClick={() => {

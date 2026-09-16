@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 
 import {
@@ -13,7 +13,6 @@ import {
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { analyticsService } from '@/lib/services';
-import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import { ProviderSearchResultWithScreening } from './providers';
 
 jest.mock('@/components/svg-icon', () => ({
@@ -26,10 +25,6 @@ jest.mock('@/components/provider-search-result', () => ({
 	default: ({ onScheduleAppointmentButtonClick }: { onScheduleAppointmentButtonClick(): void }) => (
 		<button onClick={onScheduleAppointmentButtonClick}>Check Eligibility &amp; Schedule Online</button>
 	),
-}));
-
-jest.mock('@/pages/screening/screening.hooks', () => ({
-	useScreeningFlow: jest.fn(),
 }));
 
 jest.mock('@/lib/services', () => {
@@ -53,8 +48,7 @@ beforeEach(() => {
 	jest.clearAllMocks();
 });
 
-it('starts referral-backed provider eligibility screening directly from the list', async () => {
-	const startScreeningFlow = jest.fn().mockResolvedValue(undefined);
+it('opens referral-backed provider details from the list instead of starting screening', () => {
 	const provider = {
 		providerId: 'team-clinic-provider-id',
 		providerSearchResultTypeId: ProviderSearchResultTypeId.PROVIDER,
@@ -67,13 +61,6 @@ it('starts referral-backed provider eligibility screening directly from the list
 		},
 	} as ProviderSearchResultModel;
 	const onTitleButtonClick = jest.fn();
-	(useScreeningFlow as jest.MockedFunction<typeof useScreeningFlow>).mockReturnValue({
-		didCheckScreeningSessions: true,
-		startScreeningFlow,
-		renderedCollectPhoneModal: null,
-		renderedPreScreeningLoader: null,
-		renderedAccountSourcesModal: null,
-	} as ReturnType<typeof useScreeningFlow>);
 
 	render(
 		<MemoryRouter>
@@ -89,17 +76,12 @@ it('starts referral-backed provider eligibility screening directly from the list
 
 	fireEvent.click(screen.getByRole('button', { name: 'Check Eligibility & Schedule Online' }));
 
-	await waitFor(() => expect(startScreeningFlow).toHaveBeenCalledTimes(1));
-	expect(onTitleButtonClick).not.toHaveBeenCalled();
-	expect(useScreeningFlow).toHaveBeenCalledWith({
-		screeningFlowId: 'team-clinic-screening-flow-id',
-		instantiateOnLoad: false,
-	});
+	expect(onTitleButtonClick).toHaveBeenCalledTimes(1);
 	expect(analyticsService.persistEvent).toHaveBeenCalledWith(
 		AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT,
 		expect.objectContaining({
 			bookingExperienceId: BookingExperienceId.V2,
-			action: AnalyticsNativeEventProviderSearchResultActionId.CHECK_ELIGIBILITY,
+			action: AnalyticsNativeEventProviderSearchResultActionId.VIEW_DETAILS,
 			source: AnalyticsNativeEventProviderSearchResultSourceId.LIST,
 			providerId: 'team-clinic-provider-id',
 			screeningFlowId: 'team-clinic-screening-flow-id',
@@ -150,7 +132,6 @@ it('selects an appointment time before launching a provider intake screening', (
 	expect(screen.getByTestId('location')).toHaveTextContent('/provider-confirm-appointment-time?');
 	expect(screen.getByTestId('location')).toHaveTextContent('providerId=provider-id');
 	expect(screen.getByTestId('location')).toHaveTextContent('appointmentTypeId=appointment-type-id');
-	expect(useScreeningFlow).not.toHaveBeenCalled();
 	expect(analyticsService.persistEvent).toHaveBeenCalledWith(
 		AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT,
 		expect.objectContaining({

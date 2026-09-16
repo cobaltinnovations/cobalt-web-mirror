@@ -104,9 +104,11 @@ it('uses the appointment description when the provider has no title', () => {
 	);
 });
 
-it('marks a referral-backed result as actionable without a first available appointment', () => {
+it('marks a referral-backed result as actionable without showing appointment helper text', () => {
 	const provider = {
 		name: 'TEAM Clinic',
+		title: 'Complete a brief eligibility screening to continue to online scheduling.',
+		appointmentDescription: 'Complete a brief eligibility screening to continue to online scheduling.',
 		supportedAppointmentModalities: [],
 		referralBooking: {
 			institutionReferrerId: 'team-clinic-referrer-id',
@@ -125,4 +127,5 @@ it('marks a referral-backed result as actionable without a first available appoi
 	);
 
 	expect(screen.getByTestId('provider-schedule-card')).toHaveAttribute('data-is-referral-booking', 'true');
+	expect(screen.getByTestId('provider-schedule-card')).toHaveAttribute('data-schedule-appointment-description', '');
 });

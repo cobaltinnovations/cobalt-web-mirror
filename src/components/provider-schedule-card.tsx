@@ -50,6 +50,7 @@ interface ProviderScheduleCardProps {
 	showMoreAppointmentsButton?: boolean;
 	showCardStyle?: boolean;
 	isReferralBooking?: boolean;
+	referralBookingButtonText?: string;
 	className?: string;
 }
 
@@ -64,12 +65,11 @@ const ProviderScheduleCard = ({
 	showMoreAppointmentsButton,
 	showCardStyle = true,
 	isReferralBooking = false,
+	referralBookingButtonText = 'Check Eligibility & Schedule Online',
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
-	const appointmentDescription =
-		scheduleAppointmentDescription ||
-		(isReferralBooking ? 'Complete a brief eligibility screening to continue to online scheduling.' : undefined);
+	const appointmentDescription = scheduleAppointmentDescription;
 	const schedulingContactUnavailable =
 		!isReferralBooking &&
 		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE &&
@@ -99,7 +99,7 @@ const ProviderScheduleCard = ({
 			<div className={classes.providerNextAppointmentCard}>
 				{isReferralBooking && (
 					<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
-						Check Eligibility &amp; Schedule Online
+						{referralBookingButtonText}
 					</Button>
 				)}
 				{schedulingUnavailable && (

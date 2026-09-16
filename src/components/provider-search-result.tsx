@@ -62,6 +62,7 @@ const ProviderSearchResult = ({
 	className,
 }: ProviderSearchResultProps) => {
 	const classes = useStyles();
+	const isReferralBooking = Boolean(provider.referralBooking?.intakeScreeningFlowId);
 
 	return (
 		<div className={classNames(classes.providerResult, className)}>
@@ -107,7 +108,9 @@ const ProviderSearchResult = ({
 					<Col xl={5}>
 						<ProviderScheduleCard
 							showCardStyle={false}
-							scheduleAppointmentDescription={provider.title ?? provider.appointmentDescription ?? ''}
+							scheduleAppointmentDescription={
+								isReferralBooking ? '' : provider.title ?? provider.appointmentDescription ?? ''
+							}
 							scheduleTypeId={
 								provider.appointmentSelectionTypeId ??
 								ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED
@@ -118,7 +121,7 @@ const ProviderSearchResult = ({
 							showMoreAppointmentsButton={provider.hasMoreAppointments}
 							phoneNumber={provider.phoneNumber}
 							phoneNumberDescription={provider.phoneNumberDescription}
-							isReferralBooking={Boolean(provider.referralBooking?.intakeScreeningFlowId)}
+							isReferralBooking={isReferralBooking}
 						/>
 					</Col>
 				</Row>
