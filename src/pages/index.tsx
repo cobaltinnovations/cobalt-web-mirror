@@ -221,9 +221,6 @@ const Index: FC = () => {
 
 			{showOnboardingInSmallModal ? (
 				<Modal centered backdrop="static" keyboard={false} show={showOnboardingScreeningFlow}>
-					<Modal.Header>
-						<Modal.Title>{institution.name}</Modal.Title>
-					</Modal.Header>
 					<Modal.Body>{renderedOnboardingScreeningFlow}</Modal.Body>
 				</Modal>
 			) : (
