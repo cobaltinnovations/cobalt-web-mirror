@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, Button, ModalProps } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import AppointmentDateTimePicker, {
@@ -22,6 +22,7 @@ import { analyticsService, appointmentService } from '@/lib/services';
 import {
 	buildBookingV2UrlWithV1Fallback,
 	buildProviderBookingAnalyticsData,
+	getProviderBookingScreeningSearchParams,
 	setProviderIdToScheduleSearchParam,
 } from '@/lib/utils';
 import useHandleError from '@/hooks/use-handle-error';
@@ -178,8 +179,13 @@ const buildProviderBookAppointmentUrl = ({ config, value }: ProviderScheduleModa
 const ProviderScheduleModal = ({ config, ...props }: ProviderScheduleModalProps) => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const location = useLocation();
 	const handleError = useHandleError();
-	const { navigateToNext } = useScreeningNavigation();
+	const screeningQuestionSearch = useMemo(
+		() => getProviderBookingScreeningSearchParams(new URLSearchParams(location.search)),
+		[location.search]
+	);
+	const { navigateToNext } = useScreeningNavigation({ screeningQuestionSearch });
 	const [isCheckingBookingRequirements, setIsCheckingBookingRequirements] = useState(false);
 	const [selectedAppointmentDateTimePickerValue, setSelectedAppointmentDateTimePickerValue] = useState(() =>
 		getInitialAppointmentDateTimePickerValue(config)

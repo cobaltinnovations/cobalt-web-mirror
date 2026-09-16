@@ -1,6 +1,6 @@
 import React from 'react';
-import { render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 
 import { CobaltThemeProvider } from '@/jss/theme';
 import { AnalyticsNativeEventTypeId, BookingExperienceId } from '@/lib/models';
@@ -40,7 +40,7 @@ jest.mock('@/components/async-page', () => ({
 
 jest.mock('@/components/fullscreen-bar', () => ({
 	__esModule: true,
-	default: () => null,
+	default: ({ onExit }: { onExit: () => void }) => <button onClick={onExit}>Exit</button>,
 }));
 
 jest.mock('@/components/appointment-unavailable-modal', () => ({
@@ -71,6 +71,12 @@ beforeEach(() => {
 		value: 0,
 	});
 });
+
+const LocationDisplay = () => {
+	const location = useLocation();
+
+	return <div data-testid="location">{`${location.pathname}${location.search}`}</div>;
+};
 
 it('records the V2 appointment confirmation page without contact information', () => {
 	render(
@@ -146,4 +152,25 @@ it('does not autofocus a contact-information field on a touch device', () => {
 
 	expect(contactInputs).toHaveLength(4);
 	contactInputs.forEach((input) => expect(input).not.toHaveFocus());
+});
+
+it('exits to the provider list with the selected care type and employer', () => {
+	render(
+		<CobaltThemeProvider>
+			<MemoryRouter
+				initialEntries={[
+					'/provider-book-appointment?featureId=THERAPY&institutionLocationId=location-id&providerSearchResultTypeId=PROVIDER&providerId=provider-id&appointmentModalityId=VIRTUAL',
+				]}
+			>
+				<Component />
+				<LocationDisplay />
+			</MemoryRouter>
+		</CobaltThemeProvider>
+	);
+
+	fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'/providers?featureId=THERAPY&institutionLocationId=location-id'
+	);
 });

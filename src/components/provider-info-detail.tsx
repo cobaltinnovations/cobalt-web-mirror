@@ -15,7 +15,7 @@ import {
 	ProviderReferralBooking,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { analyticsService, AvailabilityModel, clinicService, providerService } from '@/lib/services';
 import SvgIcon from './svg-icon';
 import classNames from 'classnames';
@@ -27,6 +27,7 @@ import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import {
 	buildBookingV2UrlWithV1Fallback,
 	buildProviderBookingAnalyticsData,
+	getProviderBookingScreeningSearchParams,
 	getBookingV1FallbackUrlFromSearchParams,
 	setFirstAvailableAppointmentSearchParams,
 	shouldFetchInstitutionLocation,
@@ -255,11 +256,18 @@ const ProviderInfoDetailReferralSchedule = ({
 	providerId?: string;
 	referralBooking: ProviderReferralBooking;
 }) => {
+	const location = useLocation();
+	const screeningQuestionSearch = useMemo(
+		() => getProviderBookingScreeningSearchParams(new URLSearchParams(location.search)),
+		[location.search]
+	);
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
 		useScreeningFlow({
 			screeningFlowId: referralBooking.intakeScreeningFlowId ?? undefined,
 			instantiateOnLoad: false,
 			disabled: !referralBooking.intakeScreeningFlowId,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch,
 		});
 
 	if (renderedPreScreeningLoader) {
@@ -272,6 +280,7 @@ const ProviderInfoDetailReferralSchedule = ({
 			{renderedAccountSourcesModal}
 			<ProviderScheduleCard
 				isReferralBooking
+				referralBookingButtonText="Schedule Online"
 				scheduleAppointmentDescription={REFERRAL_BOOKING_DESCRIPTION}
 				scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED}
 				onScheduleAppointmentButtonClick={() => {

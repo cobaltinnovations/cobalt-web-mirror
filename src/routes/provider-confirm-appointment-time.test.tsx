@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 
 import {
 	AnalyticsNativeEventProviderAppointmentSelectionPresentationId,
@@ -10,6 +10,11 @@ import {
 } from '@/lib/models';
 import { analyticsService, appointmentService } from '@/lib/services';
 import { Component } from './provider-confirm-appointment-time';
+
+const mockNavigateToNext = jest.fn();
+const mockUseScreeningNavigation = jest.fn((options?: { screeningQuestionSearch?: string }) => ({
+	navigateToNext: mockNavigateToNext,
+}));
 
 jest.mock('@/hooks/use-account', () => ({
 	__esModule: true,
@@ -22,7 +27,7 @@ jest.mock('@/hooks/use-handle-error', () => ({
 }));
 
 jest.mock('@/pages/screening/screening.hooks', () => ({
-	useScreeningNavigation: () => ({ navigateToNext: jest.fn() }),
+	useScreeningNavigation: (options?: { screeningQuestionSearch?: string }) => mockUseScreeningNavigation(options),
 }));
 
 jest.mock('@/components/async-page', () => ({
@@ -32,7 +37,7 @@ jest.mock('@/components/async-page', () => ({
 
 jest.mock('@/components/fullscreen-bar', () => ({
 	__esModule: true,
-	default: () => null,
+	default: ({ onExit }: { onExit: () => void }) => <button onClick={onExit}>Exit</button>,
 }));
 
 jest.mock('@/components/svg-icon', () => ({
@@ -57,7 +62,14 @@ jest.mock('@/lib/services', () => ({
 
 beforeEach(() => {
 	jest.clearAllMocks();
+	mockUseScreeningNavigation.mockReturnValue({ navigateToNext: mockNavigateToNext });
 });
+
+const LocationDisplay = () => {
+	const location = useLocation();
+
+	return <div data-testid="location">{`${location.pathname}${location.search}`}</div>;
+};
 
 it('records the appointment selector page and the confirmed clinic slot', async () => {
 	(appointmentService.getAppointmentBookingRequirements as jest.Mock).mockReturnValue({
@@ -77,6 +89,14 @@ it('records the appointment selector page and the confirmed clinic slot', async 
 		>
 			<Component />
 		</MemoryRouter>
+	);
+
+	const screeningNavigationOptions = mockUseScreeningNavigation.mock.calls[0]?.[0];
+	const screeningSearchParams = new URLSearchParams(screeningNavigationOptions?.screeningQuestionSearch);
+	expect(screeningSearchParams.get('featureId')).toBe('THERAPY');
+	expect(screeningSearchParams.get('institutionLocationId')).toBe('location-id');
+	expect(screeningSearchParams.get('returnTo')).toBe(
+		'/providers?featureId=THERAPY&institutionLocationId=location-id'
 	);
 
 	await waitFor(() => {
@@ -106,4 +126,23 @@ it('records the appointment selector page and the confirmed clinic slot', async 
 			})
 		);
 	});
+});
+
+it('exits to the provider list with the selected care type and employer', () => {
+	render(
+		<MemoryRouter
+			initialEntries={[
+				'/provider-confirm-appointment-time?featureId=THERAPY&institutionLocationId=location-id&providerSearchResultTypeId=PROVIDER&providerId=provider-id',
+			]}
+		>
+			<Component />
+			<LocationDisplay />
+		</MemoryRouter>
+	);
+
+	fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'/providers?featureId=THERAPY&institutionLocationId=location-id'
+	);
 });

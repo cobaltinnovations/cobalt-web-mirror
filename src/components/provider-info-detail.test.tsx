@@ -110,22 +110,30 @@ it('starts the referrer screening flow and does not fetch provider availability'
 
 	render(
 		<CobaltThemeProvider>
-			<MemoryRouter>
+			<MemoryRouter
+				initialEntries={['/providers?featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id']}
+			>
 				<ProviderInfoDetail providerId={provider.providerId} />
 			</MemoryRouter>
 		</CobaltThemeProvider>
 	);
 
 	const screeningButton = await screen.findByRole('button', {
-		name: 'Check Eligibility & Schedule Online',
+		name: 'Schedule Online',
 	});
 	expect(screen.getByText('In-person')).toBeInTheDocument();
+	expect(
+		screen.getByText('Complete a brief eligibility screening to continue to online scheduling.')
+	).toBeInTheDocument();
 	expect(screen.queryByRole('heading', { name: 'Contact' })).not.toBeInTheDocument();
 	expect(mockGetProviderAvailability).not.toHaveBeenCalled();
 	expect(mockUseScreeningFlow).toHaveBeenCalledWith(
 		expect.objectContaining({
 			screeningFlowId: 'team-clinic-screening-flow-id',
 			instantiateOnLoad: false,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch:
+				'featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id&returnTo=%2Fproviders%3FfeatureId%3DMEDICATION_PRESCRIBER%26institutionLocationId%3Dlocation-id',
 		})
 	);
 

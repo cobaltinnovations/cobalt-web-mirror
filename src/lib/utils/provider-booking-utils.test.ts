@@ -2,6 +2,8 @@ import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	getPersistedInstitutionLocationId,
 	getProviderSearchInstitutionLocationIdForAccount,
+	getProviderListUrlFromSearchParams,
+	getProviderBookingScreeningSearchParams,
 	isAllInstitutionLocationsId,
 	shouldFetchInstitutionLocation,
 	getBookingExperienceId,
@@ -21,6 +23,35 @@ import {
 import { BookingExperienceId, FeatureId, InstitutionFeature, SupportRoleId } from '@/lib/models';
 
 describe('provider booking institution locations', () => {
+	it('builds a provider-list return URL with the selected care type and employer', () => {
+		const searchParams = new URLSearchParams({
+			featureId: 'THERAPY',
+			institutionLocationId: 'location-id',
+			providerId: 'provider-id',
+		});
+
+		expect(getProviderListUrlFromSearchParams(searchParams)).toBe(
+			'/providers?featureId=THERAPY&institutionLocationId=location-id'
+		);
+		expect(getProviderListUrlFromSearchParams(new URLSearchParams())).toBe('/providers');
+	});
+
+	it('adds the filtered provider list as the return destination for booking screenings', () => {
+		const searchParams = new URLSearchParams({
+			featureId: 'THERAPY',
+			institutionLocationId: 'location-id',
+			providerId: 'provider-id',
+		});
+		const screeningSearchParams = new URLSearchParams(getProviderBookingScreeningSearchParams(searchParams));
+
+		expect(screeningSearchParams.get('featureId')).toBe('THERAPY');
+		expect(screeningSearchParams.get('institutionLocationId')).toBe('location-id');
+		expect(screeningSearchParams.get('providerId')).toBe('provider-id');
+		expect(screeningSearchParams.get('returnTo')).toBe(
+			'/providers?featureId=THERAPY&institutionLocationId=location-id'
+		);
+	});
+
 	it('recognizes the synthetic all-locations option case-insensitively', () => {
 		expect(isAllInstitutionLocationsId(ALL_INSTITUTION_LOCATIONS_ID)).toBe(true);
 		expect(isAllInstitutionLocationsId('NA')).toBe(true);

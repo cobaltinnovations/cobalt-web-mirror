@@ -27,7 +27,7 @@ import {
 	getScreeningSessionDestinationWithSessionId,
 } from '@/lib/utils';
 
-export function useScreeningNavigation() {
+export function useScreeningNavigation({ screeningQuestionSearch }: { screeningQuestionSearch?: string } = {}) {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { trackEvent } = useAnalytics();
@@ -68,10 +68,12 @@ export function useScreeningNavigation() {
 
 			navigate({
 				pathname,
-				search: fullscreenScreening ? location.search : fallbackSearchParams.toString(),
+				search: fullscreenScreening
+					? screeningQuestionSearch ?? location.search
+					: fallbackSearchParams.toString(),
 			});
 		},
-		[fullscreenScreening, location.search, matches, navigate]
+		[fullscreenScreening, location.search, matches, navigate, screeningQuestionSearch]
 	);
 
 	const navigateToDestination = useCallback(

@@ -25,7 +25,6 @@ import { accountService, analyticsService, institutionService, providerService }
 import AsyncWrapper from '@/components/async-page';
 import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
 import NoData from '@/components/no-data';
-import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import useHandleError from '@/hooks/use-handle-error';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import EmployerSelectionModal from '@/components/employer-selection-modal';
@@ -116,41 +115,6 @@ interface ProviderSearchResultWithScreeningProps {
 	onViewAppointmentsButtonClick(): void;
 }
 
-const ProviderReferralScreeningLauncher = ({ screeningFlowId }: { screeningFlowId: string }) => {
-	const didStartRef = useRef(false);
-	const handleError = useHandleError();
-	const {
-		didCheckScreeningSessions,
-		startScreeningFlow,
-		renderedCollectPhoneModal,
-		renderedPreScreeningLoader,
-		renderedAccountSourcesModal,
-	} = useScreeningFlow({
-		screeningFlowId,
-		instantiateOnLoad: false,
-	});
-
-	useEffect(() => {
-		if (!didCheckScreeningSessions || didStartRef.current) {
-			return;
-		}
-
-		didStartRef.current = true;
-		startScreeningFlow().catch(handleError);
-	}, [didCheckScreeningSessions, handleError, startScreeningFlow]);
-
-	return (
-		<>
-			{renderedPreScreeningLoader ?? (
-				<>
-					{renderedCollectPhoneModal}
-					{renderedAccountSourcesModal}
-				</>
-			)}
-		</>
-	);
-};
-
 export const ProviderSearchResultWithScreening = ({
 	featureId,
 	institutionLocationId,
@@ -160,7 +124,6 @@ export const ProviderSearchResultWithScreening = ({
 }: ProviderSearchResultWithScreeningProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [referralScreeningLaunchSequence, setReferralScreeningLaunchSequence] = useState(0);
 	const bookingV1FallbackUrl = useMemo(
 		() => getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search)),
 		[location.search]
@@ -186,48 +149,38 @@ export const ProviderSearchResultWithScreening = ({
 	);
 
 	return (
-		<>
-			{isReferralBooking &&
-				referralScreeningLaunchSequence > 0 &&
-				provider.referralBooking?.intakeScreeningFlowId && (
-					<ProviderReferralScreeningLauncher
-						key={referralScreeningLaunchSequence}
-						screeningFlowId={provider.referralBooking.intakeScreeningFlowId}
-					/>
-				)}
-			<ProviderSearchResult
-				className="mb-6"
-				provider={provider}
-				onTitleButtonClick={() => {
+		<ProviderSearchResult
+			className="mb-6"
+			provider={provider}
+			onTitleButtonClick={() => {
+				persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.VIEW_DETAILS);
+				onTitleButtonClick();
+			}}
+			onViewAppointmentsButtonClick={() => {
+				persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.VIEW_MORE_APPOINTMENTS);
+				onViewAppointmentsButtonClick();
+			}}
+			onScheduleAppointmentButtonClick={() => {
+				if (isReferralBooking) {
 					persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.VIEW_DETAILS);
 					onTitleButtonClick();
-				}}
-				onViewAppointmentsButtonClick={() => {
-					persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.VIEW_MORE_APPOINTMENTS);
-					onViewAppointmentsButtonClick();
-				}}
-				onScheduleAppointmentButtonClick={() => {
-					if (isReferralBooking) {
-						persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.CHECK_ELIGIBILITY);
-						setReferralScreeningLaunchSequence((previousSequence) => previousSequence + 1);
-						return;
-					}
+					return;
+				}
 
-					persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.SCHEDULE_APPOINTMENT);
+				persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.SCHEDULE_APPOINTMENT);
 
-					const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
-						featureId,
-						institutionLocationId,
-						provider,
-						bookingV1FallbackUrl,
-					});
+				const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
+					featureId,
+					institutionLocationId,
+					provider,
+					bookingV1FallbackUrl,
+				});
 
-					if (providerConfirmAppointmentTimeUrl) {
-						navigate(providerConfirmAppointmentTimeUrl);
-					}
-				}}
-			/>
-		</>
+				if (providerConfirmAppointmentTimeUrl) {
+					navigate(providerConfirmAppointmentTimeUrl);
+				}
+			}}
+		/>
 	);
 };
 
