@@ -159,6 +159,12 @@ export class CrisisAnalyticsEvent {
 		return event;
 	}
 
+	static clickCrisisNonEmergencyResource(label: string) {
+		const event = new CrisisAnalyticsEvent(CrisisEventActions.UserClickCrisisNonEmergencyResource, label);
+
+		return event;
+	}
+
 	static presentScreeningCrisis() {
 		const event = new CrisisAnalyticsEvent(CrisisEventActions.PresentScreeningCrisis);
 		event.nonInteractive = true;
