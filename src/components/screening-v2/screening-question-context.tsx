@@ -13,7 +13,7 @@ import {
 import { CobaltError } from '@/lib/http-client';
 import { screeningService } from '@/lib/services';
 import useHandleError from '@/hooks/use-handle-error';
-import { ScreeningAnswer, ScreeningQuestionPrompt } from '@/components/screening-v2';
+import { ScreeningAnswer, ScreeningQuestionFooter, ScreeningQuestionPrompt } from '@/components/screening-v2';
 import InlineAlert from '@/components/inline-alert';
 import { WysiwygDisplay } from '@/components/wysiwyg-basic';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -410,17 +410,13 @@ export const ScreeningQuestionContext = ({
 										onChange={handleScreeningAnswerChange}
 									/>
 
-									{screeningQuestionContext.screeningQuestion.footerText &&
-										(renderQuestionHtml ? (
-											<WysiwygDisplay
-												className="mb-6 wysiwyg-display"
-												html={screeningQuestionContext.screeningQuestion.footerText ?? ''}
-											/>
-										) : (
-											<p className="mb-6">
-												{screeningQuestionContext.screeningQuestion.footerText}
-											</p>
-										))}
+									{screeningQuestionContext.screeningQuestion.footerText && (
+										<ScreeningQuestionFooter
+											footerText={screeningQuestionContext.screeningQuestion.footerText}
+											metadata={screeningQuestionContext.screeningQuestion.metadata}
+											renderQuestionHtml={renderQuestionHtml}
+										/>
+									)}
 
 									<Collapse in={(answerConfig?.messages ?? []).length > 0}>
 										<div>

@@ -26,6 +26,7 @@ import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import useHandleError from '@/hooks/use-handle-error';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import EmployerSelectionModal from '@/components/employer-selection-modal';
+import InstitutionLocationSelectOptions from '@/components/institution-location-select-options';
 import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
@@ -733,14 +734,7 @@ export const Component = () => {
 									<option value={ALL_INSTITUTION_LOCATIONS_ID}>
 										I'm not sure / I'd rather not say
 									</option>
-									{institutionLocations.map((institutionLocation) => (
-										<option
-											key={institutionLocation.institutionLocationId}
-											value={institutionLocation.institutionLocationId}
-										>
-											{institutionLocation.name}
-										</option>
-									))}
+									<InstitutionLocationSelectOptions institutionLocations={institutionLocations} />
 								</InputHelper>
 								<InputHelper
 									ref={careTypeRef}
