@@ -9,7 +9,8 @@ interface InstitutionLocationSelectOptionsProps {
 type InstitutionLocationSelectEntry =
 	| {
 			type: 'group';
-			groupName: string;
+			institutionLocationGroupId: string;
+			groupLabel: string;
 			institutionLocations: InstitutionLocation[];
 	  }
 	| {
@@ -19,17 +20,17 @@ type InstitutionLocationSelectEntry =
 
 const buildInstitutionLocationSelectEntries = (institutionLocations: InstitutionLocation[]) => {
 	const entries: InstitutionLocationSelectEntry[] = [];
-	const entriesByGroupName = new Map<string, Extract<InstitutionLocationSelectEntry, { type: 'group' }>>();
+	const entriesByGroupId = new Map<string, Extract<InstitutionLocationSelectEntry, { type: 'group' }>>();
 
 	institutionLocations.forEach((institutionLocation) => {
-		const groupName = institutionLocation.groupName?.trim();
+		const institutionLocationGroup = institutionLocation.institutionLocationGroup;
 
-		if (!groupName) {
+		if (!institutionLocationGroup) {
 			entries.push({ type: 'location', institutionLocation });
 			return;
 		}
 
-		const existingEntry = entriesByGroupName.get(groupName);
+		const existingEntry = entriesByGroupId.get(institutionLocationGroup.institutionLocationGroupId);
 		if (existingEntry) {
 			existingEntry.institutionLocations.push(institutionLocation);
 			return;
@@ -37,10 +38,11 @@ const buildInstitutionLocationSelectEntries = (institutionLocations: Institution
 
 		const entry: Extract<InstitutionLocationSelectEntry, { type: 'group' }> = {
 			type: 'group',
-			groupName,
+			institutionLocationGroupId: institutionLocationGroup.institutionLocationGroupId,
+			groupLabel: institutionLocationGroup.name,
 			institutionLocations: [institutionLocation],
 		};
-		entriesByGroupName.set(groupName, entry);
+		entriesByGroupId.set(institutionLocationGroup.institutionLocationGroupId, entry);
 		entries.push(entry);
 	});
 
@@ -64,7 +66,7 @@ export const InstitutionLocationSelectOptions = ({ institutionLocations }: Insti
 				}
 
 				return (
-					<optgroup key={`group--${entry.groupName}`} label={entry.groupName}>
+					<optgroup key={`group--${entry.institutionLocationGroupId}`} label={entry.groupLabel}>
 						{entry.institutionLocations.map(renderInstitutionLocationOption)}
 					</optgroup>
 				);
