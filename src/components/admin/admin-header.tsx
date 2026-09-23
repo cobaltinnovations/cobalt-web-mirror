@@ -181,7 +181,8 @@ export const AdminHeader = () => {
 						},
 				  ]
 				: []),
-			...(isAdministrator && account?.accountCapabilityFlags.canViewProviderReports
+			...(isAdministrator &&
+			(account?.accountCapabilityFlags.canViewProviderReports || account?.accountCapabilityFlags.canViewAnalytics)
 				? [
 						{
 							testId: '',
