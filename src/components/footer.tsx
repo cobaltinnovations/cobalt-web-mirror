@@ -74,15 +74,18 @@ const Footer: FC = () => {
 	}, [hideFooter]);
 
 	useLayoutEffect(() => {
+		setFooterHeight();
+
 		if (hideFooter) {
 			return;
 		}
 
-		setFooterHeight();
 		window.addEventListener('resize', setFooterHeight);
 
 		return () => {
 			window.removeEventListener('resize', setFooterHeight);
+			document.body.style.paddingBottom = '0px';
+			document.body.style.minBlockSize = '100%';
 		};
 	}, [hideFooter, setFooterHeight]);
 

@@ -1,6 +1,11 @@
 import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	getPersistedInstitutionLocationId,
+	getProviderSearchInstitutionLocationIdForAccount,
+	getProviderBookingReturnUrl,
+	getProviderBookingReturnUrlFromSearchParams,
+	getProviderListUrlFromSearchParams,
+	getProviderBookingScreeningSearchParams,
 	isAllInstitutionLocationsId,
 	shouldFetchInstitutionLocation,
 	getBookingExperienceId,
@@ -14,11 +19,77 @@ import {
 	PROVIDER_BOOKING_EXPERIENCE_ID,
 	buildBookingV2UrlWithV1Fallback,
 	didBookingExperienceChange,
+	getProviderBookingPathForScreeningDestination,
 	getSafeBookingV1FallbackUrl,
 } from './provider-booking-utils';
 import { BookingExperienceId, FeatureId, InstitutionFeature, SupportRoleId } from '@/lib/models';
 
 describe('provider booking institution locations', () => {
+	it('builds a provider-list return URL with the selected care type and employer', () => {
+		const searchParams = new URLSearchParams({
+			featureId: 'THERAPY',
+			institutionLocationId: 'location-id',
+			providerId: 'provider-id',
+		});
+
+		expect(getProviderListUrlFromSearchParams(searchParams)).toBe(
+			'/providers?featureId=THERAPY&institutionLocationId=location-id'
+		);
+		expect(getProviderListUrlFromSearchParams(new URLSearchParams())).toBe('/providers');
+	});
+
+	it('adds the filtered provider list as the return destination for booking screenings', () => {
+		const searchParams = new URLSearchParams({
+			featureId: 'THERAPY',
+			institutionLocationId: 'location-id',
+			providerId: 'provider-id',
+		});
+		const screeningSearchParams = new URLSearchParams(getProviderBookingScreeningSearchParams(searchParams));
+
+		expect(screeningSearchParams.get('featureId')).toBe('THERAPY');
+		expect(screeningSearchParams.get('institutionLocationId')).toBe('location-id');
+		expect(screeningSearchParams.get('providerId')).toBe('provider-id');
+		expect(screeningSearchParams.get('returnTo')).toBe(
+			'/providers?featureId=THERAPY&institutionLocationId=location-id'
+		);
+	});
+
+	it('returns standalone provider bookings to the provider information page that launched them', () => {
+		const searchParams = new URLSearchParams({
+			institutionLocationId: 'location-id',
+		});
+		const returnTo = getProviderBookingReturnUrl({
+			pathname: '/provider-info/provider-id',
+			searchParams,
+		});
+		const screeningSearchParams = new URLSearchParams(
+			getProviderBookingScreeningSearchParams(searchParams, returnTo)
+		);
+
+		expect(returnTo).toBe('/provider-info/provider-id?institutionLocationId=location-id');
+		expect(screeningSearchParams.get('returnTo')).toBe(returnTo);
+		expect(
+			getProviderBookingReturnUrlFromSearchParams(
+				new URLSearchParams({
+					returnTo,
+					institutionLocationId: 'location-id',
+				})
+			)
+		).toBe(returnTo);
+	});
+
+	it('rejects unsafe provider booking return destinations', () => {
+		expect(
+			getProviderBookingReturnUrlFromSearchParams(
+				new URLSearchParams({
+					returnTo: 'https://example.com',
+					featureId: 'THERAPY',
+					institutionLocationId: 'location-id',
+				})
+			)
+		).toBe('/providers?featureId=THERAPY&institutionLocationId=location-id');
+	});
+
 	it('recognizes the synthetic all-locations option case-insensitively', () => {
 		expect(isAllInstitutionLocationsId(ALL_INSTITUTION_LOCATIONS_ID)).toBe(true);
 		expect(isAllInstitutionLocationsId('NA')).toBe(true);
@@ -31,6 +102,28 @@ describe('provider booking institution locations', () => {
 		expect(shouldFetchInstitutionLocation(ALL_INSTITUTION_LOCATIONS_ID)).toBe(false);
 		expect(shouldFetchInstitutionLocation('location-id')).toBe(true);
 		expect(shouldFetchInstitutionLocation()).toBe(false);
+	});
+
+	it('restores a saved employer or the synthetic declined-to-answer option from the account', () => {
+		expect(
+			getProviderSearchInstitutionLocationIdForAccount({
+				institutionLocationId: 'location-id',
+				promptedForInstitutionLocation: true,
+			})
+		).toBe('location-id');
+		expect(
+			getProviderSearchInstitutionLocationIdForAccount({
+				institutionLocationId: '',
+				promptedForInstitutionLocation: true,
+			})
+		).toBe(ALL_INSTITUTION_LOCATIONS_ID);
+		expect(
+			getProviderSearchInstitutionLocationIdForAccount({
+				institutionLocationId: '',
+				promptedForInstitutionLocation: false,
+			})
+		).toBeUndefined();
+		expect(getProviderSearchInstitutionLocationIdForAccount()).toBeUndefined();
 	});
 });
 
@@ -209,5 +302,29 @@ describe('provider booking experience', () => {
 				bookingV1FallbackUrl: 'https://example.com/steal',
 			})
 		).toBe('/connect-with-support/therapy');
+	});
+
+	it('continues directly to booking after screening an already-confirmed appointment time', () => {
+		expect(
+			getProviderBookingPathForScreeningDestination({
+				accountId: 'account-id',
+				providerSearchResultTypeId: 'PROVIDER',
+				providerId: 'provider-id',
+				appointmentTypeId: 'appointment-type-id',
+				appointmentModalityId: 'VIRTUAL',
+				date: '2026-09-24',
+				time: '20:00:00',
+			})
+		).toBe('/provider-book-appointment');
+	});
+
+	it('returns to time selection when screening began before an exact appointment was confirmed', () => {
+		expect(
+			getProviderBookingPathForScreeningDestination({
+				providerSearchResultTypeId: 'PROVIDER',
+				providerId: 'provider-id',
+				appointmentTypeId: 'appointment-type-id',
+			})
+		).toBe('/provider-confirm-appointment-time');
 	});
 });

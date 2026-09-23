@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
 
 import SvgIcon from '@/components/svg-icon';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -51,17 +50,9 @@ interface ProviderScheduleCardProps {
 	showMoreAppointmentsButton?: boolean;
 	showCardStyle?: boolean;
 	isReferralBooking?: boolean;
+	referralBookingButtonText?: string;
 	className?: string;
 }
-
-export const formatFirstAvailableAppointmentDate = (date?: string) => {
-	if (!date) {
-		return '';
-	}
-
-	const parsedDate = moment(date, 'YYYY-MM-DD', true);
-	return parsedDate.isValid() ? parsedDate.format('MMMM D, YYYY') : date;
-};
 
 const ProviderScheduleCard = ({
 	scheduleAppointmentDescription,
@@ -74,15 +65,11 @@ const ProviderScheduleCard = ({
 	showMoreAppointmentsButton,
 	showCardStyle = true,
 	isReferralBooking = false,
+	referralBookingButtonText = 'Check Eligibility & Schedule Online',
 	className,
 }: ProviderScheduleCardProps) => {
 	const classes = useStyles({ showCardStyle });
-	const firstAvailableAppointmentDateDescription = formatFirstAvailableAppointmentDate(
-		firstAvailableAppointment?.date
-	);
-	const appointmentDescription =
-		scheduleAppointmentDescription ||
-		(isReferralBooking ? 'Complete a brief eligibility screening to continue to online scheduling.' : undefined);
+	const appointmentDescription = scheduleAppointmentDescription;
 	const schedulingContactUnavailable =
 		!isReferralBooking &&
 		scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE &&
@@ -97,6 +84,11 @@ const ProviderScheduleCard = ({
 		showMoreAppointmentsButton &&
 		!schedulingUnavailable &&
 		scheduleTypeId !== ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE;
+	const showFirstAvailableAppointment =
+		!isReferralBooking &&
+		!schedulingUnavailable &&
+		(scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED ||
+			scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED);
 
 	return (
 		<div className={classNames(classes.providerScheduleCard, className)}>
@@ -107,7 +99,7 @@ const ProviderScheduleCard = ({
 			<div className={classes.providerNextAppointmentCard}>
 				{isReferralBooking && (
 					<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
-						Check Eligibility &amp; Schedule Online
+						{referralBookingButtonText}
 					</Button>
 				)}
 				{schedulingUnavailable && (
@@ -117,36 +109,24 @@ const ProviderScheduleCard = ({
 							: 'No appointments are currently available.'}
 					</p>
 				)}
-				{!isReferralBooking &&
-					!schedulingUnavailable &&
-					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED && (
-						<div className="d-md-flex justify-content-between">
-							<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
-								<div className={classNames(classes.iconOuter, 'me-4')}>
-									<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
-								</div>
-								<div>
-									<p className="mb-0">First Available Appointment:</p>
-									<p className="mb-0">
-										<strong>
-											{firstAvailableAppointmentDateDescription}{' '}
-											{firstAvailableAppointment?.timeDescription}
-										</strong>
-									</p>
-								</div>
+				{showFirstAvailableAppointment && (
+					<div className="d-md-flex justify-content-between">
+						<div className="mb-4 mb-md-0 me-4 d-flex align-items-center">
+							<div className={classNames(classes.iconOuter, 'me-4')}>
+								<SvgIcon kit="far" icon="calendar" size={16} className="text-primary" />
 							</div>
-							<Button variant="primary" onClick={onScheduleAppointmentButtonClick}>
-								Schedule Appointment
-							</Button>
+							<div>
+								<p className="mb-0">First Available Appointment:</p>
+								<p className="mb-0">
+									<strong>{firstAvailableAppointment?.dateTimeDescription}</strong>
+								</p>
+							</div>
 						</div>
-					)}
-				{!isReferralBooking &&
-					!schedulingUnavailable &&
-					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED && (
-						<Button variant="primary" className="d-block w-100" onClick={onScheduleAppointmentButtonClick}>
+						<Button variant="primary" onClick={onScheduleAppointmentButtonClick}>
 							Schedule Appointment
 						</Button>
-					)}
+					</div>
+				)}
 				{!isReferralBooking &&
 					!schedulingUnavailable &&
 					scheduleTypeId === ProviderAppointmentSelectionTypeId.APPOINTMENT_BY_PHONE && (

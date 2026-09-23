@@ -17,7 +17,12 @@ jest.mock('@/components/svg-icon', () => ({
 
 const mockUseAccount = useAccount as jest.MockedFunction<typeof useAccount>;
 
-const mockAccount = (canManageCareEncounters: boolean, roleId = 'ADMINISTRATOR', administerFlags = false) => {
+const mockAccount = (
+	canManageCareEncounters: boolean,
+	roleId = 'ADMINISTRATOR',
+	administerFlags = false,
+	canViewAnalytics = administerFlags
+) => {
 	mockUseAccount.mockReturnValue({
 		account: {
 			roleId,
@@ -26,7 +31,7 @@ const mockAccount = (canManageCareEncounters: boolean, roleId = 'ADMINISTRATOR',
 				canAdministerGroupSessions: administerFlags,
 				canCreatePages: administerFlags,
 				canViewProviderReports: administerFlags,
-				canViewAnalytics: administerFlags,
+				canViewAnalytics,
 				canViewStudyInsights: administerFlags,
 				canManageCareEncounters,
 			},
@@ -93,4 +98,11 @@ it('shows administrator-only links to an administrator', () => {
 
 	expect(screen.getByRole('link', { name: 'Group Sessions' })).toBeInTheDocument();
 	expect(screen.queryByRole('link', { name: 'Encounters' })).not.toBeInTheDocument();
+});
+
+it('shows Reports to an analytics-only administrator', () => {
+	mockAccount(false, 'ADMINISTRATOR', false, true);
+	renderHeader();
+
+	expect(screen.getByRole('link', { name: 'Reports' })).toHaveAttribute('href', '/admin/reports');
 });

@@ -324,6 +324,11 @@ export const ScreeningQuestionContext = ({
 	}
 
 	const renderQuestionHtml = Boolean(screeningQuestionContext.screeningQuestion.metadata?.renderQuestionHtml);
+	const configuredSubmitButtonText = screeningQuestionContext.screeningQuestion.metadata?.submitButtonText;
+	const submitButtonText =
+		typeof configuredSubmitButtonText === 'string' && configuredSubmitButtonText.trim()
+			? configuredSubmitButtonText.trim()
+			: 'Submit';
 
 	return (
 		<div className={classes.questionOuter}>
@@ -513,7 +518,7 @@ export const ScreeningQuestionContext = ({
 													screeningQuestionContext.screeningQuestion.minimumAnswerCount
 												}
 											>
-												Submit
+												{submitButtonText}
 											</Button>
 										</div>
 									)}

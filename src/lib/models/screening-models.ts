@@ -144,6 +144,7 @@ export interface ScreeningQuestion {
 			title: string;
 			displayTypeId: 'PRIMARY';
 		};
+		submitButtonText?: string;
 		footerAction?: {
 			label: string;
 			actionType?: 'OPEN_CONTENT_MODAL';

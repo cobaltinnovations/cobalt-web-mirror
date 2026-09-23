@@ -1,12 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import WysiwygBasic from './wysiwyg-basic';
+import WysiwygBasic, { wysiwygValueHasContent } from './wysiwyg-basic';
 
 const mockGetSelection = jest.fn();
 const mockGetFormat = jest.fn();
 const mockEditorFocus = jest.fn();
 const mockFormatLine = jest.fn();
 const mockFormat = jest.fn();
+const mockSetEditorRootAttribute = jest.fn();
+const mockRemoveEditorRootAttribute = jest.fn();
 
 jest.mock('react-quill', () => {
 	const mockReact = require('react');
@@ -16,6 +18,10 @@ jest.mock('react-quill', () => {
 		focus: (...args: unknown[]) => mockEditorFocus(...args),
 		formatLine: (...args: unknown[]) => mockFormatLine(...args),
 		format: (...args: unknown[]) => mockFormat(...args),
+		root: {
+			setAttribute: (...args: unknown[]) => mockSetEditorRootAttribute(...args),
+			removeAttribute: (...args: unknown[]) => mockRemoveEditorRootAttribute(...args),
+		},
 	};
 	const MockReactQuill = mockReact.forwardRef(
 		(
@@ -97,4 +103,16 @@ it("reads formats from the current selection without using Quill's focus-produci
 	expect(mockGetFormat).toHaveBeenCalledWith(selection);
 	expect(mockEditorFocus).not.toHaveBeenCalled();
 	expect(screen.getByRole('button', { name: 'Title 2' })).toBeInTheDocument();
+});
+
+it('applies an accessible label to the Quill editing area', () => {
+	render(<WysiwygBasic ariaLabel="Encounter note" value="" onChange={jest.fn()} />);
+
+	expect(mockSetEditorRootAttribute).toHaveBeenCalledWith('aria-label', 'Encounter note');
+});
+
+it('distinguishes visible WYSIWYG content from empty Quill markup', () => {
+	expect(wysiwygValueHasContent('<p><br></p>')).toBe(false);
+	expect(wysiwygValueHasContent('<p>&nbsp;</p>')).toBe(false);
+	expect(wysiwygValueHasContent('<p><strong>Encounter note</strong></p>')).toBe(true);
 });
