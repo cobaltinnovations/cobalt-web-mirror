@@ -21,11 +21,15 @@ import useAccount from '@/hooks/use-account';
 import useAccountSourceClickHandler from '@/hooks/use-account-source-click-handler';
 import {
 	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
+	PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM,
 	getBookingV1FallbackUrlFromSearchParams,
+	getProviderBookingReturnUrlFromSearchParams,
+	getProviderBookingPathForScreeningDestination,
 	getSafeBookingV1FallbackUrl,
+	getScreeningSessionDestinationWithSessionId,
 } from '@/lib/utils';
 
-export function useScreeningNavigation() {
+export function useScreeningNavigation({ screeningQuestionSearch }: { screeningQuestionSearch?: string } = {}) {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { trackEvent } = useAnalytics();
@@ -66,10 +70,12 @@ export function useScreeningNavigation() {
 
 			navigate({
 				pathname,
-				search: fullscreenScreening ? location.search : fallbackSearchParams.toString(),
+				search: fullscreenScreening
+					? screeningQuestionSearch ?? location.search
+					: fallbackSearchParams.toString(),
 			});
 		},
-		[fullscreenScreening, location.search, matches, navigate]
+		[fullscreenScreening, location.search, matches, navigate, screeningQuestionSearch]
 	);
 
 	const navigateToDestination = useCallback(
@@ -200,6 +206,16 @@ export function useScreeningNavigation() {
 								? getSafeBookingV1FallbackUrl(destinationFallbackUrl)
 								: undefined) ??
 							getBookingV1FallbackUrlFromSearchParams(new URLSearchParams(location.search));
+						const returnTo =
+							getSafeBookingV1FallbackUrl(
+								typeof destination.context[PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM] === 'string'
+									? destination.context[PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM]
+									: undefined
+							) ??
+							getSafeBookingV1FallbackUrl(
+								new URLSearchParams(location.search).get(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM) ??
+									undefined
+							);
 
 						if (bookingV1FallbackUrl) {
 							destinationSearchParams.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
@@ -207,9 +223,15 @@ export function useScreeningNavigation() {
 							destinationSearchParams.delete(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM);
 						}
 
+						if (returnTo) {
+							destinationSearchParams.set(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM, returnTo);
+						} else {
+							destinationSearchParams.delete(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM);
+						}
+
 						navigate(
 							{
-								pathname: '/provider-confirm-appointment-time',
+								pathname: getProviderBookingPathForScreeningDestination(destination.context),
 								search: destinationSearchParams.toString(),
 							},
 							{
@@ -219,7 +241,7 @@ export function useScreeningNavigation() {
 						return;
 					}
 
-					const returnTo = new URLSearchParams(location.search).get('returnTo') ?? '/providers';
+					const returnTo = getProviderBookingReturnUrlFromSearchParams(new URLSearchParams(location.search));
 					const ineligibleMessage = destination.context.ineligibleMessage;
 
 					navigate(returnTo, {
@@ -253,7 +275,12 @@ export function useScreeningNavigation() {
 			if (session?.nextScreeningQuestionContextId) {
 				navigateToQuestion(session.nextScreeningQuestionContextId);
 			} else if (session?.screeningSessionDestination) {
-				navigateToDestination(session.screeningSessionDestination);
+				navigateToDestination(
+					getScreeningSessionDestinationWithSessionId(
+						session.screeningSessionDestination,
+						session.screeningSessionId
+					)
+				);
 			}
 		},
 		[navigateToDestination, navigateToQuestion]
@@ -315,7 +342,12 @@ export function useScreeningFlow({
 
 				navigateToQuestion(session.nextScreeningQuestionContextId);
 			} else if (session?.screeningSessionDestination) {
-				navigateToDestination(session.screeningSessionDestination);
+				navigateToDestination(
+					getScreeningSessionDestinationWithSessionId(
+						session.screeningSessionDestination,
+						session.screeningSessionId
+					)
+				);
 			}
 		},
 		[navigate, navigateToDestination, navigateToQuestion, screeningQuestionPathPrefix, screeningQuestionSearch]

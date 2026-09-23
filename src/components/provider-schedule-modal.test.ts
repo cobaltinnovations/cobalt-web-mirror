@@ -1,14 +1,45 @@
+import React from 'react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import {
+	AnalyticsNativeEventProviderAppointmentSelectionPresentationId,
+	AnalyticsNativeEventTypeId,
+	AppointmentBookingRequirementsDestinationId,
+	BookingExperienceId,
 	ProviderAppointmentModalityId,
 	ProviderAppointmentSelectionTypeId,
 	ProviderSearchResultModel,
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
-import { createProviderScheduleModalConfig, getInitialAppointmentDateTimePickerValue } from './provider-schedule-modal';
+import { analyticsService, appointmentService } from '@/lib/services';
+import { CobaltThemeProvider } from '@/jss/theme';
+import ProviderScheduleModal, {
+	createProviderScheduleModalConfig,
+	getInitialAppointmentDateTimePickerValue,
+} from './provider-schedule-modal';
 
 jest.mock('@/components/appointment-date-time-picker', () => ({
 	__esModule: true,
-	default: () => null,
+	default: ({
+		onFirstAvailableAppointmentSelect,
+	}: {
+		onFirstAvailableAppointmentSelect?: (value: unknown) => void;
+	}) =>
+		require('react').createElement(
+			'button',
+			{
+				type: 'button',
+				onClick: () =>
+					onFirstAvailableAppointmentSelect?.({
+						dateTime: require('moment').utc('2026-09-24 20:00:00', 'YYYY-MM-DD HH:mm:ss'),
+						appointmentModalityId: 'PHONE',
+						appointmentTypeIds: ['appointment-type-id'],
+						appointmentTypeId: 'appointment-type-id',
+						providerId: 'clinic-provider-id',
+					}),
+			},
+			'First available shortcut'
+		),
 	getDefaultAppointmentDateTimePickerValue: () => ({ dateTime: undefined }),
 }));
 
@@ -16,6 +47,70 @@ jest.mock('./svg-icon', () => ({
 	__esModule: true,
 	default: () => null,
 }));
+
+const mockNavigateToNext = jest.fn();
+const mockUseScreeningNavigation = jest.fn((options?: { screeningQuestionSearch?: string }) => ({
+	navigateToNext: mockNavigateToNext,
+}));
+const mockHandleError = jest.fn();
+
+jest.mock('@/hooks/use-handle-error', () => ({
+	__esModule: true,
+	default: () => mockHandleError,
+}));
+
+jest.mock('@/pages/screening/screening.hooks', () => ({
+	useScreeningNavigation: (options?: { screeningQuestionSearch?: string }) => mockUseScreeningNavigation(options),
+}));
+
+jest.mock('@/lib/services', () => ({
+	analyticsService: {
+		persistEvent: jest.fn(),
+	},
+	appointmentService: {
+		getAppointmentBookingRequirements: jest.fn(),
+	},
+}));
+
+beforeEach(() => {
+	jest.clearAllMocks();
+	mockUseScreeningNavigation.mockReturnValue({ navigateToNext: mockNavigateToNext });
+	(appointmentService.getAppointmentBookingRequirements as jest.Mock).mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({
+			appointmentBookingRequirements: {
+				appointmentBookingRequirementsDestinationId:
+					AppointmentBookingRequirementsDestinationId.APPOINTMENT_BOOKING,
+			},
+		}),
+	});
+});
+
+const LocationDisplay = () => {
+	const location = useLocation();
+	return React.createElement('div', { 'data-testid': 'location' }, `${location.pathname}${location.search}`);
+};
+
+const createClinicProviderSearchResult = () =>
+	({
+		providerSearchResultId: 'clinic-result-id',
+		clinicId: 'clinic-id',
+		providerSearchResultTypeId: ProviderSearchResultTypeId.CLINIC,
+		appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED,
+		supportedAppointmentModalities: [
+			{
+				appointmentModalityId: ProviderAppointmentModalityId.PHONE,
+				description: 'Phone',
+			},
+		],
+		firstAvailableAppointment: {
+			providerId: 'clinic-provider-id',
+			date: '2026-09-24',
+			time: '20:00:00',
+			dateTime: '2026-09-24T20:00:00',
+			timeDescription: '8:00 PM',
+			appointmentTypeId: 'appointment-type-id',
+		},
+	} as ProviderSearchResultModel);
 
 it('carries the list card availability filters and first appointment into the schedule modal', () => {
 	const provider = {
@@ -97,5 +192,122 @@ it('uses the concrete provider from a clinic card first appointment', () => {
 
 	expect(config.clinicId).toBe('clinic-id');
 	expect(config.providerId).toBeUndefined();
+	expect(config.appointmentTypeId).toBeUndefined();
+	expect(initialValue.appointmentTypeId).toBe('phone-appointment-type-id');
 	expect(initialValue.providerId).toBe('clinic-provider-id');
+});
+
+it('uses the first-available shortcut to select a pooled clinic slot and advance directly to booking', async () => {
+	const provider = createClinicProviderSearchResult();
+	const config = createProviderScheduleModalConfig({
+		featureId: 'THERAPY',
+		institutionLocationId: 'institution-location-id',
+		provider,
+	});
+
+	render(
+		React.createElement(
+			CobaltThemeProvider,
+			null,
+			React.createElement(
+				MemoryRouter,
+				{
+					initialEntries: [
+						'/provider-info/care-navigator-provider-id?institutionLocationId=institution-location-id',
+					],
+				},
+				React.createElement(
+					React.Fragment,
+					null,
+					React.createElement(ProviderScheduleModal, { animation: false, show: true, config }),
+					React.createElement(LocationDisplay)
+				)
+			)
+		)
+	);
+
+	await waitFor(() => {
+		expect(analyticsService.persistEvent).toHaveBeenCalledWith(
+			AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTION_VIEWED,
+			expect.objectContaining({
+				bookingExperienceId: BookingExperienceId.V2,
+				presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.MODAL,
+				providerSearchResultId: 'clinic-result-id',
+				clinicId: 'clinic-id',
+				providerIdToSchedule: 'clinic-provider-id',
+			})
+		);
+	});
+
+	fireEvent.click(screen.getByRole('button', { name: 'First available shortcut' }));
+
+	await waitFor(() => {
+		expect(analyticsService.persistEvent).toHaveBeenCalledWith(
+			AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTED,
+			expect.objectContaining({
+				bookingExperienceId: BookingExperienceId.V2,
+				presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.MODAL,
+				clinicId: 'clinic-id',
+				providerIdToSchedule: 'clinic-provider-id',
+				appointmentTypeId: 'appointment-type-id',
+				appointmentModalityId: ProviderAppointmentModalityId.PHONE,
+			})
+		);
+		expect(appointmentService.getAppointmentBookingRequirements).toHaveBeenCalledWith({
+			providerId: 'clinic-provider-id',
+			appointmentTypeId: 'appointment-type-id',
+			appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED,
+			appointmentModalityId: ProviderAppointmentModalityId.PHONE,
+			date: '2026-09-24',
+			time: '20:00:00',
+		});
+		expect(screen.getByTestId('location')).toHaveTextContent('/provider-book-appointment?');
+		expect(screen.getByTestId('location')).not.toHaveTextContent('/provider-confirm-appointment-time');
+		expect(screen.getByTestId('location')).toHaveTextContent(
+			'returnTo=%2Fprovider-info%2Fcare-navigator-provider-id%3FinstitutionLocationId%3Dinstitution-location-id'
+		);
+	});
+});
+
+it('starts a required screening directly from the appointment modal', async () => {
+	const screeningSession = { screeningSessionId: 'screening-session-id' };
+	(appointmentService.getAppointmentBookingRequirements as jest.Mock).mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({
+			appointmentBookingRequirements: {
+				appointmentBookingRequirementsDestinationId:
+					AppointmentBookingRequirementsDestinationId.SCREENING_SESSION,
+				screeningSession,
+			},
+		}),
+	});
+	const config = createProviderScheduleModalConfig({
+		featureId: 'THERAPY',
+		institutionLocationId: 'institution-location-id',
+		provider: createClinicProviderSearchResult(),
+	});
+
+	render(
+		React.createElement(
+			CobaltThemeProvider,
+			null,
+			React.createElement(
+				MemoryRouter,
+				{
+					initialEntries: ['/providers?featureId=THERAPY&institutionLocationId=institution-location-id'],
+				},
+				React.createElement(ProviderScheduleModal, { animation: false, show: true, config })
+			)
+		)
+	);
+
+	expect(mockUseScreeningNavigation).toHaveBeenCalledWith({
+		screeningQuestionSearch:
+			'featureId=THERAPY&institutionLocationId=institution-location-id&returnTo=%2Fproviders%3FfeatureId%3DTHERAPY%26institutionLocationId%3Dinstitution-location-id',
+	});
+
+	fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+	await waitFor(() => {
+		expect(mockNavigateToNext).toHaveBeenCalledWith(screeningSession);
+	});
 });

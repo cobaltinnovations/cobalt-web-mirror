@@ -3,6 +3,7 @@ import InputHelper from '@/components/input-helper';
 import ScreeningPromptImage from '@/components/screening-prompt-image';
 import FullscreenBar from '@/components/fullscreen-bar';
 import useHandleError from '@/hooks/use-handle-error';
+import { getScreeningSessionDestinationWithSessionId } from '@/lib/utils';
 import {
 	ScreeningAnswerFormatId,
 	ScreeningAnswerSelection,
@@ -259,7 +260,12 @@ const ScreeningQuestionsPage = () => {
 						if (r.nextScreeningQuestionContextId) {
 							navigateToQuestion(r.nextScreeningQuestionContextId);
 						} else if (r.screeningSessionDestination) {
-							navigateToDestination(r.screeningSessionDestination);
+							navigateToDestination(
+								getScreeningSessionDestinationWithSessionId(
+									r.screeningSessionDestination,
+									r.screeningSession.screeningSessionId
+								)
+							);
 						}
 					};
 

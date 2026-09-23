@@ -242,6 +242,7 @@ type AppointmentDateTimePickerFetchData = {
 export interface AppointmentDateTimePickerProps {
 	value: AppointmentDateTimePickerValue;
 	onChange(value: AppointmentDateTimePickerValue): void;
+	onFirstAvailableAppointmentSelect?(value: AppointmentDateTimePickerValue): void;
 	config?: AppointmentDateTimePickerConfig;
 	fetchData?(): Promise<AppointmentDateTimePickerFetchData>;
 }
@@ -259,7 +260,13 @@ const getAppointmentTypesFromFetchData = (data: AppointmentDateTimePickerFetchDa
 	return Array.from(appointmentTypesById.values());
 };
 
-const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: AppointmentDateTimePickerProps) => {
+const AppointmentDateTimePicker = ({
+	value,
+	onChange,
+	onFirstAvailableAppointmentSelect,
+	config,
+	fetchData,
+}: AppointmentDateTimePickerProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const minSelectableDate = moment().startOf('day').toDate();
@@ -372,7 +379,14 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 
 	const handleFirstAvailableSelect = () => {
 		if (firstAvailableAppointment) {
-			onChange(getValueForTimeSlot(value, firstAvailableAppointment.date, firstAvailableAppointment.timeSlot));
+			const nextValue = getValueForTimeSlot(
+				value,
+				firstAvailableAppointment.date,
+				firstAvailableAppointment.timeSlot
+			);
+
+			onChange(nextValue);
+			onFirstAvailableAppointmentSelect?.(nextValue);
 		}
 	};
 
@@ -646,14 +660,14 @@ const AppointmentDateTimePicker = ({ value, onChange, config, fetchData }: Appoi
 						<div
 							key={timeSlotGroup.label}
 							className={classNames({
-								'mb-6': timeSlotGroupIndex < timeSlotGroups.length - 1,
+								'mb-2': timeSlotGroupIndex < timeSlotGroups.length - 1,
 							})}
 						>
 							<p className="mb-2">{timeSlotGroup.label}</p>
 							{timeSlotGroup.slots.length === 0 ? (
 								<p className="text-muted">No Appointment Slots</p>
 							) : (
-								<div className="w-100 d-flex overflow-auto">
+								<div className="w-100 d-flex overflow-auto pb-4">
 									{timeSlotGroup.slots.map((timeSlot, timeSlotIndex) => {
 										const timeSlotDateTime = createAppointmentDateTime(
 											selectedAppointmentDateTime.format('YYYY-MM-DD'),

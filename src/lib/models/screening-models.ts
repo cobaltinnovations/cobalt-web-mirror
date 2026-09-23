@@ -140,6 +140,7 @@ export interface ScreeningQuestion {
 	metadata?: {
 		prepopulatedEmailAddress?: string;
 		renderQuestionHtml?: boolean;
+		submitButtonText?: string;
 		footerAction?: {
 			label: string;
 			actionType?: 'OPEN_CONTENT_MODAL';
