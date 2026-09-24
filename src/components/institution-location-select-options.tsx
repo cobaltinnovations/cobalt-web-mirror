@@ -6,7 +6,7 @@ interface InstitutionLocationSelectOptionsProps {
 	institutionLocations: InstitutionLocation[];
 }
 
-type InstitutionLocationSelectEntry =
+export type InstitutionLocationSelectEntry =
 	| {
 			type: 'group';
 			institutionLocationGroupId: string;
@@ -18,7 +18,7 @@ type InstitutionLocationSelectEntry =
 			institutionLocation: InstitutionLocation;
 	  };
 
-const buildInstitutionLocationSelectEntries = (institutionLocations: InstitutionLocation[]) => {
+export const buildInstitutionLocationSelectEntries = (institutionLocations: InstitutionLocation[]) => {
 	const entries: InstitutionLocationSelectEntry[] = [];
 	const entriesByGroupId = new Map<string, Extract<InstitutionLocationSelectEntry, { type: 'group' }>>();
 
