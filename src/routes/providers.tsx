@@ -28,6 +28,7 @@ import NoData from '@/components/no-data';
 import useHandleError from '@/hooks/use-handle-error';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import EmployerSelectionModal from '@/components/employer-selection-modal';
+import InstitutionLocationSelectOptions from '@/components/institution-location-select-options';
 import {
 	ALL_INSTITUTION_LOCATIONS_ID,
 	buildBookingV2UrlWithV1Fallback,
@@ -616,14 +617,7 @@ export const Component = () => {
 									<option value={ALL_INSTITUTION_LOCATIONS_ID}>
 										I'm not sure / I'd rather not say
 									</option>
-									{institutionLocations.map((institutionLocation) => (
-										<option
-											key={institutionLocation.institutionLocationId}
-											value={institutionLocation.institutionLocationId}
-										>
-											{institutionLocation.name}
-										</option>
-									))}
+									<InstitutionLocationSelectOptions institutionLocations={institutionLocations} />
 								</InputHelper>
 								<InputHelper
 									ref={careTypeRef}

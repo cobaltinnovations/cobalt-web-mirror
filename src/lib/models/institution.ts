@@ -231,6 +231,13 @@ export interface InstitutionLocation {
 	institutionLocationId: string;
 	name: string;
 	shortName?: string;
+	institutionLocationGroup?: InstitutionLocationGroup;
+}
+
+export interface InstitutionLocationGroup {
+	institutionLocationGroupId: string;
+	name: string;
+	displayOrder: number;
 }
 
 export enum AlertTypeId {

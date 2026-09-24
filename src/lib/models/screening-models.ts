@@ -140,6 +140,10 @@ export interface ScreeningQuestion {
 	metadata?: {
 		prepopulatedEmailAddress?: string;
 		renderQuestionHtml?: boolean;
+		footerCallout?: {
+			title: string;
+			displayTypeId: 'PRIMARY';
+		};
 		submitButtonText?: string;
 		footerAction?: {
 			label: string;
