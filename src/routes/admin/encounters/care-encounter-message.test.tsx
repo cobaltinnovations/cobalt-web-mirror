@@ -330,6 +330,26 @@ it('shows a terminal unsent status instead of claiming the message was sent', ()
 	expect(screen.queryByText(/sent a follow-up email/)).not.toBeInTheDocument();
 });
 
+it('shows resource link visits on a sent follow-up', () => {
+	renderWithTheme(
+		<EncounterContactHistory
+			careEncounter={{
+				...careEncounter,
+				careEncounterScheduledMessages: [{
+					...sentMessage,
+					resourceLinkCount: 3,
+					resourceLinkOpenedCount: 2,
+					resourceLinkLastClickedAtDescription: 'Sep 24, 2026 at 3:30 PM',
+				}],
+			}}
+			onChanged={jest.fn()}
+		/>
+	);
+
+	expect(screen.getByText(/Resource links visited: 2 of 3/)).toBeInTheDocument();
+	expect(screen.getByText(/Last visit Sep 24, 2026 at 3:30 PM/)).toBeInTheDocument();
+});
+
 it('keeps the schedule action visible but disabled on a closed encounter', () => {
 	renderWithTheme(
 		<EncounterContactHistory

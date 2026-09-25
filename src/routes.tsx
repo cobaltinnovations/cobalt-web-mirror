@@ -32,6 +32,7 @@ import { AppDefaultLayout, AppErrorDefaultLayout } from './app-default-layout';
 
 import MhicOrderAssessment from './routes/ic/mhic/order-assessment';
 import PatientAssessmentComplete from './routes/ic/patient/assessment-complete';
+import PatientEligibilityExit from './routes/ic/patient/eligibility-exit';
 import PatientDemographicsIntroduction from './routes/ic/patient/demographics-introduction';
 import PatientDemographics from './routes/ic/patient/patient-demographics';
 import PatientDemographicsThanks from './routes/ic/patient/demographics-thanks';
@@ -45,6 +46,7 @@ import { LoginDestinationIdRouteMap } from './contexts/account-context';
 import PatientAssessmentResults from './routes/ic/patient/assessment-results';
 import { mhicShelfRouteObject } from './routes/ic/mhic/patient-order-shelf';
 import PatientCheckIn from './routes/ic/patient/patient-check-in';
+import CareEncounterLinkRedirect from './pages/care-encounter-link-redirect';
 
 import AsyncWrapper from './components/async-page';
 import {
@@ -409,6 +411,10 @@ const LegacyCareExperienceRoute = ({ element, featureId, isLegacyEnabled }: Lega
 };
 
 export const routes: RouteObject[] = [
+	{
+		path: '/care-encounter-links/:linkId/redirect',
+		element: <CareEncounterLinkRedirect />,
+	},
 	{
 		id: 'root',
 		path: '/',
@@ -1436,6 +1442,10 @@ export const routes: RouteObject[] = [
 									{
 										path: 'assessment-complete',
 										element: <PatientAssessmentComplete />,
+									},
+									{
+										path: 'eligibility-exit/:screeningSessionId',
+										element: <PatientEligibilityExit />,
 									},
 									{
 										path: 'assessment-results',

@@ -40,6 +40,22 @@ export const screeningService = {
 		});
 	},
 
+	getEligibilityExitContent(screeningSessionId: string) {
+		return httpSingleton.orchestrateRequest<{
+			eligibilityExitContent: {
+				title: string;
+				message: string;
+				actionUrl?: string;
+				actionText?: string;
+				contactName?: string;
+				contactPhone?: string;
+			};
+		}>({
+			method: 'get',
+			url: `/screening-sessions/${screeningSessionId}/eligibility-exit`,
+		});
+	},
+
 	getScreeningFlowVersionsByFlowId(params: ScreeningFlowParams) {
 		return httpSingleton.orchestrateRequest<{
 			activeScreeningFlowVersionId: string;

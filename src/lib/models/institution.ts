@@ -144,6 +144,7 @@ export interface InstitutionFeature {
 	landingPageVisible: boolean;
 	navigationHeaderId: string;
 	providerId?: string;
+	clinicId?: string;
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];
 	urlName: string;
