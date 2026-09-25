@@ -717,6 +717,48 @@ it('renders encounter shelf details and switches shelf tabs without changing the
 	expect(router.state.location.search).toBe('?status=CLOSED');
 });
 
+it('shows the latest completed landing assessment in the encounter details', async () => {
+	getCareEncounterSpy.mockImplementation(
+		() =>
+			({
+				abort: jest.fn(),
+				fetch: jest.fn().mockResolvedValue({
+					...defaultDetailResponse,
+					careEncounter: {
+						...careEncounter,
+						featureScreeningCompletedAtDescription: 'Sep 24, 2026 at 9:30 AM',
+						featureScreeningSessionResult: {
+							screeningSessionScreeningResults: [
+								{
+									screeningId: 'landing-assessment',
+									screeningName: 'Wellbeing Assessment',
+									screeningScore: { overallScore: 7 },
+									screeningQuestionResults: [
+										{
+											screeningQuestionId: 'question-1',
+											screeningQuestionText: 'How have you been feeling?',
+											screeningAnswerResults: [
+												{ screeningAnswerId: 'answer-1', answerOptionText: 'Somewhat anxious' },
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				}),
+			} as ReturnType<typeof careEncounterService.getCareEncounter>)
+	);
+
+	renderEncounters('/admin/encounters/care-encounter-1');
+
+	expect(await screen.findByText('Recent Cobalt Assessment')).toBeInTheDocument();
+	expect(screen.getByText('Completed Sep 24, 2026 at 9:30 AM')).toBeInTheDocument();
+	expect(screen.getByText('Score: 7')).toBeInTheDocument();
+	expect(screen.getByText('How have you been feeling?')).toBeInTheDocument();
+	expect(screen.getByText('Somewhat anxious')).toBeInTheDocument();
+});
+
 it('counts only non-deleted scheduled messages in contact history', async () => {
 	getCareEncounterSpy.mockImplementationOnce(
 		() =>

@@ -28,6 +28,9 @@ const useStyles = createUseThemedStyles((theme) => ({
 	modal: {
 		maxWidth: 680,
 	},
+	previewModal: {
+		maxWidth: 800,
+	},
 	field: {
 		flex: 1,
 	},
@@ -36,8 +39,14 @@ const useStyles = createUseThemedStyles((theme) => ({
 	},
 	preview: {
 		overflowX: 'auto',
-		'& p, & div': {
-			marginBottom: 20,
+	},
+	messageEditor: {
+		'& .ql-container': {
+			height: 320,
+		},
+		'& .ql-editor': {
+			maxHeight: 320,
+			overflowY: 'auto',
 		},
 	},
 }));
@@ -239,7 +248,13 @@ export const CareEncounterMessageModal = ({ careEncounterId, messageToEdit, onCh
 
 	return (
 		<>
-			<Modal {...props} onHide={onHide} dialogClassName={classes.modal} centered onEntering={handleEntering}>
+			<Modal
+				{...props}
+				onHide={onHide}
+				dialogClassName={page === 'preview' && !messageToEdit ? classes.previewModal : classes.modal}
+				centered
+				onEntering={handleEntering}
+			>
 				<Modal.Header closeButton>
 					<Modal.Title>
 						{messageToEdit
@@ -355,6 +370,7 @@ export const CareEncounterMessageModal = ({ careEncounterId, messageToEdit, onCh
 								<Form.Label className="mb-4">Custom email text</Form.Label>
 								<WysiwygBasic
 									ref={editorRef}
+									className={classes.messageEditor}
 									value={formValues.customEmailText}
 									onChange={(customEmailText) => {
 										setFormValues((current) => ({ ...current, customEmailText }));

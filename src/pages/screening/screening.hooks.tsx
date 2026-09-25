@@ -172,6 +172,14 @@ export function useScreeningNavigation({ screeningQuestionSearch }: { screeningQ
 
 					navigateToQuestion(nextQuestionId);
 					return;
+				case ScreeningSessionDestinationId.IC_PATIENT_ELIGIBILITY_EXIT: {
+					const eligibilitySessionId = destination.context.screeningSessionId;
+					if (typeof eligibilitySessionId !== 'string') {
+						throw new Error('Screening Session Unknown');
+					}
+					navigate(`/ic/patient/eligibility-exit/${eligibilitySessionId}`, { replace });
+					return;
+				}
 				case ScreeningSessionDestinationId.HOME:
 					window.location.href = '/';
 					return;
