@@ -50,7 +50,7 @@ export const PatientEligibilityExit = () => {
 									</p>
 								)}
 								{context.actionUrl && (
-									<Button as="a" href={context.actionUrl}>
+									<Button as="a" href={context.actionUrl} className="text-white text-decoration-none">
 										{context.actionText || 'Explore support options'}
 									</Button>
 								)}
