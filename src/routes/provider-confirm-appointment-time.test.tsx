@@ -186,3 +186,22 @@ it('exits to the provider information page that launched booking', () => {
 		'/provider-info/provider-id?institutionLocationId=location-id'
 	);
 });
+
+it('exits an in-progress Care Navigator booking to its clinic page despite an old provider-list return URL', () => {
+	render(
+		<MemoryRouter
+			initialEntries={[
+				'/provider-confirm-appointment-time?featureId=RESOURCE_NAVIGATOR&institutionLocationId=location-id&providerSearchResultTypeId=CLINIC&clinicId=care-navigator-clinic-id&returnTo=%2Fproviders%3FfeatureId%3DRESOURCE_NAVIGATOR',
+			]}
+		>
+			<Component />
+			<LocationDisplay />
+		</MemoryRouter>
+	);
+
+	fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'/clinic-info/care-navigator-clinic-id?featureId=RESOURCE_NAVIGATOR&institutionLocationId=location-id'
+	);
+});
