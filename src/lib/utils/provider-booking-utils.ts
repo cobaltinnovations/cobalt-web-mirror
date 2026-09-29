@@ -56,7 +56,7 @@ export const getProviderBookingReturnUrl = ({
 	pathname: string;
 	searchParams: URLSearchParams;
 }) => {
-	if (pathname.startsWith('/provider-info/')) {
+	if (pathname.startsWith('/provider-info/') || pathname.startsWith('/clinic-info/')) {
 		const queryString = searchParams.toString();
 		return queryString ? `${pathname}?${queryString}` : pathname;
 	}
@@ -64,9 +64,29 @@ export const getProviderBookingReturnUrl = ({
 	return getProviderListUrlFromSearchParams(searchParams);
 };
 
-export const getProviderBookingReturnUrlFromSearchParams = (searchParams: URLSearchParams) =>
-	getSafeBookingV1FallbackUrl(searchParams.get(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM) ?? undefined) ??
-	getProviderListUrlFromSearchParams(searchParams);
+export const getProviderBookingReturnUrlFromSearchParams = (searchParams: URLSearchParams) => {
+	const returnTo = getSafeBookingV1FallbackUrl(
+		searchParams.get(PROVIDER_BOOKING_RETURN_TO_SEARCH_PARAM) ?? undefined
+	);
+	const clinicId = searchParams.get('clinicId');
+
+	// Older Care Navigator bookings can carry a provider-list return URL. The clinic
+	// page is their direct booking entry point, so send them back there instead.
+	if (
+		searchParams.get('featureId') === FeatureId.RESOURCE_NAVIGATOR &&
+		clinicId &&
+		(!returnTo || returnTo.startsWith('/providers?') || returnTo === '/providers')
+	) {
+		const clinicSearchParams = new URLSearchParams({ featureId: FeatureId.RESOURCE_NAVIGATOR });
+		const institutionLocationId = searchParams.get('institutionLocationId');
+		if (institutionLocationId) {
+			clinicSearchParams.set('institutionLocationId', institutionLocationId);
+		}
+		return `/clinic-info/${encodeURIComponent(clinicId)}?${clinicSearchParams.toString()}`;
+	}
+
+	return returnTo ?? getProviderListUrlFromSearchParams(searchParams);
+};
 
 export const getProviderBookingScreeningSearchParams = (searchParams: URLSearchParams, returnTo?: string) => {
 	const screeningSearchParams = new URLSearchParams(searchParams);

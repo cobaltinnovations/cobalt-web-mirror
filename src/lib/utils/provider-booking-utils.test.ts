@@ -78,6 +78,37 @@ describe('provider booking institution locations', () => {
 		).toBe(returnTo);
 	});
 
+	it('returns clinic bookings to the clinic information page that launched them', () => {
+		const searchParams = new URLSearchParams({
+			featureId: FeatureId.RESOURCE_NAVIGATOR,
+			institutionLocationId: 'location-id',
+		});
+		const returnTo = getProviderBookingReturnUrl({
+			pathname: '/clinic-info/care-navigator-clinic-id',
+			searchParams,
+		});
+
+		expect(returnTo).toBe(
+			'/clinic-info/care-navigator-clinic-id?featureId=RESOURCE_NAVIGATOR&institutionLocationId=location-id'
+		);
+		expect(
+			new URLSearchParams(getProviderBookingScreeningSearchParams(searchParams, returnTo)).get('returnTo')
+		).toBe(returnTo);
+	});
+
+	it('recovers the direct Care Navigator clinic page from an old provider-list return URL', () => {
+		expect(
+			getProviderBookingReturnUrlFromSearchParams(
+				new URLSearchParams({
+					featureId: FeatureId.RESOURCE_NAVIGATOR,
+					institutionLocationId: 'location-id',
+					clinicId: 'care-navigator-clinic-id',
+					returnTo: '/providers?featureId=RESOURCE_NAVIGATOR',
+				})
+			)
+		).toBe('/clinic-info/care-navigator-clinic-id?featureId=RESOURCE_NAVIGATOR&institutionLocationId=location-id');
+	});
+
 	it('rejects unsafe provider booking return destinations', () => {
 		expect(
 			getProviderBookingReturnUrlFromSearchParams(
