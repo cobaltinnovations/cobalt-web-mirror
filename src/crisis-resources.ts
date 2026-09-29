@@ -19,11 +19,5 @@ export const CRISIS_RESOURCES: CrisisResource[] = [
 		description: '24/7 Crisis Text Line',
 		href: 'sms:741741',
 	},
-	{
-		crisisResourceTypeId: CrisisResourceTypeId.NON_EMERGENCY_SUPPORT,
-		title: 'Learn about EASE Clinic',
-		description: 'Expedited, non-emergency mental health support for eligible UPHS employees.',
-		href: '/referrals/ease-clinic',
-		institutionIds: ['COBALT'],
-	},
+	// EASE Clinic is temporarily unavailable from crisis surfaces.
 ];
