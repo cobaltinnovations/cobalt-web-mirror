@@ -107,6 +107,7 @@ const useStyles = createUseThemedStyles((theme) => ({
 interface ScreeningQuestionContextCardSortProps {
 	initialScreeningQuestionContextId: string;
 	onScreeningFlowComplete(screeningSessionDestination?: ScreeningSessionDestination): void;
+	onScreeningNameChange?(screeningName: string): void;
 }
 
 interface CardStack {
@@ -122,6 +123,7 @@ interface CardStackItem {
 export const ScreeningQuestionContextCardSort = ({
 	initialScreeningQuestionContextId,
 	onScreeningFlowComplete,
+	onScreeningNameChange,
 }: ScreeningQuestionContextCardSortProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
@@ -146,6 +148,7 @@ export const ScreeningQuestionContextCardSort = ({
 
 		try {
 			const response = await screeningService.getScreeningQuestionContext(screeningQuestionContextId).fetch();
+			onScreeningNameChange?.(response.screening.name);
 			const card = {
 				id: uuidv4(),
 				text: response.screeningQuestion.questionText,
@@ -175,7 +178,7 @@ export const ScreeningQuestionContextCardSort = ({
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, screeningQuestionContextId]);
+	}, [handleError, onScreeningNameChange, screeningQuestionContextId]);
 
 	useEffect(() => {
 		fetchData();

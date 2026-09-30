@@ -32,6 +32,19 @@ export async function loader() {
 	return null;
 }
 
+const normalizeCourseUnitTitle = (title: string) =>
+	title
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, ' ')
+		.trim();
+
+const isKeepLearningUnit = (courseUnit: CourseUnitModel) => {
+	const normalizedTitle = normalizeCourseUnitTitle(courseUnit.title);
+	return normalizedTitle === 'klwbb' || normalizedTitle.includes('keep learning with behavior bridge');
+};
+
+const isWrapUpUnit = (courseUnit: CourseUnitModel) => normalizeCourseUnitTitle(courseUnit.title).includes('wrap up');
+
 export const Component = () => {
 	const handleError = useHandleError();
 	const { courseIdentifier, unitId } = useParams<{ courseIdentifier: string; unitId: string }>();
@@ -45,6 +58,8 @@ export const Component = () => {
 	const [courseUnit, setCourseUnit] = useState<CourseUnitModel>();
 	const [courseUnitLockStatus, setCourseUnitLockStatus] = useState<CourseUnitLockStatus>();
 	const [courseUnitCompleted, setCourseUnitCompleted] = useState(false);
+	const [screeningModalCanReopen, setScreeningModalCanReopen] = useState(false);
+	const [screeningModalOpenRequestId, setScreeningModalOpenRequestId] = useState(0);
 	const [courseUnitByCourseUnitId, setCourseUnitByCourseUnitId] = useState<Record<string, CourseUnitModel>>({});
 
 	const fetchData = useCallback(async () => {
@@ -87,6 +102,7 @@ export const Component = () => {
 		setCourseUnit(desiredCourseUnit);
 		setCourseUnitLockStatus(courseUnitLockStatusesByCourseUnitId[courseUnitId]);
 		setCourseUnitCompleted(isCompleted);
+		setScreeningModalCanReopen(!isCompleted);
 		setCourseUnitByCourseUnitId(courseUnitMap);
 
 		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_COURSE_UNIT, {
@@ -198,6 +214,9 @@ export const Component = () => {
 
 			try {
 				await coursesService.completeCourseUnit(viewedCourseUnit.courseUnitId).fetch();
+				if (isKeepLearningUnit(viewedCourseUnit)) {
+					setScreeningModalCanReopen(false);
+				}
 			} catch (error) {
 				handleError(error);
 			}
@@ -250,6 +269,38 @@ export const Component = () => {
 		return course?.contentsByCourseUnitId?.[courseUnit?.courseUnitId] ?? [];
 	}, [course?.contentsByCourseUnitId, courseUnit]);
 
+	const courseFeedbackScreeningFlowId = useMemo(() => {
+		if (!courseUnit || !isKeepLearningUnit(courseUnit)) {
+			return undefined;
+		}
+
+		if (courseUnit.screeningFlowId) {
+			return courseUnit.screeningFlowId;
+		}
+
+		if (!course) {
+			return undefined;
+		}
+
+		return course.courseModules
+			.flatMap(({ courseUnits }) => courseUnits)
+			.find((unit) => isWrapUpUnit(unit) && unit.screeningFlowId)?.screeningFlowId;
+	}, [course, courseUnit]);
+
+	const requestScreeningModalOpen = useCallback(
+		(selectedCourseUnit: CourseUnitModel) => {
+			if (
+				selectedCourseUnit.courseUnitId === unitId &&
+				screeningModalCanReopen &&
+				!courseUnitCompleted &&
+				isKeepLearningUnit(selectedCourseUnit)
+			) {
+				setScreeningModalOpenRequestId((currentId) => currentId + 1);
+			}
+		},
+		[courseUnitCompleted, screeningModalCanReopen, unitId]
+	);
+
 	return (
 		<>
 			<Helmet>
@@ -292,6 +343,7 @@ export const Component = () => {
 											setShowMenu(false);
 										}
 
+										requestScreeningModalOpen(desiredCourseUnit);
 										navigate(
 											`/courses/${course.urlName}/course-units/${desiredCourseUnit.courseUnitId}`
 										);
@@ -340,6 +392,7 @@ export const Component = () => {
 													: course.defaultCourseUnitLockStatusesByCourseUnitId
 											}
 											onCourseUnitClick={(desiredCourseUnit) => {
+												requestScreeningModalOpen(desiredCourseUnit);
 												navigate(
 													`/courses/${course.urlName}/course-units/${desiredCourseUnit.courseUnitId}`
 												);
@@ -418,6 +471,14 @@ export const Component = () => {
 															}
 															courseVideos={course.videos}
 															courseUnit={courseUnit}
+															screeningModalFlowId={courseFeedbackScreeningFlowId}
+															screeningModalOpenRequestId={screeningModalOpenRequestId}
+															autoOpenScreeningModal={
+																!courseUnitCompleted &&
+																isKeepLearningUnit(courseUnit) &&
+																Boolean(courseFeedbackScreeningFlowId)
+															}
+															hideInlineScreening={isWrapUpUnit(courseUnit)}
 															dependencyCourseUnits={weakCourseUnitDependencies}
 															onActivityComplete={handleActivityComplete}
 															onSkipActivityButtonClick={handleSkipActivityButtonClick}

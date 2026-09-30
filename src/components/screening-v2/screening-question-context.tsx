@@ -81,11 +81,13 @@ const useStyles = createUseThemedStyles({
 interface ScreeningQuestionContextProps {
 	initialScreeningQuestionContextId: string;
 	onScreeningFlowComplete(screeningSessionDestination?: ScreeningSessionDestination): void;
+	onScreeningNameChange?(screeningName: string): void;
 }
 
 export const ScreeningQuestionContext = ({
 	initialScreeningQuestionContextId,
 	onScreeningFlowComplete,
+	onScreeningNameChange,
 }: ScreeningQuestionContextProps) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
@@ -115,6 +117,7 @@ export const ScreeningQuestionContext = ({
 			const response = await screeningService.getScreeningQuestionContext(screeningQuestionContextId).fetch();
 
 			setScreeningQuestionContext(response);
+			onScreeningNameChange?.(response.screening.name);
 			setConfirmationPrompt({
 				screeningConfirmationPrompt: response.previouslyAnswered
 					? undefined
@@ -132,7 +135,7 @@ export const ScreeningQuestionContext = ({
 		} finally {
 			setIsLoading(false);
 		}
-	}, [handleError, screeningQuestionContextId]);
+	}, [handleError, onScreeningNameChange, screeningQuestionContextId]);
 
 	useEffect(() => {
 		fetchData();
