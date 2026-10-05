@@ -15,12 +15,15 @@ import { createUseThemedStyles } from '@/jss/theme';
 import { Link, To } from 'react-router-dom';
 
 interface UseStylesProps {
-	hasFeaturedItem: boolean;
+	wide: boolean;
 }
 
 const useStyles = createUseThemedStyles((theme) => ({
 	dropdownMenu: {
-		width: ({ hasFeaturedItem }: UseStylesProps) => (hasFeaturedItem ? 640 : 344),
+		width: ({ wide }: UseStylesProps) => (wide ? 640 : 344),
+		maxWidth: 'calc(100vw - 32px)',
+		maxHeight: 'calc(100vh - 160px)',
+		overflowY: 'auto',
 	},
 }));
 
@@ -30,6 +33,9 @@ interface HeaderNavDropdownProps {
 	onTitleClick?(): void;
 	subtitle?: string;
 	onToggle?: (show: boolean) => void;
+	secondaryColumn?: React.ReactNode;
+	footerLink?: { title: string; to: To };
+	onFooterClick?(): void;
 	featuredItem: NavFeaturedItem | null;
 	children: React.ReactNode;
 }
@@ -41,9 +47,13 @@ const HeaderNavDropdown = ({
 	subtitle,
 	onToggle,
 	featuredItem,
+	secondaryColumn,
+	footerLink,
+	onFooterClick,
 	children,
 }: PropsWithChildren<HeaderNavDropdownProps>) => {
-	const classes = useStyles({ hasFeaturedItem: !!featuredItem });
+	const wide = !!(featuredItem || secondaryColumn || footerLink);
+	const classes = useStyles({ wide });
 	const [show, setShow] = useState(false);
 
 	return (
@@ -91,7 +101,7 @@ const HeaderNavDropdown = ({
 									popper: { width: number };
 									reference: { width: number };
 								}) => {
-									if (!featuredItem && title !== 'Community') {
+									if (!wide) {
 										return [0, 0];
 									}
 									const halfPopperWidth = popper.width / 2;
@@ -107,14 +117,27 @@ const HeaderNavDropdown = ({
 			>
 				<div className="d-flex w-100">
 					<div
+						style={{ minWidth: 0 }}
 						className={classNames('flex-grow-1', {
-							'px-5 py-6': featuredItem,
-							'p-4': !featuredItem,
+							'px-5 py-6': wide,
+							'p-4': !wide,
 						})}
 					>
 						{subtitle && <p className="text-n500 px-3 mb-3">{subtitle}</p>}
 						{children}
+						{footerLink && (
+							<Dropdown.Item
+								as={Link}
+								to={footerLink.to}
+								className="text-p500 mt-4"
+								onClick={onFooterClick}
+							>
+								{footerLink.title}
+								<SvgIcon kit="far" icon="arrow-right" size={16} className="ms-2" />
+							</Dropdown.Item>
+						)}
 					</div>
+					{secondaryColumn}
 
 					{featuredItem && (
 						<HeaderNavFeaturedItem

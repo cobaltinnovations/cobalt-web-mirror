@@ -170,6 +170,7 @@ export enum DisplayTypeId {
 }
 
 export interface AdditionalNavigationItem {
+	shortDescription?: string;
 	iconName?: string;
 	imageUrl?: string;
 	name: string;

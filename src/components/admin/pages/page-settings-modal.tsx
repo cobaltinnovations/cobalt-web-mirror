@@ -12,6 +12,9 @@ import InlineAlert from '@/components/inline-alert';
 import { shouldWarnForPageUrlChange } from '@/lib/utils/page-admin-utils';
 
 const useStyles = createUseThemedStyles((_theme) => ({
+	caution: {
+		borderRadius: 8,
+	},
 	modal: {
 		maxWidth: 620,
 	},
@@ -177,7 +180,7 @@ export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, .
 						{shouldWarnForPageUrlChange(page, formValues.friendlyUrl) && (
 							<InlineAlert
 								variant="danger"
-								className="mb-4"
+								className={`${classes.caution} mb-4`}
 								title="Proceed with caution"
 								description="Updating the URL will break any existing links using the previous URL."
 							/>

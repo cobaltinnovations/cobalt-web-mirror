@@ -29,6 +29,7 @@ interface UseStylesProps {
 const useFeaturedItemStyles = createUseThemedStyles((theme) => ({
 	featuredItemContainer: {
 		width: ({ mobileNav }: UseStylesProps) => (mobileNav ? '100%' : 304),
+		flexShrink: 0,
 		borderTopRightRadius: ({ mobileNav }: UseStylesProps) => (mobileNav ? 0 : 8),
 		borderBottomRightRadius: 8,
 		borderBottomLeftRadius: ({ mobileNav }: UseStylesProps) => (mobileNav ? 8 : 0),
@@ -36,7 +37,10 @@ const useFeaturedItemStyles = createUseThemedStyles((theme) => ({
 	},
 	featuredItemImage: {
 		width: ({ mobileNav }: UseStylesProps) => (mobileNav ? '100%' : 240),
-		borderRadius: 12,
+		maxWidth: '100%',
+		aspectRatio: '16 / 9',
+		objectFit: 'cover',
+		borderRadius: 6,
 		backgroundColor: theme.colors.n100,
 	},
 	featuredItemDescriptionWrapper: {

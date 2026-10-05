@@ -1,7 +1,21 @@
 import { AdditionalNavigationItem, FeatureId, InstitutionFeature } from '@/lib/models/institution';
-import { getFeatureNavigationLink, getGeneralNavigationGroups } from './general-navigation-utils';
+import {
+	getFeatureNavigationLink,
+	getGeneralNavigationGroups,
+	getEmployerNavigationLinks,
+	getResourceNavigationMetadata,
+	featuredTopicsNavigationMetadata,
+	communityDirectoryNavigationMetadata,
+	getCommunityNavigationLink,
+} from './general-navigation-utils';
 import { analyticsService } from '@/lib/services/analytics-service';
-import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId } from '@/lib/models/analytics';
+import {
+	AnalyticsNativeEventClickthroughFeatureSource,
+	AnalyticsNativeEventClickthroughTopicCenterSource,
+	AnalyticsNativeEventTypeId,
+} from '@/lib/models/analytics';
+
+import { SITE_LOCATION_ID } from '@/lib/models';
 
 afterEach(() => jest.restoreAllMocks());
 
@@ -70,3 +84,72 @@ it('retains the configured screening URL and native feature analytics when Group
 		source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
 	});
 });
+
+it('preserves employer order, uses short names when available, and navigates with a directory-only filter', () => {
+	const locations = [
+		{ institutionId: 'COBALT', institutionLocationId: 'employer-b', name: 'Employer B long name', shortName: 'B' },
+		{ institutionId: 'COBALT', institutionLocationId: 'employer-a', name: 'Employer A' },
+	];
+	const links = getEmployerNavigationLinks(locations);
+	expect(links.map(({ title }) => title)).toEqual(['B', 'Employer A']);
+	links.forEach(({ to }, index) => {
+		const url = new URL(to, 'https://example.com');
+		expect(url.pathname).toBe('/providers');
+		expect([...url.searchParams]).toEqual([['institutionLocationId', locations[index].institutionLocationId]]);
+	});
+	expect(getEmployerNavigationLinks([])).toEqual([]);
+});
+
+it('uses the mockup resource labels while retaining institution routes and descriptions', () => {
+	const resource = {
+		...feature(FeatureId.SELF_HELP_RESOURCES, 'BROWSE_RESOURCES'),
+		urlName: '/resources?org=example',
+		navDescription: 'Configured description',
+	};
+	expect(getResourceNavigationMetadata(resource)).toEqual({
+		title: 'Resource Library',
+		to: resource.urlName,
+		description: resource.navDescription,
+	});
+	const other = feature(FeatureId.COACHING, 'BROWSE_RESOURCES');
+	expect(getResourceNavigationMetadata(other).title).toBe(other.name);
+	expect(featuredTopicsNavigationMetadata).toEqual({
+		title: 'Featured Topics',
+		to: '/featured-topics',
+		description: 'Pages that bring together a variety of resources focused on specific topics.',
+	});
+	expect(communityDirectoryNavigationMetadata).toEqual({ title: 'All communities', to: '/communities' });
+});
+
+it.each([false, true])(
+	'retains community supporting HTML, destinations, and native analytics (legacy=%s)',
+	(legacy) => {
+		const item: AdditionalNavigationItem = {
+			name: 'Configured community',
+			url: legacy ? '/topic-centers/community' : '/pages/community',
+			pageId: 'page-id',
+			topicCenterId: 'topic-id',
+			shortDescription: '<p>Supporting text</p>',
+		};
+		const persistEvent = jest.spyOn(analyticsService, 'persistEvent').mockReturnValue(true);
+		const link = getCommunityNavigationLink(item, legacy);
+		expect(link).toMatchObject({ title: item.name, to: item.url, descriptionHtml: item.shortDescription });
+		link.onClick();
+		expect(persistEvent).toHaveBeenCalledTimes(1);
+		expect(persistEvent).toHaveBeenCalledWith(
+			legacy
+				? AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER
+				: AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
+			legacy
+				? { topicCenterId: item.topicCenterId, source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV }
+				: {
+						pageId: item.pageId,
+						source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
+						siteLocationId: SITE_LOCATION_ID.COMMUNITY,
+				  }
+		);
+		expect(
+			getCommunityNavigationLink({ ...item, shortDescription: undefined }, legacy).descriptionHtml
+		).toBeUndefined();
+	}
+);
