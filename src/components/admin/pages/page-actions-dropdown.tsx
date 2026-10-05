@@ -1,9 +1,9 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
-
-import { PAGE_STATUS_ID, PageDetailModel } from '@/lib/models';
+import { PageDetailModel } from '@/lib/models';
 import { DropdownMenu, DropdownToggle } from '@/components/dropdown';
-import SvgIcon from '@/components/svg-icon';
+import SvgIcon, { SvgIconProps } from '@/components/svg-icon';
+import { getPageActionIds, PageActionId } from '@/lib/utils/page-admin-utils';
 
 interface PageActionsDropdownProps {
 	page: PageDetailModel;
@@ -22,80 +22,51 @@ export const PageActionsDropdown = ({
 	onDelete,
 	onUnpublish,
 }: PageActionsDropdownProps) => {
+	const actions: Record<
+		PageActionId,
+		{ title: string; icon: SvgIconProps['icon']; onClick(): void; dividerBefore?: boolean }
+	> = {
+		EDIT: { title: 'Edit', icon: 'pen', onClick: () => onEdit(page) },
+		DUPLICATE: { title: 'Duplicate', icon: 'clone', onClick: () => onDuplicate(page) },
+		SETTINGS: { title: 'Settings', icon: 'gear', onClick: () => onPageSettings(page) },
+		DELETE: { title: 'Delete', icon: 'trash-can', onClick: () => onDelete(page), dividerBefore: true },
+		VIEW: {
+			title: 'View on Cobalt',
+			icon: 'arrow-up-right-from-square',
+			onClick: () => {
+				window.open(page.relativeUrl, '_blank', 'noopener,noreferrer');
+			},
+			dividerBefore: true,
+		},
+		UNPUBLISH: { title: 'Unpublish', icon: 'minus', onClick: () => onUnpublish(page), dividerBefore: true },
+	};
 	return (
 		<Dropdown>
 			<Dropdown.Toggle
 				as={DropdownToggle}
 				variant="transparent-secondary"
 				size="sm"
-				id={`dropdown--${page.pageId}`}
+				id={`page-actions--${page.pageId}`}
+				aria-label={`Actions for ${page.name}`}
 				className="p-2"
 			>
 				<SvgIcon kit="far" icon="ellipsis-vertical" size={20} className="d-flex" />
 			</Dropdown.Toggle>
 			<Dropdown.Menu compact as={DropdownMenu} align="end" popperConfig={{ strategy: 'fixed' }} renderOnMount>
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					onClick={() => {
-						onEdit(page);
-					}}
-				>
-					<SvgIcon kit="far" icon="pen" size={16} className="me-2 text-n500" />
-					Edit
-				</Dropdown.Item>
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					onClick={() => {
-						onPageSettings(page);
-					}}
-				>
-					<SvgIcon kit="far" icon="gear" size={16} className="me-2 text-n500" />
-					Page Settings
-				</Dropdown.Item>
-				<Dropdown.Item
-					className="d-flex align-items-center"
-					onClick={() => {
-						onDuplicate(page);
-					}}
-				>
-					<SvgIcon kit="far" icon="clone" size={16} className="me-2 text-n500" />
-					Duplicate
-				</Dropdown.Item>
-				<Dropdown.Divider />
-				{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
-					<Dropdown.Item
-						className="d-flex align-items-center"
-						onClick={() => {
-							onDelete(page);
-						}}
-					>
-						<SvgIcon kit="far" icon="trash-can" size={16} className="me-2 text-n500" />
-						Delete
-					</Dropdown.Item>
-				)}
-				{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
-					<>
-						<Dropdown.Item
-							className="d-flex align-items-center"
-							onClick={() => {
-								window.open(page.relativeUrl, '_blank', 'noopener, noreferrer');
-							}}
-						>
-							<SvgIcon kit="far" icon="arrow-up-right-from-square" size={16} className="me-2 text-n500" />
-							View on Cobalt
+				{getPageActionIds(page.pageStatusId).map((id) => (
+					<React.Fragment key={id}>
+						{actions[id].dividerBefore && <Dropdown.Divider />}
+						<Dropdown.Item className="d-flex align-items-center" onClick={actions[id].onClick}>
+							<SvgIcon
+								kit={id === 'UNPUBLISH' ? 'fas' : 'far'}
+								icon={actions[id].icon}
+								size={16}
+								className={`me-2 ${id === 'DELETE' ? 'text-danger' : 'text-n500'}`}
+							/>
+							{actions[id].title}
 						</Dropdown.Item>
-						<Dropdown.Divider />
-						<Dropdown.Item
-							className="d-flex align-items-center"
-							onClick={() => {
-								onUnpublish(page);
-							}}
-						>
-							<SvgIcon kit="fas" icon="minus" size={16} className="me-2 text-n500" />
-							Unpublish
-						</Dropdown.Item>
-					</>
-				)}
+					</React.Fragment>
+				))}
 			</Dropdown.Menu>
 		</Dropdown>
 	);

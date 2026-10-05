@@ -1,5 +1,5 @@
 import { httpSingleton } from '@/lib/singletons/http-singleton';
-import { buildQueryParamUrl } from '@/lib/utils';
+import { buildBackendDownloadUrl, buildQueryParamUrl } from '@/lib/utils';
 import {
 	BACKGROUND_COLOR_ID,
 	CallToActionBlockRowModel,
@@ -8,10 +8,14 @@ import {
 	CustomRowModel,
 	GroupSessionsRowModel,
 	MailingListRowModel,
+	MailingListEntryTypeId,
 	OneColumnImageRowModel,
 	OneColumnTextRowModel,
 	PAGE_STATUS_ID,
+	PAGE_LOCATION_ID,
 	PageDetailModel,
+	PageLocationModel,
+	PageSummaryModel,
 	PageFriendlyUrlValidationResult,
 	PageRowMailingListModel,
 	PageRowUnionModel,
@@ -35,7 +39,36 @@ export interface GetPagesResponse {
 	pages: PageDetailModel[];
 }
 
+export interface GetPublishedPagesResponse {
+	pages: PageSummaryModel[];
+	totalCount: number;
+	totalCountDescription: string;
+}
+
 export const pagesService = {
+	getSubscriberEmailDownloadUrl(pageId: string) {
+		return buildBackendDownloadUrl('/page-row-mailing-lists/csv', {
+			pageId,
+			mailingListEntryTypeId: MailingListEntryTypeId.EMAIL_ADDRESS,
+		});
+	},
+	getPageLocations() {
+		return httpSingleton.orchestrateRequest<{ pageLocations: PageLocationModel[] }>({
+			method: 'GET',
+			url: '/page-locations',
+		});
+	},
+	getPublishedPages(searchParameters: {
+		pageLocationId: PAGE_LOCATION_ID;
+		searchQuery?: string;
+		pageNumber?: string;
+		pageSize?: string;
+	}) {
+		return httpSingleton.orchestrateRequest<GetPublishedPagesResponse>({
+			method: 'GET',
+			url: buildQueryParamUrl('/pages/published', searchParameters),
+		});
+	},
 	validatePageUrl(searchParameters?: { searchQuery?: string; pageId?: string }) {
 		return httpSingleton.orchestrateRequest<{
 			pageUrlNameValidationResult: PageFriendlyUrlValidationResult;
@@ -48,6 +81,7 @@ export const pagesService = {
 		name: string;
 		urlName: string;
 		pageStatusId: PAGE_STATUS_ID;
+		pageLocationId?: PAGE_LOCATION_ID;
 		headline?: string;
 		description?: string;
 		imageFileUploadId?: string;
@@ -90,6 +124,7 @@ export const pagesService = {
 		data: {
 			name: string;
 			urlName: string;
+			pageLocationId?: PAGE_LOCATION_ID;
 		}
 	) {
 		return httpSingleton.orchestrateRequest<{

@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { PAGE_STATUS_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
+import { PAGE_LOCATION_ID, PAGE_STATUS_ID, PageDetailModel, ROW_TYPE_ID } from '@/lib/models';
 import { analyticsService, resourceLibraryService } from '@/lib/services';
 import { getPageRowAnchorDomId } from '@/lib/utils';
 import { PagePreview } from './page-preview';
@@ -46,6 +46,10 @@ const page = {
 	name: 'Resilience',
 	urlName: 'resilience',
 	pageStatusId: PAGE_STATUS_ID.LIVE,
+	pageStatusDescription: 'Published',
+	hasBeenPublished: true,
+	pageLocationId: PAGE_LOCATION_ID.FEATURED_TOPIC,
+	pageLocationDescription: 'Featured Topics',
 	headline: 'Resilience',
 	description: 'Description',
 	imageFileUploadId: 'image-id',

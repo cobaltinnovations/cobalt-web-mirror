@@ -1,75 +1,36 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { pagesService } from '@/lib/services';
 import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import useHandleError from '@/hooks/use-handle-error';
-import useDebouncedAsyncFunction from '@/hooks/use-debounced-async-function';
+import { usePageSettingsForm } from '@/hooks/use-page-settings-form';
 import InputHelper from '@/components/input-helper';
 import { EditUrlModal } from '@/components/admin/pages';
 import SvgIcon from '@/components/svg-icon';
-import { PageDetailModel } from '@/lib/models';
+import { PageLocationSelect } from './page-location-select';
 
 export const SettingsTab = () => {
 	const handleError = useHandleError();
 	const { page, setPage, setIsSaving } = usePageBuilderContext();
 	const [showEditUrlModal, setShowEditUrlModal] = useState(false);
-	const [formValues, setFormValues] = useState({
-		pageName: '',
-		friendlyUrl: '',
+	const { formValues, changeValues, saveUrl } = usePageSettingsForm({
+		page,
+		onSaved: setPage,
+		onSavingChange: setIsSaving,
+		onError: handleError,
 	});
-
-	useEffect(() => {
-		if (!page) {
-			return;
-		}
-
-		setFormValues({
-			pageName: page.name ?? '',
-			friendlyUrl: page.urlName ?? '',
-		});
-	}, [page]);
-
-	const debouncedSubmission = useDebouncedAsyncFunction(async (p: PageDetailModel, fv: typeof formValues) => {
-		setIsSaving(true);
-
-		try {
-			const response = await pagesService
-				.updatePageSettings(p.pageId, {
-					name: fv.pageName,
-					urlName: fv.friendlyUrl,
-				})
-				.fetch();
-
-			setPage(response.page);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsSaving(false);
-		}
-	});
-
-	const handleInputChange = useCallback(
-		({ currentTarget }: React.ChangeEvent<HTMLInputElement>) => {
-			setFormValues((previousValue) => {
-				const newValue = {
-					...previousValue,
-					[currentTarget.name]: currentTarget.value,
-				};
-
-				if (page) {
-					debouncedSubmission(page, newValue);
-				}
-
-				return newValue;
-			});
-		},
-		[debouncedSubmission, page]
-	);
 
 	return (
 		<>
+			<PageLocationSelect
+				className="mb-4"
+				value={formValues.pageLocationId}
+				description={page?.pageLocationDescription}
+				onChange={(pageLocationId) => changeValues({ pageLocationId })}
+			/>
 			<EditUrlModal
 				show={showEditUrlModal}
+				friendlyUrl={formValues.friendlyUrl}
+				onSaveUrl={saveUrl}
 				onHide={() => {
 					setShowEditUrlModal(false);
 				}}
@@ -83,7 +44,7 @@ export const SettingsTab = () => {
 				label="Page name"
 				name="pageName"
 				value={formValues.pageName}
-				onChange={handleInputChange}
+				onChange={({ currentTarget }) => changeValues({ pageName: currentTarget.value })}
 				required
 			/>
 			<InputHelper

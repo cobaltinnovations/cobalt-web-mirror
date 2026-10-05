@@ -302,7 +302,7 @@ const Index: FC = () => {
 					{legacyFeaturedTopicCenter && (
 						<Container className="pt-4 pt-lg-8">
 							<CallToActionBlock
-								subheading="Featured Topic"
+								subheading="Monthly Spotlight"
 								heading={legacyFeaturedTopicCenter.featuredTitle!}
 								descriptionHtml={legacyFeaturedTopicCenter.featuredDescription!}
 								imageUrl={legacyFeaturedTopicCenter.imageUrl!}
@@ -339,6 +339,7 @@ const Index: FC = () => {
 										key={featuredTopic.pageId}
 										className={classNames({ 'mb-4': !isLast })}
 										variant={featuredTopicIndex === 0 ? undefined : 'light'}
+										subheading="Monthly Spotlight"
 										heading={featuredTopic.headline}
 										descriptionHtml={featuredTopic.description}
 										imageUrl={featuredTopic.imageUrl}

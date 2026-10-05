@@ -1,12 +1,13 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Modal, Button, ModalProps, Form } from 'react-bootstrap';
 import useDebouncedState from '@/hooks/use-debounced-state';
-import { PAGE_STATUS_ID, PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
+import { PAGE_LOCATION_ID, PAGE_STATUS_ID, PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import useHandleError from '@/hooks/use-handle-error';
 import { pagesService } from '@/lib/services';
 import SvgIcon from '@/components/svg-icon';
+import { PageLocationSelect } from './page-location-select';
 
 const useStyles = createUseThemedStyles((_theme) => ({
 	modal: {
@@ -22,6 +23,7 @@ interface AddPageModalProps extends ModalProps {
 const initialFormValues = {
 	pageName: '',
 	friendlyUrl: '',
+	pageLocationId: PAGE_LOCATION_ID.UNCATEGORIZED,
 };
 
 export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props }) => {
@@ -38,6 +40,8 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 
 	const handleOnEnter = () => {
 		setFormValues(initialFormValues);
+		setUrlNameSetByUser(false);
+		setUrlNameValidation(undefined);
 	};
 
 	const handleOnEntered = () => {
@@ -45,37 +49,59 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 	};
 
 	useEffect(() => {
-		if (!debouncedPageNameQuery || urlNameSetByUser) {
+		if (
+			!props.show ||
+			!debouncedPageNameQuery ||
+			debouncedPageNameQuery !== formValues.pageName ||
+			urlNameSetByUser
+		) {
 			return;
 		}
 
-		pagesService
-			.validatePageUrl({
-				searchQuery: debouncedPageNameQuery,
-			})
+		const request = pagesService.validatePageUrl({
+			searchQuery: debouncedPageNameQuery,
+		});
+		let active = true;
+		request
 			.fetch()
 			.then((response) => {
+				if (!active) return;
 				setFormValues((previousValues) => ({
 					...previousValues,
 					friendlyUrl: response.pageUrlNameValidationResult.recommendation,
 				}));
+			})
+			.catch((error) => {
+				if (active) handleError(error);
 			});
-	}, [debouncedPageNameQuery, page, urlNameSetByUser]);
+		return () => {
+			active = false;
+			request.abort();
+		};
+	}, [debouncedPageNameQuery, formValues.pageName, props.show, urlNameSetByUser, handleError]);
 
 	useEffect(() => {
-		if (!debouncedFriendlyUrlQuery) {
+		if (!props.show || !debouncedFriendlyUrlQuery || debouncedFriendlyUrlQuery !== formValues.friendlyUrl) {
 			return;
 		}
 
-		pagesService
-			.validatePageUrl({
-				searchQuery: debouncedFriendlyUrlQuery,
-			})
+		const request = pagesService.validatePageUrl({
+			searchQuery: debouncedFriendlyUrlQuery,
+		});
+		let active = true;
+		request
 			.fetch()
 			.then((response) => {
-				setUrlNameValidation(response.pageUrlNameValidationResult);
+				if (active) setUrlNameValidation(response.pageUrlNameValidationResult);
+			})
+			.catch((error) => {
+				if (active) handleError(error);
 			});
-	}, [debouncedFriendlyUrlQuery, page]);
+		return () => {
+			active = false;
+			request.abort();
+		};
+	}, [debouncedFriendlyUrlQuery, formValues.friendlyUrl, props.show, handleError]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -95,6 +121,7 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 							name: formValues.pageName,
 							urlName: formValues.friendlyUrl,
 							pageStatusId: PAGE_STATUS_ID.DRAFT,
+							pageLocationId: formValues.pageLocationId,
 						})
 						.fetch();
 
@@ -168,8 +195,8 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 							}}
 							required
 						/>
-						{!formValues.pageName || urlNameValidation?.available === false ? null : (
-							<div className="d-flex align-items-center">
+						{urlNameValidation?.available === false ? null : (
+							<div className="mb-4 d-flex align-items-center">
 								<SvgIcon
 									kit="fas"
 									icon="circle-info"
@@ -181,6 +208,15 @@ export const AddPageModal: FC<AddPageModalProps> = ({ page, onContinue, ...props
 									<span className="fw-bold">{formValues.friendlyUrl}</span>
 								</p>
 							</div>
+						)}
+						{!page && (
+							<PageLocationSelect
+								value={formValues.pageLocationId}
+								enabled={!!props.show}
+								onChange={(pageLocationId) =>
+									setFormValues((previous) => ({ ...previous, pageLocationId }))
+								}
+							/>
 						)}
 					</Modal.Body>
 					<Modal.Footer>

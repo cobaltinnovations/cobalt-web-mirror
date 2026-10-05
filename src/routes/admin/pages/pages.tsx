@@ -19,7 +19,7 @@ import NoData from '@/components/no-data';
 import ConfirmDialog from '@/components/confirm-dialog';
 import InputHelperSearch from '@/components/input-helper-search';
 import SvgIcon from '@/components/svg-icon';
-import { buildBackendDownloadUrl } from '@/lib/utils';
+import { getSubscriberEmailAddresses } from '@/lib/utils/page-admin-utils';
 
 const PAGE_TABLE_DATE_FORMAT = 'MMM DD, YYYY';
 const PAGE_TABLE_DATE_INPUT_FORMATS = [
@@ -187,18 +187,12 @@ export const Component = () => {
 			const response = await pagesService.getPageRowMailingListsForPageById(page.pageId).fetch();
 			const pageRowMailingLists: PageRowMailingListModel[] = response.pageRowMailingLists ?? [];
 
-			// Pick out only email addresses across all subscribe rows for now.
-			// Revisit later when UI supports more types (e.g. phone number) and/or multiple subscribe rows
-			const emailValues = pageRowMailingLists.flatMap((list) =>
-				(list.mailingListEntries ?? [])
-					.filter((entry) => entry.mailingListEntryTypeId === 'EMAIL_ADDRESS')
-					.map((entry) => entry.value)
-			);
+			const emailValues = getSubscriberEmailAddresses(pageRowMailingLists);
 
 			copyTextToClipboard(emailValues.join(', '), {
 				successTitle: 'Email addresses copied to clipboard',
 				successDescription:
-					'The subscribed email addresses were to your clipboard. Paste them into the "BCC" field of your email client.',
+					'The subscribed email addresses were copied to your clipboard. Paste them into the "BCC" field of your email client.',
 				errorTitle: 'Failed to copy email addresses',
 				errorDesctiption: 'Please try again.',
 			});
@@ -208,9 +202,7 @@ export const Component = () => {
 	};
 
 	const handleMailingListDownload = async (page: PageDetailModel) => {
-		window.location.href = buildBackendDownloadUrl('/page-row-mailing-lists/csv', {
-			pageId: page.pageId,
-		});
+		window.location.href = pagesService.getSubscriberEmailDownloadUrl(page.pageId);
 	};
 
 	return (
@@ -249,6 +241,7 @@ export const Component = () => {
 				detailText={<p className="mt-2 mb-0">This action is permanent.</p>}
 				dismissText="Cancel"
 				confirmText="Delete"
+				isConfirming={isLoading}
 				destructive
 				onHide={() => {
 					setSelectedPage(undefined);
@@ -267,6 +260,7 @@ export const Component = () => {
 				}
 				dismissText="Cancel"
 				confirmText="Unpublish"
+				isConfirming={isLoading}
 				destructive
 				onHide={() => {
 					setSelectedPage(undefined);
@@ -321,6 +315,9 @@ export const Component = () => {
 										Name
 									</TableCell>
 									<TableCell header>Status</TableCell>
+									<TableCell header minWidth="160px">
+										Location
+									</TableCell>
 									<TableCell header minWidth="max-content">
 										Created
 									</TableCell>
@@ -339,7 +336,7 @@ export const Component = () => {
 							<TableBody>
 								{pages.length <= 0 && (
 									<TableRow>
-										<TableCell colSpan={6}>
+										<TableCell colSpan={8}>
 											<NoData title="No pages" actions={[]} />
 										</TableCell>
 									</TableRow>
@@ -363,15 +360,23 @@ export const Component = () => {
 												<div>
 													{page.pageStatusId === PAGE_STATUS_ID.DRAFT && (
 														<Badge pill bg="outline-dark" className="text-nowrap">
-															Draft
+															{page.pageStatusDescription ?? 'Unpublished'}
 														</Badge>
 													)}
 													{page.pageStatusId === PAGE_STATUS_ID.LIVE && (
 														<Badge pill bg="outline-success" className="text-nowrap">
-															Live
+															{page.pageStatusDescription ?? 'Published'}
+														</Badge>
+													)}
+													{page.pageStatusId === PAGE_STATUS_ID.COPY_FOR_EDITING && (
+														<Badge pill bg="outline-dark" className="text-nowrap">
+															{page.pageStatusDescription}
 														</Badge>
 													)}
 												</div>
+											</TableCell>
+											<TableCell className="text-nowrap" minWidth="160px">
+												{page.pageLocationDescription ?? 'Uncategorized'}
 											</TableCell>
 											<TableCell className="text-nowrap" minWidth="max-content">
 												{formatPageTableDate(page.created, page.createdDescription)}

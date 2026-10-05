@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import {
 	AccountSourceId,
 	AlertTypeId,
-	AnalyticsNativeEventClickthroughFeatureSource,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
@@ -36,6 +35,7 @@ import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
 import { buildQueryParamUrl, canAccessProviderScheduling, getGeneralNavigationFeatures } from '@/lib/utils';
 import SvgIcon from './svg-icon';
+import { getFeatureNavigationLink, getGeneralNavigationGroups } from '@/lib/utils/general-navigation-utils';
 
 export const HEADER_HEIGHT = 60;
 
@@ -304,23 +304,35 @@ const AdditionalNavigationItemIconOrImage = ({
 
 const MobileAccordianItem = ({
 	toggleElement,
+	titleTo,
+	title,
 	className,
 	children,
-}: PropsWithChildren<{ toggleElement: JSX.Element; className?: string }>) => {
+}: PropsWithChildren<{ toggleElement: JSX.Element; titleTo?: To; title?: string; className?: string }>) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
 		<>
-			<Button
-				variant="light"
-				className="d-flex justify-content-between align-items-center"
-				onClick={() => {
-					setIsExpanded(!isExpanded);
-				}}
-			>
-				{toggleElement}
-				<SvgIcon kit="far" icon="chevron-down" size={16} className="text-n300" />
-			</Button>
+			<div className={titleTo ? 'd-flex align-items-center' : undefined}>
+				{titleTo && (
+					<Link to={titleTo} className="flex-grow-1">
+						{toggleElement}
+					</Link>
+				)}
+				<Button
+					variant="light"
+					className="d-flex justify-content-between align-items-center"
+					style={titleTo ? { width: 'auto' } : undefined}
+					aria-label={titleTo ? `Show ${title} links` : undefined}
+					aria-expanded={isExpanded}
+					onClick={() => {
+						setIsExpanded(!isExpanded);
+					}}
+				>
+					{!titleTo && toggleElement}
+					<SvgIcon kit="far" icon="chevron-down" size={16} className="text-n300" />
+				</Button>
+			</div>
 			<Collapse in={isExpanded}>
 				<div>
 					<div className={classNames('collapse-inner', className)}>{children}</div>
@@ -437,6 +449,7 @@ const HeaderV2 = () => {
 		title: string;
 		subtitle?: string;
 		to?: To;
+		onClick?(): void;
 		active: PathMatch<string> | boolean | null;
 		items?: {
 			testId?: string;
@@ -449,71 +462,76 @@ const HeaderV2 = () => {
 		}[];
 	}[] = useMemo(() => {
 		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
-		const showCommunityLinks = institution?.additionalNavigationItems.length > 0;
+		const groups = getGeneralNavigationGroups({
+			features: generalNavigationFeatures,
+			additionalNavigationItems: institution.additionalNavigationItems,
+		});
+		const showCommunityLinks = groups.communities.length > 0;
 
 		return [
-			{
-				testId: 'menuLinkHome',
-				navigationItemId: 'HOME',
-				title: 'Home',
-				to: '/',
-				active: matchPath('/', pathname),
-			},
 			...(institution?.featuresEnabled
 				? [
 						{
 							navigationItemId: 'CONNECT_WITH_SUPPORT',
-							title: 'Connect with Support',
-							active: generalNavigationFeatures
-								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
-								.filter((feature) => feature.navVisible)
+							title: 'Appointments',
+							active: groups.appointments
 								.map(({ urlName }) => urlName)
 								.some((urlName) => matchPath(urlName + '/*', pathname)),
-							items: generalNavigationFeatures
-								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
-								.filter((feature) => feature.navVisible)
-								.map(({ featureId, name, navDescription, urlName }) => ({
-									navigationItemId: featureId,
-									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
-									title: name,
-									description: navDescription,
-									to:
-										featureIdsWithLocationFilter.includes(featureId) &&
-										account?.institutionLocationId
-											? buildQueryParamUrl(urlName, {
-													institutionLocationId: account.institutionLocationId,
-											  })
-											: urlName,
-									onClick: () => {
-										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {
-											featureId: featureId,
-											source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
-										});
-									},
-								})),
+							items: groups.appointments.map(({ featureId, name, navDescription, urlName }) => ({
+								navigationItemId: featureId,
+								icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
+								title: name,
+								description: navDescription,
+								to:
+									featureIdsWithLocationFilter.includes(featureId) && account?.institutionLocationId
+										? buildQueryParamUrl(urlName, {
+												institutionLocationId: account.institutionLocationId,
+										  })
+										: urlName,
+								onClick: getFeatureNavigationLink({ featureId, urlName }).onClick,
+							})),
+						},
+				  ]
+				: []),
+			...(groups.groupSessions
+				? [
+						{
+							navigationItemId: 'GROUP_SESSIONS',
+							title: 'Group Sessions',
+							...getFeatureNavigationLink(groups.groupSessions),
+							active: matchPath(groups.groupSessions.urlName + '/*', pathname),
 						},
 				  ]
 				: []),
 			{
 				navigationItemId: 'BROWSE_RESOURCES',
-				title: 'Browse Resources',
+				title: 'Self-Help Resources',
 				subtitle: 'Resources',
 				active: [
-					...generalNavigationFeatures
-						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
-						.map(({ urlName }) => urlName),
+					'/featured-topics',
+					...groups.resources.map(({ urlName }) => urlName),
 					...exploreLinks.map(({ to }) => to()),
 				].some((to) => matchPath(to + '/*', pathname)),
 				items: [
-					...generalNavigationFeatures
-						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
-						.map(({ featureId, name, navDescription, urlName }) => ({
-							navigationItemId: featureId,
-							icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
-							title: name,
-							description: navDescription,
-							to: urlName,
-						})),
+					...groups.resources.map(({ featureId, name, navDescription, urlName }) => ({
+						navigationItemId: featureId,
+						icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
+						title: name,
+						description: navDescription,
+						to: urlName,
+					})),
+					{
+						navigationItemId: 'FEATURED_TOPICS_DIRECTORY',
+						title: 'Featured Topics',
+						to: '/featured-topics',
+						icon: (
+							<PathwaysIcon
+								featureId={FeatureId.SELF_HELP_RESOURCES}
+								svgProps={{ width: 24, height: 24 }}
+							/>
+						),
+						description: '',
+					},
 					...exploreLinks.map(({ testId, icon, label, to }) => ({
 						testId,
 						icon,
@@ -528,10 +546,11 @@ const HeaderV2 = () => {
 						{
 							navigationItemId: 'COMMUNITY',
 							title: 'Community',
-							active: (institution?.additionalNavigationItems ?? []).some(({ url }) =>
-								matchPath(url + '/*', pathname)
-							),
-							items: (institution?.additionalNavigationItems ?? []).map(
+							to: '/communities',
+							active:
+								!!matchPath('/communities/*', pathname) ||
+								groups.communities.some(({ url }) => matchPath(url + '/*', pathname)),
+							items: groups.communities.map(
 								({ iconName, imageUrl, name, url, topicCenterId, pageId }, index) => ({
 									testId: `menuLink-additionalItem${index}`,
 									icon: (
@@ -568,7 +587,14 @@ const HeaderV2 = () => {
 							),
 						},
 				  ]
-				: []),
+				: [
+						{
+							navigationItemId: 'COMMUNITY',
+							title: 'Community',
+							to: '/communities',
+							active: matchPath('/communities/*', pathname),
+						},
+				  ]),
 		];
 	}, [
 		institution?.additionalNavigationItems,
@@ -667,7 +693,7 @@ const HeaderV2 = () => {
 			return legacyFeaturedTopicCenter
 				? {
 						isLegacy: true,
-						subtitle: 'Featured Topic',
+						subtitle: 'Monthly Spotlight',
 						name: legacyFeaturedTopicCenter.featuredTitle!,
 						imageAlt: legacyFeaturedTopicCenter.name!,
 						imageUrl: legacyFeaturedTopicCenter.imageUrl!,
@@ -682,7 +708,7 @@ const HeaderV2 = () => {
 		return featuredTopicCenter
 			? {
 					isLegacy: false,
-					subtitle: 'Featured Topic',
+					subtitle: 'Monthly Spotlight',
 					name: featuredTopicCenter.headline,
 					imageAlt: featuredTopicCenter.imageAltText ?? '',
 					imageUrl: featuredTopicCenter.imageUrl,
@@ -718,9 +744,15 @@ const HeaderV2 = () => {
 
 							return (
 								<li key={navigationItem.navigationItemId}>
-									{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
+									{navigationItem.to && !navigationItem.items && (
+										<Link to={navigationItem.to} onClick={navigationItem.onClick}>
+											{navigationItem.title}
+										</Link>
+									)}
 									{navigationItem.items && (
 										<MobileAccordianItem
+											titleTo={navigationItem.to}
+											title={navigationItem.title}
 											className={classNames({
 												'pt-2': !navigationItem.subtitle,
 												'pb-2': !showFeaturedItem,
@@ -899,10 +931,11 @@ const HeaderV2 = () => {
 												active: navigationItem.active,
 											})}
 										>
-											{navigationItem.to && (
+											{navigationItem.to && !navigationItem.items && (
 												<Link
 													to={navigationItem.to}
 													onClick={() => {
+														navigationItem.onClick?.();
 														trackEvent({
 															action: 'Top Nav',
 															link_text: navigationItem.title,
@@ -914,6 +947,13 @@ const HeaderV2 = () => {
 											)}
 											{navigationItem.items && (
 												<HeaderNavDropdown
+													titleTo={navigationItem.to}
+													onTitleClick={() =>
+														trackEvent({
+															action: 'Top Nav',
+															link_text: navigationItem.title,
+														})
+													}
 													onToggle={(nextShow) => {
 														if (nextShow) {
 															trackEvent({

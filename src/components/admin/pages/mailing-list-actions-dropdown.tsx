@@ -18,7 +18,8 @@ export const MailingListActionsDropdown = ({ page, onCopy, onDownload }: Mailing
 				as={DropdownToggle}
 				variant="transparent-secondary"
 				size="sm"
-				id={`dropdown--${page.pageId}`}
+				id={`subscriber-actions--${page.pageId}`}
+				aria-label={`Subscriber email actions for ${page.name}`}
 				className="p-2"
 			>
 				<SvgIcon kit="far" icon="envelope" size={20} className="d-flex" />
