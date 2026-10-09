@@ -473,6 +473,9 @@ export const Component = () => {
 															courseUnit={courseUnit}
 															screeningModalFlowId={courseFeedbackScreeningFlowId}
 															screeningModalOpenRequestId={screeningModalOpenRequestId}
+															hideSkipWhenMultiSelectAnswered={isKeepLearningUnit(
+																courseUnit
+															)}
 															autoOpenScreeningModal={
 																!courseUnitCompleted &&
 																isKeepLearningUnit(courseUnit) &&

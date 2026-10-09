@@ -132,6 +132,7 @@ interface CourseUnitAvailableProps {
 	screeningModalFlowId?: string;
 	autoOpenScreeningModal?: boolean;
 	screeningModalOpenRequestId?: number;
+	hideSkipWhenMultiSelectAnswered?: boolean;
 	hideInlineScreening?: boolean;
 }
 
@@ -150,6 +151,7 @@ export const CourseUnitAvailable = ({
 	screeningModalFlowId,
 	autoOpenScreeningModal = false,
 	screeningModalOpenRequestId = 0,
+	hideSkipWhenMultiSelectAnswered = false,
 	hideInlineScreening = false,
 }: CourseUnitAvailableProps) => {
 	const classes = useStyles();
@@ -304,6 +306,7 @@ export const CourseUnitAvailable = ({
 								screeningFlowParams={screeningModalFlowParams}
 								onScreeningFlowComplete={handleScreeningModalComplete}
 								onScreeningNameChange={handleScreeningNameChange}
+								hideSkipWhenMultiSelectAnswered={hideSkipWhenMultiSelectAnswered}
 							/>
 						)}
 					</Modal.Body>

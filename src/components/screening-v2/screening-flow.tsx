@@ -10,6 +10,7 @@ interface ScreeningProps {
 	onScreeningFlowComplete(screeningSessionDestination?: ScreeningSessionDestination): void;
 	onScreeningNameChange?(screeningName: string): void;
 	cardSortOnly?: boolean;
+	hideSkipWhenMultiSelectAnswered?: boolean;
 }
 
 export const ScreeningFlow = ({
@@ -17,6 +18,7 @@ export const ScreeningFlow = ({
 	onScreeningFlowComplete,
 	onScreeningNameChange,
 	cardSortOnly,
+	hideSkipWhenMultiSelectAnswered,
 }: ScreeningProps) => {
 	useScreeningV2Styles();
 	const [initialScreeningQuestionContextId, setInitialScreeningQuestionContextId] = useState('');
@@ -48,6 +50,7 @@ export const ScreeningFlow = ({
 							initialScreeningQuestionContextId={initialScreeningQuestionContextId}
 							onScreeningFlowComplete={onScreeningFlowComplete}
 							onScreeningNameChange={onScreeningNameChange}
+							hideSkipWhenMultiSelectAnswered={hideSkipWhenMultiSelectAnswered}
 						/>
 					)}
 				</>
