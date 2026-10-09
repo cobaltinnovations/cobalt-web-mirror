@@ -12,6 +12,7 @@ import {
 	SortDirectionId,
 } from '@/lib/models';
 import { PatientOrdersListResponse, analyticsService, integratedCareService } from '@/lib/services';
+import { CobaltError } from '@/lib/http-client';
 import {
 	MhicCustomizeTableModal,
 	MhicPageHeader,
@@ -244,7 +245,12 @@ function loadMyPatients(
 	const accessToken = Cookies.get('accessToken');
 
 	if (!accessToken) {
-		throw new Error('Not authenticated');
+		throw CobaltError.fromApiError({
+			code: 'AUTHENTICATION_REQUIRED',
+			message: 'Please sign in.',
+			stackTrace: '',
+			accessTokenStatus: 'FULLY_EXPIRED',
+		});
 	}
 
 	const { accountId } = decodeAccessToken(accessToken);

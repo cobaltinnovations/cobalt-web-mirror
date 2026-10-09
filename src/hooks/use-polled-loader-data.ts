@@ -1,9 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigation } from 'react-router-dom';
+import { CobaltError } from '@/lib/http-client';
 import useFlags from './use-flags';
+import useHandleError from './use-handle-error';
 
 interface LoaderDataWithResponseChecksum {
 	getResponseChecksum: () => Promise<string | undefined>;
+}
+
+async function getLoaderDataChecksum(data: LoaderDataWithResponseChecksum) {
+	// Polling data has not reached <Await> yet. Observe every deferred promise so
+	// a rejected request cannot leave its derived data promises unhandled.
+	const [checksum] = await Promise.all([
+		data.getResponseChecksum(),
+		Promise.all(Object.values(data).filter((value) => value instanceof Promise)),
+	]);
+	return checksum;
 }
 
 export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
@@ -20,11 +32,15 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 	enabled?: boolean;
 }) {
 	const { addFlag } = useFlags();
+	const handleError = useHandleError();
 	const { state } = useNavigation();
 	const loaderData = useLoaderHook();
+	const mounted = useRef(false);
+	const pollInFlight = useRef(false);
 
 	const isLoading = state === 'loading';
 	const [isPolling, setIsPolling] = useState(false);
+	const [authenticationRequired, setAuthenticationRequired] = useState(false);
 	const [usingPolled, setUsingPolled] = useState(false);
 	const [polledData, setPolledData] = useState(loaderData);
 	const [immediateNext, setImmediateNext] = useState(false);
@@ -33,18 +49,40 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 
 	const hasUpdates = !!polledChecksum && uiChecksum !== polledChecksum;
 
-	const pollLoader = useCallback(() => {
-		setIsPolling(true);
-		const result = pollingFn();
+	useEffect(() => {
+		mounted.current = true;
+		return () => {
+			mounted.current = false;
+		};
+	}, []);
 
-		result.getResponseChecksum().then((checksum) => {
-			setIsPolling(false);
+	const pollLoader = useCallback(async () => {
+		if (authenticationRequired || pollInFlight.current) return;
+
+		pollInFlight.current = true;
+		setIsPolling(true);
+
+		try {
+			const result = pollingFn();
+			const checksum = await getLoaderDataChecksum(result);
+			if (!mounted.current) return;
+
 			setPolledData(result);
 			setChecksums((curr) => {
 				return [curr[0], checksum ?? ''];
 			});
-		});
-	}, [pollingFn]);
+		} catch (error) {
+			if (!mounted.current) return;
+
+			if (error instanceof CobaltError && error.apiError?.code === 'AUTHENTICATION_REQUIRED') {
+				setAuthenticationRequired(true);
+			}
+			handleError(error);
+		} finally {
+			pollInFlight.current = false;
+			if (mounted.current) setIsPolling(false);
+		}
+	}, [authenticationRequired, handleError, pollingFn]);
 
 	const swapData = useCallback(() => {
 		setUsingPolled(true);
@@ -54,16 +92,29 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 	}, []);
 
 	useEffect(() => {
+		let canceled = false;
 		setUsingPolled(false);
 
-		loaderData.getResponseChecksum().then((checksum) => {
-			setPolledData(loaderData);
-			setChecksums([checksum ?? '', checksum ?? '']);
-		});
+		getLoaderDataChecksum(loaderData)
+			.then((checksum) => {
+				if (canceled) return;
+				setPolledData(loaderData);
+				setChecksums([checksum ?? '', checksum ?? '']);
+			})
+			.catch(() => {
+				// The route handles initial-load failures through <Await>. This
+				// checksum observer must not create another unhandled rejection.
+			});
+
+		return () => {
+			canceled = true;
+		};
 	}, [loaderData]);
 
 	// start/stop intervals-- or update immediately
 	useEffect(() => {
+		if (authenticationRequired) return;
+
 		if (!enabled) {
 			setImmediateNext(true);
 			return;
@@ -81,7 +132,7 @@ export function usePolledLoaderData<T extends LoaderDataWithResponseChecksum>({
 		}, intervalSeconds * 1000);
 
 		return () => clearInterval(intervalId);
-	}, [enabled, immediateNext, intervalSeconds, pollLoader]);
+	}, [authenticationRequired, enabled, immediateNext, intervalSeconds, pollLoader]);
 
 	// update data immediately if configured, or display flag
 	useEffect(() => {
