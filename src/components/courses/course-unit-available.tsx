@@ -439,7 +439,7 @@ export const CourseUnitAvailable = ({
 				{screeningModalFlowId && (
 					<Button
 						type="button"
-						variant="success"
+						variant="primary"
 						className="d-flex align-items-center text-decoration-none rounded-pill px-4"
 						onClick={() => setIsScreeningModalOpen(true)}
 					>
