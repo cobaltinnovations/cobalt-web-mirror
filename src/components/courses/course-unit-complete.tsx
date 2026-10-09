@@ -49,7 +49,9 @@ export const CourseUnitComplete = ({
 					onClick={onNextButtonClick}
 				>
 					{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL ? 'Go to course home' : 'Next'}
-					<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
+					{courseUnit.courseUnitTypeId !== CourseUnitTypeId.FINAL && (
+						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
+					)}
 				</Button>
 			</div>
 		</>

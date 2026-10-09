@@ -440,7 +440,7 @@ export const CourseUnitAvailable = ({
 					<Button
 						type="button"
 						variant="primary"
-						className="d-flex align-items-center text-decoration-none rounded-pill px-4"
+						className="me-1 d-flex align-items-center text-decoration-none pe-3 cobalt-button cobalt-button-outline-primary"
 						onClick={() => setIsScreeningModalOpen(true)}
 					>
 						Leave Course Feedback
@@ -454,7 +454,9 @@ export const CourseUnitAvailable = ({
 						onClick={onNextButtonClick}
 					>
 						{courseUnit.courseUnitTypeId === CourseUnitTypeId.FINAL ? 'Go to course home' : 'Next'}
-						<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
+						{courseUnit.courseUnitTypeId !== CourseUnitTypeId.FINAL && (
+							<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-1" />
+						)}
 					</Button>
 				) : (
 					<Button
