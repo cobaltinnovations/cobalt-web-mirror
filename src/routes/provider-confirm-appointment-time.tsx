@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -16,6 +16,8 @@ import {
 	isProviderAppointmentModalityId,
 } from '@/components/provider-appointment-modality-summary';
 import {
+	AnalyticsNativeEventProviderAppointmentSelectionPresentationId,
+	AnalyticsNativeEventTypeId,
 	AppointmentBookingRequirementsDestinationId,
 	Clinic,
 	InstitutionLocation,
@@ -25,6 +27,7 @@ import {
 } from '@/lib/models';
 import {
 	appointmentService,
+	analyticsService,
 	AvailabilityModel,
 	clinicService,
 	institutionService,
@@ -33,6 +36,9 @@ import {
 import AsyncWrapper from '@/components/async-page';
 import {
 	PROVIDER_ID_TO_SCHEDULE_SEARCH_PARAM,
+	getProviderBookingScreeningSearchParams,
+	getProviderBookingAnalyticsDataFromSearchParams,
+	getProviderBookingReturnUrlFromSearchParams,
 	parseProviderAppointmentDateTime,
 	setProviderIdToScheduleSearchParam,
 	shouldFetchInstitutionLocation,
@@ -166,14 +172,15 @@ export const Component = () => {
 	const { institution } = useAccount();
 	const navigate = useNavigate();
 	const handleError = useHandleError();
-	const { navigateToNext } = useScreeningNavigation();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isCheckingBookingRequirements, setIsCheckingBookingRequirements] = useState(false);
+	const didPersistAppointmentSelectionViewedRef = useRef(false);
 
 	const providerId = useMemo(() => searchParams.get('providerId') ?? '', [searchParams]);
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
+	const screeningSessionId = useMemo(() => searchParams.get('screeningSessionId') ?? '', [searchParams]);
 	const appointmentSelectionTypeId = useMemo(() => {
 		const value = searchParams.get('appointmentSelectionTypeId');
 		return isProviderAppointmentSelectionTypeId(value) ? value : undefined;
@@ -184,6 +191,11 @@ export const Component = () => {
 	);
 
 	const searchString = searchParams.toString();
+	const screeningQuestionSearch = useMemo(
+		() => getProviderBookingScreeningSearchParams(new URLSearchParams(searchString)),
+		[searchString]
+	);
+	const { navigateToNext } = useScreeningNavigation({ screeningQuestionSearch });
 	const appointmentDateTimePickerConfig = useMemo(() => {
 		const params = new URLSearchParams();
 
@@ -245,6 +257,18 @@ export const Component = () => {
 	const [provider, setProvider] = useState<Provider>();
 	const [clinic, setClinic] = useState<Clinic>();
 	const [institutionLocation, setInstitutionLocation] = useState<InstitutionLocation>();
+
+	useEffect(() => {
+		if (!appointmentDateTimePickerConfig || didPersistAppointmentSelectionViewedRef.current) {
+			return;
+		}
+
+		didPersistAppointmentSelectionViewedRef.current = true;
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTION_VIEWED, {
+			...getProviderBookingAnalyticsDataFromSearchParams(new URLSearchParams(searchString)),
+			presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.PAGE,
+		});
+	}, [appointmentDateTimePickerConfig, searchString]);
 
 	const fetchData = useCallback(async (): Promise<AppointmentAvailabilityData> => {
 		const institutionLocationRequest = shouldFetchInstitutionLocation(institutionLocationId)
@@ -362,80 +386,91 @@ export const Component = () => {
 		[syncAppointmentDateTimePickerValueToSearchParams]
 	);
 
-	const handleContinue = useCallback(async () => {
-		const selectedProviderId = selectedAppointmentDateTimePickerValue.providerId;
-		const selectedAppointmentTypeId = selectedAppointmentDateTimePickerValue.appointmentTypeId;
+	const handleContinue = useCallback(
+		async (appointmentDateTimePickerValue: AppointmentDateTimePickerValue) => {
+			const selectedProviderId = appointmentDateTimePickerValue.providerId;
+			const selectedAppointmentTypeId = appointmentDateTimePickerValue.appointmentTypeId;
 
-		if (!selectedProviderId || !selectedAppointmentTypeId || isCheckingBookingRequirements) {
-			return;
-		}
-
-		setIsCheckingBookingRequirements(true);
-
-		try {
-			const response = await appointmentService
-				.getAppointmentBookingRequirements({
-					providerId: selectedProviderId,
-					appointmentTypeId: selectedAppointmentTypeId,
-					...(appointmentSelectionTypeId && { appointmentSelectionTypeId }),
-					...(selectedAppointmentDateTimePickerValue.appointmentModalityId && {
-						appointmentModalityId: selectedAppointmentDateTimePickerValue.appointmentModalityId,
-					}),
-					date: selectedAppointmentDateTimePickerValue.dateTime.format('YYYY-MM-DD'),
-					time: selectedAppointmentDateTimePickerValue.dateTime.format('HH:mm:ss'),
-					...(selectedAppointmentDateTimePickerValue.epicDepartmentId && {
-						epicDepartmentId: selectedAppointmentDateTimePickerValue.epicDepartmentId,
-					}),
-					...(selectedAppointmentDateTimePickerValue.epicAppointmentFhirId && {
-						epicAppointmentFhirId: selectedAppointmentDateTimePickerValue.epicAppointmentFhirId,
-					}),
-				})
-				.fetch();
-			const bookingRequirements = response.appointmentBookingRequirements;
-
-			if (
-				bookingRequirements.appointmentBookingRequirementsDestinationId ===
-				AppointmentBookingRequirementsDestinationId.SCREENING_SESSION
-			) {
-				if (!bookingRequirements.screeningSession) {
-					throw new Error('Screening session is required but was not returned.');
-				}
-
-				navigateToNext(bookingRequirements.screeningSession);
+			if (!selectedProviderId || !selectedAppointmentTypeId || isCheckingBookingRequirements) {
 				return;
 			}
 
-			if (
-				bookingRequirements.appointmentBookingRequirementsDestinationId !==
-				AppointmentBookingRequirementsDestinationId.APPOINTMENT_BOOKING
-			) {
-				throw new Error('Unknown appointment booking destination.');
-			}
+			setIsCheckingBookingRequirements(true);
+			analyticsService.persistEvent(AnalyticsNativeEventTypeId.EVENT_PROVIDER_APPOINTMENT_SELECTED, {
+				...getProviderBookingAnalyticsDataFromSearchParams(new URLSearchParams(searchString)),
+				providerIdToSchedule: selectedProviderId,
+				appointmentTypeId: selectedAppointmentTypeId,
+				appointmentModalityId: appointmentDateTimePickerValue.appointmentModalityId,
+				presentation: AnalyticsNativeEventProviderAppointmentSelectionPresentationId.PAGE,
+			});
 
-			navigate(
-				buildProviderBookAppointmentUrl({
-					currentSearchString: searchString,
-					providerId,
-					providerSearchResultTypeId,
-					value: selectedAppointmentDateTimePickerValue,
-				})
-			);
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setIsCheckingBookingRequirements(false);
-		}
-	}, [
-		appointmentSelectionTypeId,
-		handleError,
-		isCheckingBookingRequirements,
-		navigate,
-		navigateToNext,
-		providerId,
-		providerSearchResultTypeId,
-		searchString,
-		selectedAppointmentDateTimePickerValue,
-	]);
+			try {
+				const response = await appointmentService
+					.getAppointmentBookingRequirements({
+						providerId: selectedProviderId,
+						appointmentTypeId: selectedAppointmentTypeId,
+						...(screeningSessionId && { screeningSessionId }),
+						...(appointmentSelectionTypeId && { appointmentSelectionTypeId }),
+						...(appointmentDateTimePickerValue.appointmentModalityId && {
+							appointmentModalityId: appointmentDateTimePickerValue.appointmentModalityId,
+						}),
+						date: appointmentDateTimePickerValue.dateTime.format('YYYY-MM-DD'),
+						time: appointmentDateTimePickerValue.dateTime.format('HH:mm:ss'),
+						...(appointmentDateTimePickerValue.epicDepartmentId && {
+							epicDepartmentId: appointmentDateTimePickerValue.epicDepartmentId,
+						}),
+						...(appointmentDateTimePickerValue.epicAppointmentFhirId && {
+							epicAppointmentFhirId: appointmentDateTimePickerValue.epicAppointmentFhirId,
+						}),
+					})
+					.fetch();
+				const bookingRequirements = response.appointmentBookingRequirements;
+
+				if (
+					bookingRequirements.appointmentBookingRequirementsDestinationId ===
+					AppointmentBookingRequirementsDestinationId.SCREENING_SESSION
+				) {
+					if (!bookingRequirements.screeningSession) {
+						throw new Error('Screening session is required but was not returned.');
+					}
+
+					navigateToNext(bookingRequirements.screeningSession);
+					return;
+				}
+
+				if (
+					bookingRequirements.appointmentBookingRequirementsDestinationId !==
+					AppointmentBookingRequirementsDestinationId.APPOINTMENT_BOOKING
+				) {
+					throw new Error('Unknown appointment booking destination.');
+				}
+
+				navigate(
+					buildProviderBookAppointmentUrl({
+						currentSearchString: searchString,
+						providerId,
+						providerSearchResultTypeId,
+						value: appointmentDateTimePickerValue,
+					})
+				);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setIsCheckingBookingRequirements(false);
+			}
+		},
+		[
+			appointmentSelectionTypeId,
+			handleError,
+			isCheckingBookingRequirements,
+			navigate,
+			navigateToNext,
+			providerId,
+			providerSearchResultTypeId,
+			searchString,
+			screeningSessionId,
+		]
+	);
 
 	useEffect(() => {
 		setSelectedAppointmentDateTimePickerValue(
@@ -457,7 +492,7 @@ export const Component = () => {
 							: 'Appointment Scheduling'
 					}
 					onExit={() => {
-						navigate('/providers');
+						navigate(getProviderBookingReturnUrlFromSearchParams(searchParams));
 					}}
 				/>
 
@@ -475,13 +510,14 @@ export const Component = () => {
 									fetchData={fetchAppointmentAvailabilityData}
 									value={selectedAppointmentDateTimePickerValue}
 									onChange={handleAppointmentDateTimePickerChange}
+									onFirstAvailableAppointmentSelect={handleContinue}
 								/>
 							</div>
 							<div className="text-right">
 								<Button
 									className="d-inline-flex align-items-center"
 									disabled={!canContinue || isCheckingBookingRequirements}
-									onClick={handleContinue}
+									onClick={() => handleContinue(selectedAppointmentDateTimePickerValue)}
 								>
 									Continue
 									<SvgIcon kit="far" icon="chevron-right" size={16} className="ms-2" />

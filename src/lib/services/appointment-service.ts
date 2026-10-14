@@ -19,6 +19,7 @@ export interface CreateAppointmentData {
 	emailAddress?: string;
 	phoneNumber?: string;
 	appointmentTypeId?: string;
+	screeningSessionId?: string;
 	appointmentReasonId?: string;
 	intakeAssessmentId?: string;
 	comment?: string;
@@ -40,6 +41,7 @@ export interface AppointmentBookingRequirementsData {
 	accountId?: string;
 	providerId: string;
 	appointmentTypeId: string;
+	screeningSessionId?: string;
 	appointmentSelectionTypeId?: ProviderAppointmentSelectionTypeId;
 	appointmentModalityId?: string;
 	date: string;

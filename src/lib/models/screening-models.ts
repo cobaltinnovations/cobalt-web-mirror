@@ -75,6 +75,7 @@ export enum ScreeningSessionDestinationId {
 	IC_PATIENT_SCREENING_SESSION_RESULTS = 'IC_PATIENT_SCREENING_SESSION_RESULTS',
 	IC_MHIC_SCREENING_SESSION_RESULTS = 'IC_MHIC_SCREENING_SESSION_RESULTS',
 	IC_PATIENT_CLINICAL_SCREENING = 'IC_PATIENT_CLINICAL_SCREENING',
+	IC_PATIENT_ELIGIBILITY_EXIT = 'IC_PATIENT_ELIGIBILITY_EXIT',
 	HOME = 'HOME',
 	MENTAL_HEALTH_PROVIDER_RECOMMENDATIONS = 'MENTAL_HEALTH_PROVIDER_RECOMMENDATIONS',
 	IC_MHIC_CLINICAL_SCREENING = 'IC_MHIC_CLINICAL_SCREENING',
@@ -140,6 +141,11 @@ export interface ScreeningQuestion {
 	metadata?: {
 		prepopulatedEmailAddress?: string;
 		renderQuestionHtml?: boolean;
+		footerCallout?: {
+			title: string;
+			displayTypeId: 'PRIMARY';
+		};
+		submitButtonText?: string;
 		footerAction?: {
 			label: string;
 			actionType?: 'OPEN_CONTENT_MODAL';

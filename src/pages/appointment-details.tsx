@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
@@ -34,19 +34,32 @@ const AppointmentDetails: FC = () => {
 				<HeroContainer>
 					<h2 className="mb-0 text-center">Appointment</h2>
 				</HeroContainer>
-				{details?.videoconferencePlatformId === VideoconferencePlatformId.TELEPHONE ? (
+					{details && (
 					<Container className="pt-5">
 						<Row>
 							<Col md={{ span: 10, offset: 1 }} lg={{ span: 8, offset: 2 }} xl={{ span: 6, offset: 3 }}>
-								<p className="text-center fs-large mt-5">
-									Your telephone consultation is scheduled for {details.timeDescription}. Your intake
-									counselor will call you at that time.
-								</p>
+								{details.videoconferencePlatformId === VideoconferencePlatformId.TELEPHONE ? (
+									<p className="text-center fs-large mt-5">
+										Your telephone consultation is scheduled for {details.timeDescription}. Your intake
+										counselor will call you at that time.
+									</p>
+								) : (
+									<div className="text-center mt-5">
+										<p className="fs-large">
+											{details.canceled
+												? 'Your appointment was canceled.'
+												: `Your appointment is scheduled for ${details.timeDescription}.`}
+										</p>
+										{details.videoconferenceUrl && !details.canceled && (
+											<Button href={details.videoconferenceUrl} target="_blank" rel="noopener noreferrer">
+												Join Now
+											</Button>
+										)}
+									</div>
+								)}
 							</Col>
 						</Row>
 					</Container>
-				) : (
-					<></>
 				)}
 			</AsyncPage>
 		</>

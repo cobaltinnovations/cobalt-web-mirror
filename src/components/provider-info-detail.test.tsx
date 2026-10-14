@@ -1,10 +1,18 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 
 import { CobaltThemeProvider } from '@/jss/theme';
-import { Provider, ProviderAppointmentModalityId } from '@/lib/models';
-import { providerService } from '@/lib/services';
+import {
+	AnalyticsNativeEventProviderSearchResultActionId,
+	AnalyticsNativeEventProviderSearchResultSourceId,
+	AnalyticsNativeEventTypeId,
+	Clinic,
+	Provider,
+	ProviderAppointmentModalityId,
+	ProviderAppointmentSelectionTypeId,
+} from '@/lib/models';
+import { analyticsService, clinicService, providerService } from '@/lib/services';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import ProviderInfoDetail from './provider-info-detail';
 
@@ -30,9 +38,13 @@ jest.mock('@/hooks/use-handle-error', () => {
 });
 
 jest.mock('@/lib/services', () => ({
+	analyticsService: {
+		persistEvent: jest.fn(),
+	},
 	providerService: {
 		getProviderById: jest.fn(),
 		getProviderAvailability: jest.fn(),
+		getClinicAvailability: jest.fn(),
 	},
 	clinicService: {
 		getClinicByClinicId: jest.fn(),
@@ -49,7 +61,23 @@ const mockGetProviderById = providerService.getProviderById as jest.MockedFuncti
 const mockGetProviderAvailability = providerService.getProviderAvailability as jest.MockedFunction<
 	typeof providerService.getProviderAvailability
 >;
+const mockGetClinicAvailability = providerService.getClinicAvailability as jest.MockedFunction<
+	typeof providerService.getClinicAvailability
+>;
+const mockGetClinicByClinicId = clinicService.getClinicByClinicId as jest.MockedFunction<
+	typeof clinicService.getClinicByClinicId
+>;
 const mockUseScreeningFlow = useScreeningFlow as jest.MockedFunction<typeof useScreeningFlow>;
+
+const LocationProbe = () => {
+	const location = useLocation();
+
+	return <div data-testid="location">{`${location.pathname}${location.search}`}</div>;
+};
+
+beforeEach(() => {
+	jest.clearAllMocks();
+});
 
 it('starts the referrer screening flow and does not fetch provider availability', async () => {
 	const startScreeningFlow = jest.fn();
@@ -82,27 +110,135 @@ it('starts the referrer screening flow and does not fetch provider availability'
 
 	render(
 		<CobaltThemeProvider>
-			<MemoryRouter>
+			<MemoryRouter
+				initialEntries={[
+					'/provider-info/team-clinic-provider-id?featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id',
+				]}
+			>
 				<ProviderInfoDetail providerId={provider.providerId} />
 			</MemoryRouter>
 		</CobaltThemeProvider>
 	);
 
 	const screeningButton = await screen.findByRole('button', {
-		name: 'Check Eligibility & Schedule Online',
+		name: 'Schedule Online',
 	});
 	expect(screen.getByText('In-person')).toBeInTheDocument();
+	expect(
+		screen.getByText('Complete a brief eligibility screening to continue to online scheduling.')
+	).toBeInTheDocument();
 	expect(screen.queryByRole('heading', { name: 'Contact' })).not.toBeInTheDocument();
 	expect(mockGetProviderAvailability).not.toHaveBeenCalled();
 	expect(mockUseScreeningFlow).toHaveBeenCalledWith(
 		expect.objectContaining({
 			screeningFlowId: 'team-clinic-screening-flow-id',
 			instantiateOnLoad: false,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch:
+				'featureId=MEDICATION_PRESCRIBER&institutionLocationId=location-id&returnTo=%2Fprovider-info%2Fteam-clinic-provider-id%3FfeatureId%3DMEDICATION_PRESCRIBER%26institutionLocationId%3Dlocation-id',
 		})
 	);
 
 	fireEvent.click(screeningButton);
 	await waitFor(() => expect(startScreeningFlow).toHaveBeenCalledWith());
+	expect(analyticsService.persistEvent).toHaveBeenCalledWith(
+		AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT,
+		expect.objectContaining({
+			action: AnalyticsNativeEventProviderSearchResultActionId.CHECK_ELIGIBILITY,
+			source: AnalyticsNativeEventProviderSearchResultSourceId.DETAIL,
+			providerId: 'team-clinic-provider-id',
+		})
+	);
+});
+
+it('selects an appointment time before launching a provider intake screening from details', async () => {
+	const provider = {
+		providerId: 'provider-id',
+		name: 'University of Pennsylvania Employee Assistance Program',
+		detailsHtml: '<p>EAP details</p>',
+		locations: [],
+		websiteUrl: '',
+		imageUrl: '',
+		supportedAppointmentModalities: [
+			{
+				appointmentModalityId: ProviderAppointmentModalityId.PHONE,
+				description: 'Phone',
+			},
+		],
+	} as Provider;
+
+	mockGetProviderById.mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({ provider }),
+	} as ReturnType<typeof providerService.getProviderById>);
+	mockGetProviderAvailability.mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({
+			providerAvailability: {
+				appointmentModalities: [
+					{
+						appointmentModalityId: ProviderAppointmentModalityId.PHONE,
+						description: 'Phone',
+						availability: [
+							{
+								date: '2026-09-18',
+								times: [
+									{
+										time: '16:00:00',
+										providerId: 'provider-id',
+										appointmentTypeIds: ['appointment-type-id'],
+									},
+								],
+							},
+						],
+					},
+				],
+				appointmentTypes: [],
+				appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId.APPOINTMENT_PREDETERMINED,
+				firstAvailableAppointment: {
+					providerId: 'provider-id',
+					date: '2026-09-18',
+					time: '16:00:00',
+					dateTimeDescription: 'September 18 at 4:00 PM',
+					appointmentTypeId: 'appointment-type-id',
+				},
+				screeningRequirement: {
+					screeningRequired: true,
+					screeningSatisfied: false,
+					screeningFlowId: 'screening-flow-id',
+				},
+			},
+		}),
+	} as ReturnType<typeof providerService.getProviderAvailability>);
+
+	render(
+		<CobaltThemeProvider>
+			<MemoryRouter
+				initialEntries={['/provider-info/provider-id?featureId=THERAPY&institutionLocationId=location-id']}
+			>
+				<ProviderInfoDetail providerId={provider.providerId} />
+				<LocationProbe />
+			</MemoryRouter>
+		</CobaltThemeProvider>
+	);
+
+	fireEvent.click(await screen.findByRole('button', { name: 'Schedule Appointment' }));
+
+	await waitFor(() => {
+		expect(screen.getByTestId('location')).toHaveTextContent('/provider-confirm-appointment-time?');
+	});
+	expect(screen.getByTestId('location')).toHaveTextContent('providerId=provider-id');
+	expect(screen.getByTestId('location')).toHaveTextContent('appointmentTypeId=appointment-type-id');
+	expect(screen.getByTestId('location')).toHaveTextContent(
+		'returnTo=%2Fprovider-info%2Fprovider-id%3FfeatureId%3DTHERAPY%26institutionLocationId%3Dlocation-id'
+	);
+	expect(mockUseScreeningFlow).not.toHaveBeenCalled();
+	expect(analyticsService.persistEvent).toHaveBeenCalledWith(
+		AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT,
+		expect.objectContaining({
+			action: AnalyticsNativeEventProviderSearchResultActionId.SCHEDULE_APPOINTMENT,
+			source: AnalyticsNativeEventProviderSearchResultSourceId.DETAIL,
+			providerId: 'provider-id',
+		})
+	);
 });
 
 it('renders the provider header as a tinted, full-width hero', async () => {
@@ -154,5 +290,84 @@ it('renders the provider header as a tinted, full-width hero', async () => {
 	expect(body).toHaveStyle({
 		paddingTop: '32px',
 		paddingBottom: '64px',
+	});
+});
+
+it('falls back to the provider description when details HTML is empty', async () => {
+	const provider = {
+		providerId: 'provider-id',
+		name: 'Dr. Steven Fetrow-Keihl',
+		description: '<p>Provider description</p>',
+		detailsHtml: '',
+		locations: [],
+		websiteUrl: '',
+		imageUrl: '',
+		supportedAppointmentModalities: [],
+		referralBooking: {
+			institutionReferrerId: 'referrer-id',
+			urlName: 'referrer',
+			intakeScreeningFlowId: 'screening-flow-id',
+		},
+	} as Provider;
+
+	mockGetProviderById.mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({ provider }),
+	} as ReturnType<typeof providerService.getProviderById>);
+	mockUseScreeningFlow.mockReturnValue({
+		startScreeningFlow: jest.fn(),
+	} as ReturnType<typeof useScreeningFlow>);
+
+	render(
+		<CobaltThemeProvider>
+			<MemoryRouter>
+				<ProviderInfoDetail providerId={provider.providerId} />
+			</MemoryRouter>
+		</CobaltThemeProvider>
+	);
+
+	expect(await screen.findByText('Provider description')).toBeInTheDocument();
+});
+
+it('renders a clinic image and falls back to its treatment description when details HTML is empty', async () => {
+	const clinic = {
+		clinicId: 'eap-clinic-id',
+		description: 'EAP Clinician',
+		treatmentDescription:
+			'Specifically for UPHS employees, the Employee Assistance Program (EAP) offers confidential counseling.',
+		detailsHtml: '',
+		imageUrl: 'https://example.com/eap-clinician.png',
+		locations: [],
+		websiteUrl: '',
+	} as Clinic;
+
+	mockGetClinicByClinicId.mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({ clinic }),
+	} as ReturnType<typeof clinicService.getClinicByClinicId>);
+	mockGetClinicAvailability.mockReturnValue({
+		fetch: jest.fn().mockResolvedValue({
+			clinicAvailability: {
+				appointmentModalities: [],
+				appointmentTypes: [],
+			},
+		}),
+	} as ReturnType<typeof providerService.getClinicAvailability>);
+	mockUseScreeningFlow.mockReturnValue({
+		startScreeningFlow: jest.fn(),
+	} as ReturnType<typeof useScreeningFlow>);
+
+	const { container } = render(
+		<CobaltThemeProvider>
+			<MemoryRouter>
+				<ProviderInfoDetail clinicId={clinic.clinicId} />
+			</MemoryRouter>
+		</CobaltThemeProvider>
+	);
+
+	const description = await screen.findByText(clinic.treatmentDescription ?? '');
+
+	expect(description).toBeInTheDocument();
+	expect(description.closest('.col-12')).toHaveClass('mb-6', 'mb-xl-0');
+	expect(container.querySelector('[style*="background-image"]')).toHaveStyle({
+		backgroundImage: `url(${clinic.imageUrl})`,
 	});
 });

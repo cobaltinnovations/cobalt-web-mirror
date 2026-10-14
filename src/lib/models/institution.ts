@@ -144,6 +144,7 @@ export interface InstitutionFeature {
 	landingPageVisible: boolean;
 	navigationHeaderId: string;
 	providerId?: string;
+	clinicId?: string;
 	recommended: boolean;
 	supportRoleIds: SupportRoleId[];
 	urlName: string;
@@ -232,6 +233,13 @@ export interface InstitutionLocation {
 	institutionLocationId: string;
 	name: string;
 	shortName?: string;
+	institutionLocationGroup?: InstitutionLocationGroup;
+}
+
+export interface InstitutionLocationGroup {
+	institutionLocationGroupId: string;
+	name: string;
+	displayOrder: number;
 }
 
 export enum AlertTypeId {

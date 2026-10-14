@@ -24,10 +24,12 @@ const mockUseAccount = useAccount as jest.MockedFunction<typeof useAccount>;
 const renderCta = ({
 	features = [],
 	hasTakenFeatureScreening = false,
+	bookingV2Enabled = false,
 	onStartAssessment = jest.fn(),
 }: {
 	features?: InstitutionFeature[];
 	hasTakenFeatureScreening?: boolean;
+	bookingV2Enabled?: boolean;
 	onStartAssessment?: jest.Mock;
 } = {}) => {
 	mockUseAccount.mockReturnValue({
@@ -35,6 +37,7 @@ const renderCta = ({
 			epicFhirEnabled: false,
 			features,
 			hasTakenFeatureScreening,
+			bookingV2Enabled,
 		},
 	} as ReturnType<typeof useAccount>);
 
@@ -51,6 +54,14 @@ const renderCta = ({
 			{
 				path: '/provider-info/:providerId',
 				element: <div>Provider detail</div>,
+			},
+			{
+				path: '/clinic-info/:clinicId',
+				element: <div>Clinic detail</div>,
+			},
+			{
+				path: '/providers',
+				element: <div>Provider list</div>,
 			},
 		],
 		{ initialEntries: ['/'] }
@@ -84,6 +95,18 @@ it('routes the feature-driven Care Navigator action to its provider detail page'
 	fireEvent.click(scheduleButton);
 
 	expect(router.state.location.pathname).toBe('/provider-info/care-navigator-provider-id');
+});
+
+it('routes booking V2 Care Navigator to its shared clinic booking page', () => {
+	const { router } = renderCta({
+		bookingV2Enabled: true,
+		features: [{ featureId: FeatureId.RESOURCE_NAVIGATOR, providerId: 'care-navigator-provider-id', clinicId: 'care-navigator-clinic-id' } as InstitutionFeature],
+	});
+
+	fireEvent.click(screen.getByRole('button', { name: 'Schedule with Care Navigator' }));
+
+	expect(router.state.location.pathname).toBe('/clinic-info/care-navigator-clinic-id');
+	expect(router.state.location.search).toBe('?featureId=RESOURCE_NAVIGATOR');
 });
 
 it('keeps both actions visible and moves recommendation context below them after screening', () => {

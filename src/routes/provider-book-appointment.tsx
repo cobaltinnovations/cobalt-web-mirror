@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import {
+	AnalyticsNativeEventTypeId,
 	Clinic,
 	InstitutionLocation,
 	Provider,
@@ -12,6 +13,7 @@ import {
 } from '@/lib/models';
 import {
 	accountService,
+	analyticsService,
 	appointmentService,
 	AvailabilityModel,
 	clinicService,
@@ -30,10 +32,13 @@ import SvgIcon from '@/components/svg-icon';
 import useHandleError from '@/hooks/use-handle-error';
 import {
 	parseProviderAppointmentDateTime,
+	getProviderBookingAnalyticsDataFromSearchParams,
+	getProviderBookingReturnUrlFromSearchParams,
 	PROVIDER_BOOKING_EXPERIENCE_ID,
 	shouldFetchInstitutionLocation,
 } from '@/lib/utils';
 import useFlags from '@/hooks/use-flags';
+import useTouchScreenCheck from '@/hooks/use-touch-screen-check';
 import AppointmentUnavailableModal from '@/components/appointment-unavailable-modal';
 import { CobaltError } from '@/lib/http-client';
 
@@ -42,6 +47,8 @@ const getAppointmentDateTimeFromSearchParams = (searchParams: URLSearchParams) =
 	const time = searchParams.get('time');
 	return parseProviderAppointmentDateTime(date, time);
 };
+
+const contactInformationFieldNames = ['firstName', 'lastName', 'emailAddress', 'phoneNumber'] as const;
 
 const getAppointmentTypeDescriptionFromAvailability = ({
 	appointmentDateTime,
@@ -89,6 +96,7 @@ export const Component = () => {
 	const { account, institution } = useAccount();
 	const navigate = useNavigate();
 	const { addFlag } = useFlags();
+	const { hasTouchScreen } = useTouchScreenCheck();
 	const [showUnavailableModal, setShowUnavailableModal] = useState(false);
 	const appointmentCreationErrorHandler = useCallback((error: CobaltError) => {
 		if (error.apiError?.metadata?.appointmentTimeslotUnavailable) {
@@ -109,6 +117,7 @@ export const Component = () => {
 	const clinicId = useMemo(() => searchParams.get('clinicId') ?? '', [searchParams]);
 	const institutionLocationId = useMemo(() => searchParams.get('institutionLocationId') ?? '', [searchParams]);
 	const appointmentTypeId = useMemo(() => searchParams.get('appointmentTypeId') ?? '', [searchParams]);
+	const screeningSessionId = useMemo(() => searchParams.get('screeningSessionId') ?? '', [searchParams]);
 	const epicAppointmentFhirId = useMemo(() => searchParams.get('epicAppointmentFhirId') ?? undefined, [searchParams]);
 	const featureId = useMemo(() => searchParams.get('featureId') ?? '', [searchParams]);
 	const appointmentModalityId = useMemo(() => {
@@ -120,6 +129,14 @@ export const Component = () => {
 		[searchParams]
 	);
 	const appointmentDateTime = useMemo(() => getAppointmentDateTimeFromSearchParams(searchParams), [searchParams]);
+
+	useEffect(() => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDER_APPOINTMENT_CONFIRMATION, {
+			...getProviderBookingAnalyticsDataFromSearchParams(searchParams),
+			...(searchParams.get('date') && { date: searchParams.get('date') }),
+			...(searchParams.get('time') && { time: searchParams.get('time') }),
+		});
+	}, [searchParams]);
 
 	const selectedAppointmentModalitySummary = useMemo(() => {
 		return getAppointmentModalitySummaryById(appointmentModalityId);
@@ -139,6 +156,10 @@ export const Component = () => {
 		emailAddress: account?.emailAddress ?? '',
 		phoneNumber: account?.phoneNumber ?? '',
 	});
+	const firstEmptyContactInformationFieldName = useMemo(
+		() => contactInformationFieldNames.find((fieldName) => !formValues[fieldName].trim()),
+		[formValues]
+	);
 
 	const fetchData = useCallback(async () => {
 		const institutionLocationRequest = shouldFetchInstitutionLocation(institutionLocationId)
@@ -240,6 +261,7 @@ export const Component = () => {
 				emailAddress: formValues.emailAddress,
 				phoneNumber: formValues.phoneNumber,
 				appointmentTypeId: appointmentTypeId,
+				...(screeningSessionId && { screeningSessionId }),
 				appointmentModalityId,
 				epicAppointmentFhirId,
 			})
@@ -396,7 +418,7 @@ export const Component = () => {
 							: 'Appointment Scheduling'
 					}
 					onExit={() => {
-						navigate('/providers');
+						navigate(getProviderBookingReturnUrlFromSearchParams(searchParams));
 					}}
 				/>
 
@@ -432,6 +454,7 @@ export const Component = () => {
 										<>
 											<InputHelper
 												required
+												autoFocus={!hasTouchScreen}
 												className="mb-6"
 												type="text"
 												label="Confirmation Code"
@@ -468,6 +491,10 @@ export const Component = () => {
 										<>
 											<InputHelper
 												required
+												autoFocus={
+													!hasTouchScreen &&
+													firstEmptyContactInformationFieldName === 'firstName'
+												}
 												className="mb-4"
 												name="firstName"
 												label="First Name"
@@ -477,6 +504,10 @@ export const Component = () => {
 											/>
 											<InputHelper
 												required
+												autoFocus={
+													!hasTouchScreen &&
+													firstEmptyContactInformationFieldName === 'lastName'
+												}
 												className="mb-4"
 												name="lastName"
 												label="Last Name"
@@ -486,6 +517,10 @@ export const Component = () => {
 											/>
 											<InputHelper
 												required
+												autoFocus={
+													!hasTouchScreen &&
+													firstEmptyContactInformationFieldName === 'emailAddress'
+												}
 												className="mb-4"
 												type="email"
 												name="emailAddress"
@@ -496,6 +531,10 @@ export const Component = () => {
 											/>
 											<InputHelper
 												required
+												autoFocus={
+													!hasTouchScreen &&
+													firstEmptyContactInformationFieldName === 'phoneNumber'
+												}
 												className="mb-2"
 												type="tel"
 												name="phoneNumber"
@@ -562,7 +601,7 @@ export const Component = () => {
 										className="text-primary me-2 mt-1 flex-shrink-0"
 									/>
 									<p className="mb-0 fs-large fw-bold">
-										{appointmentDateTime?.format('MMMM D, YYYY [at] h:mmA')}
+										{appointmentDateTime?.format('ddd, MMM D, YYYY h:mm a')}
 									</p>
 								</div>
 

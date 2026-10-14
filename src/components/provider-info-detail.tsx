@@ -5,6 +5,9 @@ import ProviderScheduleCard from '@/components/provider-schedule-card';
 import ProviderScheduleModal from './provider-schedule-modal';
 import AsyncWrapper from './async-page';
 import {
+	AnalyticsNativeEventProviderSearchResultActionId,
+	AnalyticsNativeEventProviderSearchResultSourceId,
+	AnalyticsNativeEventTypeId,
 	Clinic,
 	Provider,
 	ProviderAppointmentModalityId,
@@ -13,7 +16,7 @@ import {
 	ProviderSearchResultTypeId,
 } from '@/lib/models';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { AvailabilityModel, clinicService, providerService } from '@/lib/services';
+import { analyticsService, AvailabilityModel, clinicService, providerService } from '@/lib/services';
 import SvgIcon from './svg-icon';
 import classNames from 'classnames';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -22,8 +25,10 @@ import ProviderInfoDetailContact from './provider-info-detail-contact';
 import { useScreeningFlow } from '@/pages/screening/screening.hooks';
 import IneligibleBookingModal from '@/components/ineligible-booking-modal';
 import {
-	BOOKING_V1_FALLBACK_URL_SEARCH_PARAM,
 	buildBookingV2UrlWithV1Fallback,
+	buildProviderBookingAnalyticsData,
+	getProviderBookingReturnUrl,
+	getProviderBookingScreeningSearchParams,
 	getBookingV1FallbackUrlFromSearchParams,
 	setFirstAvailableAppointmentSearchParams,
 	shouldFetchInstitutionLocation,
@@ -166,7 +171,9 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 									<div className="d-flex align-items-center">
 										<div
 											className={classNames(classes.imageOuter, 'me-6')}
-											style={{ backgroundImage: `url(${provider?.imageUrl ?? ''})` }}
+											style={{
+												backgroundImage: `url(${provider?.imageUrl ?? clinic?.imageUrl ?? ''})`,
+											}}
 										/>
 										<div>
 											<h3 className="mb-2">{provider?.name ?? clinic?.description}</h3>
@@ -195,16 +202,23 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 					</div>
 					<Container className={classes.body}>
 						<Row>
-							<Col xs={12} xl={7}>
+							<Col xs={12} xl={7} className="mb-6 mb-xl-0">
 								<div
 									dangerouslySetInnerHTML={{
-										__html: provider?.detailsHtml ?? clinic?.detailsHtml ?? '',
+										__html: provider
+											? provider.detailsHtml || provider.description || ''
+											: clinic?.detailsHtml || clinic?.treatmentDescription || '',
 									}}
 								/>
 							</Col>
 							<Col xs={12} xl={5}>
 								{provider?.referralBooking?.intakeScreeningFlowId ? (
-									<ProviderInfoDetailReferralSchedule referralBooking={provider.referralBooking} />
+									<ProviderInfoDetailReferralSchedule
+										featureId={featureId}
+										institutionLocationId={institutionLocationId}
+										providerId={providerId}
+										referralBooking={provider.referralBooking}
+									/>
 								) : availability ? (
 									<ProviderInfoDetailSchedule
 										featureId={featureId}
@@ -232,12 +246,37 @@ const ProviderInfoDetail = ({ providerId, clinicId, className, flushHeader = fal
 
 const REFERRAL_BOOKING_DESCRIPTION = 'Complete a brief eligibility screening to continue to online scheduling.';
 
-const ProviderInfoDetailReferralSchedule = ({ referralBooking }: { referralBooking: ProviderReferralBooking }) => {
+const ProviderInfoDetailReferralSchedule = ({
+	featureId,
+	institutionLocationId,
+	providerId,
+	referralBooking,
+}: {
+	featureId?: string;
+	institutionLocationId?: string;
+	providerId?: string;
+	referralBooking: ProviderReferralBooking;
+}) => {
+	const location = useLocation();
+	const returnTo = useMemo(
+		() =>
+			getProviderBookingReturnUrl({
+				pathname: location.pathname,
+				searchParams: new URLSearchParams(location.search),
+			}),
+		[location.pathname, location.search]
+	);
+	const screeningQuestionSearch = useMemo(
+		() => getProviderBookingScreeningSearchParams(new URLSearchParams(location.search), returnTo),
+		[location.search, returnTo]
+	);
 	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
 		useScreeningFlow({
 			screeningFlowId: referralBooking.intakeScreeningFlowId ?? undefined,
 			instantiateOnLoad: false,
 			disabled: !referralBooking.intakeScreeningFlowId,
+			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
+			screeningQuestionSearch,
 		});
 
 	if (renderedPreScreeningLoader) {
@@ -250,9 +289,21 @@ const ProviderInfoDetailReferralSchedule = ({ referralBooking }: { referralBooki
 			{renderedAccountSourcesModal}
 			<ProviderScheduleCard
 				isReferralBooking
+				referralBookingButtonText="Schedule Online"
 				scheduleAppointmentDescription={REFERRAL_BOOKING_DESCRIPTION}
 				scheduleTypeId={ProviderAppointmentSelectionTypeId.APPOINTMENT_UNDETERMINED}
 				onScheduleAppointmentButtonClick={() => {
+					analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT, {
+						...buildProviderBookingAnalyticsData({
+							featureId,
+							institutionLocationId,
+							providerSearchResultTypeId: ProviderSearchResultTypeId.PROVIDER,
+							providerId,
+							screeningFlowId: referralBooking.intakeScreeningFlowId,
+						}),
+						action: AnalyticsNativeEventProviderSearchResultActionId.CHECK_ELIGIBILITY,
+						source: AnalyticsNativeEventProviderSearchResultSourceId.DETAIL,
+					});
 					startScreeningFlow();
 				}}
 				onViewAppointmentsButtonClick={() => undefined}
@@ -281,6 +332,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	clinicId,
 	appointmentSelectionTypeId,
 	bookingV1FallbackUrl,
+	returnTo,
 }: {
 	featureId?: string;
 	institutionLocationId?: string;
@@ -289,6 +341,7 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 	clinicId?: string;
 	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
 	bookingV1FallbackUrl?: string;
+	returnTo?: string;
 }) => {
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 
@@ -304,6 +357,10 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 
 	if (institutionLocationId) {
 		params.set('institutionLocationId', institutionLocationId);
+	}
+
+	if (returnTo) {
+		params.set('returnTo', returnTo);
 	}
 
 	if (clinicId) {
@@ -330,82 +387,6 @@ const buildProviderConfirmAppointmentTimeUrl = ({
 		`/provider-confirm-appointment-time?${params.toString()}`,
 		bookingV1FallbackUrl
 	);
-};
-
-const appointmentBookingContextForProviderAvailability = ({
-	featureId,
-	institutionLocationId,
-	availability,
-	providerId,
-	clinicId,
-	appointmentSelectionTypeId,
-	bookingV1FallbackUrl,
-}: {
-	featureId?: string;
-	institutionLocationId?: string;
-	availability: AvailabilityModel;
-	providerId?: string;
-	clinicId?: string;
-	appointmentSelectionTypeId: ProviderAppointmentSelectionTypeId;
-	bookingV1FallbackUrl?: string;
-}) => {
-	const firstAvailableAppointment = availability.firstAvailableAppointment;
-
-	const context: Record<string, string> = {};
-
-	if (featureId) {
-		context.featureId = featureId;
-	}
-
-	if (institutionLocationId) {
-		context.institutionLocationId = institutionLocationId;
-	}
-
-	if (bookingV1FallbackUrl) {
-		context[BOOKING_V1_FALLBACK_URL_SEARCH_PARAM] = bookingV1FallbackUrl;
-	}
-
-	if (clinicId) {
-		context.clinicId = clinicId;
-		context.providerSearchResultTypeId = ProviderSearchResultTypeId.CLINIC;
-	} else if (providerId) {
-		context.providerId = providerId;
-		context.providerSearchResultTypeId = ProviderSearchResultTypeId.PROVIDER;
-	} else {
-		return;
-	}
-
-	const appointmentModalityId = availability.appointmentModalities[0]?.appointmentModalityId;
-
-	if (appointmentModalityId) {
-		context.appointmentModalityId = appointmentModalityId;
-	}
-
-	context.appointmentSelectionTypeId = appointmentSelectionTypeId;
-
-	if (firstAvailableAppointment) {
-		context.date = firstAvailableAppointment.date;
-		context.time = firstAvailableAppointment.time;
-
-		if (firstAvailableAppointment.providerId) {
-			context.providerId = firstAvailableAppointment.providerId;
-			context.providerIdToSchedule = firstAvailableAppointment.providerId;
-		}
-
-		if (firstAvailableAppointment.appointmentTypeId) {
-			context.appointmentTypeId = firstAvailableAppointment.appointmentTypeId;
-		}
-
-		if (firstAvailableAppointment.epicDepartmentId) {
-			context.epicDepartmentId = firstAvailableAppointment.epicDepartmentId;
-		}
-
-		if (firstAvailableAppointment.epicAppointmentFhirId) {
-			context.epicAppointmentFhirId = firstAvailableAppointment.epicAppointmentFhirId;
-		}
-	}
-
-	return context;
 };
 
 const getAvailabilityAppointmentCount = (availability: AvailabilityModel) => {
@@ -470,6 +451,14 @@ const ProviderInfoDetailSchedule = ({
 }: ProviderInfoDetailScheduleProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const returnTo = useMemo(
+		() =>
+			getProviderBookingReturnUrl({
+				pathname: location.pathname,
+				searchParams: new URLSearchParams(location.search),
+			}),
+		[location.pathname, location.search]
+	);
 	const phoneNumber = provider?.phoneNumber ?? clinic?.phoneNumber;
 	const phoneNumberDescription =
 		provider?.formattedPhoneNumber ?? clinic?.formattedPhoneNumber ?? provider?.phoneNumber ?? clinic?.phoneNumber;
@@ -480,85 +469,52 @@ const ProviderInfoDetailSchedule = ({
 	const firstAvailableAppointment = availability.firstAvailableAppointment;
 	const scheduleAppointmentDescription = firstAvailableAppointment?.appointmentDescription ?? '';
 	const showMoreAppointmentsButton = getAvailabilityAppointmentCount(availability) > 1;
-	const screeningRequirement = availability.screeningRequirement;
-	const screeningRequired = Boolean(
-		screeningRequirement?.screeningRequired &&
-			!screeningRequirement?.screeningSatisfied &&
-			screeningRequirement?.screeningFlowId
-	);
-	const appointmentBookingContext = useMemo(
-		() =>
-			appointmentBookingContextForProviderAvailability({
+	const persistSearchResultClick = (action: AnalyticsNativeEventProviderSearchResultActionId) => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PROVIDER_SEARCH_RESULT, {
+			...buildProviderBookingAnalyticsData({
 				featureId,
 				institutionLocationId,
-				availability,
+				providerSearchResultTypeId: providerId
+					? ProviderSearchResultTypeId.PROVIDER
+					: ProviderSearchResultTypeId.CLINIC,
 				providerId,
 				clinicId,
-				appointmentSelectionTypeId: scheduleTypeId,
-				bookingV1FallbackUrl,
 			}),
-		[availability, bookingV1FallbackUrl, clinicId, featureId, institutionLocationId, providerId, scheduleTypeId]
-	);
-	const screeningQuestionSearch = useMemo(() => {
-		const params = new URLSearchParams({
-			returnTo: location.pathname + location.search,
+			action,
+			source: AnalyticsNativeEventProviderSearchResultSourceId.DETAIL,
 		});
-
-		if (bookingV1FallbackUrl) {
-			params.set(BOOKING_V1_FALLBACK_URL_SEARCH_PARAM, bookingV1FallbackUrl);
-		}
-
-		return params.toString();
-	}, [bookingV1FallbackUrl, location.pathname, location.search]);
-	const { startScreeningFlow, renderedCollectPhoneModal, renderedPreScreeningLoader, renderedAccountSourcesModal } =
-		useScreeningFlow({
-			screeningFlowId: screeningRequirement?.screeningFlowId,
-			instantiateOnLoad: false,
-			checkCompletionState: false,
-			disabled: !screeningRequired,
-			screeningQuestionPathPrefix: '/screening-questions-fullscreen',
-			screeningQuestionSearch,
-			...(appointmentBookingContext && { metadata: { appointmentBooking: appointmentBookingContext } }),
-		});
-
-	if (renderedPreScreeningLoader) {
-		return renderedPreScreeningLoader;
-	}
+	};
 
 	return (
-		<>
-			{renderedCollectPhoneModal}
-			{renderedAccountSourcesModal}
-			<ProviderScheduleCard
-				scheduleAppointmentDescription={scheduleAppointmentDescription}
-				scheduleTypeId={scheduleTypeId}
-				firstAvailableAppointment={firstAvailableAppointment ?? undefined}
-				onScheduleAppointmentButtonClick={() => {
-					if (screeningRequired) {
-						startScreeningFlow(true);
-						return;
-					}
+		<ProviderScheduleCard
+			scheduleAppointmentDescription={scheduleAppointmentDescription}
+			scheduleTypeId={scheduleTypeId}
+			firstAvailableAppointment={firstAvailableAppointment ?? undefined}
+			onScheduleAppointmentButtonClick={() => {
+				persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.SCHEDULE_APPOINTMENT);
+				const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
+					featureId,
+					institutionLocationId,
+					availability,
+					providerId,
+					clinicId,
+					appointmentSelectionTypeId: scheduleTypeId,
+					bookingV1FallbackUrl,
+					returnTo,
+				});
 
-					const providerConfirmAppointmentTimeUrl = buildProviderConfirmAppointmentTimeUrl({
-						featureId,
-						institutionLocationId,
-						availability,
-						providerId,
-						clinicId,
-						appointmentSelectionTypeId: scheduleTypeId,
-						bookingV1FallbackUrl,
-					});
-
-					if (providerConfirmAppointmentTimeUrl) {
-						navigate(providerConfirmAppointmentTimeUrl);
-					}
-				}}
-				onViewAppointmentsButtonClick={onViewAppointmentsButtonClick}
-				showMoreAppointmentsButton={showMoreAppointmentsButton}
-				phoneNumber={phoneNumber}
-				phoneNumberDescription={phoneNumberDescription}
-			/>
-		</>
+				if (providerConfirmAppointmentTimeUrl) {
+					navigate(providerConfirmAppointmentTimeUrl);
+				}
+			}}
+			onViewAppointmentsButtonClick={() => {
+				persistSearchResultClick(AnalyticsNativeEventProviderSearchResultActionId.VIEW_MORE_APPOINTMENTS);
+				onViewAppointmentsButtonClick();
+			}}
+			showMoreAppointmentsButton={showMoreAppointmentsButton}
+			phoneNumber={phoneNumber}
+			phoneNumberDescription={phoneNumberDescription}
+		/>
 	);
 };
 

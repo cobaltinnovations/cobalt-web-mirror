@@ -1,18 +1,23 @@
 import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
 
 import { reportingSerive, ReportType, ReportTypeId } from '@/lib/services';
 import AsyncWrapper from '@/components/async-page';
 import DatePicker from '@/components/date-picker';
-import { buildBackendDownloadUrl } from '@/lib/utils';
+import LoadingButton from '@/components/loading-button';
+import { CobaltError } from '@/lib/http-client';
+import { buildBackendDownloadUrl, downloadBlob, filenameFromContentDisposition } from '@/lib/utils';
 import InputHelper from '@/components/input-helper';
 import useAccount from '@/hooks/use-account';
+import useHandleError from '@/hooks/use-handle-error';
 
 const Reports = () => {
 	const { institution, account } = useAccount();
 	const [reportingTypes, setReportingTypes] = useState<ReportType[]>([]);
+	const [isDownloading, setIsDownloading] = useState(false);
+	const handleError = useHandleError();
 	const [formValues, setFormValues] = useState({
 		reportTypeId: '',
 		startDate: '',
@@ -32,7 +37,8 @@ const Reports = () => {
 			ACCOUNT_ONBOARDING_INCOMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_COMPLETE: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_ONBOARDING_COMPLETE_V2: account?.accountCapabilityFlags.canViewAnalytics,
-			ACCOUNT_GEOLOCATION: account?.accountCapabilityFlags.canViewAnalytics,
+			// Authorization for this report is determined exclusively by report-types.
+			ACCOUNT_GEOLOCATION: true,
 			COURSE_FEEDBACK: account?.accountCapabilityFlags.canViewAnalytics,
 			COURSE_MCB_DOWNLOAD: account?.accountCapabilityFlags.canViewAnalytics,
 			ACCOUNT_TIMELINE: account?.accountCapabilityFlags.canViewAnalytics,
@@ -52,27 +58,81 @@ const Reports = () => {
 
 		setFormValues((previousValues) => ({
 			...previousValues,
-			reportTypeId: uiReportTypes[0].reportTypeId,
+			reportTypeId: uiReportTypes[0]?.reportTypeId ?? '',
 		}));
 	}, [enabledReportTypes]);
 
 	const isAccountTimelineReport = formValues.reportTypeId === ReportTypeId.ACCOUNT_TIMELINE;
+	const isAccountGeolocationReport = formValues.reportTypeId === ReportTypeId.ACCOUNT_GEOLOCATION;
+	const hasInvalidDateRange = Boolean(
+		formValues.startDate && formValues.endDate && moment(formValues.startDate).isAfter(formValues.endDate, 'day')
+	);
 
 	const handleFormSubmit = useCallback(
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
+			if (isDownloading || hasInvalidDateRange) {
+				return;
+			}
+
+			const startDateTime = formValues.startDate ? `${formValues.startDate}T00:00:00` : undefined;
+			const endDateTime = formValues.endDate ? `${formValues.endDate}T23:59:59.999999` : undefined;
+
+			if (isAccountGeolocationReport && startDateTime && endDateTime) {
+				setIsDownloading(true);
+
+				try {
+					const reportRequest = reportingSerive.runReport({
+						reportTypeId: ReportTypeId.ACCOUNT_GEOLOCATION,
+						reportFormatId: 'CSV',
+						startDateTime,
+						endDateTime,
+					});
+					const blob = await reportRequest.fetch();
+					const filename = filenameFromContentDisposition(
+						reportRequest.responseHeaders?.['content-disposition'],
+						'Cobalt ACCOUNT_GEOLOCATION.csv'
+					);
+
+					downloadBlob(blob, filename);
+				} catch (error) {
+					if (error instanceof CobaltError && error.axiosError?.response?.status === 403) {
+						try {
+							await fetchData();
+						} catch (ignored) {
+							// Preserve the original authorization error for the standard error handler.
+						}
+					}
+
+					handleError(error);
+				} finally {
+					setIsDownloading(false);
+				}
+
+				return;
+			}
 
 			window.location.href = buildBackendDownloadUrl('/reporting/run-report', {
 				reportTypeId: formValues.reportTypeId,
 				reportFormatId: 'CSV',
-				...(formValues.startDate ? { startDateTime: `${formValues.startDate}T00:00:00` } : {}),
-				...(formValues.endDate ? { endDateTime: `${formValues.endDate}T23:59:59.999999` } : {}),
+				...(startDateTime ? { startDateTime } : {}),
+				...(endDateTime ? { endDateTime } : {}),
 				...(formValues.reportTypeId === ReportTypeId.ACCOUNT_TIMELINE && formValues.accountId
 					? { accountId: formValues.accountId }
 					: {}),
 			});
 		},
-		[formValues.accountId, formValues.endDate, formValues.reportTypeId, formValues.startDate]
+		[
+			fetchData,
+			formValues.accountId,
+			formValues.endDate,
+			formValues.reportTypeId,
+			formValues.startDate,
+			handleError,
+			hasInvalidDateRange,
+			isAccountGeolocationReport,
+			isDownloading,
+		]
 	);
 
 	return (
@@ -138,7 +198,7 @@ const Reports = () => {
 									}}
 								/>
 								<DatePicker
-									className="mb-4"
+									className={hasInvalidDateRange ? 'mb-2' : 'mb-4'}
 									labelText={isAccountTimelineReport ? 'Optional End Date' : 'End Date'}
 									showYearDropdown
 									showMonthDropdown
@@ -159,6 +219,11 @@ const Reports = () => {
 										}));
 									}}
 								/>
+								{hasInvalidDateRange && (
+									<p className="mb-4 text-danger fs-small" role="alert">
+										Start Date must be on or before End Date.
+									</p>
+								)}
 								{isAccountTimelineReport && (
 									<>
 										<InputHelper
@@ -179,6 +244,12 @@ const Reports = () => {
 											Leave the date fields blank to export the full timeline for this account.
 										</p>
 									</>
+								)}
+								{isAccountGeolocationReport && (
+									<p className="text-muted">
+										IP geolocation enrichment begins nightly at 11:00 PM Eastern. Newly observed
+										addresses may remain pending until the next nightly run finishes.
+									</p>
 								)}
 								<p>
 									Patient privacy is our highest priority at Cobalt. If you chose to download reports,
@@ -207,10 +278,13 @@ const Reports = () => {
 									)}
 
 								<div className="text-right">
-									<Button
+									<LoadingButton
 										type="submit"
 										size="sm"
+										isLoading={isDownloading}
 										disabled={
+											isDownloading ||
+											hasInvalidDateRange ||
 											!formValues.reportTypeId ||
 											(isAccountTimelineReport
 												? !formValues.accountId
@@ -218,7 +292,7 @@ const Reports = () => {
 										}
 									>
 										Download Report
-									</Button>
+									</LoadingButton>
 								</div>
 							</Form>
 						</Col>

@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import ReactQuill from 'react-quill';
 import { Button, Form } from 'react-bootstrap';
 import classNames from 'classnames';
 
-import InputHelper from '@/components/input-helper';
 import LoadingButton from '@/components/loading-button';
 import NoData from '@/components/no-data';
 import SvgIcon from '@/components/svg-icon';
+import WysiwygBasic, { WysiwygDisplay, wysiwygValueHasContent } from '@/components/wysiwyg-basic';
 import useFlags from '@/hooks/use-flags';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
@@ -40,11 +41,12 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
 	const { addFlag } = useFlags();
-	const noteInputRef = useRef<HTMLInputElement>(null);
+	const noteInputRef = useRef<ReactQuill>(null);
 	const [noteInputValue, setNoteInputValue] = useState('');
 	const [noteToEdit, setNoteToEdit] = useState<CareEncounterNoteModel>();
 	const [isAddingNote, setIsAddingNote] = useState(false);
 	const normalizedNoteInputValue = noteInputValue.trim();
+	const noteInputHasContent = wysiwygValueHasContent(normalizedNoteInputValue);
 	const notesEditable = careEncounter.notesEditable;
 
 	useEffect(() => {
@@ -55,7 +57,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			if (!normalizedNoteInputValue || !notesEditable) {
+			if (!noteInputHasContent || !notesEditable) {
 				return;
 			}
 
@@ -84,6 +86,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 			careEncounter.careEncounterId,
 			careEncounter.careEncounterNotes,
 			handleError,
+			noteInputHasContent,
 			notesEditable,
 			normalizedNoteInputValue,
 			onNotesChange,
@@ -149,7 +152,7 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 										</Button>
 									</div>
 								</div>
-								<p className="mb-0">{careEncounterNote.note}</p>
+								<WysiwygDisplay html={careEncounterNote.note} />
 							</div>
 						))
 					) : (
@@ -159,24 +162,24 @@ export const EncounterNotes = ({ careEncounter, onNotesChange }: Props) => {
 
 				<div className={classes.inputOuter}>
 					<Form onSubmit={handleFormSubmit}>
-						<InputHelper
-							ref={noteInputRef}
-							className="mb-4"
-							as="textarea"
-							label="Your Note:"
-							aria-label="Your Note:"
-							value={noteInputValue}
-							disabled={!notesEditable || isAddingNote}
-							onChange={({ currentTarget }) => {
-								setNoteInputValue(currentTarget.value);
-							}}
-						/>
+						<Form.Group className="mb-4">
+							<Form.Label>Your Note:</Form.Label>
+							<WysiwygBasic
+								ref={noteInputRef}
+								ariaLabel="Your Note:"
+								value={noteInputValue}
+								disabled={!notesEditable || isAddingNote}
+								height={120}
+								toolbarPreset="care-encounter-message"
+								onChange={setNoteInputValue}
+							/>
+						</Form.Group>
 						<div className="text-right">
 							<LoadingButton
 								type="submit"
 								variant="primary"
 								isLoading={isAddingNote}
-								disabled={!normalizedNoteInputValue || !notesEditable || isAddingNote}
+								disabled={!noteInputHasContent || !notesEditable || isAddingNote}
 							>
 								Add Note
 							</LoadingButton>

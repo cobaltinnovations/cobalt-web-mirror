@@ -33,6 +33,13 @@ export interface ReportType {
 	description: string;
 }
 
+interface RunReportQuery {
+	reportTypeId: ReportTypeId;
+	reportFormatId: 'CSV';
+	startDateTime: string;
+	endDateTime: string;
+}
+
 export const reportingSerive = {
 	getCharts(query?: { reportingWindowId?: REPORTING_WINDOW_ID }): OrchestratedRequest<GetChartsResponse> {
 		return httpSingleton.orchestrateRequest({
@@ -54,6 +61,13 @@ export const reportingSerive = {
 		return httpSingleton.orchestrateRequest<{ reportTypes: ReportType[] }>({
 			method: 'GET',
 			url: '/reporting/report-types',
+		});
+	},
+	runReport(query: RunReportQuery): OrchestratedRequest<Blob> {
+		return httpSingleton.orchestrateRequest<Blob>({
+			method: 'GET',
+			responseType: 'blob',
+			url: buildQueryParamUrl('/reporting/run-report', query),
 		});
 	},
 };

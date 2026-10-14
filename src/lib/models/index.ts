@@ -14,6 +14,7 @@ export * from './content-visibility-type-id-models';
 export * from './content';
 export * from './content-snippet-models';
 export * from './courses-models';
+export * from './crisis-resource-models';
 export * from './faq-models';
 export * from './ga-events';
 export * from './group-session-models';

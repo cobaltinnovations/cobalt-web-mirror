@@ -1,5 +1,6 @@
 import { AppointmentModel, AppointmentTimeStatusId, ATTENDANCE_STATUS_ID } from './appointments';
 import { MessageStatusId, MessageTypeId, ScheduledMessageStatusId } from './integrated-care-models';
+import { ScreeningSessionResult } from './screening-models';
 
 export enum CareEncounterStatusId {
 	OPEN = 'OPEN',
@@ -106,6 +107,10 @@ export interface CareEncounterScheduledMessageModel {
 	deliveryFailedReason?: string;
 	complaintRegisteredAt?: string;
 	complaintRegisteredAtDescription?: string;
+	resourceLinkCount: number;
+	resourceLinkOpenedCount: number;
+	resourceLinkLastClickedAt?: string;
+	resourceLinkLastClickedAtDescription?: string;
 	recipientEmailAddress: string;
 	customEmailText: string;
 	emailSubject: string;
@@ -182,6 +187,8 @@ export interface CareEncounterListModel extends CareEncounterBaseModel {
 
 export interface CareEncounterModel extends CareEncounterBaseModel {
 	emailAddress?: string;
+	featureScreeningSessionResult?: ScreeningSessionResult;
+	featureScreeningCompletedAtDescription?: string;
 	careEncounterNotes: CareEncounterNoteModel[];
 	notesEditable: boolean;
 	careEncounterScheduledMessages: CareEncounterScheduledMessageModel[];

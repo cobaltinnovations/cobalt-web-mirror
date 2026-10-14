@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import SvgIcon from '@/components/svg-icon';
 import useAccount from '@/hooks/use-account';
 import { createUseThemedStyles } from '@/jss/theme';
+import { AnalyticsNativeEventTypeId } from '@/lib/models';
+import { analyticsService } from '@/lib/services';
+import { getProviderBookingAnalyticsDataFromSearchParams } from '@/lib/utils';
 
 export const loader = () => {
 	return null;
@@ -39,7 +42,15 @@ const useStyles = createUseThemedStyles((theme) => ({
 export const Component = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const { institution } = useAccount();
+
+	useEffect(() => {
+		analyticsService.persistEvent(
+			AnalyticsNativeEventTypeId.PAGE_VIEW_PROVIDER_BOOKING_COMPLETE,
+			getProviderBookingAnalyticsDataFromSearchParams(searchParams)
+		);
+	}, [searchParams]);
 
 	return (
 		<>

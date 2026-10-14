@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useRevalidator, useSearchParams } from 'react-router-dom';
-import { Button, Col, Container, Form, Modal, Row } from 'react-bootstrap';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 
@@ -37,6 +37,7 @@ import NoData from '@/components/no-data';
 import useAnalytics from '@/hooks/use-analytics';
 import CallToActionBlock from '@/components/call-to-action-block';
 import HeaderAlert from '@/components/header-alert';
+import EmployerSelectionModal from '@/components/employer-selection-modal';
 
 import scheduleApptWoman from '@/assets/images/img-ill-schedule-appt-woman.png';
 
@@ -365,55 +366,14 @@ const ConnectWithSupportV2 = () => {
 				<title>{`Cobalt | Connect with Support - ${pageTitleOverride ?? featureDetails?.name ?? ''}`}</title>
 			</Helmet>
 
-			<Modal centered show={showEmployerModal}>
-				<Modal.Header>
-					<Modal.Title>Select Employer</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<p className="mb-2 fw-bold">
-						Select your employer so we can display the providers available to you.
-					</p>
-					<p className="mb-4 fs-small">Your employment information will not be shared.</p>
-					{institutionLocations.map((l) => {
-						return (
-							<Form.Check
-								key={l.institutionLocationId}
-								className="mb-1 align-items-start"
-								type="radio"
-								name="employer"
-								id={`employer--${l.institutionLocationId}`}
-								label={
-									<>
-										<span className="d-block fw-semibold">{l.shortName ?? l.name}</span>
-										{l.shortName && <span className="d-block text-n500">{l.name}</span>}
-									</>
-								}
-								value={l.institutionLocationId}
-								checked={selectedEmployerId === l.institutionLocationId}
-								onChange={({ currentTarget }) => {
-									setSelectedEmployerId(currentTarget.value);
-								}}
-							/>
-						);
-					})}
-					<Form.Check
-						type="radio"
-						name="employer"
-						id="employer--NA"
-						label={<span className="fw-semibold">I'm not sure / I'd rather not say</span>}
-						value="NA"
-						checked={selectedEmployerId === 'NA'}
-						onChange={({ currentTarget }) => {
-							setSelectedEmployerId(currentTarget.value);
-						}}
-					/>
-				</Modal.Body>
-				<Modal.Footer className="text-right">
-					<Button disabled={!selectedEmployerId} onClick={handleEmployerModalContinueButton}>
-						Continue
-					</Button>
-				</Modal.Footer>
-			</Modal>
+			<EmployerSelectionModal
+				show={showEmployerModal}
+				institutionLocations={institutionLocations}
+				selectedInstitutionLocationId={selectedEmployerId}
+				notSureValue="NA"
+				onInstitutionLocationSelect={setSelectedEmployerId}
+				onContinue={handleEmployerModalContinueButton}
+			/>
 
 			<BookingModals ref={bookingRef} />
 			<IneligibleBookingModal show={!isEligible} onHide={() => setIsEligible(true)} />

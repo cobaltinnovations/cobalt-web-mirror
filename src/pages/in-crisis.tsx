@@ -33,7 +33,7 @@ const InCrisis = () => {
 							nearest emergency department or crisis center.
 						</p>
 						<hr className="mb-6" />
-						<InCrisisTemplate />
+						<InCrisisTemplate showNonEmergencySupport />
 					</Col>
 				</Row>
 			</Container>

@@ -156,26 +156,23 @@ const subdomainBuildMap = subdomainMappingString.split(',').reduce((map, mapping
 const indexFileContentsInMemoryCache = {};
 
 // Given a path to an index file on disk (either default or institution-specific),
-// read it from disk, apply any transformations needed, and keep the result in an in-memory cache.
-// Cache entries are never evicted
+// read it from disk, apply any transformations needed, and cache it until the build changes.
 function indexFileContentsForPath(indexFilePath) {
-	var indexFileContents = indexFileContentsInMemoryCache[indexFilePath];
+	const modifiedAt = fs.statSync(indexFilePath).mtimeMs;
+	const cachedIndex = indexFileContentsInMemoryCache[indexFilePath];
+	if (cachedIndex?.modifiedAt === modifiedAt) return cachedIndex.contents;
 
-	// On cache miss:
+	// On cache miss or after a rebuild:
 	// 1. Read the file into a string in memory.
-	// 2. Inject the API base URL into the string and then cache that off.
-	if (!indexFileContents) {
-		if (!fs.existsSync(indexFilePath)) throw new Error(`Unable to locate index file at ${indexFilePath}`);
-
-		indexFileContents = fs.readFileSync(indexFilePath, { encoding: 'utf8', flag: 'r' });
-		indexFileContents = indexFileContents.replace('%ANALYTICS_API_BASE_URL%', settings.nodeApp.webApiBaseUrl);
-		indexFileContents = indexFileContents.replace('%ANALYTICS_APP_VERSION%', launchDate.toISOString());
-		indexFileContents = indexFileContents.replace(
-			'%ANALYTICS_DEBUGGING_ENABLED%',
-			nodeEnv === 'PRODUCTION' ? 'false' : 'true'
-		);
-		indexFileContentsInMemoryCache[indexFilePath] = indexFileContents;
-	}
+	// 2. Inject the API base URL into the string and cache the result.
+	let indexFileContents = fs.readFileSync(indexFilePath, { encoding: 'utf8', flag: 'r' });
+	indexFileContents = indexFileContents.replace('%ANALYTICS_API_BASE_URL%', settings.nodeApp.webApiBaseUrl);
+	indexFileContents = indexFileContents.replace('%ANALYTICS_APP_VERSION%', launchDate.toISOString());
+	indexFileContents = indexFileContents.replace(
+		'%ANALYTICS_DEBUGGING_ENABLED%',
+		nodeEnv === 'PRODUCTION' ? 'false' : 'true'
+	);
+	indexFileContentsInMemoryCache[indexFilePath] = { modifiedAt, contents: indexFileContents };
 
 	return indexFileContents;
 }

@@ -10,4 +10,5 @@ export * from './screening-flow';
 export * from './screening-question-context-card-sort';
 export * from './screening-question-context';
 export * from './screening-question-prompt';
+export * from './screening-question-footer';
 export * from './screening-answer';

@@ -30,6 +30,7 @@ import { EncounterAppointmentHistoryCard } from './encounter-appointment-history
 import { EncounterContactHistory } from './encounter-contact-history';
 import { EncounterNotes } from './encounter-notes';
 import { EncounterRelatedEncountersCard } from './encounter-related-encounters-card';
+import { EncounterScreeningAnswers } from './encounter-screening-answers-card';
 import type { EncountersOutletContext } from './encounters';
 
 type EncounterShelfTab = 'encounter-details' | 'contact-history' | 'notes';
@@ -455,6 +456,36 @@ const EncounterShelfContent = ({
 							</Card.Body>
 						</Card>
 					</section>
+
+					{careEncounter.featureScreeningSessionResult && (
+						<section className={classes.section}>
+							<Card bsPrefix="ic-card">
+								<Card.Header>
+									<Card.Title>Recent Cobalt Assessment</Card.Title>
+								</Card.Header>
+								<Card.Body>
+									{careEncounter.featureScreeningCompletedAtDescription && (
+										<p className="text-muted mb-4">
+											Completed {careEncounter.featureScreeningCompletedAtDescription}
+										</p>
+									)}
+									{(careEncounter.featureScreeningSessionResult.screeningSessionScreeningResults ?? []).map(
+										(screening, index) => (
+											<div key={screening.screeningId ?? index} className="mb-6">
+												<h5>{screening.screeningName ?? 'Assessment'}</h5>
+												{screening.screeningScore?.overallScore !== undefined && (
+													<p>Score: {screening.screeningScore.overallScore}</p>
+												)}
+												<EncounterScreeningAnswers
+													screeningSessionResult={{ screeningSessionScreeningResults: [screening] }}
+												/>
+											</div>
+										)
+									)}
+								</Card.Body>
+							</Card>
+						</section>
+					)}
 
 					<section className={classes.section}>
 						<h4 className="mb-6 fw-semibold">Navigator Appointment</h4>

@@ -28,7 +28,9 @@ function FeatureScreeningCta({ onStartAssessment }: FeatureScreeningCtaProps) {
 		[institution.features]
 	);
 	const hasRecommendations = institution.features.some((feature) => feature.recommended);
-	const description = resourceNavigatorFeature?.providerId
+	const canScheduleCareNavigator = !!resourceNavigatorFeature?.providerId ||
+		!!(institution.bookingV2Enabled && resourceNavigatorFeature?.clinicId);
+	const description = canScheduleCareNavigator
 		? 'Take an online assessment to get instant recommendations or schedule a call with a Care Navigator to discuss your options.'
 		: 'Take an online assessment to get instant recommendations.';
 
@@ -55,15 +57,21 @@ function FeatureScreeningCta({ onStartAssessment }: FeatureScreeningCtaProps) {
 									Take Assessment
 								</Button>
 							)}
-							{resourceNavigatorFeature?.providerId && (
+							{canScheduleCareNavigator && resourceNavigatorFeature ? (
 								<Button
 									className="mx-1 mb-2 d-flex align-items-center"
-									onClick={() => navigate(`/provider-info/${resourceNavigatorFeature.providerId}`)}
+									onClick={() =>
+										navigate(
+											resourceNavigatorFeature.clinicId && institution.bookingV2Enabled
+												? `/clinic-info/${resourceNavigatorFeature.clinicId}?featureId=${FeatureId.RESOURCE_NAVIGATOR}`
+												: `/provider-info/${resourceNavigatorFeature.providerId}`
+										)
+									}
 								>
 									<SvgIcon kit="far" icon="calendar" size={16} className="me-2" />
 									Schedule with Care Navigator
 								</Button>
-							)}
+							) : null}
 						</div>
 						{institution.hasTakenFeatureScreening && (
 							<div className="mt-5 d-flex align-items-center justify-content-center">

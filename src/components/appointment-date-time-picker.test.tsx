@@ -1,5 +1,6 @@
 import React from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import moment from 'moment';
 
 import { CobaltThemeProvider } from '@/jss/theme';
 import { ProviderAppointmentModalityId, ProviderSearchResultTypeId } from '@/lib/models';
@@ -124,4 +125,77 @@ it('filters the provider availability request to the appointment type shown on t
 	});
 
 	getProviderAvailability.mockRestore();
+});
+
+it('uses the first-available appointment and advances even when it is already selected', async () => {
+	const firstAvailableTimeSlot = {
+		appointmentTypeIds: ['appointment-type-id'],
+		providerId: 'provider-id',
+		status: 'OPEN',
+		time: '12:30:00',
+		timeDescription: '12:30 pm',
+	};
+	const fetchData = jest.fn().mockResolvedValue({
+		availability: {
+			appointmentTypes: [],
+			appointmentModalities: [
+				{
+					appointmentModalityId: ProviderAppointmentModalityId.VIRTUAL,
+					description: 'Virtual',
+					availability: [
+						{
+							date: '2026-09-18',
+							times: [
+								firstAvailableTimeSlot,
+								{
+									...firstAvailableTimeSlot,
+									time: '13:00:00',
+									timeDescription: '1:00 pm',
+								},
+							],
+						},
+					],
+				},
+			],
+			startDate: '2026-09-18',
+			endDate: '2026-09-18',
+		},
+	});
+	const firstAvailableValue = {
+		dateTime: moment.utc('2026-09-18 12:30:00', 'YYYY-MM-DD HH:mm:ss'),
+		appointmentModalityId: ProviderAppointmentModalityId.VIRTUAL,
+		appointmentTypeIds: ['appointment-type-id'],
+		appointmentTypeId: 'appointment-type-id',
+		providerId: 'provider-id',
+	};
+	const onChange = jest.fn();
+	const onFirstAvailableAppointmentSelect = jest.fn();
+	render(
+		<CobaltThemeProvider>
+			<AppointmentDateTimePicker
+				value={firstAvailableValue}
+				onChange={onChange}
+				onFirstAvailableAppointmentSelect={onFirstAvailableAppointmentSelect}
+				fetchData={fetchData}
+			/>
+		</CobaltThemeProvider>
+	);
+
+	const firstAvailableButton = await screen.findByRole('button', {
+		name: 'Fri, Sep 18, 12:30 pm',
+	});
+	expect(firstAvailableButton).toBeEnabled();
+	fireEvent.click(firstAvailableButton);
+
+	expect(onFirstAvailableAppointmentSelect).toHaveBeenCalledTimes(1);
+	const selectedValue = onFirstAvailableAppointmentSelect.mock.calls[0][0];
+	expect(selectedValue).toEqual(
+		expect.objectContaining({
+			appointmentModalityId: ProviderAppointmentModalityId.VIRTUAL,
+			appointmentTypeId: 'appointment-type-id',
+			providerId: 'provider-id',
+		})
+	);
+	expect(selectedValue.dateTime.format('YYYY-MM-DD HH:mm:ss')).toBe('2026-09-18 12:30:00');
+	expect(onChange).toHaveBeenCalledWith(selectedValue);
 });

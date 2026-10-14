@@ -9,6 +9,8 @@ import { CRISIS_RESOURCES } from '@/crisis-resources';
 import useAnalytics from '@/hooks/use-analytics';
 import { CrisisAnalyticsEvent } from '@/contexts/analytics-context';
 import SvgIcon from '@/components/svg-icon';
+import { CrisisResourceTypeId } from '@/lib/models';
+import useAccount from '@/hooks/use-account';
 
 const useStyles = createUseThemedStyles((theme) => ({
 	linkButton: {
@@ -35,16 +37,29 @@ const useStyles = createUseThemedStyles((theme) => ({
 
 interface InCrisisTemplateProps {
 	isModal?: boolean;
+	showNonEmergencySupport?: boolean;
 }
 
-export const InCrisisTemplate = ({ isModal = false }: InCrisisTemplateProps) => {
+export const InCrisisTemplate = ({ isModal = false, showNonEmergencySupport = false }: InCrisisTemplateProps) => {
 	const classes = useStyles();
 	const { trackEvent } = useAnalytics();
+	const { institution } = useAccount();
+	const institutionResources = CRISIS_RESOURCES.filter(
+		(resource) => !resource.institutionIds || resource.institutionIds.includes(institution.institutionId)
+	);
+	const crisisContactResources = institutionResources.filter(
+		(resource) => resource.crisisResourceTypeId === CrisisResourceTypeId.CRISIS_CONTACT
+	);
+	const nonEmergencyResources = showNonEmergencySupport
+		? institutionResources.filter(
+				(resource) => resource.crisisResourceTypeId === CrisisResourceTypeId.NON_EMERGENCY_SUPPORT
+		  )
+		: [];
 
 	return (
 		<>
-			{CRISIS_RESOURCES.map((link, index) => {
-				const isLast = CRISIS_RESOURCES.length - 1 === index;
+			{crisisContactResources.map((link, index) => {
+				const isLast = crisisContactResources.length - 1 === index;
 
 				return (
 					<Button
@@ -75,6 +90,40 @@ export const InCrisisTemplate = ({ isModal = false }: InCrisisTemplateProps) => 
 					</Button>
 				);
 			})}
+
+			{nonEmergencyResources.length > 0 && (
+				<div className="mt-6">
+					<hr className="mb-6" />
+					<h4 className="mb-2">Looking for non-emergency support?</h4>
+					<p className="mb-4">Explore additional mental health support options.</p>
+
+					{nonEmergencyResources.map((link, index) => (
+						<Button
+							key={link.href}
+							variant="light"
+							className={classNames(classes.linkButton, {
+								'mb-4': nonEmergencyResources.length - 1 !== index,
+							})}
+							href={link.href}
+							onClick={() => {
+								trackEvent({
+									action: isModal ? 'In Crisis Pop Up' : 'In Crisis Page',
+									link_text: link.description,
+								});
+								trackEvent(CrisisAnalyticsEvent.clickCrisisNonEmergencyResource(link.href));
+							}}
+						>
+							<div>
+								<h4 className="mb-2">{link.title}</h4>
+								<p className="mb-0">{link.description}</p>
+							</div>
+							<div className={classes.iconOuter}>
+								<SvgIcon kit="far" icon="arrow-right" size={20} className="d-flex" />
+							</div>
+						</Button>
+					))}
+				</div>
+			)}
 		</>
 	);
 };
