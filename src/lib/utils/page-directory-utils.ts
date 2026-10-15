@@ -11,7 +11,7 @@ export const pageDirectoryConfiguration = {
 	},
 	'/communities': {
 		pageLocationId: PAGE_LOCATION_ID.COMMUNITY,
-		title: 'Penn Communities',
+		title: 'Communities',
 		searchPlaceholder: 'Search all communities',
 		emptyTitle: 'No communities',
 	},

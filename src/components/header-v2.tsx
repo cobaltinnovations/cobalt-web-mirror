@@ -370,8 +370,9 @@ const HeaderV2 = () => {
 	const { trackEvent } = useAnalytics();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
-	const employers = useNavigationEmployers(institution.institutionId, institution.featuresEnabled);
-	const showEmployers = employers.status !== 'loaded' || employers.locations.length > 0;
+	const employersEnabled = institution.featuresEnabled && institution.bookingV2Enabled;
+	const employers = useNavigationEmployers(institution.institutionId, employersEnabled);
+	const showEmployers = employersEnabled && (employers.status !== 'loaded' || employers.locations.length > 0);
 	const generalNavigationFeatures = useMemo(() => getGeneralNavigationFeatures(institution), [institution]);
 
 	/* ----------------------------------------------------------- */

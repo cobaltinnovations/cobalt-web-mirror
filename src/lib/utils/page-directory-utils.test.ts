@@ -8,7 +8,7 @@ import {
 
 it.each([
 	['/featured-topics', PAGE_LOCATION_ID.FEATURED_TOPIC, 'Featured Topics'],
-	['/communities/', PAGE_LOCATION_ID.COMMUNITY, 'Penn Communities'],
+	['/communities/', PAGE_LOCATION_ID.COMMUNITY, 'Communities'],
 ])('maps the public route %s to its directory category', (path, category, title) => {
 	expect(getPageDirectoryConfiguration(path)).toMatchObject({ pageLocationId: category, title });
 });

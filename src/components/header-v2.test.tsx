@@ -1,10 +1,11 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
 import { CobaltThemeProvider } from '@/jss/theme';
-import { ROLE_ID } from '@/lib/models';
+import { FeatureId, InstitutionLocation, ROLE_ID } from '@/lib/models';
+import { institutionService } from '@/lib/services/institution-service';
 import HeaderV2 from './header-v2';
 
 jest.mock('react-bootstrap', () => {
@@ -48,6 +49,7 @@ jest.mock('@/hooks/use-account', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
+jest.mock('@/lib/services/institution-service', () => ({ institutionService: { getInstitutionLocations: jest.fn() } }));
 jest.mock('@/hooks/use-analytics', () => ({
 	__esModule: true,
 	default: () => ({ trackEvent: jest.fn() }),
@@ -81,17 +83,24 @@ jest.mock('@/components/header-alert', () => ({
 }));
 
 const mockUseAccount = useAccount as jest.MockedFunction<typeof useAccount>;
+const getLocations = institutionService.getInstitutionLocations as jest.Mock;
+
+beforeEach(() => getLocations.mockReset());
 
 const mockAccount = ({
 	roleId,
 	providerId,
 	isAdmin,
 	isProvider,
+	featuresEnabled = false,
+	bookingV2Enabled = false,
 }: {
 	roleId: string;
 	providerId?: string;
 	isAdmin: boolean;
 	isProvider: boolean;
+	featuresEnabled?: boolean;
+	bookingV2Enabled?: boolean;
 }) => {
 	mockUseAccount.mockReturnValue({
 		account: {
@@ -104,9 +113,20 @@ const mockAccount = ({
 		institution: {
 			additionalNavigationItems: [],
 			alerts: [],
-			bookingV2Enabled: false,
-			features: [],
-			featuresEnabled: false,
+			institutionId: 'COBALT',
+			bookingV2Enabled,
+			features: featuresEnabled
+				? [
+						{
+							featureId: FeatureId.THERAPY,
+							name: 'Therapy',
+							navigationHeaderId: 'CONNECT_WITH_SUPPORT',
+							navVisible: true,
+							urlName: '/therapy',
+						},
+				  ]
+				: [],
+			featuresEnabled,
 			headerLogoUrl: '',
 			name: 'Test Institution',
 			preferLegacyTopicCenters: false,
@@ -133,8 +153,107 @@ const renderHeader = () => {
 		{ initialEntries: ['/'] }
 	);
 
-	return render(<RouterProvider router={router} />);
+	return { ...render(<RouterProvider router={router} />), router };
 };
+
+it.each([
+	[false, false],
+	[false, true],
+	[true, false],
+])('omits employer browsing when features=%s and booking V2=%s', (featuresEnabled, bookingV2Enabled) => {
+	mockAccount({ roleId: ROLE_ID.MEMBER, isAdmin: false, isProvider: false, featuresEnabled, bookingV2Enabled });
+
+	renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+
+	expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
+	expect(screen.queryByText('Loading employers…')).not.toBeInTheDocument();
+	expect(getLocations).not.toHaveBeenCalled();
+});
+
+it('shows employer loading, errors, and filtered links in desktop and mobile navigation for booking V2', async () => {
+	mockAccount({
+		roleId: ROLE_ID.MEMBER,
+		isAdmin: false,
+		isProvider: false,
+		featuresEnabled: true,
+		bookingV2Enabled: true,
+	});
+	let reject!: (reason: Error) => void;
+	getLocations.mockReturnValueOnce({
+		fetch: () => new Promise((_resolve, rejectRequest) => (reject = rejectRequest)),
+		abort: jest.fn(),
+	});
+	getLocations.mockReturnValueOnce({
+		fetch: async () => ({
+			locations: [{ institutionId: 'COBALT', institutionLocationId: 'employer-1', name: 'Employer One' }],
+		}),
+		abort: jest.fn(),
+	});
+
+	renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+	expect(screen.getAllByRole('region', { name: 'Browse by Employer', hidden: true })).toHaveLength(2);
+	expect(screen.getAllByText('Loading employers…')).toHaveLength(2);
+	expect(getLocations).toHaveBeenCalledTimes(1);
+
+	await act(async () => reject(new Error('Unavailable')));
+	expect(screen.getAllByText('Unable to load employers.')).toHaveLength(2);
+	await act(async () => fireEvent.click(screen.getAllByRole('button', { name: 'Retry', hidden: true })[0]));
+	expect(getLocations).toHaveBeenCalledTimes(2);
+	const links = screen.getAllByText('Employer One');
+	expect(links).toHaveLength(2);
+	links.forEach((link) =>
+		expect(link.closest('a')).toHaveAttribute('href', '/providers?institutionLocationId=employer-1')
+	);
+});
+
+it.each(['loading', 'error', 'loaded'])(
+	'hides existing employer %s content from desktop and mobile navigation when booking V2 is disabled',
+	async (status) => {
+		mockAccount({
+			roleId: ROLE_ID.MEMBER,
+			isAdmin: false,
+			isProvider: false,
+			featuresEnabled: true,
+			bookingV2Enabled: true,
+		});
+		let resolve!: (value: { locations: InstitutionLocation[] }) => void;
+		let reject!: (reason: Error) => void;
+		const abort = jest.fn();
+		getLocations.mockReturnValueOnce({
+			fetch: () =>
+				new Promise((resolveRequest, rejectRequest) => {
+					resolve = resolveRequest;
+					reject = rejectRequest;
+				}),
+			abort,
+		});
+		const { router } = renderHeader();
+		fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+		if (status === 'error') await act(async () => reject(new Error('Unavailable')));
+		if (status === 'loaded')
+			await act(async () =>
+				resolve({
+					locations: [{ institutionId: 'COBALT', institutionLocationId: 'employer-1', name: 'Employer One' }],
+				})
+			);
+		expect(screen.getAllByRole('region', { name: 'Browse by Employer', hidden: true })).toHaveLength(2);
+
+		mockAccount({
+			roleId: ROLE_ID.MEMBER,
+			isAdmin: false,
+			isProvider: false,
+			featuresEnabled: true,
+			bookingV2Enabled: false,
+		});
+		await act(async () => router.navigate('/therapy'));
+
+		expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
+		expect(getLocations).toHaveBeenCalledTimes(1);
+		expect(abort).toHaveBeenCalledTimes(1);
+	}
+);
 
 it('shows Patient Scheduling for an administrator linked to a provider', () => {
 	mockAccount({

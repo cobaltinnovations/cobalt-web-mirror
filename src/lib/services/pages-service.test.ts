@@ -18,7 +18,7 @@ it('requests ordered location metadata without treating categories as site place
 			},
 			{
 				pageLocationId: PAGE_LOCATION_ID.COMMUNITY,
-				description: 'Penn Communities',
+				description: 'Communities',
 				directoryRelativeUrl: '/communities',
 			},
 			{ pageLocationId: PAGE_LOCATION_ID.UNCATEGORIZED, description: 'Uncategorized' },
@@ -74,7 +74,7 @@ it('allows creation to retain the API default category', () => {
 it('round trips the selected category and API descriptions through settings', async () => {
 	const page = {
 		pageLocationId: PAGE_LOCATION_ID.COMMUNITY,
-		pageLocationDescription: 'Penn Communities',
+		pageLocationDescription: 'Communities',
 		pageStatusId: PAGE_STATUS_ID.DRAFT,
 		pageStatusDescription: 'Unpublished',
 	};
