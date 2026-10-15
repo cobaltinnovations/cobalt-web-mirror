@@ -228,7 +228,7 @@ it.each(['desktop', 'mobile'])('records Featured Topics directory navigation on 
 	router.dispose();
 });
 
-it('renders the Featured Topics history icon while retaining the Resource Library book icon on both surfaces', () => {
+it('renders aligned Featured Topics and Resource Library icons on both surfaces', () => {
 	mockAccount({
 		roleId: ROLE_ID.MEMBER,
 		isAdmin: false,
@@ -243,12 +243,12 @@ it('renders the Featured Topics history icon while retaining the Resource Librar
 	const resourceLinks = screen.getAllByRole('link', { name: 'Resource Library', hidden: true });
 	expect(featuredTopicsLinks).toHaveLength(2);
 	expect(resourceLinks).toHaveLength(2);
-	featuredTopicsLinks.forEach((link) =>
-		expect(link.querySelector('svg path')).toHaveAttribute(
-			'd',
-			byPrefixAndName.fas['rectangle-vertical-history'].icon[4] as string
-		)
-	);
+	featuredTopicsLinks.forEach((link) => {
+		const icon = link.querySelector('svg');
+		expect(icon).toHaveAttribute('width', '24');
+		expect(icon).toHaveAttribute('height', '24');
+		expect(icon).toHaveAttribute('aria-hidden', 'true');
+	});
 	resourceLinks.forEach((link) =>
 		expect(link.querySelector('svg path')).toHaveAttribute('d', byPrefixAndName.fak['menu-book'].icon[4] as string)
 	);
