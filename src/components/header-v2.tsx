@@ -43,8 +43,6 @@ import {
 	communityDirectoryNavigationMetadata,
 	getCommunityNavigationLink,
 } from '@/lib/utils/general-navigation-utils';
-import { useNavigationEmployers } from '@/hooks/use-navigation-employers';
-import { HeaderNavEmployers } from './header-nav-employers';
 import { HeaderNavDescription } from './header-nav-description';
 
 export const HEADER_HEIGHT = 60;
@@ -370,9 +368,6 @@ const HeaderV2 = () => {
 	const { trackEvent } = useAnalytics();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
-	const employersEnabled = institution.featuresEnabled && institution.bookingV2Enabled;
-	const employers = useNavigationEmployers(institution.institutionId, employersEnabled);
-	const showEmployers = employersEnabled && (employers.status !== 'loaded' || employers.locations.length > 0);
 	const generalNavigationFeatures = useMemo(() => getGeneralNavigationFeatures(institution), [institution]);
 
 	/* ----------------------------------------------------------- */
@@ -795,14 +790,6 @@ const HeaderV2 = () => {
 													</div>
 												</Link>
 											))}
-											{navigationItem.navigationItemId === 'CONNECT_WITH_SUPPORT' &&
-												showEmployers && (
-													<HeaderNavEmployers
-														employers={employers}
-														mobileNav
-														onNavigate={() => setMenuOpen(false)}
-													/>
-												)}
 											{navigationItem.footerLink && (
 												<Link
 													to={navigationItem.footerLink.to}
@@ -1003,21 +990,6 @@ const HeaderV2 = () => {
 															link_text: navigationItem.title,
 															link_detail: navigationItem.footerLink?.title,
 														})
-													}
-													secondaryColumn={
-														navigationItem.navigationItemId === 'CONNECT_WITH_SUPPORT' &&
-														showEmployers ? (
-															<HeaderNavEmployers
-																employers={employers}
-																onNavigate={(title) =>
-																	trackEvent({
-																		action: 'Top Nav Dropdown',
-																		link_text: navigationItem.title,
-																		link_detail: title,
-																	})
-																}
-															/>
-														) : undefined
 													}
 													featuredItem={showFeaturedItem ? featuredTopicCenterItem : null}
 												>
