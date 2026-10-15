@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import {
 	AccountSourceId,
 	AlertTypeId,
-	AnalyticsNativeEventClickthroughFeatureSource,
 	AnalyticsNativeEventClickthroughTopicCenterSource,
 	AnalyticsNativeEventTypeId,
 	FeatureId,
@@ -36,6 +35,17 @@ import { AnalyticsNativeEventAccountSignedOutSource } from '@/lib/models';
 import { RouteHandle } from '@/routes';
 import { buildQueryParamUrl, canAccessProviderScheduling, getGeneralNavigationFeatures } from '@/lib/utils';
 import SvgIcon from './svg-icon';
+import {
+	getFeatureNavigationLink,
+	getGeneralNavigationGroups,
+	getResourceNavigationMetadata,
+	featuredTopicsNavigationMetadata,
+	communityDirectoryNavigationMetadata,
+	getCommunityNavigationLink,
+} from '@/lib/utils/general-navigation-utils';
+import { useNavigationEmployers } from '@/hooks/use-navigation-employers';
+import { HeaderNavEmployers } from './header-nav-employers';
+import { HeaderNavDescription } from './header-nav-description';
 
 export const HEADER_HEIGHT = 60;
 
@@ -70,7 +80,9 @@ const useHeaderV2Styles = createUseThemedStyles((theme) => ({
 	},
 	communityNavImage: {
 		borderRadius: 6,
-		height: 80,
+		height: 'auto',
+		aspectRatio: '16 / 9',
+		objectFit: 'cover',
 		width: 144,
 		flexShrink: 0,
 		[mediaQueries.lg]: {
@@ -304,23 +316,35 @@ const AdditionalNavigationItemIconOrImage = ({
 
 const MobileAccordianItem = ({
 	toggleElement,
+	titleTo,
+	title,
 	className,
 	children,
-}: PropsWithChildren<{ toggleElement: JSX.Element; className?: string }>) => {
+}: PropsWithChildren<{ toggleElement: JSX.Element; titleTo?: To; title?: string; className?: string }>) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
 		<>
-			<Button
-				variant="light"
-				className="d-flex justify-content-between align-items-center"
-				onClick={() => {
-					setIsExpanded(!isExpanded);
-				}}
-			>
-				{toggleElement}
-				<SvgIcon kit="far" icon="chevron-down" size={16} className="text-n300" />
-			</Button>
+			<div className={titleTo ? 'd-flex align-items-center' : undefined}>
+				{titleTo && (
+					<Link to={titleTo} className="flex-grow-1">
+						{toggleElement}
+					</Link>
+				)}
+				<Button
+					variant="light"
+					className="d-flex justify-content-between align-items-center"
+					style={titleTo ? { width: 'auto' } : undefined}
+					aria-label={titleTo ? `Show ${title} links` : undefined}
+					aria-expanded={isExpanded}
+					onClick={() => {
+						setIsExpanded(!isExpanded);
+					}}
+				>
+					{!titleTo && toggleElement}
+					<SvgIcon kit="far" icon="chevron-down" size={16} className="text-n300" />
+				</Button>
+			</div>
 			<Collapse in={isExpanded}>
 				<div>
 					<div className={classNames('collapse-inner', className)}>{children}</div>
@@ -346,6 +370,9 @@ const HeaderV2 = () => {
 	const { trackEvent } = useAnalytics();
 	const [menuOpen, setMenuOpen] = useState<boolean>(false);
 	const [alertsDisabled, setAlertsDisabled] = useState(false);
+	const employersEnabled = institution.featuresEnabled && institution.bookingV2Enabled;
+	const employers = useNavigationEmployers(institution.institutionId, employersEnabled);
+	const showEmployers = employersEnabled && (employers.status !== 'loaded' || employers.locations.length > 0);
 	const generalNavigationFeatures = useMemo(() => getGeneralNavigationFeatures(institution), [institution]);
 
 	/* ----------------------------------------------------------- */
@@ -441,7 +468,9 @@ const HeaderV2 = () => {
 		navigationItemId?: string;
 		title: string;
 		subtitle?: string;
+		footerLink?: { title: string; to: To; onClick?(): void };
 		to?: To;
+		onClick?(): void;
 		active: PathMatch<string> | boolean | null;
 		items?: {
 			testId?: string;
@@ -450,75 +479,83 @@ const HeaderV2 = () => {
 			to: To;
 			icon: JSX.Element;
 			description: string;
+			descriptionHtml?: string;
 			onClick?(): void;
 		}[];
 	}[] = useMemo(() => {
 		const featureIdsWithLocationFilter = [FeatureId.THERAPY, FeatureId.COACHING];
-		const showCommunityLinks = institution?.additionalNavigationItems.length > 0;
+		const groups = getGeneralNavigationGroups({
+			features: generalNavigationFeatures,
+			additionalNavigationItems: institution.additionalNavigationItems,
+		});
+		const showCommunityLinks = groups.communities.length > 0;
+		const pageDirectoriesEnabled = institution.pageDirectoriesEnabled === true;
 
 		return [
-			{
-				testId: 'menuLinkHome',
-				navigationItemId: 'HOME',
-				title: 'Home',
-				to: '/',
-				active: matchPath('/', pathname),
-			},
 			...(institution?.featuresEnabled
 				? [
 						{
 							navigationItemId: 'CONNECT_WITH_SUPPORT',
-							title: 'Connect with Support',
-							active: generalNavigationFeatures
-								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
-								.filter((feature) => feature.navVisible)
+							title: 'Appointments',
+							subtitle: 'Appointment Services',
+							active: groups.appointments
 								.map(({ urlName }) => urlName)
 								.some((urlName) => matchPath(urlName + '/*', pathname)),
-							items: generalNavigationFeatures
-								.filter((feature) => feature.navigationHeaderId === 'CONNECT_WITH_SUPPORT')
-								.filter((feature) => feature.navVisible)
-								.map(({ featureId, name, navDescription, urlName }) => ({
-									navigationItemId: featureId,
-									icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
-									title: name,
-									description: navDescription,
-									to:
-										featureIdsWithLocationFilter.includes(featureId) &&
-										account?.institutionLocationId
-											? buildQueryParamUrl(urlName, {
-													institutionLocationId: account.institutionLocationId,
-											  })
-											: urlName,
-									onClick: () => {
-										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_FEATURE, {
-											featureId: featureId,
-											source: AnalyticsNativeEventClickthroughFeatureSource.NAV,
-										});
-									},
-								})),
+							items: groups.appointments.map(({ featureId, name, navDescription, urlName }) => ({
+								navigationItemId: featureId,
+								icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
+								title: name,
+								description: navDescription,
+								to:
+									featureIdsWithLocationFilter.includes(featureId) && account?.institutionLocationId
+										? buildQueryParamUrl(urlName, {
+												institutionLocationId: account.institutionLocationId,
+										  })
+										: urlName,
+								onClick: getFeatureNavigationLink({ featureId, urlName }).onClick,
+							})),
+						},
+				  ]
+				: []),
+			...(groups.groupSessions
+				? [
+						{
+							navigationItemId: 'GROUP_SESSIONS',
+							title: 'Group Sessions',
+							...getFeatureNavigationLink(groups.groupSessions),
+							active: matchPath(groups.groupSessions.urlName + '/*', pathname),
 						},
 				  ]
 				: []),
 			{
 				navigationItemId: 'BROWSE_RESOURCES',
-				title: 'Browse Resources',
-				subtitle: 'Resources',
+				title: 'Self-Help Resources',
+				subtitle: 'Self-Help Resources',
 				active: [
-					...generalNavigationFeatures
-						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
-						.map(({ urlName }) => urlName),
+					'/featured-topics',
+					...groups.resources.map(({ urlName }) => urlName),
 					...exploreLinks.map(({ to }) => to()),
 				].some((to) => matchPath(to + '/*', pathname)),
 				items: [
-					...generalNavigationFeatures
-						.filter((feature) => feature.navigationHeaderId === 'BROWSE_RESOURCES')
-						.map(({ featureId, name, navDescription, urlName }) => ({
-							navigationItemId: featureId,
-							icon: <PathwaysIcon featureId={featureId} svgProps={{ width: 24, height: 24 }} />,
-							title: name,
-							description: navDescription,
-							to: urlName,
-						})),
+					...groups.resources.map((feature) => ({
+						navigationItemId: feature.featureId,
+						icon: <PathwaysIcon featureId={feature.featureId} svgProps={{ width: 24, height: 24 }} />,
+						...getResourceNavigationMetadata(feature),
+					})),
+					...(pageDirectoriesEnabled
+						? [
+								{
+									navigationItemId: 'FEATURED_TOPICS_DIRECTORY',
+									...featuredTopicsNavigationMetadata,
+									icon: (
+										<PathwaysIcon
+											featureId={FeatureId.SELF_HELP_RESOURCES}
+											svgProps={{ width: 24, height: 24 }}
+										/>
+									),
+								},
+						  ]
+						: []),
 					...exploreLinks.map(({ testId, icon, label, to }) => ({
 						testId,
 						icon,
@@ -533,44 +570,33 @@ const HeaderV2 = () => {
 						{
 							navigationItemId: 'COMMUNITY',
 							title: 'Community',
-							active: (institution?.additionalNavigationItems ?? []).some(({ url }) =>
-								matchPath(url + '/*', pathname)
-							),
-							items: (institution?.additionalNavigationItems ?? []).map(
-								({ iconName, imageUrl, name, url, topicCenterId, pageId }, index) => ({
-									testId: `menuLink-additionalItem${index}`,
-									icon: (
-										<AdditionalNavigationItemIconOrImage
-											iconName={iconName}
-											imageUrl={imageUrl}
-											imageAlt={name}
-											svgProps={{ width: 24, height: 24 }}
-										/>
-									),
-									title: name,
-									description: '',
-									to: url,
-									onClick: () => {
-										if (institution.preferLegacyTopicCenters) {
-											analyticsService.persistEvent(
-												AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
-												{
-													topicCenterId,
-													source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
-												}
-											);
-
-											return;
-										}
-
-										analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE, {
-											pageId,
-											source: AnalyticsNativeEventClickthroughTopicCenterSource.NAV,
-											siteLocationId: SITE_LOCATION_ID.COMMUNITY,
-										});
-									},
-								})
-							),
+							footerLink: pageDirectoriesEnabled ? communityDirectoryNavigationMetadata : undefined,
+							active:
+								!!matchPath('/communities/*', pathname) ||
+								groups.communities.some(({ url }) => matchPath(url + '/*', pathname)),
+							items: groups.communities.map((item, index) => ({
+								testId: `menuLink-additionalItem${index}`,
+								icon: (
+									<AdditionalNavigationItemIconOrImage
+										iconName={item.iconName}
+										imageUrl={item.imageUrl}
+										imageAlt={item.name}
+										svgProps={{ width: 24, height: 24 }}
+									/>
+								),
+								description: '',
+								...getCommunityNavigationLink(item, institution.preferLegacyTopicCenters),
+							})),
+						},
+				  ]
+				: pageDirectoriesEnabled
+				? [
+						{
+							navigationItemId: 'COMMUNITY',
+							title: 'Community',
+							to: '/communities',
+							onClick: communityDirectoryNavigationMetadata.onClick,
+							active: matchPath('/communities/*', pathname),
 						},
 				  ]
 				: []),
@@ -578,6 +604,7 @@ const HeaderV2 = () => {
 	}, [
 		institution?.additionalNavigationItems,
 		institution?.featuresEnabled,
+		institution.pageDirectoriesEnabled,
 		institution.preferLegacyTopicCenters,
 		generalNavigationFeatures,
 		pathname,
@@ -672,7 +699,7 @@ const HeaderV2 = () => {
 			return legacyFeaturedTopicCenter
 				? {
 						isLegacy: true,
-						subtitle: 'Featured Topic',
+						subtitle: 'Monthly Spotlight',
 						name: legacyFeaturedTopicCenter.featuredTitle!,
 						imageAlt: legacyFeaturedTopicCenter.name!,
 						imageUrl: legacyFeaturedTopicCenter.imageUrl!,
@@ -687,7 +714,7 @@ const HeaderV2 = () => {
 		return featuredTopicCenter
 			? {
 					isLegacy: false,
-					subtitle: 'Featured Topic',
+					subtitle: 'Monthly Spotlight',
 					name: featuredTopicCenter.headline,
 					imageAlt: featuredTopicCenter.imageAltText ?? '',
 					imageUrl: featuredTopicCenter.imageUrl,
@@ -712,15 +739,27 @@ const HeaderV2 = () => {
 							const showFeaturedItem =
 								navigationItem.navigationItemId === 'BROWSE_RESOURCES' && featuredTopicCenterItem;
 
-							if (navigationItem.items && navigationItem.items.length <= 0) {
+							if (navigationItem.items && navigationItem.items.length <= 0 && !showFeaturedItem) {
 								return null;
 							}
 
 							return (
 								<li key={navigationItem.navigationItemId}>
-									{navigationItem.to && <Link to={navigationItem.to}>{navigationItem.title}</Link>}
+									{navigationItem.to && !navigationItem.items && (
+										<Link
+											to={navigationItem.to}
+											onClick={() => {
+												setMenuOpen(false);
+												navigationItem.onClick?.();
+											}}
+										>
+											{navigationItem.title}
+										</Link>
+									)}
 									{navigationItem.items && (
 										<MobileAccordianItem
+											titleTo={navigationItem.to}
+											title={navigationItem.title}
 											className={classNames({
 												'pt-2': !navigationItem.subtitle,
 												'pb-2': !showFeaturedItem,
@@ -735,30 +774,55 @@ const HeaderV2 = () => {
 													key={itemIndex}
 													to={item.to ?? '/#'}
 													onClick={() => {
+														setMenuOpen(false);
 														item.onClick?.();
 													}}
 												>
 													<div
 														className={classNames('d-flex', {
-															'align-items-center': !item.description,
+															'align-items-center':
+																!item.description || !!item.descriptionHtml,
 														})}
 													>
 														{item.icon}
 														<div className="ps-4 w-100">
 															<p className="mb-0 fw-semibold">{item.title}</p>
-															{item.description && (
-																<p className="mb-0 text-gray">{item.description}</p>
-															)}
+															<HeaderNavDescription
+																description={item.description}
+																descriptionHtml={item.descriptionHtml}
+															/>
 														</div>
 													</div>
 												</Link>
 											))}
+											{navigationItem.navigationItemId === 'CONNECT_WITH_SUPPORT' &&
+												showEmployers && (
+													<HeaderNavEmployers
+														employers={employers}
+														mobileNav
+														onNavigate={() => setMenuOpen(false)}
+													/>
+												)}
+											{navigationItem.footerLink && (
+												<Link
+													to={navigationItem.footerLink.to}
+													className="text-p500 mt-4"
+													onClick={() => {
+														setMenuOpen(false);
+														navigationItem.footerLink?.onClick?.();
+													}}
+												>
+													{navigationItem.footerLink.title}
+													<SvgIcon kit="far" icon="arrow-right" size={16} className="ms-2" />
+												</Link>
+											)}
 											{showFeaturedItem && (
 												<HeaderNavFeaturedItem
 													mobileNav
 													className="bg-n50 mt-6 px-4 py-6"
 													featuredItem={featuredTopicCenterItem}
 													onImageClick={() => {
+														setMenuOpen(false);
 														featuredTopicCenterItem.isLegacy
 															? analyticsService.persistEvent(
 																	AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER,
@@ -888,7 +952,7 @@ const HeaderV2 = () => {
 										navigationItem.navigationItemId === 'BROWSE_RESOURCES' &&
 										featuredTopicCenterItem;
 
-									if (navigationItem.items && navigationItem.items.length <= 0) {
+									if (navigationItem.items && navigationItem.items.length <= 0 && !showFeaturedItem) {
 										return null;
 									}
 
@@ -899,10 +963,11 @@ const HeaderV2 = () => {
 												active: navigationItem.active,
 											})}
 										>
-											{navigationItem.to && (
+											{navigationItem.to && !navigationItem.items && (
 												<Link
 													to={navigationItem.to}
 													onClick={() => {
+														navigationItem.onClick?.();
 														trackEvent({
 															action: 'Top Nav',
 															link_text: navigationItem.title,
@@ -914,6 +979,13 @@ const HeaderV2 = () => {
 											)}
 											{navigationItem.items && (
 												<HeaderNavDropdown
+													titleTo={navigationItem.to}
+													onTitleClick={() =>
+														trackEvent({
+															action: 'Top Nav',
+															link_text: navigationItem.title,
+														})
+													}
 													onToggle={(nextShow) => {
 														if (nextShow) {
 															trackEvent({
@@ -923,12 +995,30 @@ const HeaderV2 = () => {
 														}
 													}}
 													title={navigationItem.title}
-													{...(showFeaturedItem
-														? {
-																subtitle: navigationItem.subtitle,
-																featuredItem: featuredTopicCenterItem,
-														  }
-														: null)}
+													subtitle={navigationItem.subtitle}
+													footerLink={navigationItem.footerLink}
+													onFooterClick={() =>
+														trackEvent({
+															action: 'Top Nav Dropdown',
+															link_text: navigationItem.title,
+															link_detail: navigationItem.footerLink?.title,
+														})
+													}
+													secondaryColumn={
+														navigationItem.navigationItemId === 'CONNECT_WITH_SUPPORT' &&
+														showEmployers ? (
+															<HeaderNavEmployers
+																employers={employers}
+																onNavigate={(title) =>
+																	trackEvent({
+																		action: 'Top Nav Dropdown',
+																		link_text: navigationItem.title,
+																		link_detail: title,
+																	})
+																}
+															/>
+														) : undefined
+													}
 													featuredItem={showFeaturedItem ? featuredTopicCenterItem : null}
 												>
 													{navigationItem.items.map((item, itemIndex) => (
@@ -947,17 +1037,17 @@ const HeaderV2 = () => {
 														>
 															<div
 																className={classNames('d-flex', {
-																	'align-items-center': !item.description,
+																	'align-items-center':
+																		!item.description || !!item.descriptionHtml,
 																})}
 															>
 																{item.icon}
 																<div className="ps-4">
 																	<p className="mb-0 fw-semibold">{item.title}</p>
-																	{item.description && (
-																		<p className="mb-0 text-gray">
-																			{item.description}
-																		</p>
-																	)}
+																	<HeaderNavDescription
+																		description={item.description}
+																		descriptionHtml={item.descriptionHtml}
+																	/>
 																</div>
 															</div>
 														</Dropdown.Item>

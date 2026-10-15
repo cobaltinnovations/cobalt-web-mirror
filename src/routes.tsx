@@ -1005,6 +1005,16 @@ export const routes: RouteObject[] = [
 						element: <RedirectToCommunityPage />,
 					},
 					{
+						id: 'featured-topics-directory',
+						path: 'featured-topics',
+						lazy: () => import('@/routes/page-directory'),
+					},
+					{
+						id: 'communities-directory',
+						path: 'communities',
+						lazy: () => import('@/routes/page-directory'),
+					},
+					{
 						path: 'featured-topics/:topicCenterId',
 						element: <RedirectLegacyFeaturedTopicCenterToPage />,
 					},

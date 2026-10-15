@@ -1,14 +1,20 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Button, Form, Modal, ModalProps } from 'react-bootstrap';
-import { PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
+import { PAGE_LOCATION_ID, PageDetailModel, PageFriendlyUrlValidationResult } from '@/lib/models';
 import { pagesService } from '@/lib/services';
 import InputHelper from '@/components/input-helper';
 import SvgIcon from '@/components/svg-icon';
 import useDebouncedState from '@/hooks/use-debounced-state';
 import useHandleError from '@/hooks/use-handle-error';
 import { createUseThemedStyles } from '@/jss/theme';
+import { PageLocationSelect } from './page-location-select';
+import InlineAlert from '@/components/inline-alert';
+import { shouldWarnForPageUrlChange } from '@/lib/utils/page-admin-utils';
 
 const useStyles = createUseThemedStyles((_theme) => ({
+	caution: {
+		borderRadius: 8,
+	},
 	modal: {
 		maxWidth: 620,
 	},
@@ -22,6 +28,7 @@ interface PageSettingsModalProps extends ModalProps {
 const initialFormValues = {
 	pageName: '',
 	friendlyUrl: '',
+	pageLocationId: PAGE_LOCATION_ID.UNCATEGORIZED,
 };
 
 export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, ...props }) => {
@@ -35,11 +42,13 @@ export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, .
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleOnEnter = () => {
+		setUrlNameValidation(undefined);
 		setFormValues(
 			page
 				? {
 						pageName: page.name ?? '',
 						friendlyUrl: page.urlName ?? '',
+						pageLocationId: page.pageLocationId ?? PAGE_LOCATION_ID.UNCATEGORIZED,
 				  }
 				: initialFormValues
 		);
@@ -50,20 +59,28 @@ export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, .
 	};
 
 	useEffect(() => {
-		if (!debouncedFriendlyUrlQuery) {
+		if (!props.show || !debouncedFriendlyUrlQuery || debouncedFriendlyUrlQuery !== formValues.friendlyUrl) {
 			return;
 		}
 
-		pagesService
-			.validatePageUrl({
-				searchQuery: debouncedFriendlyUrlQuery,
-				...(page && { pageId: page.pageId }),
-			})
+		const request = pagesService.validatePageUrl({
+			searchQuery: debouncedFriendlyUrlQuery,
+			...(page && { pageId: page.pageId }),
+		});
+		let active = true;
+		request
 			.fetch()
 			.then((response) => {
-				setUrlNameValidation(response.pageUrlNameValidationResult);
+				if (active) setUrlNameValidation(response.pageUrlNameValidationResult);
+			})
+			.catch((error) => {
+				if (active) handleError(error);
 			});
-	}, [debouncedFriendlyUrlQuery, page]);
+		return () => {
+			active = false;
+			request.abort();
+		};
+	}, [debouncedFriendlyUrlQuery, formValues.friendlyUrl, page, props.show, handleError]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -78,6 +95,7 @@ export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, .
 				.updatePageSettings(page.pageId, {
 					name: formValues.pageName,
 					urlName: formValues.friendlyUrl,
+					pageLocationId: formValues.pageLocationId,
 				})
 				.fetch();
 
@@ -146,7 +164,7 @@ export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, .
 							required
 						/>
 						{urlNameValidation?.available === false ? null : (
-							<div className="d-flex align-items-center">
+							<div className="mb-4 d-flex align-items-center">
 								<SvgIcon
 									kit="fas"
 									icon="circle-info"
@@ -159,6 +177,22 @@ export const PageSettingsModal: FC<PageSettingsModalProps> = ({ page, onSaved, .
 								</p>
 							</div>
 						)}
+						{shouldWarnForPageUrlChange(page, formValues.friendlyUrl) && (
+							<InlineAlert
+								variant="danger"
+								className={`${classes.caution} mb-4`}
+								title="Proceed with caution"
+								description="Updating the URL will break any existing links using the previous URL."
+							/>
+						)}
+						<PageLocationSelect
+							value={formValues.pageLocationId}
+							description={page?.pageLocationDescription}
+							enabled={!!props.show}
+							onChange={(pageLocationId) =>
+								setFormValues((previous) => ({ ...previous, pageLocationId }))
+							}
+						/>
 					</Modal.Body>
 					<Modal.Footer>
 						<div className="text-right">

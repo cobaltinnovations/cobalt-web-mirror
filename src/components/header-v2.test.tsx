@@ -1,11 +1,14 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
 import { CobaltThemeProvider } from '@/jss/theme';
-import { ROLE_ID } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, FeatureId, InstitutionLocation, PAGE_LOCATION_ID, ROLE_ID } from '@/lib/models';
+import { institutionService } from '@/lib/services/institution-service';
+import { analyticsService } from '@/lib/services/analytics-service';
 import HeaderV2 from './header-v2';
+import { useAppRootLoaderData } from '@/routes/root';
 
 jest.mock('react-bootstrap', () => {
 	const actual = jest.requireActual('react-bootstrap');
@@ -48,6 +51,7 @@ jest.mock('@/hooks/use-account', () => ({
 	__esModule: true,
 	default: jest.fn(),
 }));
+jest.mock('@/lib/services/institution-service', () => ({ institutionService: { getInstitutionLocations: jest.fn() } }));
 jest.mock('@/hooks/use-analytics', () => ({
 	__esModule: true,
 	default: () => ({ trackEvent: jest.fn() }),
@@ -57,10 +61,7 @@ jest.mock('@/hooks/use-handle-error', () => ({
 	default: () => jest.fn(),
 }));
 jest.mock('@/routes/root', () => ({
-	useAppRootLoaderData: () => ({
-		featuredTopicCenter: undefined,
-		legacyFeaturedTopicCenter: undefined,
-	}),
+	useAppRootLoaderData: jest.fn(),
 }));
 jest.mock('@/menu-links', () => ({ exploreLinks: [] }));
 jest.mock('@/components/svg-icon', () => ({
@@ -81,17 +82,34 @@ jest.mock('@/components/header-alert', () => ({
 }));
 
 const mockUseAccount = useAccount as jest.MockedFunction<typeof useAccount>;
+const getLocations = institutionService.getInstitutionLocations as jest.Mock;
+
+beforeEach(() => {
+	getLocations.mockReset();
+	(useAppRootLoaderData as jest.Mock).mockReturnValue({});
+});
+afterEach(() => jest.restoreAllMocks());
 
 const mockAccount = ({
 	roleId,
 	providerId,
 	isAdmin,
 	isProvider,
+	featuresEnabled = false,
+	bookingV2Enabled = false,
+	communitiesEnabled = false,
+	pageDirectoriesEnabled,
+	preferLegacyTopicCenters = false,
 }: {
 	roleId: string;
 	providerId?: string;
 	isAdmin: boolean;
 	isProvider: boolean;
+	featuresEnabled?: boolean;
+	bookingV2Enabled?: boolean;
+	communitiesEnabled?: boolean;
+	pageDirectoriesEnabled?: boolean;
+	preferLegacyTopicCenters?: boolean;
 }) => {
 	mockUseAccount.mockReturnValue({
 		account: {
@@ -102,14 +120,28 @@ const mockAccount = ({
 			},
 		},
 		institution: {
-			additionalNavigationItems: [],
+			additionalNavigationItems: communitiesEnabled
+				? [{ name: 'Parents', url: '/pages/parents', pageId: 'parents-page', topicCenterId: 'parents-topic' }]
+				: [],
 			alerts: [],
-			bookingV2Enabled: false,
-			features: [],
-			featuresEnabled: false,
+			institutionId: 'COBALT',
+			bookingV2Enabled,
+			features: featuresEnabled
+				? [
+						{
+							featureId: FeatureId.THERAPY,
+							name: 'Therapy',
+							navigationHeaderId: 'CONNECT_WITH_SUPPORT',
+							navVisible: true,
+							urlName: '/therapy',
+						},
+				  ]
+				: [],
+			featuresEnabled,
+			pageDirectoriesEnabled,
 			headerLogoUrl: '',
 			name: 'Test Institution',
-			preferLegacyTopicCenters: false,
+			preferLegacyTopicCenters,
 			requireConsentForm: false,
 		},
 		isAdmin,
@@ -133,8 +165,240 @@ const renderHeader = () => {
 		{ initialEntries: ['/'] }
 	);
 
-	return render(<RouterProvider router={router} />);
+	return { ...render(<RouterProvider router={router} />), router };
 };
+
+it.each([
+	['desktop', false],
+	['mobile', false],
+	['desktop', true],
+	['mobile', true],
+])('records Community directory navigation on %s (curated links=%s)', async (surface, communitiesEnabled) => {
+	mockAccount({
+		roleId: ROLE_ID.MEMBER,
+		isAdmin: false,
+		isProvider: false,
+		communitiesEnabled,
+		pageDirectoriesEnabled: true,
+	});
+	const persistEvent = jest.spyOn(analyticsService, 'persistEvent').mockReturnValue(true);
+	const { router } = renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+	const links = screen.getAllByRole('link', {
+		name: communitiesEnabled ? 'All communities' : 'Community',
+		hidden: true,
+	});
+	expect(links).toHaveLength(2);
+	fireEvent.click(links[surface === 'mobile' ? 0 : 1]);
+	await waitFor(() => expect(router.state.location.pathname).toBe('/communities'));
+	expect(persistEvent).toHaveBeenCalledTimes(1);
+	expect(persistEvent).toHaveBeenCalledWith(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_DIRECTORY, {
+		source: 'NAV',
+		pageLocationId: PAGE_LOCATION_ID.COMMUNITY,
+	});
+	expect(router.state.location.pathname).toBe('/communities');
+	router.dispose();
+});
+
+it.each(['desktop', 'mobile'])('records Featured Topics directory navigation on %s', async (surface) => {
+	mockAccount({ roleId: ROLE_ID.MEMBER, isAdmin: false, isProvider: false, pageDirectoriesEnabled: true });
+	const persistEvent = jest.spyOn(analyticsService, 'persistEvent').mockReturnValue(true);
+	const { router } = renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+	const links = screen.getAllByRole('link', { name: /Featured Topics/, hidden: true });
+	expect(links).toHaveLength(2);
+	fireEvent.click(links[surface === 'mobile' ? 0 : 1]);
+	await waitFor(() => expect(router.state.location.pathname).toBe('/featured-topics'));
+	expect(persistEvent).toHaveBeenCalledTimes(1);
+	expect(persistEvent).toHaveBeenCalledWith(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_DIRECTORY, {
+		source: 'NAV',
+		pageLocationId: PAGE_LOCATION_ID.FEATURED_TOPIC,
+	});
+	expect(router.state.location.pathname).toBe('/featured-topics');
+	router.dispose();
+});
+
+it.each([
+	[false, false],
+	[false, true],
+	[undefined, false],
+	[undefined, true],
+])(
+	'hides directory navigation when the flag is %s and curated links=%s',
+	(pageDirectoriesEnabled, communitiesEnabled) => {
+		mockAccount({
+			roleId: ROLE_ID.MEMBER,
+			isAdmin: false,
+			isProvider: false,
+			communitiesEnabled,
+			pageDirectoriesEnabled,
+		});
+		const { router } = renderHeader();
+		fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+		expect(screen.queryByRole('link', { name: /Featured Topics/, hidden: true })).not.toBeInTheDocument();
+		expect(screen.queryByRole('link', { name: 'All communities', hidden: true })).not.toBeInTheDocument();
+		expect(screen.queryByRole('link', { name: 'Community', hidden: true })).not.toBeInTheDocument();
+		if (communitiesEnabled) {
+			expect(screen.getAllByRole('link', { name: 'Parents', hidden: true })).toHaveLength(2);
+		} else {
+			expect(screen.queryByRole('button', { name: 'Community', hidden: true })).not.toBeInTheDocument();
+		}
+		router.dispose();
+	}
+);
+
+it('removes existing directory navigation after refreshed institution configuration disables it', async () => {
+	mockAccount({ roleId: ROLE_ID.MEMBER, isAdmin: false, isProvider: false, pageDirectoriesEnabled: true });
+	const { router } = renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+	expect(screen.getAllByRole('link', { name: /Featured Topics/, hidden: true })).toHaveLength(2);
+	mockAccount({ roleId: ROLE_ID.MEMBER, isAdmin: false, isProvider: false, pageDirectoriesEnabled: false });
+	await act(async () => router.navigate('/other'));
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+	expect(screen.queryByRole('link', { name: /Featured Topics/, hidden: true })).not.toBeInTheDocument();
+	expect(screen.queryByRole('link', { name: 'Community', hidden: true })).not.toBeInTheDocument();
+	router.dispose();
+});
+
+it.each([false, true])(
+	'preserves curated communities and featured spotlights with directories off (legacy=%s)',
+	(preferLegacyTopicCenters) => {
+		mockAccount({
+			roleId: ROLE_ID.MEMBER,
+			isAdmin: false,
+			isProvider: false,
+			communitiesEnabled: true,
+			pageDirectoriesEnabled: false,
+			preferLegacyTopicCenters,
+		});
+		(useAppRootLoaderData as jest.Mock).mockReturnValue({
+			featuredTopicCenter: { headline: 'Spotlight', relativeUrl: '/pages/spotlight' },
+			legacyFeaturedTopicCenter: { featuredTitle: 'Spotlight', featuredDescription: '', urlName: 'spotlight' },
+		});
+		const persistEvent = jest.spyOn(analyticsService, 'persistEvent').mockReturnValue(true);
+		const { router } = renderHeader();
+		fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+		const parentsLinks = screen.getAllByRole('link', { name: 'Parents', hidden: true });
+		expect(parentsLinks).toHaveLength(2);
+		const spotlightLinks = screen.getAllByRole('link', { name: /Spotlight/, hidden: true });
+		expect(spotlightLinks).toHaveLength(2);
+		spotlightLinks.forEach((link) =>
+			expect(link).toHaveAttribute(
+				'href',
+				preferLegacyTopicCenters ? '/featured-topics/spotlight' : '/pages/spotlight'
+			)
+		);
+		fireEvent.click(parentsLinks[0]);
+		expect(persistEvent).toHaveBeenCalledWith(
+			preferLegacyTopicCenters
+				? AnalyticsNativeEventTypeId.CLICKTHROUGH_TOPIC_CENTER
+				: AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE,
+			expect.objectContaining(
+				preferLegacyTopicCenters ? { topicCenterId: 'parents-topic' } : { pageId: 'parents-page' }
+			)
+		);
+		router.dispose();
+	}
+);
+
+it.each([
+	[false, false],
+	[false, true],
+	[true, false],
+])('omits employer browsing when features=%s and booking V2=%s', (featuresEnabled, bookingV2Enabled) => {
+	mockAccount({ roleId: ROLE_ID.MEMBER, isAdmin: false, isProvider: false, featuresEnabled, bookingV2Enabled });
+
+	renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+
+	expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
+	expect(screen.queryByText('Loading employers…')).not.toBeInTheDocument();
+	expect(getLocations).not.toHaveBeenCalled();
+});
+
+it('shows employer loading, errors, and filtered links in desktop and mobile navigation for booking V2', async () => {
+	mockAccount({
+		roleId: ROLE_ID.MEMBER,
+		isAdmin: false,
+		isProvider: false,
+		featuresEnabled: true,
+		bookingV2Enabled: true,
+	});
+	let reject!: (reason: Error) => void;
+	getLocations.mockReturnValueOnce({
+		fetch: () => new Promise((_resolve, rejectRequest) => (reject = rejectRequest)),
+		abort: jest.fn(),
+	});
+	getLocations.mockReturnValueOnce({
+		fetch: async () => ({
+			locations: [{ institutionId: 'COBALT', institutionLocationId: 'employer-1', name: 'Employer One' }],
+		}),
+		abort: jest.fn(),
+	});
+
+	renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+	expect(screen.getAllByRole('region', { name: 'Browse by Employer', hidden: true })).toHaveLength(2);
+	expect(screen.getAllByText('Loading employers…')).toHaveLength(2);
+	expect(getLocations).toHaveBeenCalledTimes(1);
+
+	await act(async () => reject(new Error('Unavailable')));
+	expect(screen.getAllByText('Unable to load employers.')).toHaveLength(2);
+	await act(async () => fireEvent.click(screen.getAllByRole('button', { name: 'Retry', hidden: true })[0]));
+	expect(getLocations).toHaveBeenCalledTimes(2);
+	const links = screen.getAllByText('Employer One');
+	expect(links).toHaveLength(2);
+	links.forEach((link) =>
+		expect(link.closest('a')).toHaveAttribute('href', '/providers?institutionLocationId=employer-1')
+	);
+});
+
+it.each(['loading', 'error', 'loaded'])(
+	'hides existing employer %s content from desktop and mobile navigation when booking V2 is disabled',
+	async (status) => {
+		mockAccount({
+			roleId: ROLE_ID.MEMBER,
+			isAdmin: false,
+			isProvider: false,
+			featuresEnabled: true,
+			bookingV2Enabled: true,
+		});
+		let resolve!: (value: { locations: InstitutionLocation[] }) => void;
+		let reject!: (reason: Error) => void;
+		const abort = jest.fn();
+		getLocations.mockReturnValueOnce({
+			fetch: () =>
+				new Promise((resolveRequest, rejectRequest) => {
+					resolve = resolveRequest;
+					reject = rejectRequest;
+				}),
+			abort,
+		});
+		const { router } = renderHeader();
+		fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+		if (status === 'error') await act(async () => reject(new Error('Unavailable')));
+		if (status === 'loaded')
+			await act(async () =>
+				resolve({
+					locations: [{ institutionId: 'COBALT', institutionLocationId: 'employer-1', name: 'Employer One' }],
+				})
+			);
+		expect(screen.getAllByRole('region', { name: 'Browse by Employer', hidden: true })).toHaveLength(2);
+
+		mockAccount({
+			roleId: ROLE_ID.MEMBER,
+			isAdmin: false,
+			isProvider: false,
+			featuresEnabled: true,
+			bookingV2Enabled: false,
+		});
+		await act(async () => router.navigate('/therapy'));
+
+		expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
+		expect(getLocations).toHaveBeenCalledTimes(1);
+		expect(abort).toHaveBeenCalledTimes(1);
+	}
+);
 
 it('shows Patient Scheduling for an administrator linked to a provider', () => {
 	mockAccount({

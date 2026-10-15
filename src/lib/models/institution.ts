@@ -60,6 +60,7 @@ export interface Institution {
 	groupSessionRequestsEnabled: boolean;
 	features: InstitutionFeature[];
 	featuresEnabled: boolean;
+	pageDirectoriesEnabled: boolean;
 	featureScreeningFlowId?: string;
 	featuredTopicCenterId?: string;
 	featuredSecondaryTopicCenterId?: string;
@@ -171,6 +172,7 @@ export enum DisplayTypeId {
 }
 
 export interface AdditionalNavigationItem {
+	shortDescription?: string;
 	iconName?: string;
 	imageUrl?: string;
 	name: string;

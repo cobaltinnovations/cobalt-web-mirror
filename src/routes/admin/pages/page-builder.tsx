@@ -339,11 +339,11 @@ const PageBuilder = () => {
 						<h5 className="mb-0 me-4 text-truncate">{page?.name}</h5>
 						{page?.editingLivePage ? (
 							<Badge pill bg="outline-success" className="text-nowrap">
-								Live
+								Published
 							</Badge>
 						) : (
 							<Badge pill bg="outline-dark" className="text-nowrap">
-								Draft
+								Unpublished
 							</Badge>
 						)}
 					</div>
@@ -353,7 +353,7 @@ const PageBuilder = () => {
 								? 'Saving...'
 								: page?.editingLivePage
 								? `Updates saved on ${lastSaved}`
-								: `Draft saved on ${lastSaved}`}
+								: `Unpublished page saved on ${lastSaved}`}
 						</span>
 						{page?.editingLivePage && (
 							<>

@@ -8,6 +8,8 @@ import usePageBuilderContext from '@/hooks/use-page-builder-context';
 import InputHelper from '@/components/input-helper';
 import { createUseThemedStyles } from '@/jss/theme';
 import SvgIcon from '@/components/svg-icon';
+import InlineAlert from '@/components/inline-alert';
+import { shouldWarnForPageUrlChange } from '@/lib/utils/page-admin-utils';
 
 const useStyles = createUseThemedStyles((_theme) => ({
 	modal: {
@@ -17,25 +19,37 @@ const useStyles = createUseThemedStyles((_theme) => ({
 
 interface EditUrlModalProps extends ModalProps {
 	onSave(): void;
+	onSaveUrl(pageId: string, urlName: string): Promise<void>;
+	friendlyUrl: string;
 }
 
 const initialFormValues = {
 	friendlyUrl: '',
 };
 
-export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
+export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, onSaveUrl, friendlyUrl, ...props }) => {
 	const classes = useStyles();
 	const handleError = useHandleError();
-	const { page, setPage } = usePageBuilderContext();
+	const { page } = usePageBuilderContext();
 	const urlInputRef = useRef<HTMLInputElement>(null);
 
 	const [formValues, setFormValues] = useState(initialFormValues);
 	const [debouncedFriendlyUrlQuery] = useDebouncedState(formValues.friendlyUrl);
 	const [urlNameValidation, setUrlNameValidation] = useState<PageFriendlyUrlValidationResult>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const modalSessionRef = useRef(0);
+	const modalPageIdRef = useRef<string>();
+	const currentPageIdRef = useRef(page?.pageId);
+	currentPageIdRef.current = page?.pageId;
+	const showRef = useRef(props.show);
+	showRef.current = props.show;
 
 	const handleOnEnter = () => {
-		setFormValues(page ? { friendlyUrl: page.urlName } : initialFormValues);
+		modalSessionRef.current += 1;
+		modalPageIdRef.current = page?.pageId;
+		setIsSubmitting(false);
+		setUrlNameValidation(undefined);
+		setFormValues(page ? { friendlyUrl } : initialFormValues);
 	};
 
 	const handleOnEntered = () => {
@@ -43,43 +57,57 @@ export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
 	};
 
 	useEffect(() => {
-		if (!debouncedFriendlyUrlQuery) {
+		if (!props.show) {
+			modalSessionRef.current += 1;
+		} else if (modalPageIdRef.current && modalPageIdRef.current !== page?.pageId) {
+			modalSessionRef.current += 1;
+			props.onHide?.();
+		}
+	}, [page?.pageId, props.show, props.onHide]);
+
+	useEffect(() => {
+		if (!props.show || !debouncedFriendlyUrlQuery || debouncedFriendlyUrlQuery !== formValues.friendlyUrl) {
 			return;
 		}
 
-		pagesService
-			.validatePageUrl({
-				searchQuery: debouncedFriendlyUrlQuery,
-				...(page && { pageId: page.pageId }),
-			})
+		const request = pagesService.validatePageUrl({
+			searchQuery: debouncedFriendlyUrlQuery,
+			...(page && { pageId: page.pageId }),
+		});
+		let active = true;
+		request
 			.fetch()
 			.then((response) => {
-				setUrlNameValidation(response.pageUrlNameValidationResult);
+				if (active) setUrlNameValidation(response.pageUrlNameValidationResult);
+			})
+			.catch((error) => {
+				if (active) handleError(error);
 			});
-	}, [debouncedFriendlyUrlQuery, page]);
+		return () => {
+			active = false;
+			request.abort();
+		};
+	}, [debouncedFriendlyUrlQuery, formValues.friendlyUrl, page, props.show, handleError]);
 
 	const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsSubmitting(true);
+		const modalSession = modalSessionRef.current;
 
 		try {
-			if (!page) {
-				throw new Error('page is undefined');
+			const pageId = modalPageIdRef.current;
+			if (!pageId || pageId !== currentPageIdRef.current) {
+				throw new Error('The page being edited has changed.');
 			}
 
-			const response = await pagesService
-				.updatePageSettings(page.pageId, {
-					name: page.name,
-					urlName: formValues.friendlyUrl,
-				})
-				.fetch();
-
-			setPage(response.page);
-			onSave();
+			await onSaveUrl(pageId, formValues.friendlyUrl);
+			if (modalSessionRef.current === modalSession && currentPageIdRef.current === pageId && showRef.current) {
+				onSave();
+			}
 		} catch (error) {
 			handleError(error);
 		} finally {
-			setIsSubmitting(false);
+			if (modalSessionRef.current === modalSession) setIsSubmitting(false);
 		}
 	};
 
@@ -91,10 +119,6 @@ export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
 			<Form onSubmit={handleFormSubmit}>
 				<fieldset disabled={isSubmitting}>
 					<Modal.Body>
-						<p className="mb-4 fw-bold">
-							Updating this URL will break any existing links using the previous URL. Proceed with
-							caution.
-						</p>
 						<InputHelper
 							ref={urlInputRef}
 							className="mb-1"
@@ -145,6 +169,14 @@ export const EditUrlModal: FC<EditUrlModalProps> = ({ onSave, ...props }) => {
 									<span className="fw-bold">{formValues.friendlyUrl}</span>
 								</p>
 							</div>
+						)}
+						{shouldWarnForPageUrlChange(page, formValues.friendlyUrl) && (
+							<InlineAlert
+								variant="danger"
+								className="mt-4"
+								title="Proceed with caution"
+								description="Updating the URL will break any existing links using the previous URL."
+							/>
 						)}
 					</Modal.Body>
 					<Modal.Footer>

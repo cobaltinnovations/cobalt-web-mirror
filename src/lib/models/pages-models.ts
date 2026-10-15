@@ -20,6 +20,34 @@ export interface PageSiteLocationModel {
 export enum PAGE_STATUS_ID {
 	LIVE = 'LIVE',
 	DRAFT = 'DRAFT',
+	COPY_FOR_EDITING = 'COPY_FOR_EDITING',
+}
+
+export enum PAGE_LOCATION_ID {
+	FEATURED_TOPIC = 'FEATURED_TOPIC',
+	COMMUNITY = 'COMMUNITY',
+	UNCATEGORIZED = 'UNCATEGORIZED',
+}
+
+export interface PageLocationModel {
+	pageLocationId: PAGE_LOCATION_ID;
+	description: string;
+	directoryRelativeUrl?: string;
+}
+
+export interface PageSummaryModel {
+	pageId: string;
+	name: string;
+	urlName: string;
+	pageStatusId: PAGE_STATUS_ID;
+	pageStatusDescription: string;
+	hasBeenPublished: boolean;
+	pageLocationId: PAGE_LOCATION_ID;
+	pageLocationDescription: string;
+	headline: string;
+	imageUrl?: string;
+	imageAltText?: string;
+	relativeUrl: string;
 }
 
 export enum BACKGROUND_COLOR_ID {
@@ -71,12 +99,7 @@ export interface PageFriendlyUrlValidationResult {
 	recommendation: string;
 }
 
-export interface PageDetailModel {
-	pageId: string;
-	name: string;
-	urlName: string;
-	pageStatusId: PAGE_STATUS_ID;
-	headline: string;
+export interface PageDetailModel extends PageSummaryModel {
 	description: string;
 	imageFileUploadId: string;
 	imageAltText: string;
@@ -88,7 +111,6 @@ export interface PageDetailModel {
 	lastUpdated: string;
 	lastUpdatedDescription: string;
 	pageSections: PageSectionDetailModel[];
-	relativeUrl: string;
 	editingLivePage: boolean;
 	livePageSiteLocations: PageSiteLocationModel[];
 	mailingListEntryCount?: number;
