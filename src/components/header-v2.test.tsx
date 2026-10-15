@@ -9,6 +9,14 @@ import { institutionService } from '@/lib/services/institution-service';
 import { analyticsService } from '@/lib/services/analytics-service';
 import HeaderV2 from './header-v2';
 import { useAppRootLoaderData } from '@/routes/root';
+import { byPrefixAndName } from '@awesome.me/kit-c75e843088/icons';
+
+// Jest's resolver predates the icon kit's package subpath exports.
+jest.mock(
+	'@awesome.me/kit-c75e843088/icons',
+	() => jest.requireActual('@awesome.me/kit-c75e843088/icons/modules/index.js'),
+	{ virtual: true }
+);
 
 jest.mock('react-bootstrap', () => {
 	const actual = jest.requireActual('react-bootstrap');
@@ -64,14 +72,6 @@ jest.mock('@/routes/root', () => ({
 	useAppRootLoaderData: jest.fn(),
 }));
 jest.mock('@/menu-links', () => ({ exploreLinks: [] }));
-jest.mock('@/components/svg-icon', () => ({
-	__esModule: true,
-	default: () => null,
-}));
-jest.mock('@/components/pathways-icons', () => ({
-	__esModule: true,
-	default: () => null,
-}));
 jest.mock('@/components/in-crisis-header-button', () => ({
 	__esModule: true,
 	default: () => null,
@@ -137,6 +137,13 @@ const mockAccount = ({
 							navigationHeaderId: 'CONNECT_WITH_SUPPORT',
 							navVisible: true,
 							urlName: '/therapy',
+						},
+						{
+							featureId: FeatureId.SELF_HELP_RESOURCES,
+							name: 'Self-Help Resources',
+							navigationHeaderId: 'BROWSE_RESOURCES',
+							navVisible: true,
+							urlName: '/resources',
 						},
 				  ]
 				: [],
@@ -218,6 +225,33 @@ it.each(['desktop', 'mobile'])('records Featured Topics directory navigation on 
 		pageLocationId: PAGE_LOCATION_ID.FEATURED_TOPIC,
 	});
 	expect(router.state.location.pathname).toBe('/featured-topics');
+	router.dispose();
+});
+
+it('renders the Featured Topics history icon while retaining the Resource Library book icon on both surfaces', () => {
+	mockAccount({
+		roleId: ROLE_ID.MEMBER,
+		isAdmin: false,
+		isProvider: false,
+		featuresEnabled: true,
+		pageDirectoriesEnabled: true,
+	});
+	const { router } = renderHeader();
+	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
+
+	const featuredTopicsLinks = screen.getAllByRole('link', { name: /Featured Topics/, hidden: true });
+	const resourceLinks = screen.getAllByRole('link', { name: 'Resource Library', hidden: true });
+	expect(featuredTopicsLinks).toHaveLength(2);
+	expect(resourceLinks).toHaveLength(2);
+	featuredTopicsLinks.forEach((link) =>
+		expect(link.querySelector('svg path')).toHaveAttribute(
+			'd',
+			byPrefixAndName.fas['rectangle-vertical-history'].icon[4] as string
+		)
+	);
+	resourceLinks.forEach((link) =>
+		expect(link.querySelector('svg path')).toHaveAttribute('d', byPrefixAndName.fak['menu-book'].icon[4] as string)
+	);
 	router.dispose();
 });
 

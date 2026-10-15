@@ -52,7 +52,7 @@ const HeaderNavDropdown = ({
 	onFooterClick,
 	children,
 }: PropsWithChildren<HeaderNavDropdownProps>) => {
-	const wide = !!(featuredItem || secondaryColumn || footerLink);
+	const wide = !!(featuredItem || secondaryColumn);
 	const classes = useStyles({ wide });
 	const [show, setShow] = useState(false);
 
