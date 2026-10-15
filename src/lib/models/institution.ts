@@ -60,6 +60,7 @@ export interface Institution {
 	groupSessionRequestsEnabled: boolean;
 	features: InstitutionFeature[];
 	featuresEnabled: boolean;
+	pageDirectoriesEnabled: boolean;
 	featureScreeningFlowId?: string;
 	featuredTopicCenterId?: string;
 	featuredSecondaryTopicCenterId?: string;

@@ -34,7 +34,7 @@ interface HeaderNavDropdownProps {
 	subtitle?: string;
 	onToggle?: (show: boolean) => void;
 	secondaryColumn?: React.ReactNode;
-	footerLink?: { title: string; to: To };
+	footerLink?: { title: string; to: To; onClick?(): void };
 	onFooterClick?(): void;
 	featuredItem: NavFeaturedItem | null;
 	children: React.ReactNode;
@@ -130,7 +130,11 @@ const HeaderNavDropdown = ({
 								as={Link}
 								to={footerLink.to}
 								className="text-p500 mt-4"
-								onClick={onFooterClick}
+								onClick={() => {
+									setShow(false);
+									footerLink.onClick?.();
+									onFooterClick?.();
+								}}
 							>
 								{footerLink.title}
 								<SvgIcon kit="far" icon="arrow-right" size={16} className="ms-2" />

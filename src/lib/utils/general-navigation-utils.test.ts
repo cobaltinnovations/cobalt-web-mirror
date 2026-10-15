@@ -15,7 +15,7 @@ import {
 	AnalyticsNativeEventTypeId,
 } from '@/lib/models/analytics';
 
-import { SITE_LOCATION_ID } from '@/lib/models';
+import { PAGE_LOCATION_ID, SITE_LOCATION_ID } from '@/lib/models';
 
 afterEach(() => jest.restoreAllMocks());
 
@@ -117,8 +117,26 @@ it('uses the mockup resource labels while retaining institution routes and descr
 		title: 'Featured Topics',
 		to: '/featured-topics',
 		description: 'Pages that bring together a variety of resources focused on specific topics.',
+		onClick: expect.any(Function),
 	});
-	expect(communityDirectoryNavigationMetadata).toEqual({ title: 'All communities', to: '/communities' });
+	expect(communityDirectoryNavigationMetadata).toEqual({
+		title: 'All communities',
+		to: '/communities',
+		onClick: expect.any(Function),
+	});
+});
+
+it.each([
+	[featuredTopicsNavigationMetadata, PAGE_LOCATION_ID.FEATURED_TOPIC],
+	[communityDirectoryNavigationMetadata, PAGE_LOCATION_ID.COMMUNITY],
+])('records the directory destination for %s navigation', (metadata, pageLocationId) => {
+	const persistEvent = jest.spyOn(analyticsService, 'persistEvent').mockReturnValue(true);
+	metadata.onClick();
+	expect(persistEvent).toHaveBeenCalledTimes(1);
+	expect(persistEvent).toHaveBeenCalledWith(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_DIRECTORY, {
+		source: 'NAV',
+		pageLocationId,
+	});
 });
 
 it.each([false, true])(

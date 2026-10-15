@@ -18,7 +18,9 @@ import { TablePagination } from '@/components/table';
 import useAccount from '@/hooks/use-account';
 import useHandleError from '@/hooks/use-handle-error';
 import { usePageDirectorySearch } from '@/hooks/use-page-directory-search';
+import { usePageDirectoryAnalytics } from '@/hooks/use-page-directory-analytics';
 import { createUseThemedStyles } from '@/jss/theme';
+import NoMatch from '@/pages/no-match';
 import { GetPublishedPagesResponse } from '@/lib/services/pages-service';
 import {
 	getPageDirectoryConfiguration,
@@ -68,9 +70,15 @@ const DirectoryError = () => {
 };
 
 export const Component = () => {
+	const { institution } = useAccount();
+	return institution.pageDirectoriesEnabled === true ? <PageDirectory /> : <NoMatch />;
+};
+
+const PageDirectory = () => {
 	const classes = useStyles();
 	const { institution } = useAccount();
 	const { configuration, pagesResponse } = useLoaderData() as DirectoryLoaderData;
+	const trackPageClick = usePageDirectoryAnalytics(configuration.pageLocationId, pagesResponse);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const navigation = useNavigation();
 	const searchQuery = searchParams.get('searchQuery') ?? '';
@@ -110,7 +118,11 @@ export const Component = () => {
 									<Row>
 										{pages.map((page) => (
 											<Col key={page.pageId} xs={12} md={6} lg={4} className="mb-6">
-												<Link to={page.relativeUrl} className={classes.card}>
+												<Link
+													to={page.relativeUrl}
+													className={classes.card}
+													onClick={() => trackPageClick(page.pageId)}
+												>
 													{page.imageUrl ? (
 														<img
 															className={classes.image}

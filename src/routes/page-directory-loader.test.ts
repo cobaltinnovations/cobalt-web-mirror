@@ -3,11 +3,14 @@ import { createMemoryRouter, LoaderFunctionArgs } from 'react-router-dom';
 import { Headers, Request, Response } from 'node-fetch';
 import { PAGE_LOCATION_ID } from '@/lib/models/pages-models';
 import { pagesService } from '@/lib/services/pages-service';
+import { institutionService } from '@/lib/services/institution-service';
 import { loader } from './page-directory-loader';
 
 jest.mock('@/lib/services/pages-service', () => ({ pagesService: { getPublishedPages: jest.fn() } }));
+jest.mock('@/lib/services/institution-service', () => ({ institutionService: { getInstitution: jest.fn() } }));
 Object.assign(globalThis, { Headers, Request, Response });
 
+beforeEach(() => jest.clearAllMocks());
 afterEach(() => jest.restoreAllMocks());
 
 const args = (url: string, signal = new AbortController().signal) =>
@@ -88,6 +91,28 @@ const waitForNavigation = async (router: ReturnType<typeof createMemoryRouter>) 
 		});
 	});
 };
+
+it('adds no institution lookup when loading directory navigation, search, and pagination', async () => {
+	jest.spyOn(pagesService, 'getPublishedPages').mockReturnValue({
+		fetch: async () => ({ pages: [{ pageId: 'published-page' }], totalCount: 51, totalCountDescription: '51' }),
+		abort: jest.fn(),
+	} as never);
+	const router = createMemoryRouter([{ path: '/communities', id: 'directory', loader }], {
+		initialEntries: ['/communities'],
+	});
+	await waitForNavigation(router);
+	await router.navigate('/communities?searchQuery=wellness');
+	await router.navigate('/communities?searchQuery=wellness&pageNumber=1');
+	expect(institutionService.getInstitution).not.toHaveBeenCalled();
+	expect(pagesService.getPublishedPages).toHaveBeenCalledTimes(3);
+	expect(pagesService.getPublishedPages).toHaveBeenLastCalledWith({
+		pageLocationId: PAGE_LOCATION_ID.COMMUNITY,
+		searchQuery: 'wellness',
+		pageNumber: '1',
+		pageSize: '25',
+	});
+	router.dispose();
+});
 
 it.each([
 	[10, '0'],

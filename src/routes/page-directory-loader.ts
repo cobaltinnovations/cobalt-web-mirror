@@ -7,6 +7,17 @@ import {
 	withPageDirectoryPage,
 } from '@/lib/utils/page-directory-utils';
 
+const fetchForNavigation = <T>(apiRequest: { fetch(): Promise<T>; abort(): void }, signal: AbortSignal) => {
+	const response = apiRequest.fetch();
+	const abort = () => apiRequest.abort();
+	if (signal.aborted) {
+		abort();
+	} else {
+		signal.addEventListener('abort', abort, { once: true });
+	}
+	return response.finally(() => signal.removeEventListener('abort', abort));
+};
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const url = new URL(request.url);
 	const configuration = getPageDirectoryConfiguration(url.pathname);
@@ -15,16 +26,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	}
 
 	const parameters = getPageDirectoryRequestParameters(configuration.pageLocationId, url.searchParams);
-	const pagesRequest = pagesService.getPublishedPages(parameters);
-	const pagesResponse = pagesRequest.fetch();
-	const abort = () => pagesRequest.abort();
-	if (request.signal.aborted) {
-		abort();
-	} else {
-		request.signal.addEventListener('abort', abort, { once: true });
-	}
-
-	const settledResponse = pagesResponse.finally(() => request.signal.removeEventListener('abort', abort));
+	const settledResponse = fetchForNavigation(pagesService.getPublishedPages(parameters), request.signal);
 	if (Number(parameters.pageNumber) > 0) {
 		try {
 			const response = await settledResponse;

@@ -468,7 +468,7 @@ const HeaderV2 = () => {
 		navigationItemId?: string;
 		title: string;
 		subtitle?: string;
-		footerLink?: { title: string; to: To };
+		footerLink?: { title: string; to: To; onClick?(): void };
 		to?: To;
 		onClick?(): void;
 		active: PathMatch<string> | boolean | null;
@@ -489,6 +489,7 @@ const HeaderV2 = () => {
 			additionalNavigationItems: institution.additionalNavigationItems,
 		});
 		const showCommunityLinks = groups.communities.length > 0;
+		const pageDirectoriesEnabled = institution.pageDirectoriesEnabled === true;
 
 		return [
 			...(institution?.featuresEnabled
@@ -541,16 +542,20 @@ const HeaderV2 = () => {
 						icon: <PathwaysIcon featureId={feature.featureId} svgProps={{ width: 24, height: 24 }} />,
 						...getResourceNavigationMetadata(feature),
 					})),
-					{
-						navigationItemId: 'FEATURED_TOPICS_DIRECTORY',
-						...featuredTopicsNavigationMetadata,
-						icon: (
-							<PathwaysIcon
-								featureId={FeatureId.SELF_HELP_RESOURCES}
-								svgProps={{ width: 24, height: 24 }}
-							/>
-						),
-					},
+					...(pageDirectoriesEnabled
+						? [
+								{
+									navigationItemId: 'FEATURED_TOPICS_DIRECTORY',
+									...featuredTopicsNavigationMetadata,
+									icon: (
+										<PathwaysIcon
+											featureId={FeatureId.SELF_HELP_RESOURCES}
+											svgProps={{ width: 24, height: 24 }}
+										/>
+									),
+								},
+						  ]
+						: []),
 					...exploreLinks.map(({ testId, icon, label, to }) => ({
 						testId,
 						icon,
@@ -565,7 +570,7 @@ const HeaderV2 = () => {
 						{
 							navigationItemId: 'COMMUNITY',
 							title: 'Community',
-							footerLink: communityDirectoryNavigationMetadata,
+							footerLink: pageDirectoriesEnabled ? communityDirectoryNavigationMetadata : undefined,
 							active:
 								!!matchPath('/communities/*', pathname) ||
 								groups.communities.some(({ url }) => matchPath(url + '/*', pathname)),
@@ -584,18 +589,22 @@ const HeaderV2 = () => {
 							})),
 						},
 				  ]
-				: [
+				: pageDirectoriesEnabled
+				? [
 						{
 							navigationItemId: 'COMMUNITY',
 							title: 'Community',
 							to: '/communities',
+							onClick: communityDirectoryNavigationMetadata.onClick,
 							active: matchPath('/communities/*', pathname),
 						},
-				  ]),
+				  ]
+				: []),
 		];
 	}, [
 		institution?.additionalNavigationItems,
 		institution?.featuresEnabled,
+		institution.pageDirectoriesEnabled,
 		institution.preferLegacyTopicCenters,
 		generalNavigationFeatures,
 		pathname,
@@ -730,7 +739,7 @@ const HeaderV2 = () => {
 							const showFeaturedItem =
 								navigationItem.navigationItemId === 'BROWSE_RESOURCES' && featuredTopicCenterItem;
 
-							if (navigationItem.items && navigationItem.items.length <= 0) {
+							if (navigationItem.items && navigationItem.items.length <= 0 && !showFeaturedItem) {
 								return null;
 							}
 
@@ -798,7 +807,10 @@ const HeaderV2 = () => {
 												<Link
 													to={navigationItem.footerLink.to}
 													className="text-p500 mt-4"
-													onClick={() => setMenuOpen(false)}
+													onClick={() => {
+														setMenuOpen(false);
+														navigationItem.footerLink?.onClick?.();
+													}}
 												>
 													{navigationItem.footerLink.title}
 													<SvgIcon kit="far" icon="arrow-right" size={16} className="ms-2" />
@@ -940,7 +952,7 @@ const HeaderV2 = () => {
 										navigationItem.navigationItemId === 'BROWSE_RESOURCES' &&
 										featuredTopicCenterItem;
 
-									if (navigationItem.items && navigationItem.items.length <= 0) {
+									if (navigationItem.items && navigationItem.items.length <= 0 && !showFeaturedItem) {
 										return null;
 									}
 

@@ -7,7 +7,7 @@ import {
 } from '@/lib/models/institution';
 import { AnalyticsNativeEventClickthroughFeatureSource, AnalyticsNativeEventTypeId } from '@/lib/models/analytics';
 import { AnalyticsNativeEventClickthroughTopicCenterSource } from '@/lib/models/analytics';
-import { SITE_LOCATION_ID } from '@/lib/models';
+import { PAGE_LOCATION_ID, SITE_LOCATION_ID } from '@/lib/models';
 import { buildQueryParamUrl } from './url-utils';
 import { analyticsService } from '@/lib/services/analytics-service';
 
@@ -57,9 +57,24 @@ export const featuredTopicsNavigationMetadata = {
 	title: 'Featured Topics',
 	description: 'Pages that bring together a variety of resources focused on specific topics.',
 	to: '/featured-topics',
+	onClick: () => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_DIRECTORY, {
+			source: 'NAV',
+			pageLocationId: PAGE_LOCATION_ID.FEATURED_TOPIC,
+		});
+	},
 };
 
-export const communityDirectoryNavigationMetadata = { title: 'All communities', to: '/communities' };
+export const communityDirectoryNavigationMetadata = {
+	title: 'All communities',
+	to: '/communities',
+	onClick: () => {
+		analyticsService.persistEvent(AnalyticsNativeEventTypeId.CLICKTHROUGH_PAGE_DIRECTORY, {
+			source: 'NAV',
+			pageLocationId: PAGE_LOCATION_ID.COMMUNITY,
+		});
+	},
+};
 
 export const getCommunityNavigationLink = (item: AdditionalNavigationItem, preferLegacyTopicCenters: boolean) => ({
 	title: item.name,
