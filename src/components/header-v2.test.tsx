@@ -4,7 +4,7 @@ import { createMemoryRouter, Outlet, RouterProvider } from 'react-router-dom';
 
 import useAccount from '@/hooks/use-account';
 import { CobaltThemeProvider } from '@/jss/theme';
-import { AnalyticsNativeEventTypeId, FeatureId, InstitutionLocation, PAGE_LOCATION_ID, ROLE_ID } from '@/lib/models';
+import { AnalyticsNativeEventTypeId, FeatureId, PAGE_LOCATION_ID, ROLE_ID } from '@/lib/models';
 import { institutionService } from '@/lib/services/institution-service';
 import { analyticsService } from '@/lib/services/analytics-service';
 import HeaderV2 from './header-v2';
@@ -93,6 +93,7 @@ afterEach(() => jest.restoreAllMocks());
 const mockAccount = ({
 	roleId,
 	providerId,
+	institutionLocationId,
 	isAdmin,
 	isProvider,
 	featuresEnabled = false,
@@ -103,6 +104,7 @@ const mockAccount = ({
 }: {
 	roleId: string;
 	providerId?: string;
+	institutionLocationId?: string;
 	isAdmin: boolean;
 	isProvider: boolean;
 	featuresEnabled?: boolean;
@@ -115,6 +117,7 @@ const mockAccount = ({
 		account: {
 			roleId,
 			providerId,
+			institutionLocationId,
 			accountCapabilityFlags: {
 				canManageCareEncounters: true,
 			},
@@ -305,98 +308,65 @@ it.each([
 	[false, false],
 	[false, true],
 	[true, false],
+	[true, true],
 ])('omits employer browsing when features=%s and booking V2=%s', (featuresEnabled, bookingV2Enabled) => {
 	mockAccount({ roleId: ROLE_ID.MEMBER, isAdmin: false, isProvider: false, featuresEnabled, bookingV2Enabled });
-
-	renderHeader();
-	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
-
-	expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
-	expect(screen.queryByText('Loading employers…')).not.toBeInTheDocument();
-	expect(getLocations).not.toHaveBeenCalled();
-});
-
-it('shows employer loading, errors, and filtered links in desktop and mobile navigation for booking V2', async () => {
-	mockAccount({
-		roleId: ROLE_ID.MEMBER,
-		isAdmin: false,
-		isProvider: false,
-		featuresEnabled: true,
-		bookingV2Enabled: true,
-	});
-	let reject!: (reason: Error) => void;
-	getLocations.mockReturnValueOnce({
-		fetch: () => new Promise((_resolve, rejectRequest) => (reject = rejectRequest)),
-		abort: jest.fn(),
-	});
-	getLocations.mockReturnValueOnce({
+	getLocations.mockReturnValue({
 		fetch: async () => ({
 			locations: [{ institutionId: 'COBALT', institutionLocationId: 'employer-1', name: 'Employer One' }],
 		}),
 		abort: jest.fn(),
 	});
 
-	renderHeader();
+	const { router } = renderHeader();
 	fireEvent.click(screen.getByTestId('headerNavMenuButton'));
-	expect(screen.getAllByRole('region', { name: 'Browse by Employer', hidden: true })).toHaveLength(2);
-	expect(screen.getAllByText('Loading employers…')).toHaveLength(2);
-	expect(getLocations).toHaveBeenCalledTimes(1);
 
-	await act(async () => reject(new Error('Unavailable')));
-	expect(screen.getAllByText('Unable to load employers.')).toHaveLength(2);
-	await act(async () => fireEvent.click(screen.getAllByRole('button', { name: 'Retry', hidden: true })[0]));
-	expect(getLocations).toHaveBeenCalledTimes(2);
-	const links = screen.getAllByText('Employer One');
-	expect(links).toHaveLength(2);
-	links.forEach((link) =>
-		expect(link.closest('a')).toHaveAttribute('href', '/providers?institutionLocationId=employer-1')
-	);
+	expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
+	expect(screen.queryByText('Browse by Employer')).not.toBeInTheDocument();
+	expect(screen.queryByRole('link', { name: 'Employer One', hidden: true })).not.toBeInTheDocument();
+	expect(screen.queryByText('Loading employers…')).not.toBeInTheDocument();
+	expect(screen.queryByText('Unable to load employers.')).not.toBeInTheDocument();
+	expect(getLocations).not.toHaveBeenCalled();
+	if (featuresEnabled) {
+		expect(screen.getAllByRole('link', { name: 'Therapy', hidden: true })).toHaveLength(2);
+	} else {
+		expect(screen.queryByRole('link', { name: 'Therapy', hidden: true })).not.toBeInTheDocument();
+	}
+	router.dispose();
 });
 
-it.each(['loading', 'error', 'loaded'])(
-	'hides existing employer %s content from desktop and mobile navigation when booking V2 is disabled',
-	async (status) => {
+it.each<[string, boolean, string | undefined]>([
+	['desktop', false, undefined],
+	['mobile', false, undefined],
+	['desktop', true, undefined],
+	['mobile', true, undefined],
+	['desktop', false, 'account-location'],
+	['mobile', false, 'account-location'],
+	['desktop', true, 'account-location'],
+	['mobile', true, 'account-location'],
+])(
+	'preserves appointment service navigation on %s (booking V2=%s, location=%s)',
+	async (surface, bookingV2Enabled, institutionLocationId) => {
 		mockAccount({
 			roleId: ROLE_ID.MEMBER,
 			isAdmin: false,
 			isProvider: false,
 			featuresEnabled: true,
-			bookingV2Enabled: true,
+			bookingV2Enabled,
+			institutionLocationId,
 		});
-		let resolve!: (value: { locations: InstitutionLocation[] }) => void;
-		let reject!: (reason: Error) => void;
-		const abort = jest.fn();
-		getLocations.mockReturnValueOnce({
-			fetch: () =>
-				new Promise((resolveRequest, rejectRequest) => {
-					resolve = resolveRequest;
-					reject = rejectRequest;
-				}),
-			abort,
-		});
+		jest.spyOn(analyticsService, 'persistEvent').mockReturnValue(true);
 		const { router } = renderHeader();
 		fireEvent.click(screen.getByTestId('headerNavMenuButton'));
-		if (status === 'error') await act(async () => reject(new Error('Unavailable')));
-		if (status === 'loaded')
-			await act(async () =>
-				resolve({
-					locations: [{ institutionId: 'COBALT', institutionLocationId: 'employer-1', name: 'Employer One' }],
-				})
-			);
-		expect(screen.getAllByRole('region', { name: 'Browse by Employer', hidden: true })).toHaveLength(2);
-
-		mockAccount({
-			roleId: ROLE_ID.MEMBER,
-			isAdmin: false,
-			isProvider: false,
-			featuresEnabled: true,
-			bookingV2Enabled: false,
-		});
-		await act(async () => router.navigate('/therapy'));
-
-		expect(screen.queryByRole('region', { name: 'Browse by Employer', hidden: true })).not.toBeInTheDocument();
-		expect(getLocations).toHaveBeenCalledTimes(1);
-		expect(abort).toHaveBeenCalledTimes(1);
+		const links = screen.getAllByRole('link', { name: 'Therapy', hidden: true });
+		expect(links).toHaveLength(2);
+		const expectedSearch = institutionLocationId ? '?institutionLocationId=account-location' : '';
+		links.forEach((link) => expect(link).toHaveAttribute('href', `/therapy${expectedSearch}`));
+		fireEvent.click(links[surface === 'mobile' ? 0 : 1]);
+		await waitFor(() => expect(router.state.location.pathname).toBe('/therapy'));
+		expect(router.state.location.search).toBe(expectedSearch);
+		expect(getLocations).not.toHaveBeenCalled();
+		router.dispose();
 	}
 );
 
