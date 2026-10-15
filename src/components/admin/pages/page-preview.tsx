@@ -78,6 +78,7 @@ const PageRowAnchorScroller = ({ pageRowAnchorIds }: { pageRowAnchorIds: string[
 };
 
 export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop' }: PagePreviewProps) => {
+	const pageTitle = page.headline ?? 'No hero headline';
 	const [searchParams] = useSearchParams();
 	const livePageSiteLocationIdsRef = useRef(page.livePageSiteLocations.map((i) => i.siteLocationId));
 
@@ -164,7 +165,7 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 			<PageHeader
 				className="bg-p700 text-white"
 				forceMobileLayout={previewViewport === 'mobile'}
-				title={<h1>{page.headline ?? 'No hero headline'}</h1>}
+				title={<h1>{pageTitle}</h1>}
 				descriptionHtml={page.description ?? 'No hero description'}
 				imageAlt={page.imageAltText ?? ''}
 				imageUrl={page.imageUrl ?? ''}
@@ -184,6 +185,7 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 					<div key={pageRow.pageRowId} {...getPageRowAnchorProps(pageRow.pageRowAnchorId)}>
 						{getRendererForPageRow({
 							pageId: page.pageId,
+							pageTitle,
 							pageRow,
 							contentsByTagGroupId: contentsByTagGroupId ?? {},
 							tagsByTagId: tagsByTagId ?? {},
@@ -203,6 +205,7 @@ export const PagePreview = ({ page, enableAnalytics, previewViewport = 'desktop'
 						<Container className={getRowPaddingClassName(pageRow.paddingTopId, pageRow.paddingBottomId)}>
 							{getRendererForPageRow({
 								pageId: page.pageId,
+								pageTitle,
 								pageRow,
 								contentsByTagGroupId: contentsByTagGroupId ?? {},
 								tagsByTagId: tagsByTagId ?? {},
