@@ -26,6 +26,7 @@ import { createUseThemedStyles } from '@/jss/theme';
 import mediaQueries from '@/jss/media-queries';
 
 import { ReactComponent as LogoSmallText } from '@/assets/logos/logo-cobalt-horizontal.svg';
+import { ReactComponent as FeaturedTopicsIcon } from '@/assets/icons/rectangle-vertical-history.svg';
 import InCrisisHeaderButton from './in-crisis-header-button';
 import HeaderNavDropdown from './header-nav-dropdown';
 import { NavFeaturedItem, HeaderNavFeaturedItem } from './header-nav-featured-item';
@@ -542,7 +543,14 @@ const HeaderV2 = () => {
 								{
 									navigationItemId: 'FEATURED_TOPICS_DIRECTORY',
 									...featuredTopicsNavigationMetadata,
-									icon: <SvgIcon kit="fas" icon="rectangle-vertical-history" size={24} />,
+									icon: (
+										<FeaturedTopicsIcon
+											width={24}
+											height={24}
+											aria-hidden="true"
+											focusable="false"
+										/>
+									),
 								},
 						  ]
 						: []),
