@@ -542,12 +542,7 @@ const HeaderV2 = () => {
 								{
 									navigationItemId: 'FEATURED_TOPICS_DIRECTORY',
 									...featuredTopicsNavigationMetadata,
-									icon: (
-										<PathwaysIcon
-											featureId={FeatureId.SELF_HELP_RESOURCES}
-											svgProps={{ width: 24, height: 24 }}
-										/>
-									),
+									icon: <SvgIcon kit="fas" icon="rectangle-vertical-history" size={24} />,
 								},
 						  ]
 						: []),
