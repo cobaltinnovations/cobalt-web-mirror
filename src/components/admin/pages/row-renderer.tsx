@@ -38,6 +38,8 @@ import {
 	TwoColumnImageRowModel,
 } from '@/lib/models';
 import useHandleError from '@/hooks/use-handle-error';
+import useAccount from '@/hooks/use-account';
+import NoData from '@/components/no-data';
 import ResourceLibraryCard from '@/components/resource-library-card';
 import StudioEvent from '@/components/studio-event';
 import ResourceLibrarySubtopicCard from '@/components/resource-library-subtopic-card';
@@ -171,14 +173,41 @@ const ResourcesRowRenderer = ({
 
 const GroupSessionsRowRenderer = ({
 	pageId,
+	pageTitle,
 	pageRow,
 	className,
 	enableAnalytics,
 	livePageSiteLocations,
 	previewViewport = 'desktop',
-}: RowRendererProps<GroupSessionsRowModel>) => {
+}: RowRendererProps<GroupSessionsRowModel> & { pageTitle: string }) => {
 	const navigate = useNavigate();
+	const { institution } = useAccount();
 	const forceMobileLayout = previewViewport === 'mobile';
+
+	if (pageRow.groupSessions.length === 0) {
+		return (
+			<Row className={className}>
+				<Col>
+					<NoData
+						title="No Upcoming Group Sessions"
+						description={
+							<div className="text-center mb-6">
+								There are no upcoming Group Sessions for {pageTitle}. In the meantime, you may browse
+								other Group Sessions on {institution.platformName ?? 'Cobalt'}.
+							</div>
+						}
+						actions={[
+							{
+								variant: 'primary',
+								title: 'View All Group Sessions',
+								onClick: () => navigate('/group-sessions'),
+							},
+						]}
+					/>
+				</Col>
+			</Row>
+		);
+	}
 
 	return (
 		<Row className={className}>
@@ -1065,6 +1094,7 @@ const MailingListRowRenderer = ({
 
 export const getRendererForPageRow = ({
 	pageId,
+	pageTitle,
 	pageRow,
 	contentsByTagGroupId,
 	tagsByTagId,
@@ -1074,6 +1104,7 @@ export const getRendererForPageRow = ({
 	className,
 }: {
 	pageId: string;
+	pageTitle: string;
 	pageRow: PageRowUnionModel;
 	contentsByTagGroupId: Record<string, Content[]>;
 	tagsByTagId: Record<string, Tag>;
@@ -1102,6 +1133,7 @@ export const getRendererForPageRow = ({
 			getRow: (row: any) => (
 				<GroupSessionsRowRenderer
 					pageId={pageId}
+					pageTitle={pageTitle}
 					pageRow={row}
 					contentsByTagGroupId={contentsByTagGroupId}
 					tagsByTagId={tagsByTagId}
