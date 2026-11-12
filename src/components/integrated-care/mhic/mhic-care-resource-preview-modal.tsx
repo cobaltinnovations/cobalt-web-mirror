@@ -58,9 +58,10 @@ export const MhicCareResourcePreviewModal: FC<Props> = ({ patientOrder, ...props
 						<h4 className="mb-1">Schedule with a recommended resource</h4>
 						<p className="mb-10">
 							These resources are covered by your insurance and were recommended based on your responses
-							to the assessment. If you have any questions, please contact{' '}
-							{institution.integratedCareContactName} at{' '}
-							{institution.integratedCarePhoneNumberDescription}{' '}
+							to the assessment. If you have any questions, please{' '}
+							{institution.integratedCareContactName
+								? `contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}`
+								: `feel free to call us at ${institution.integratedCarePhoneNumberDescription}`}{' '}
 							{institution.integratedCareAvailabilityDescription} or discuss with your primary care
 							provider.
 						</p>

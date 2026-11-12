@@ -53,8 +53,9 @@ const ErrorModal: FC = () => {
 						className="mb-4 d-block fs-large font-heading-bold text-decoration-none"
 						href={`tel:${institution.integratedCarePhoneNumber}`}
 					>
-						Contact {institution.integratedCareContactName} at{' '}
-						{institution.integratedCarePhoneNumberDescription}
+						{institution.integratedCareContactName
+							? `Contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}`
+							: `Call ${institution.integratedCarePhoneNumberDescription}`}
 					</a>
 					<p className="mb-1 fw-bold">Have a clinical emergency?</p>
 					<Button

@@ -121,7 +121,9 @@ export const Component = () => {
 				setIntroductionText('');
 				setTerminalTitle('No further action is required');
 				setTerminalDescription(
-					`There is currently no order open for you with ${institution.integratedCareProgramName}. Please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
+					institution.integratedCareContactName
+						? `There is currently no order open for you with ${institution.integratedCareProgramName}. Please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
+						: `There is currently no order open for you with ${institution.integratedCareProgramName}. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
 				);
 				return;
 			}
@@ -147,7 +149,9 @@ export const Component = () => {
 				setIntroductionText('');
 				setTerminalTitle('No further action is required');
 				setTerminalDescription(
-					`Thank you. We will let your primary care provider know, but you should feel free to contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+					institution.integratedCareContactName
+						? `Thank you. We will let your primary care provider know, but you should feel free to contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+						: `Thank you. We will let your primary care provider know, but you should feel free to call the ${institution.integratedCareProgramName} Resource Center at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
 				);
 				return;
 			}
@@ -160,7 +164,9 @@ export const Component = () => {
 				setIntroductionText('');
 				setTerminalTitle('No further action is required');
 				setTerminalDescription(
-					`There is currently no order open for you with ${institution.integratedCareProgramName}. Please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
+					institution.integratedCareContactName
+						? `There is currently no order open for you with ${institution.integratedCareProgramName}. Please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
+						: `There is currently no order open for you with ${institution.integratedCareProgramName}. Please call us at ${institution.integratedCarePhoneNumberDescription} ${institution.integratedCareAvailabilityDescription} for more information or to discuss your options. We also encourage you to follow-up with your provider if you have other questions about your care.`
 				);
 				return;
 			}
@@ -174,7 +180,9 @@ export const Component = () => {
 					setIntroductionText('');
 					setTerminalTitle('No further action is required');
 					setTerminalDescription(
-						`Thank you. We will let your primary care provider know, but you should feel free to contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+						institution.integratedCareContactName
+							? `Thank you. We will let your primary care provider know, but you should feel free to contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
+							: `Thank you. We will let your primary care provider know, but you should feel free to call the ${institution.integratedCareProgramName} Resource Center at ${institution.integratedCarePhoneNumberDescription} if you change your mind.`
 					);
 					return;
 				} else if (
@@ -185,7 +193,9 @@ export const Component = () => {
 					setIntroductionText('');
 					setTerminalTitle('No further action is required');
 					setTerminalDescription(
-						`Thank you for answering the questions. Please be aware to participate in ${institution.integratedCareProgramName}, all patients must be physically be located in the state of their primary care provider's office. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}.`
+						institution.integratedCareContactName
+							? `Thank you for answering the questions. Please be aware to participate in ${institution.integratedCareProgramName}, all patients must be physically be located in the state of their primary care provider's office. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}.`
+							: `Thank you for answering the questions. Please be aware to participate in ${institution.integratedCareProgramName}, all patients must be physically be located in the state of their primary care provider's office. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact the ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription}.`
 					);
 					return;
 				} else if (
@@ -207,7 +217,9 @@ export const Component = () => {
 					setIntroductionText('');
 					setTerminalTitle('No further action is required');
 					setTerminalDescription(
-						`Thank you for answering the questions. Please contact your primary care provider with your updated insurance information. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}.`
+						institution.integratedCareContactName
+							? `Thank you for answering the questions. Please contact your primary care provider with your updated insurance information. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}.`
+							: `Thank you for answering the questions. Please contact your primary care provider with your updated insurance information. A representative from the ${institution.integratedCareProgramName} Resource Center is going to call you in the next 3 business days to help you get connected to care. If you have any immediate questions or concerns, please contact the ${institution.integratedCareProgramName} at ${institution.integratedCarePhoneNumberDescription}.`
 					);
 					return;
 				}
@@ -540,8 +552,9 @@ const AssessmentNextStepItems = ({
 							</Card.Header>
 							<Card.Body>
 								<p className="mb-5">
-									Call {institution?.integratedCareContactName} at{' '}
-									{institution?.integratedCarePhoneNumberDescription}{' '}
+									{institution?.integratedCareContactName
+										? `Call ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}`
+										: `Call us at ${institution?.integratedCarePhoneNumberDescription}`}{' '}
 									{institution?.integratedCareAvailabilityDescription} and a Mental Health Intake
 									Coordinator will guide you through the assessment over the phone.
 								</p>
@@ -604,7 +617,11 @@ const AssessmentNextStepItems = ({
 				<NoData
 					className="bg-white"
 					title="Assessment in Progress"
-					description={`Your assessment with a mental health intake coordinator is in progress. If you have been disconnected, please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}.`}
+					description={
+						institution.integratedCareContactName
+							? `Your assessment with a mental health intake coordinator is in progress. If you have been disconnected, please contact ${institution.integratedCareContactName} at ${institution.integratedCarePhoneNumberDescription}.`
+							: `Your assessment with a mental health intake coordinator is in progress. If you have been disconnected please call us back at ${institution.integratedCarePhoneNumberDescription}`
+					}
 					actions={[]}
 				/>
 			);
